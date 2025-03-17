@@ -7,9 +7,18 @@ import org.springframework.stereotype.Service;
 
 import java.util.Optional;
 @Service
-public class LoginService {
+public class UserService {
     @Autowired
     UserRepository userRepository;
+
+    public boolean createUser(User request) {
+        Optional<User> user = userRepository.findByEmail(request.getEmail());
+        if (user.isPresent()) {
+            return false;
+        }
+        userRepository.save(request);
+        return true;
+    }
 
     public boolean login(String email, String password) {
         Optional<User> user = userRepository.findByEmail(email);
@@ -20,5 +29,14 @@ public class LoginService {
             else return false;
         }
         else return false;
+    }
+
+    public boolean updateUserInfo(User request) {
+        Optional<User> user = userRepository.findByEmail(request.getEmail());
+        if (!user.isPresent()) {
+            return false;
+        }
+        userRepository.save(request);
+        return true;
     }
 }

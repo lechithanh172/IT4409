@@ -3,11 +3,9 @@ package com.controller;
 import com.request.ChangePasswordRequest;
 import com.request.LoginRequest;
 import com.service.ChangePasswordService;
-import com.service.CreateUserService;
 import com.entity.User;
 import com.repository.UserRepository;
-import com.service.LoginService;
-import com.service.UpdateUserInfoService;
+import com.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -20,32 +18,28 @@ public class DataController {
     @Autowired
     UserRepository userRepository;
     @Autowired
-    CreateUserService createUserService;
-    @Autowired
-    LoginService loginService;
-    @Autowired
-    UpdateUserInfoService updateUserInfoService;
+    UserService userService;
     @Autowired
     ChangePasswordService changePasswordService;
 
     @PostMapping("/register")
     public ResponseEntity<?> createUser(@RequestBody User request) {
-        if(createUserService.createUser(request)) {
-            return ResponseEntity.status(400).body("Email already exists");
+        if(userService.createUser(request)) {
+            return ResponseEntity.status(200).body("Account created successfully");
         }
-        else return ResponseEntity.status(200).body("Account created successfully");
+        else return ResponseEntity.status(400).body("Email already exists");
     }
 
     @GetMapping("/login")
     public ResponseEntity<?> login(@RequestBody LoginRequest request) {
-        if(loginService.login(request.getEmail(), request.getPassword())) {
+        if(userService.login(request.getEmail(), request.getPassword())) {
             return ResponseEntity.status(200).body("Login successful");
         }
         else return ResponseEntity.status(400).body("Invalid email or password");
     }
     @PostMapping("/update")
     public ResponseEntity<?> updateUserInfo(@RequestBody User request) {
-        if(updateUserInfoService.updateUserInfo(request)) {
+        if(userService.updateUserInfo(request)) {
             return ResponseEntity.status(200).body("User information updated successfully");
         }
         else return ResponseEntity.status(400).body("Failed to update user information");
@@ -66,7 +60,7 @@ public class DataController {
     }
     @GetMapping("/get-info")
     public ResponseEntity<?> getUserInfo(@RequestBody LoginRequest request) {
-        if(loginService.login(request.getEmail(), request.getPassword())) {
+        if(userService.login(request.getEmail(), request.getPassword())) {
             return ResponseEntity.status(200).body(userRepository.findByEmail(request.getEmail()).get());
         }
         else return ResponseEntity.status(400).body("Failed to find user");

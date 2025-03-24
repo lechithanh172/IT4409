@@ -1,8 +1,6 @@
 import React, { useContext, useState } from 'react';
 import { Link } from 'react-router-dom';
 
-// Import Context and Components
-// import { ShopContext } from '../../Context/ShopContext'
 import MenuTree from '../MenuTree/MenuTree';
 
 // Import CSS file
@@ -16,8 +14,6 @@ import { faCircleUser } from '@fortawesome/free-regular-svg-icons';
 
 function Navbar() {
     const [isMenu, setIsMenu] = useState(false);
-
-    // const { getTotalItems } = useContext(ShopContext);
 
     function handleMenu() {
         setIsMenu(!isMenu);

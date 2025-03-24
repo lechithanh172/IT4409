@@ -1,6 +1,7 @@
 import './App.css';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { publicRouter } from './Routes';
+import Admin from './Pages/Admin';
 
 
 function App() {
@@ -10,13 +11,6 @@ function App() {
                 <Routes>
                     {publicRouter.map((route, index) => {
                         const Page = route.component;
-
-                        // if (route.layout) {
-                        //     Layout = route.layout;
-                        // } 
-                        // else if (route.layout === null) {
-                        //     Layout = Fragment;
-                        // }
                         return (
                             <Route
                                 key={index}
@@ -27,6 +21,7 @@ function App() {
                             />
                         );
                     })}
+                {/* <Route path="/admin" element={<Admin />} /> */}
                 </Routes>
             </div>
         </Router>

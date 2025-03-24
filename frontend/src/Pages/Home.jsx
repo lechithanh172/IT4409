@@ -1,20 +1,23 @@
-import React from "react";
-import Header from "../Components/Header/Header";
-import Footer from "../Components/Footer/Footer";
-import Banner from "../Components/Banner/Banner";
-import MenuBottomTabs from "../Components/MenuBottomTabs/MenuBottomTabs";
-import FlashSales from "../Components/FlashSales/FlashSales";
+import React, { useEffect, useState } from 'react';
+import Header from '../Components/Header/Header';
+import Footer from '../Components/Footer/Footer';
+import MenuBottomTabs from '../Components/MenuBottomTabs/MenuBottomTabs';
+import Banner from '../Components/Banner/Banner';
+import NewCollections from '../Components/NewCollections/NewCollections';
+import Popular from '../Components/Popular/Popular';
+import ListItems from '../Components/ListItems/ListItems';
 
-import "./Css/Home.css";
+import './Css/Home.css';
 
 function Home() {
   return (
     <div className="home">
       <Header />
       <Banner />
-      <MenuBottomTabs active={"Home"} />
-      <FlashSales />
-      <div style={{height: '2000px'}}></div>
+      <NewCollections />
+      <ListItems />
+      <Popular category="Mobile" />
+      <MenuBottomTabs active={'Home'} />
       <Footer />
     </div>
   );

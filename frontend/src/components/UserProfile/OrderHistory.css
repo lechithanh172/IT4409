@@ -81,12 +81,17 @@
 
 /* Styles for the expand/collapse button */
 .expand-button {
-    background-color: transparent;
-    border: none;
-    font-size: 1.2em;
     cursor: pointer;
     padding: 0;
-    color: #007bff; /* Blue color */
+    padding: 5px 10px;
+    border: none;
+    border-radius: 4px;
+    font-size: 0.9em;
+    font-weight: bold;
+    cursor: default;
+    color: #ffffff;
+     background-color: #000000;
+    font-size:  12px;
 }
 
 /* Styles for the expanded row */
@@ -115,7 +120,15 @@
     }
     /* Hide expand button on very small screens - optional */
     .expand-button{
-        display: none;
+        padding: 5px 10px;
+        border: none;
+        border-radius: 4px;
+        font-size: 0.9em;
+        font-weight: bold;
+        cursor: default;
+        color: #ffffff;
+         background-color: #000000;
+        font-size:  12px;
     }
     .order-table td{
       display: block;

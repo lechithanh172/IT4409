@@ -112,7 +112,7 @@ function OrderHistory() {
                                             className="expand-button"
                                             onClick={() => toggleRow(order.orderId)}
                                         >
-                                            {expandedRows.includes(order.orderId) ? '-' : '+'}
+                                            {expandedRows.includes(order.orderId) ? 'Thu gọn' : 'Xem chi tiết'}
                                         </button>
                                     </td>
                                 </tr>

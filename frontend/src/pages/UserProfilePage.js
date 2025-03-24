@@ -5,14 +5,12 @@ import "./UserProfilePage.css";
 
 function UserProfilePage() {
   return (
-    <div className="user-profile-page-container">
-      <div className="user-profile-sidebar">
+     <div className="user-profile-page-container">
       <Sidebar />
-      </div>
-      <div className="user-profile-content">
+      <div className="user-profile-page-content">
         <UserProfile />
       </div>
-    </div>
+      </div>
   );
 }
 

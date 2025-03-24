@@ -52,7 +52,6 @@ function UserDetails() {
     return (
         <div className="user-details">
             <img src="/avatar.jpg" alt="User Avatar" className="user-avatar" />
-            <h3>Thông tin cá nhân</h3>
             <form onSubmit={handleSubmit}>
                 <div className="form-row">
                     <label>Họ và tên:</label>
@@ -87,7 +86,7 @@ function UserDetails() {
                     <span>{userData.birthdate}</span>
                 </div>
                 <div className="form-row">
-                    <label>Ngày tham gia Smember:</label>
+                    <label>Ngày tạo tài khoản:</label>
                     <span>{userData.membershipDate}</span>
                 </div>
                 <div className="form-row">

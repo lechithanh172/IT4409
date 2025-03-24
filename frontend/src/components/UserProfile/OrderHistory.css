@@ -1,6 +1,6 @@
-
+/* OrderHistory.css */
 .order-history {
-    width: 100%;
+    width: 80%;
     overflow-x: auto;
 }
 
@@ -16,14 +16,16 @@
 
 .order-table th,
 .order-table td {
+    font-family:"Calibri", sans-serif;
+    font-weight: bold;
     padding: 12px 15px;
     text-align: left;
     border-bottom: 1px solid #ddd;
 }
 
 .order-table th {
-    background-color: #343a40; 
-    color: #fff;            
+    background-color: #343a40;
+    color: #fff;
     font-weight: 600;
     text-transform: uppercase;
 }
@@ -77,6 +79,27 @@
     color: white;
 }
 
+/* Styles for the expand/collapse button */
+.expand-button {
+    background-color: transparent;
+    border: none;
+    font-size: 1.2em;
+    cursor: pointer;
+    padding: 0;
+    color: #007bff; /* Blue color */
+}
+
+/* Styles for the expanded row */
+.expanded-row {
+    background-color: #f8f9fa; /* Light gray background */
+}
+
+.expanded-row td {
+    padding: 15px; /* Add padding */
+    border-top: none; /* Remove top border */
+}
+
+/* Responsive adjustments */
 @media (max-width: 768px) {
     .order-table {
         font-size: 14px;
@@ -89,5 +112,23 @@
 
     .item-list li {
         margin-left: 5px;
+    }
+    /* Hide expand button on very small screens - optional */
+    .expand-button{
+        display: none;
+    }
+    .order-table td{
+      display: block;
+      border: none;
+    }
+      .order-table th{
+      display: none;
+    }
+      /* Style expanded row on mobile */
+    .expanded-row td {
+        display: block; /* Display as block */
+        padding-left: 10px; /*Reduce padding*/
+        padding-right: 10px;
+        text-align: center; /*Make content align at center*/
     }
 }

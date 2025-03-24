@@ -1,0 +1,33 @@
+
+.user-order-history-page-container {
+    display: flex; 
+    min-height: 100vh;
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
+}
+.user-order-history-sidebar {
+    display: flex;
+}
+
+.user-order-history-table {
+    flex: 1;         
+    padding: 20px;    
+    margin-left: 20px;  
+}
+
+@media (max-width: 768px) {
+    .user-order-history-page-container {
+      flex-direction: column;
+
+    }
+     .user-order-history-sidebar{
+         width: 100%; 
+
+     }
+
+    .user-order-history-table {
+        margin-left: 0;
+        width: 100%;
+    }
+}

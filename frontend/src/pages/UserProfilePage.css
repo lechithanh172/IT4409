@@ -6,15 +6,23 @@
     background-repeat: no-repeat;
     background-position: center;
 }
-
+.user-profile-sidebar {
+    display: flex;
+  
+}
 .user-profile-content {
     flex: 1;
     padding: 20px;
-   
+    margin-left: 20px; 
+    display: flex;
+ 
 }
-
 @media (max-width: 768px) {
     .user-profile-page-container {
-        flex-direction: column; 
+       
+          flex-direction: column; 
     }
+      .user-profile-content{
+          width: 100%;
+        }
 }

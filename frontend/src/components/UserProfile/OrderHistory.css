@@ -1,0 +1,93 @@
+
+.order-history {
+    width: 100%;
+    overflow-x: auto;
+}
+
+.order-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    border-radius: 5px;
+    overflow: hidden;
+    font-family: Arial, sans-serif;
+}
+
+.order-table th,
+.order-table td {
+    padding: 12px 15px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+}
+
+.order-table th {
+    background-color: #343a40; 
+    color: #fff;            
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.order-table tr:nth-child(even) {
+    background-color: #f2f2f2;
+}
+
+.order-table tr:hover {
+    background-color: #e9ecef;
+}
+
+.item-list {
+    list-style: none;
+    padding: 0;
+}
+
+.item-list li {
+    margin-bottom: 5px;
+    margin-left: 15px;
+}
+
+.status-button {
+    padding: 5px 10px;
+    border: none;
+    border-radius: 4px;
+    font-size: 0.9em;
+    font-weight: bold;
+    cursor: default;
+    color: #212529;
+     background-color: #f8f9fa;
+}
+
+.status-button.pending-approval {
+    background-color: #ffc107;
+    color: #212529;
+}
+
+.status-button.shipping {
+    background-color: #007bff;
+    color: white;
+}
+
+.status-button.completed {
+    background-color: #28a745;
+    color: white;
+}
+
+.status-button.cancelled {
+    background-color: #dc3545;
+    color: white;
+}
+
+@media (max-width: 768px) {
+    .order-table {
+        font-size: 14px;
+    }
+
+    .order-table th,
+    .order-table td {
+        padding: 8px 10px;
+    }
+
+    .item-list li {
+        margin-left: 5px;
+    }
+}

@@ -1,11 +1,11 @@
   spring:
     datasource:
       url: jdbc:postgresql://localhost:5432/jwt_security
-      username: "postgres" 
+      username: "postgres"
       password: "ducdaibang9c"
       driver-class-name: org.postgresql.Driver
 #    jpa:
-#      hibernate:Ư
+#      hibernate:
 #        ddl-auto: update
 #      show-sql: true
 #      properties:
@@ -17,7 +17,7 @@
       host: smtp.gmail.com
       port: 587
       username: "toilaatmin@gmail.com"
-      password: "duc123456789@"
+      password: "laijaybhzvszxfdz"
       properties:
         mail:
           smtp:

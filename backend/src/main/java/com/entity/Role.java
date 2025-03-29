@@ -1,5 +1,5 @@
 package com.entity;
 
 public enum Role {
-    CUSTOMER, ADMIN
+    CUSTOMER, PRODUCT_MANAGER, ADMIN
 }

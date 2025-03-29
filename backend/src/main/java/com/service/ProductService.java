@@ -2,9 +2,11 @@ package com.service;
 
 import com.entity.Category;
 import com.entity.Product;
+import com.entity.User;
 import com.repository.CategoryRepository;
 import com.repository.ProductRepository;
-import com.request.NewProductRequest;
+import com.repository.UserRepository;
+import jakarta.persistence.criteria.CriteriaBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -18,6 +20,8 @@ public class ProductService {
     ProductRepository productRepository;
     @Autowired
     CategoryRepository categoryRepository;
+    @Autowired
+    private UserRepository userRepository;
 
     public boolean addProduct(Product product) {
         if(productRepository.findByProductName(product.getProductName()).isPresent()) {
@@ -29,7 +33,7 @@ public class ProductService {
         }
     }
 
-    public boolean deleteProduct(Long productId) {
+    public boolean deleteProduct(Integer productId) {
         if(productRepository.findById(productId).isPresent()) {
             productRepository.deleteById(productId);
             return true;
@@ -48,17 +52,16 @@ public class ProductService {
             if(product.getStockQuantity() != null) oldProduct.setStockQuantity(product.getStockQuantity());
             if(product.getCategoryId() != null) oldProduct.setCategoryId(product.getCategoryId());
             if(product.getBrandId() != null) oldProduct.setBrandId(product.getBrandId());
-            if(product.getActive() != null) oldProduct.setActive(product.getActive());
+            if(product.getIsActive() != null) oldProduct.setIsActive(product.getIsActive());
             oldProduct.setUpdatedAt(LocalDateTime.now());
 
             productRepository.save(oldProduct);
-            System.out.println("lolll");
             return true;
         }
         else return false;
     }
 
-    public Optional<Product> getProductById(Long productId) {
+    public Optional<Product> getProductById(Integer productId) {
         return productRepository.findById(productId);
     }
 
@@ -74,6 +77,7 @@ public class ProductService {
     public List<Product> searchProductByName(String search) {
         return productRepository.findByProductNameContainingIgnoreCase(search);
     }
+
 
 
 

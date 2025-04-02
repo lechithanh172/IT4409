@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Button, Modal, Space, Table, message, Input } from 'antd';
 import { PlusCircleFilled, DeleteFilled, ExclamationCircleFilled, SearchOutlined } from '@ant-design/icons';
+import Loading from '../../Loading/Loading';
 import Highlighter from 'react-highlight-words';
 import AddProduct from './AddProduct';
 import ProductDetails from './ProductDetails';
@@ -291,7 +292,7 @@ const AdminProduct = () => {
                 columns={columns}
                 dataSource={products}
                 rowKey="_id"
-                loading={loading}
+                loading = {loading}
                 pagination={{
                     pageSizeOptions: ['5', '10', '15'],
                     showSizeChanger: true,

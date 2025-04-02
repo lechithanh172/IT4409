@@ -7,7 +7,7 @@ import MenuTree from '../MenuTree/MenuTree';
 import './Navbar.css';
 
 // Import icons from Assets and FontAwesomeIcon
-import logo from '../Assets/logo.png';
+import logo from '../Assets/TechZone.png';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faBagShopping, faBars, faPhone, faSearch, faTruckFast, faXmark } from '@fortawesome/free-solid-svg-icons';
 import { faCircleUser } from '@fortawesome/free-regular-svg-icons';
@@ -26,7 +26,6 @@ function Navbar() {
                     <div className="nav-logo">
                         <img src={logo} alt="" />
                     </div>
-                    <p>Hacom</p>
                 </a>
                 <a onClick={() => handleMenu()} className="header-item btn-menu">
                     <div className="box-icon">

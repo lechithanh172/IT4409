@@ -34,17 +34,17 @@ apiInstance.interceptors.response.use(
 const apiService = {
 
   // **Cart APIs**
-  getCart: () => apiInstance.get("cart"),
-  addProductToCart: (productId, variantColor, quantity) => apiInstance.post("cart/add", { productId, variantColor, quantity }),
-  updateCartQuantity: (productId, variantColor, quantity) => apiInstance.put("cart/update", { productId, variantColor, quantity }),
-  removeProductFromCart: (productId, variantColor) => apiInstance.delete("cart/delete", { data: { productId, variantColor } }),
-  clearCart: () => apiInstance.delete("cart/clear"),
+  // getCart: () => apiInstance.get("cart"),
+  // addProductToCart: (productId, variantColor, quantity) => apiInstance.post("cart/add", { productId, variantColor, quantity }),
+  // updateCartQuantity: (productId, variantColor, quantity) => apiInstance.put("cart/update", { productId, variantColor, quantity }),
+  // removeProductFromCart: (productId, variantColor) => apiInstance.delete("cart/delete", { data: { productId, variantColor } }),
+  // clearCart: () => apiInstance.delete("cart/clear"),
 
 
   // **Comment and Rating APIs**
-  addReview: (productId, userId, stars, text) => apiInstance.post(`/product/${productId}/review`, {productId, userId, stars, text}),
-  addComment: (productId, userId, text, rating) => apiInstance.post(`/comments`, { productId, userId, text, rating }),
-  getComments: (productId) => apiInstance.get(`/comments/${productId}`),
+  // addReview: (productId, userId, stars, text) => apiInstance.post(`/product/${productId}/review`, {productId, userId, stars, text}),
+  // addComment: (productId, userId, text, rating) => apiInstance.post(`/comments`, { productId, userId, text, rating }),
+  // getComments: (productId) => apiInstance.get(`/comments/${productId}`),
 
   // **User APIs**
   registerUser: (newUser) => apiInstance.post("/register", newUser),

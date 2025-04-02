@@ -122,6 +122,7 @@ const Admin = () => {
             </Badge>
 
             <Tooltip
+              className="tooltip"
               visible={isTooltipVisible}
               position={tooltipPosition}
               onClose={() => setTooltipVisible(false)}

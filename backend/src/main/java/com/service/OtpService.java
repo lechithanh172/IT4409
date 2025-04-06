@@ -10,7 +10,7 @@ import java.util.*;
 public class OtpService {
 
     @Autowired
-    EmailService emailService;
+    private EmailService emailService;
 
     private final Map<String, String> otpStorage = new HashMap<>();
     private final Random random = new Random();

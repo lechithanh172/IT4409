@@ -15,36 +15,33 @@ import java.util.Random;
 public class PasswordService {
 
     @Autowired
-    UserRepository userRepository;
+    private UserRepository userRepository;
     @Autowired
-    EmailService emailService;
+    private EmailService emailService;
     @Autowired
-    PasswordEncoder passwordEncoder;
+    private PasswordEncoder passwordEncoder;
+    @Autowired
+    private OtpService otpService;
 
     public void changePassword(Integer userId, String newPassword) {
         Optional<User> user = userRepository.findByUserId(userId);
         user.get().setPassword(passwordEncoder.encode(newPassword));
-    }
-
-    public String generateRandomPassword() {
-        StringBuilder password = new StringBuilder();
-        Random random = new Random();
-        for(int i = 0; i < 16; i++) {
-            char c = (char)(random.nextInt(26));
-            if(random.nextBoolean()) {
-                c += 97;
-            }
-            else c += 65;
-            password.append(c);
-        }
-        return password.toString();
+        userRepository.save(user.get());
     }
 
     public boolean forgetPassword(String email) throws UnsupportedEncodingException {
         Optional<User> user = userRepository.findByEmail(email);
         if(user.isPresent()) {
-            String randomPassword = generateRandomPassword();
-            emailService.sendEmail(email, "Cấp lại mật khẩu tài khoản", "Mật khẩu mới: " +randomPassword);
+            String randomOTP = otpService.generateOtp(email, "Đặt lại mật khẩu");
+            return true;
+        }
+        else return false;
+    }
+    public boolean resetPassword(String email, String newPassword) {
+        Optional<User> user = userRepository.findByEmail(email);
+        if(user.isPresent()) {
+            user.get().setPassword(passwordEncoder.encode(newPassword));
+            userRepository.save(user.get());
             return true;
         }
         else return false;

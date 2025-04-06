@@ -1,6 +1,7 @@
 package com.service;
 
 import com.entity.User;
+import com.enums.Role;
 import com.response.TokenResponse;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
@@ -69,9 +70,9 @@ public class JwtService {
                 .getSubject();
     }
 
-    public String extractRole(String token) {
+    public Role extractRole(String token) {
         Claims claims = extractAllClaims(token);
-        return (String) claims.get("role");
+        return (Role) claims.get("role");
     }
 
     public boolean isTokenValid(String token) {

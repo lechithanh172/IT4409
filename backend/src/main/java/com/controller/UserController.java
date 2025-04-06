@@ -1,12 +1,15 @@
 package com.controller;
 
 import com.entity.User;
+import com.enums.Role;
 import com.request.ChangePasswordRequest;
 import com.request.LoginRequest;
+import com.request.ResetPasswordRequest;
 import com.request.UpdateInfoRequest;
 import com.response.StatusResponse;
 import com.response.UserInfoResponse;
 import com.service.JwtService;
+import com.service.OtpService;
 import com.service.PasswordService;
 import com.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,11 +31,14 @@ public class UserController {
     private PasswordEncoder passwordEncoder;
     @Autowired
     private PasswordService passwordService;
+    @Autowired
+    private OtpService otpService;
+
     @GetMapping("/info/{username}")
     public ResponseEntity<?> getUserInfo(@PathVariable String username, @RequestHeader("Authorization") String token) {
         Optional<User> u = userService.getInfo(token);
         if(u.isPresent()) {
-            if(u.get().getUsername().equals(username) || jwtService.extractRole(token).equals("ADMIN")) {
+            if(u.get().getUsername().equals(username) || jwtService.extractRole(token).equals(Role.ADMIN)) {
                 UserInfoResponse user = new UserInfoResponse(u.get());
                 return ResponseEntity.status(200).body(user);
             }
@@ -55,7 +61,7 @@ public class UserController {
     public ResponseEntity<?> deleteUser(@RequestParam Integer userId, @RequestHeader("Authorization") String token) {
         Optional<User> user = userService.getInfo(token);
         if(user.isPresent()) {
-            if(user.get().getUserId().equals(userId) || jwtService.extractRole(token).equals("ADMIN")) {
+            if(user.get().getUserId().equals(userId) || jwtService.extractRole(token).equals(Role.ADMIN)) {
                 if(userService.deleteUser(userId)) {
                     return ResponseEntity.status(200).body(new StatusResponse("User deleted successfully"));
                 }
@@ -80,8 +86,16 @@ public class UserController {
     @PostMapping("/forget-password")
     public ResponseEntity<?> forgetPassword(@RequestParam String email) throws UnsupportedEncodingException {
         if(passwordService.forgetPassword(email)) {
-            return ResponseEntity.status(200).body("Send new password successfully");
+            return ResponseEntity.status(200).body("Send OTP code successfully");
         }
         else return ResponseEntity.status(401).body("Email not found");
+    }
+    @PostMapping("/reset-password")
+    public ResponseEntity<?> resetPassword(@RequestBody ResetPasswordRequest request) throws UnsupportedEncodingException {
+        if(otpService.validateOtp(request.getEmail(), request.getOtp())) {
+            passwordService.resetPassword(request.getEmail(), request.getNewPassword());
+            return ResponseEntity.status(200).body(new StatusResponse("Password reset successfully"));
+        }
+        else return ResponseEntity.status(403).body(new StatusResponse("Wrong OTP"));
     }
 }

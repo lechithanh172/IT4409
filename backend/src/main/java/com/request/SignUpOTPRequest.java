@@ -1,13 +1,7 @@
 package com.request;
 
-import com.entity.Role;
-import com.entity.User;
-import jakarta.persistence.Column;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
+import com.enums.Role;
 import lombok.Getter;
-
-import java.time.LocalDateTime;
 
 @Getter
 public class SignUpOTPRequest {

@@ -2,6 +2,7 @@ package com.entity;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
+import jakarta.persistence.IdClass;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -10,6 +11,7 @@ import lombok.Setter;
 
 @Entity
 @Table(name = "cart_items")
+@IdClass(CartItemId.class)
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
@@ -20,5 +22,7 @@ public class CartItem {
     private Integer userId;
     @Id
     private Integer productId;
+    private boolean isSelected;
+    private String status;
     private Integer quantity;
 }

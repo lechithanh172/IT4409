@@ -1,5 +1,6 @@
 package com.config;
 
+import com.enums.Role;
 import com.service.JwtService;
 import io.jsonwebtoken.io.IOException;
 import jakarta.servlet.FilterChain;
@@ -44,7 +45,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
 
         String username = jwtService.extractUsername(token);
-        String role = jwtService.extractRole(token); // e.g. ADMIN, CUSTOMER
+        Role role = jwtService.extractRole(token); // e.g. ADMIN, CUSTOMER
 
         // Tạo authorities để Spring Security hiểu
         List<GrantedAuthority> authorities = List.of(new SimpleGrantedAuthority("ROLE_" + role));

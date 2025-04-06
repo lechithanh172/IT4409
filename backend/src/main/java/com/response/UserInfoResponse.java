@@ -1,6 +1,5 @@
 package com.response;
 
-import com.entity.Role;
 import com.entity.User;
 import lombok.AllArgsConstructor;
 import lombok.Data;

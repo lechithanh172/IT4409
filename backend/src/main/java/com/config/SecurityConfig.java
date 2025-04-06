@@ -27,10 +27,17 @@ public class SecurityConfig {
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers("/auth/**").permitAll()
                         .requestMatchers("/users/forget-password").permitAll()
+                        .requestMatchers("/users/reset-password").permitAll()
+                        .requestMatchers("/users/**").authenticated()
                         .requestMatchers("/products/add").hasAnyRole("ADMIN", "PRODUCT_MANAGER")
                         .requestMatchers("/products/delete").hasAnyRole("ADMIN", "PRODUCT_MANAGER")
                         .requestMatchers("/products/update").hasAnyRole("ADMIN", "PRODUCT_MANAGER")
                         .requestMatchers("/products/**").permitAll()
+                        .requestMatchers("/orders/status/").hasAnyRole("ADMIN", "PRODUCT_MANAGER")
+                        .requestMatchers("/orders/view/").authenticated()
+                        .requestMatchers("/orders/approve/").hasAnyRole("ADMIN", "PRODUCT_MANAGER")
+                        .requestMatchers("/orders/**").authenticated()
+                        .requestMatchers("/cart-items/**").hasAnyRole("ADMIN", "PRODUCT_MANAGER")
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);

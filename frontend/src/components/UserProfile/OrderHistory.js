@@ -120,8 +120,8 @@ function OrderHistory() {
                                 {expandedRows.includes(order.orderId) && (
                                     <tr className="expanded-row">
                                         <td colSpan="6">
-                                            <p><strong>Address:</strong> {order.address}</p>
-                                            <p><strong>Other Info:</strong> {order.otherInfo}</p>
+                                            <p><strong>Địa chỉ:</strong> {order.address}</p>
+                                            <p><strong>Chú thích cho người vận chuyển:</strong> {order.otherInfo}</p>
                                         </td>
                                     </tr>
                                 )}

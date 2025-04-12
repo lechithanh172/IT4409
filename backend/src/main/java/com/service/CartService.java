@@ -2,7 +2,6 @@ package com.service;
 
 import com.entity.CartItem;
 import com.repository.CartItemRepository;
-import lombok.Setter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -26,7 +25,7 @@ public class CartService {
     public boolean updateCartItem(CartItem cartItem) {
         Optional<CartItem> item = cartItemRepository.findCartItemByUserIdAndProductId(cartItem.getUserId(), cartItem.getProductId());
         if(item.isPresent()) {
-            item.get().setQuantity(item.get().getQuantity() - cartItem.getQuantity());
+            item.get().setQuantity(item.get().getQuantity() + cartItem.getQuantity());
             cartItemRepository.save(item.get());
             return true;
         }

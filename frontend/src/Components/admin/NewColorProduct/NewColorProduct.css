@@ -1,0 +1,17 @@
+.new-color-product hr {
+    border: 1px solid rgb(195, 195, 195);
+}
+
+.new-color-product .new-color-itemfield-box {
+    display: flex;
+    gap: 40px;
+}
+
+.new-color-itemfield {
+    width: 100%;
+}
+
+.new-color-thumbnail-img {
+    height: 150px;
+    width: 150px;
+}

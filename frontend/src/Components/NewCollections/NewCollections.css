@@ -1,0 +1,91 @@
+.newcollections {
+  margin-bottom: 10px;
+  min-height: 250px;
+  display: inline-block;
+}
+
+.newcollections .product-list-title {
+  margin-bottom: 2px;
+  display: flex !important;
+  flex-wrap: wrap !important;
+}
+
+.newcollections .product-list-title .title {
+  display: block;
+  color: #363636;
+  font-size: 22px;
+  line-height: 40px;
+  margin-bottom: 0;
+  margin-right: 20px;
+  white-space: nowrap;
+}
+
+.newcollections .product-list-title .title h2 {
+  font-size: 100%;
+  color: #444;
+  font-weight: 600;
+}
+
+.newcollections .swiper-container {
+  padding: 0.5rem !important;
+  width: 75vw;
+}
+
+.newcollections .swiper-slide {
+  width: 224.8px;
+  margin-right: 10px;
+}
+
+@media (max-width: 1200px) {
+  .newcollections .swiper-slide {
+    width: calc(25% - 7.5px);
+  }
+}
+
+@media (max-width: 990px) {
+  .newcollections .swiper-slide {
+    width: calc(33.33333% - 6.66667px);
+  }
+}
+
+@media (max-width: 717px) {
+  .newcollections .swiper-slide {
+    width: calc(50% - 5px);
+  }
+}
+
+@media (max-width: 540px) {
+  .newcollections .product-list-title .title {
+    font-size: 16px;
+  }
+}
+
+
+.product-list-swiper .swiper-container .swiper-button-next {
+  border-radius: 100px 0 0 100px;
+  right: 0;
+  padding-left: 10px;
+}
+
+.product-list-swiper .swiper-container .swiper-button-prev {
+  border-radius: 0 100px 100px 0;
+  left: 0;
+  padding-right: 10px;
+}
+.product-list-swiper .swiper-container .swiper-button-prev,
+.product-list-swiper .swiper-container .swiper-button-next {
+  align-items: center;
+  background: #fff;
+  box-shadow: 0 0 4px 0 rgba(0, 0, 0, 0.2);
+  display: flex;
+  position: absolute;
+  font-size: 1.8rem;
+  height: 60px;
+  justify-content: center;
+  opacity: 0.8;
+  outline: none;
+  top: 45%;
+  transition: 0.3s;
+  width: 30px;
+  z-index: 10;
+}

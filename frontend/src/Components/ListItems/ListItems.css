@@ -1,0 +1,20 @@
+.block-products-filter {
+    padding-top: 10px;
+    display: flex !important;
+    flex-wrap: wrap !important;
+    gap: 10px;
+    margin-bottom: 15px;
+    margin: 15px auto;
+    width: 75vw;
+}
+
+.category-loadmore {
+    text-align: center;
+    color: #007bff;
+    cursor: pointer;
+    margin-top: 20px;
+}
+
+.category-loadmore:hover {
+    text-decoration: underline;
+}

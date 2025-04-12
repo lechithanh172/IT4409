@@ -1,0 +1,77 @@
+.menu-tree {
+    position: relative;
+    background-color: #fff;
+    border-radius: 10px;
+    overflow: hidden;
+    padding: 0;
+    width: 215px;
+    z-index: 31;
+}
+
+.menu-tree .label-menu-tree {
+    display: block;
+    padding: 2px 10px;
+}
+
+.menu-tree .label-menu-tree:hover {
+    background: #d9dbdd;
+    border-radius: 5px;
+}
+
+.menu-tree .label-menu-tree .label-item {
+    align-items: center;
+    color: #343a40;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    min-height: 31.3px;
+    text-decoration: none;
+    width: 100%;
+}
+
+.menu-tree .label-menu-tree .label-item .item-content {
+    display: flex;
+    align-items: center;
+}
+
+.menu-tree .label-menu-tree .label-item .item-content .category-icon, .menu-tree .label-menu-tree .label-item .item-content .category-icon img {
+    height: 25px;
+    margin-right: 5px;
+    text-align: center;
+    width: 25px;
+}
+
+.menu-tree .label-menu-tree .label-item .item-content .item-link {
+    -webkit-line-clamp: 1;
+    -webkit-box-orient: vertical;
+    color: #343a40;
+    display: -webkit-box;
+    font-size: 12px;
+    font-weight: 700;
+    overflow: hidden;
+}
+
+.menu-tree .label-menu-tree .label-item .item-content .item-link:hover {
+    color: #d70018;
+    cursor: pointer;
+}
+
+.menu-tree .label-menu-tree .label-item .right-icon {
+    width: 7.5px;
+}
+
+.menu-tree .label-menu-tree .label-item .right-icon svg {
+    color: #777;
+}
+
+.header-overlay {
+    position: fixed;
+    top: 64px;
+    left: 0;
+    height: 100vh;
+    transition: 0.3s;
+    width: 100%;
+    background: rgba(0, 0, 0, 0.53);
+    z-index: 30;
+    opacity: 1;
+}

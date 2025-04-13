@@ -21,7 +21,7 @@ import java.io.UnsupportedEncodingException;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("/users")
+@RequestMapping("/user")
 public class UserController {
     @Autowired
     private UserService userService;

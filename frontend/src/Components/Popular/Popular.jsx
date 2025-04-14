@@ -124,6 +124,10 @@ function Popular({ category }) {
         // const response = await apiService.getProductsByCategory();
         // const products = response.data.products
         const products = data
+        const filteredProducts = products.filter(
+          (product) => product.category === category
+        );
+        setPopularProducts(filteredProducts);
 
         setDataProducts(products);
 
@@ -177,7 +181,7 @@ function Popular({ category }) {
       let containerWidth;
 
       if (window.innerWidth > 1200) {
-        setOffset(index * 234.8);
+        setOffset(index * 230);
         setMaxIndex(popularProducts.length - 5);
       } else if (window.innerWidth > 990) {
         setOffset(index * (width / 4 + 2.5));

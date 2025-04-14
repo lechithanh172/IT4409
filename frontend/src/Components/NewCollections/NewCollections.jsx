@@ -176,12 +176,26 @@ function NewCollections() {
     }
   }, [maxIndex, index, mobileProducts.length]);
 
+  useEffect(() => {
+    const handleAutoSlide = () => {
+      if (index <= -maxIndex) {
+        setIndex(0); // Reset về đầu
+      } else {
+        setIndex((prev) => prev - 1); // Chuyển sang slide tiếp theo
+      }
+    };
+
+    const timer = setTimeout(handleAutoSlide, 3000); // Tự động chạy sau 3 giây
+
+    return () => clearTimeout(timer); // Xóa timer khi component unmount hoặc index thay đổi
+  }, [index, maxIndex]);
+
   return (
     <>
       {mobileProducts.length > 0 && (
         <div className="newcollections">
           <div className="product-list-title">
-            <h2>SẢN PHẨM MOBILE MỚI</h2>
+            <h2>SẢN PHẨM MỚI VỀ</h2>
           </div>
           <div className="product-list">
             <div className="product-list-swiper">

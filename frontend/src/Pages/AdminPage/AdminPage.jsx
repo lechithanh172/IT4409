@@ -8,11 +8,9 @@ import AdminOrder from "../../Components/AdminPage/AdminOrder/AdminOrder";
 import AdminProfile from "../../Components/AdminPage/AdminProfile/AdminProfile";
 import styles from "./AdminPage.module.css";
 import { InfoCircleOutlined } from "@ant-design/icons";
-import { io } from "socket.io-client";
 import Tooltip from "./Tooltip ";
 import CustomModal from './CustomModal';
 
-const socket = io("http://localhost:5001");
 
 const logout = () => {
   console.log("User logged out");
@@ -46,31 +44,6 @@ const Admin = () => {
   const [keySelected, setKeySelected] = useState("products");
   const [tooltipPosition, setTooltipPosition] = useState({ top: 0, left: 0 });
   const [isChatModalVisible, setChatModalVisible] = useState(false);
-
-  useEffect(() => {
-    const role = "admin";
-    if (role !== "admin") {
-      window.location.href = "/";
-      return;
-    }
-
-    socket.on("receive_message", (data) => {
-      console.log("Received new message:", data);
-      setMessages((prevMessages) => [...prevMessages, data]);
-      setIsRead(false);
-
-      setUsers((prevUsers) => {
-        if (!prevUsers.some((user) => user.id === data.userId)) {
-          return [...prevUsers, { id: data.userId, mes: data.message }];
-        }
-        return prevUsers;
-      });
-    });
-
-    return () => {
-      socket.off("receive_message");
-    };
-  }, []);
 
   const handleBellClick = (event) => {
     const rect = event.target.getBoundingClientRect();
@@ -182,15 +155,6 @@ const Admin = () => {
           </div>
         </div>
       </div>
-      {isChatModalVisible && (
-        <CustomModal
-          
-          isVisible={isChatModalVisible}
-          onClose={() => setChatModalVisible(false)}
-          selectedUser={selectedUser}
-          socket={socket}
-        />
-      )}
     </>
   );
 };

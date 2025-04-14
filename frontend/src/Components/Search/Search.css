@@ -13,7 +13,8 @@
 
 .search .input-y {
   outline: none;
-  height: 32px;
+  border-radius: 41px;
+  padding: 3px 26px;
 
 }
 

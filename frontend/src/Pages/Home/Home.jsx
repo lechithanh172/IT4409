@@ -13,7 +13,8 @@ function Home() {
             <Banner />
             <NewCollections />
             <ListItems />
-            <Popular category="Mobile" />
+            <Popular category="Smartphone" />
+            <Popular category="Laptop" />
             <MenuBottomTabs active={'Home'} />
         </div>
     );

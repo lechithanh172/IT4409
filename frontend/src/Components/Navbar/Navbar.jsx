@@ -2,6 +2,7 @@ import React, { useContext, useState } from 'react';
 import { Link } from 'react-router-dom';
 
 import MenuTree from '../MenuTree/MenuTree';
+import Search from '../Search';
 
 // Import CSS file
 import './Navbar.css';
@@ -36,7 +37,7 @@ function Navbar() {
                     </div>
                 </a>
                 <div className="menu-container">{isMenu && <MenuTree onMenuItemClick={handleMenu} />}</div>
-                <div className="box-search">
+                {/* <div className="box-search">
                     <form>
                         <div className="group-input">
                             <div className="input-btn">
@@ -58,7 +59,13 @@ function Navbar() {
                             </span>
                         </div>
                     </form>
+                </div> */}
+
+                <div className="menu-list">
+                    <Search />
                 </div>
+                
+
                 <a className="header-item about-contact">
                     <div className="box-icon">
                         <div className="my-icon">

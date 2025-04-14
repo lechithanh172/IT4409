@@ -266,7 +266,7 @@ const OrderDetails = ({ order, handleRefresh }) => {
                     </Col>
                 </Row>
             </div>
-            <Mod    al
+            <Modal
                 title="Xác nhận thay đổi trạng thái"
                 visible={isModalVisible}
                 onOk={handleOk}
@@ -276,7 +276,7 @@ const OrderDetails = ({ order, handleRefresh }) => {
                 cancelText="Hủy"
             >
                 <p>Bạn có chắc chắn muốn thay đổi trạng thái giao hàng thành "{newStatus}"?</p>
-            </Mod>
+            </Modal>
         </>
     );
 };

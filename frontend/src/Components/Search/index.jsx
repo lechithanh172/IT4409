@@ -41,7 +41,7 @@ function Search(props) {
           const response = await apiService.searchProducts(searchValue);
           console.log(response.data);
           
-          const products = response.data.products || [];
+          const products = response.data || [];
       
           // Cập nhật kết quả tìm kiếm
           setSearchResult(products);
@@ -90,9 +90,7 @@ function Search(props) {
                                             id={item.productId}
                                             name={item.productName}
                                             image={item.imageUrl}
-                                            // sale={item.variants[0].sale}
                                             price={item.price}
-                                            // noResult={false}
                                         />
                                     </div>
                                 ))

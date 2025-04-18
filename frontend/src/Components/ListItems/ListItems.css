@@ -19,6 +19,7 @@
     text-decoration: underline;
 }
 
-.product-list {
+.all-product-list {
     width: 100vw;
+    color: #444444;
 }

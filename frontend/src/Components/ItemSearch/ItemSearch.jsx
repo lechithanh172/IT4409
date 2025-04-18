@@ -27,7 +27,7 @@ function ItemSearch(props) {
           <div className="item-name">
             <h3>{props.name}</h3>
             <div className="box-price">
-              <p className="item-price-new">{formatPrice(discountPrice)}</p>
+              <p className="item-price-new">{formatPrice(props.price)}</p>
               <p className="item-price-old">{formatPrice(props.price)}</p>   
             </div>
           </div>

@@ -122,7 +122,7 @@ function ListItems() {
 
     return (
         <div className="block-products-filter">
-            <div className="product-list">
+            <div className="all-product-list">
               <h2>TẤT CẢ SẢN PHẨM</h2>
           </div>
             {products.length > 0 ? (

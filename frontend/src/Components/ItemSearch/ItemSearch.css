@@ -42,10 +42,11 @@
     display: -webkit-box;
     font-size: 12px;
     font-weight: 600;
-    /* height: 100px; */
     overflow: hidden;
     position: relative;
     z-index: 10;
+    text-align: left;
+    white-space: normal;
 }
 
 .item1 .box-price {

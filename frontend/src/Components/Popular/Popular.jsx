@@ -20,8 +20,8 @@ const data = [
     price: 16990000,
     imageUrl: "https://cdn2.cellphones.com.vn/358x/media/catalog/product/i/p/iphone-16e-128gb_1__1.png",
     stockQuantity: 10,
-    category_id: 3,
-    brand_id: 1
+    categoryId: 3,
+    brandId: 1
   },
   {
     productId: 2,
@@ -30,8 +30,8 @@ const data = [
     price: 40990000,
     imageUrl: "https://cdn2.cellphones.com.vn/358x/media/catalog/product/i/p/iphone15-pro-max-512gb-titan-nau.jpg",
     stockQuantity: 13,
-    category_id: 3,
-    brand_id: 1
+    categoryId: 3,
+    brandId: 1
   },
   {
     productId: 3,
@@ -40,8 +40,8 @@ const data = [
     price: 28990000,
     imageUrl: "https://cdn2.cellphones.com.vn/358x/media/catalog/product/f/l/fliip-6-den_4__1.png",
     stockQuantity: 10,
-    category_id: 3,
-    brand_id: 2
+    categoryId: 3,
+    brandId: 2
   },
   {
     productId: 4,
@@ -50,8 +50,8 @@ const data = [
     price: 39990000,
     imageUrl: "https://cdn2.cellphones.com.vn/358x/media/catalog/product/d/i/dien-thoai-samsung-galaxy-s25-ultra_5.png",
     stockQuantity: 22,
-    category_id: 3,
-    brand_id: 2
+    categoryId: 3,
+    brandId: 2
   },
   {
     productId: 5,
@@ -60,8 +60,8 @@ const data = [
     price: 4990000,
     imageUrl: "https://cdn2.cellphones.com.vn/358x/media/catalog/product/d/i/dien-thoai-xiaomi-redmi-note-14_1__2.png",
     stockQuantity: 34,
-    category_id: 3,
-    brand_id: 9
+    categoryId: 3,
+    brandId: 9
   },
   {
     productId: 6,
@@ -70,8 +70,8 @@ const data = [
     price: 22990000,
     imageUrl: "https://cdn2.cellphones.com.vn/358x/media/catalog/product/x/i/xiaomi-14-pre-xanh-la_1.png",
     stockQuantity: 36,
-    category_id: 3,
-    brand_id: 9
+    categoryId: 3,
+    brandId: 9
   },
   {
     productId: 7,
@@ -80,8 +80,8 @@ const data = [
     price: 5290000,
     imageUrl: "https://cdn2.cellphones.com.vn/358x/media/catalog/product/p/h/photo_2025-01-10_08-54-30.jpg",
     stockQuantity: 10,
-    category_id: 3,
-    brand_id: 10
+    categoryId: 3,
+    brandId: 10
   },
   {
     productId: 8,
@@ -90,8 +90,8 @@ const data = [
     price: 6490000,
     imageUrl: "https://cdn2.cellphones.com.vn/358x/media/catalog/product/p/h/photo_2024-07-25_11-39-16.jpg",
     stockQuantity: 15,
-    category_id: 3,
-    brand_id: 10
+    categoryId: 3,
+    brandId: 10
   },
   {
     productId: 9,
@@ -100,37 +100,49 @@ const data = [
     price: 24990000,
     imageUrl: "https://cdn2.cellphones.com.vn/358x/media/catalog/product/m/a/macbook_air_m2_2_1_1_7.png",
     stockQuantity: 42,
-    category_id: 1,
-    brand_id: 1
+    categoryId: 1,
+    brandId: 1
   }
 ];
 
 const Brand = [
-  { "brand_id": 1, "name": "Apple", "logo_url": "https://cdn2.cellphones.com.vn/insecure/rs:fill:0:50/q:30/plain/https://cellphones.com.vn/media/tmp/catalog/product/f/r/frame_59.png" },
-  { "brand_id": 2, "name": "Samsung", "logo_url": "https://cdn2.cellphones.com.vn/insecure/rs:fill:0:50/q:30/plain/https://cellphones.com.vn/media/tmp/catalog/product/f/r/frame_60.png" },
-  { "brand_id": 3, "name": "Dell", "logo_url": "https://cdn2.cellphones.com.vn/insecure/rs:fill:0:50/q:30/plain/https://cellphones.com.vn/media/wysiwyg/Icon/brand_logo/Dell.png" },
-  { "brand_id": 4, "name": "HP", "logo_url": "https://cdn2.cellphones.com.vn/insecure/rs:fill:0:50/q:30/plain/https://cellphones.com.vn/media/wysiwyg/Icon/brand_logo/HP.png" },
-  { "brand_id": 5, "name": "Lenovo", "logo_url": "https://cdn2.cellphones.com.vn/insecure/rs:fill:0:50/q:30/plain/https://cellphones.com.vn/media/wysiwyg/Icon/brand_logo/Lenovo.png" },
-  { "brand_id": 6, "name": "Asus", "logo_url": "https://cdn2.cellphones.com.vn/insecure/rs:fill:0:50/q:30/plain/https://cellphones.com.vn/media/wysiwyg/Icon/brand_logo/Asus.png" },
-  { "brand_id": 7, "name": "MSI", "logo_url": "https://cdn2.cellphones.com.vn/insecure/rs:fill:0:50/q:30/plain/https://cellphones.com.vn/media/wysiwyg/Icon/brand_logo/MSI.png" },
-  { "brand_id": 8, "name": "Acer", "logo_url": "https://cdn2.cellphones.com.vn/insecure/rs:fill:0:50/q:30/plain/https://cellphones.com.vn/media/wysiwyg/Icon/brand_logo/acer.png" },
-  { "brand_id": 9, "name": "Xiaomi", "logo_url": "https://cdn2.cellphones.com.vn/insecure/rs:fill:0:50/q:30/plain/https://cellphones.com.vn/media/tmp/catalog/product/f/r/frame_61.png" },
-  { "brand_id": 10, "name": "Sony", "logo_url": "https://cdn2.cellphones.com.vn/insecure/rs:fill:0:50/q:30/plain/https://cellphones.com.vn/media/catalog/product/b/r/brand-icon-sony_2.png" }
+  { "brandId": 1, "name": "Apple", "logo_url": "https://cdn2.cellphones.com.vn/insecure/rs:fill:0:50/q:30/plain/https://cellphones.com.vn/media/tmp/catalog/product/f/r/frame_59.png" },
+  { "brandId": 2, "name": "Samsung", "logo_url": "https://cdn2.cellphones.com.vn/insecure/rs:fill:0:50/q:30/plain/https://cellphones.com.vn/media/tmp/catalog/product/f/r/frame_60.png" },
+  { "brandId": 3, "name": "Dell", "logo_url": "https://cdn2.cellphones.com.vn/insecure/rs:fill:0:50/q:30/plain/https://cellphones.com.vn/media/wysiwyg/Icon/brand_logo/Dell.png" },
+  { "brandId": 4, "name": "HP", "logo_url": "https://cdn2.cellphones.com.vn/insecure/rs:fill:0:50/q:30/plain/https://cellphones.com.vn/media/wysiwyg/Icon/brand_logo/HP.png" },
+  { "brandId": 5, "name": "Lenovo", "logo_url": "https://cdn2.cellphones.com.vn/insecure/rs:fill:0:50/q:30/plain/https://cellphones.com.vn/media/wysiwyg/Icon/brand_logo/Lenovo.png" },
+  { "brandId": 6, "name": "Asus", "logo_url": "https://cdn2.cellphones.com.vn/insecure/rs:fill:0:50/q:30/plain/https://cellphones.com.vn/media/wysiwyg/Icon/brand_logo/Asus.png" },
+  { "brandId": 7, "name": "MSI", "logo_url": "https://cdn2.cellphones.com.vn/insecure/rs:fill:0:50/q:30/plain/https://cellphones.com.vn/media/wysiwyg/Icon/brand_logo/MSI.png" },
+  { "brandId": 8, "name": "Acer", "logo_url": "https://cdn2.cellphones.com.vn/insecure/rs:fill:0:50/q:30/plain/https://cellphones.com.vn/media/wysiwyg/Icon/brand_logo/acer.png" },
+  { "brandId": 9, "name": "Xiaomi", "logo_url": "https://cdn2.cellphones.com.vn/insecure/rs:fill:0:50/q:30/plain/https://cellphones.com.vn/media/tmp/catalog/product/f/r/frame_61.png" },
+  { "brandId": 10, "name": "Sony", "logo_url": "https://cdn2.cellphones.com.vn/insecure/rs:fill:0:50/q:30/plain/https://cellphones.com.vn/media/catalog/product/b/r/brand-icon-sony_2.png" }
 ]
 
 const Category = [
-  { "category_id": 1, "name": "Laptop", "description": "Portable personal computers" },
-  { "category_id": 2, "name": "Tablet", "description": "Touchscreen mobile devices" },
-  { "category_id": 3, "name": "Smartphone", "description": "Mobile phones" },
-  { "category_id": 4, "name": "Accessory", "description": "Computer accessories" },
-  { "category_id": 5, "name": "Monitor", "description": "Display devices" },
-  { "category_id": 6, "name": "Printer", "description": "Printing machines" },
-  { "category_id": 7, "name": "Router", "description": "Network routers" },
-  { "category_id": 8, "name": "Speaker", "description": "Audio output devices" },
-  { "category_id": 9, "name": "Camera", "description": "Photography and video" },
-  { "category_id": 10, "name": "Smartwatch", "description": "Wearable smart devices" }
+  { "categoryId": 1, "name": "Laptop", "description": "Portable personal computers" },
+  { "categoryId": 2, "name": "Tablet", "description": "Touchscreen mobile devices" },
+  { "categoryId": 3, "name": "Smartphone", "description": "Mobile phones" },
+  { "categoryId": 4, "name": "Accessory", "description": "Computer accessories" },
+  { "categoryId": 5, "name": "Monitor", "description": "Display devices" },
+  { "categoryId": 6, "name": "Printer", "description": "Printing machines" },
+  { "categoryId": 7, "name": "Router", "description": "Network routers" },
+  { "categoryId": 8, "name": "Speaker", "description": "Audio output devices" },
+  { "categoryId": 9, "name": "Camera", "description": "Photography and video" },
+  { "categoryId": 10, "name": "Smartwatch", "description": "Wearable smart devices" }
 ]
 
+const categoryMap = {
+  Smartphone: 3,
+  Laptop: 1,
+  Tablet: 2,
+  Accessory: 4,
+  Monitor: 5,
+  Printer: 6,
+  Router: 7,
+  Speaker: 8,
+  Camera: 9,
+  Smartwatch: 10,
+};
 
 function Popular({ category }) {
   const [popularProducts, setPopularProducts] = useState([]);
@@ -149,14 +161,15 @@ function Popular({ category }) {
         // const response = await apiService.getProductsByCategory();
         // const products = response.data.products
         const products = data
+        const categoryId = categoryMap[category];
         const filteredProducts = products.filter(
-          (product) => product.category_id === Number(category)
+          (product) => product.categoryId === categoryId
         );
         setPopularProducts(filteredProducts);
 
         setDataProducts(products);
 
-        switch (Number(category)) {
+        switch (categoryId) {
           case 1:
             setTitle("LAPTOP");
             break;

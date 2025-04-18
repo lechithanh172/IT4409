@@ -162,13 +162,6 @@ const AddProduct = ({ setModalChild, handleRefresh }) => {
                             <Input.TextArea rows={4} />
                         </Form.Item>
                         <Form.Item
-                            label="Thông số"
-                            name="specifications"
-                            rules={[{ required: true, message: 'Hãy nhập thông số sản phẩm!' }]}
-                        >
-                            <Input.TextArea rows={4} />
-                        </Form.Item>
-                        <Form.Item
                             label="Giá"
                             name="price"
                             wrapperCol={{ span: 12 }}

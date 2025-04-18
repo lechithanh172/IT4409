@@ -12,8 +12,8 @@ function Home() {
         <div className="home">
             <Banner />
             <NewCollections />
-            <Popular category="1" />
-            <Popular category="3" />
+            <Popular category="Smartphone" />
+            <Popular category="Laptop" />
             <ListItems />
             <MenuBottomTabs active={'Home'} />
         </div>

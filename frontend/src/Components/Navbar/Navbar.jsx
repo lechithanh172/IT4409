@@ -8,7 +8,7 @@ import Search from '../Search';
 import './Navbar.css';
 
 // Import icons from Assets and FontAwesomeIcon
-import logo from '../Assets/TechZone.png';
+import logo from '../Assets/senashop.png';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faBagShopping, faBars, faPhone, faSearch, faTruckFast, faXmark } from '@fortawesome/free-solid-svg-icons';
 import { faCircleUser } from '@fortawesome/free-regular-svg-icons';

@@ -144,6 +144,12 @@ const categoryMap = {
   Smartwatch: 10,
 };
 
+function formatPrice(price) {
+  return price.toLocaleString('vi-VN', {
+      style: 'currency',
+      currency: 'VND'
+  });
+}
 function Popular({ category }) {
   const [popularProducts, setPopularProducts] = useState([]);
   const [title, setTitle] = useState("");
@@ -158,9 +164,10 @@ function Popular({ category }) {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        // const response = await apiService.getProductsByCategory();
-        // const products = response.data.products
-        const products = data
+        const response = await apiService.getProductsByCategory(category);
+        console.log(response.data);
+        
+        const products = response.data
         const categoryId = categoryMap[category];
         const filteredProducts = products.filter(
           (product) => product.categoryId === categoryId
@@ -294,8 +301,8 @@ function Popular({ category }) {
                           id={product.productId}
                           name={product.productName}
                           image={product.imageUrl}
-                          new_price={product.price}
-                          old_price={product.price}
+                          new_price={formatPrice(product.price)}
+                          old_price={formatPrice(product.price)}
                         />
                       </div>
                     );

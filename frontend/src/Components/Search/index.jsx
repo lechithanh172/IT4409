@@ -9,10 +9,10 @@ import apiService from "../../api/api";
 // import unidecode from 'unidecode';
 
 
-function Search() {
+function Search(props) {
     const [searchValue, setSearchValue] = useState('');
     const [searchResult, setSearchResult] = useState([]);
-    const [showResult, setShowResult] = useState(false);
+    const [showResult, setShowResult] = useState(props.overlay);
     const [loading, setLoading] = useState(false); // Trạng thái loading
     const inputRef = useRef();
 
@@ -30,9 +30,8 @@ function Search() {
 
     // Gọi API để lấy sản phẩm khi từ khóa thay đổi
     useEffect(() => {
-      if (!searchValue.trim()) {
+      if (!searchValue) {
           setSearchResult([]);
-          setShowResult(false);
           return;
       }
   
@@ -40,6 +39,8 @@ function Search() {
         setLoading(true);
         try {
           const response = await apiService.searchProducts(searchValue);
+          console.log(response.data);
+          
           const products = response.data.products || [];
       
           // Cập nhật kết quả tìm kiếm
@@ -64,6 +65,8 @@ function Search() {
         if (!inputValue.startsWith(' ')) {
             setSearchValue(inputValue);
         }
+        console.log(inputValue);
+        
     };
 
     return (

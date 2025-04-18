@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 
 import MenuTree from '../MenuTree/MenuTree';
@@ -15,20 +15,51 @@ import { faCircleUser } from '@fortawesome/free-regular-svg-icons';
 
 function Navbar() {
     const [isMenu, setIsMenu] = useState(false);
+    const [isSearch, setIsSearch] = useState(false);
+    const menuRef = useRef(null); // Tham chiếu đến menu
 
     function handleMenu() {
         setIsMenu(!isMenu);
+        if (!isMenu) {
+            document.body.classList.add('no-scroll'); // Thêm class no-scroll
+        } else {
+            document.body.classList.remove('no-scroll'); // Xóa class no-scroll
+        }
     }
+
+    function handleSearch() {
+        setIsSearch(true);
+        document.body.classList.add('no-scroll'); // Thêm class no-scroll
+    }
+
+    function closeOverlay() {
+        setIsMenu(false);
+        setIsSearch(false);
+        document.body.classList.remove('no-scroll'); // Xóa class no-scroll
+    }
+
+    useEffect(() => {
+        function handleClickOutside(event) {
+            if (menuRef.current && !menuRef.current.contains(event.target)) {
+                closeOverlay(); // Đóng menu nếu click ra ngoài
+            }
+        }
+
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => {
+            document.removeEventListener('mousedown', handleClickOutside);
+        };
+    }, []);
 
     return (
         <div className="nav-container">
-            <div className="navbar">
+            <div className="navbar" ref={menuRef}>
                 <a href="/" aria-current="page" className="nav-brand">
                     <div className="nav-logo">
                         <img src={logo} alt="" />
                     </div>
                 </a>
-                <a onClick={() => handleMenu()} className="header-item btn-menu">
+                <a onClick={handleMenu} className="header-item btn-menu">
                     <div className="box-icon">
                         <FontAwesomeIcon icon={faBars} />
                     </div>
@@ -36,36 +67,11 @@ function Navbar() {
                         <p>Danh mục</p>
                     </div>
                 </a>
-                <div className="menu-container">{isMenu && <MenuTree onMenuItemClick={handleMenu} />}</div>
-                {/* <div className="box-search">
-                    <form>
-                        <div className="group-input">
-                            <div className="input-btn">
-                                <button type="submit">
-                                    <div>
-                                        <FontAwesomeIcon icon={faSearch} height={15} />
-                                    </div>
-                                </button>
-                            </div>
-                            <input
-                                type="text"
-                                id="input-search"
-                                placeholder="Bạn cần tìm gì?"
-                                autoComplete="off"
-                                className="input"
-                            />
-                            <span id="close-search-btn" style={{ display: 'none' }}>
-                                <FontAwesomeIcon icon={faXmark} height={15} />
-                            </span>
-                        </div>
-                    </form>
-                </div> */}
-
-                <div className="menu-list">
-                    <Search />
+                <div className="menu-container">{isMenu && <MenuTree onMenuItemClick={closeOverlay} />}</div>
+                <div className="menu-list" onClick={handleSearch}>
+                    <Search overlay={isSearch} />
                 </div>
-                
-
+                {isMenu || isSearch ? <div className="overlay" onClick={closeOverlay}></div> : null}
                 <a className="header-item about-contact">
                     <div className="box-icon">
                         <div className="my-icon">

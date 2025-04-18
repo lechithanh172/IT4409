@@ -5,7 +5,7 @@
     overflow: hidden;
     padding: 0;
     width: 215px;
-    z-index: 31;
+    z-index: 40;
 }
 
 .menu-tree .label-menu-tree {
@@ -71,7 +71,7 @@
     height: 100vh;
     transition: 0.3s;
     width: 100%;
-    background: rgba(0, 0, 0, 0.53);
+    background: rgba(0, 0, 0, 0.5);
     z-index: 30;
     opacity: 1;
 }

@@ -15,7 +15,7 @@
   outline: none;
   border-radius: 41px;
   padding: 3px 26px;
-
+  border: none;
 }
 
 .search .button-y{
@@ -54,7 +54,7 @@
   overflow-y: auto;
   height: calc(100% - 64px); /* Chiều cao trừ đi chiều cao của header */
   background-color: rgba(0, 0, 0, 0.5); /* Màu nền mờ */
-  z-index: 999; /* Đảm bảo overlay nằm dưới header */
+  z-index: 30; /* Đảm bảo overlay nằm dưới header */
 }
 
 .search-results {

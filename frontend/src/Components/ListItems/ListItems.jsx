@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import axios from 'axios';
 import Item from '../Item/Item';
 import './ListItems.css';
@@ -121,7 +122,9 @@ function ListItems() {
 
     return (
         <div className="block-products-filter">
-            {/* Hiển thị tất cả sản phẩm */}
+            <div className="product-list">
+              <h2>TẤT CẢ SẢN PHẨM</h2>
+          </div>
             {products.length > 0 ? (
                 products.map((product) => (
                     <Item

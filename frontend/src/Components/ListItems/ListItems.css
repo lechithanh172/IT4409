@@ -18,3 +18,7 @@
 .category-loadmore:hover {
     text-decoration: underline;
 }
+
+.product-list {
+    width: 100vw;
+}

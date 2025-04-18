@@ -3,7 +3,7 @@ import axios from "axios";
 // =========================
 // 🔧 Cấu hình axios instance
 // =========================
-export const base_url = "http://40.82.154.155:8080";
+export const base_url = "http://3.27.90.134:8080";
 axios.defaults.withCredentials = true;
 
 const apiInstance = axios.create({
@@ -15,6 +15,7 @@ const apiInstance = axios.create({
 apiInstance.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem("accessToken");
+    // token = '';
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
@@ -57,8 +58,6 @@ const apiService = {
     apiInstance.delete("/product/delete", {
       params: { productId },
     }),
-  getProductsByCategory: (categoryName) =>
-    apiInstance.get(`/product/category=${categoryName}`),
   searchProducts: (keyword) =>
     apiInstance.get(`/product/search=${keyword}`),
   // -------------------------------

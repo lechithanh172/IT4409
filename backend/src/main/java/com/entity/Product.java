@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 @Table(name = "products")
@@ -27,20 +28,19 @@ public class Product {
     @Column(columnDefinition = "TEXT")
     private String description;
 
+    private Integer weight;
+
     @Column(nullable = false, precision = 10, scale = 2)
     private Long price;
-
-    @Column(nullable = false)
-    private String imageUrl;
-
-    @Column(name = "stock_quantity")
-    private Integer stockQuantity = 0;
 
     @Column(nullable = false)
     private Integer categoryId;
 
     @Column(nullable = false)
     private Integer brandId;
+
+    @Column(name = "support_rush_order")
+    private Boolean supportRushOrder;
 
     @Column(name = "created_at", columnDefinition = "TIMESTAMP")
     private LocalDateTime createdAt = LocalDateTime.now();
@@ -50,4 +50,18 @@ public class Product {
 
     @Column(name = "is_active")
     private Boolean isActive = true;
+
+
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ProductVariant> variants;
+
+    @PrePersist
+    public void prePersist() {
+        this.createdAt = LocalDateTime.now();
+    }
+
+    @PreUpdate
+    public void preUpdate() {
+        this.updatedAt = LocalDateTime.now();
+    }
 }

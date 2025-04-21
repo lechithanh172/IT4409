@@ -1,9 +1,8 @@
 package com.repository;
 
-import com.entity.Category;
 import com.entity.Product;
-import jakarta.persistence.criteria.CriteriaBuilder;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -19,4 +18,9 @@ public interface ProductRepository extends JpaRepository<Product, Integer> {
     public List<Product> findByCategoryId(Integer categoryId);
 
     List<Product> findByProductNameContainingIgnoreCase(String productName);
+
+    @Query("SELECT p FROM Product p LEFT JOIN FETCH p.variants WHERE p.productId = :productId")
+    Optional<Product> findByIdWithVariants(Integer productId);
+
+    List<Product> findProductsByCategoryIdAndBrandId(Integer categoryId, Integer brandId);
 }

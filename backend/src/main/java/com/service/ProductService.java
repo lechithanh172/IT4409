@@ -2,17 +2,21 @@ package com.service;
 
 import com.entity.Category;
 import com.entity.Product;
-import com.entity.User;
+import com.entity.ProductVariant;
+import com.entity.dto.ProductDTO;
+import com.entity.dto.ProductVariantDTO;
+import com.repository.BrandRepository;
 import com.repository.CategoryRepository;
 import com.repository.ProductRepository;
-import com.repository.UserRepository;
-import jakarta.persistence.criteria.CriteriaBuilder;
+import com.request.ProductRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class ProductService {
@@ -21,13 +25,68 @@ public class ProductService {
     @Autowired
     private CategoryRepository categoryRepository;
     @Autowired
-    private UserRepository userRepository;
+    private BrandRepository brandRepository;
 
-    public boolean addProduct(Product product) {
-        if(productRepository.findByProductName(product.getProductName()).isPresent()) {
+    public ProductDTO toDTO(Product product) {
+        ProductDTO dto = new ProductDTO();
+        dto.setProductId(product.getProductId());
+        dto.setProductName(product.getProductName());
+        dto.setDescription(product.getDescription());
+        dto.setPrice(product.getPrice());
+        dto.setWeight(product.getWeight());
+        dto.setSupportRushOrder(product.getSupportRushOrder());
+
+        List<ProductVariantDTO> variantDTOs = product.getVariants().stream().map(variant -> {
+            ProductVariantDTO vDto = new ProductVariantDTO();
+            vDto.setVariantId(variant.getVariantId());
+            vDto.setColor(variant.getColor());
+            vDto.setDiscount(variant.getDiscountPercentage());
+            vDto.setImageUrl(variant.getImageUrl());
+            vDto.setStockQuantity(variant.getStockQuantity());
+            return vDto;
+        }).collect(Collectors.toList());
+
+        dto.setVariants(variantDTOs);
+        return dto;
+    }
+    public Product toEntity(ProductRequest request) {
+        // Tạo Product
+        Product product = new Product();
+        product.setProductName(request.getProductName());
+        product.setDescription(request.getDescription());
+        product.setWeight(request.getWeight());
+        product.setPrice(request.getPrice());
+        Integer categoryId = categoryRepository.findByCategoryNameIgnoreCase(request.getCategoryName()).get().getCategoryId();
+        Integer brandId = brandRepository.findByBrandNameIgnoreCase(request.getBrandName()).get().getBrandId();
+
+        product.setCategoryId(categoryId);
+        product.setBrandId(brandId);
+        product.setSupportRushOrder(request.getSupportRushOrder());
+
+        // Map danh sách variants
+        List<ProductVariant> variants = request.getVariants().stream()
+                .map(variantReq -> {
+                    ProductVariant variant = new ProductVariant();
+                    variant.setColor(variantReq.getColor());
+                    variant.setDiscountPercentage(variantReq.getDiscountPercentage());
+                    variant.setStockQuantity(variantReq.getStockQuantity());
+                    variant.setImageUrl(variantReq.getImageUrl());
+
+                    variant.setProduct(product);
+                    return variant;
+                })
+                .collect(Collectors.toList());
+
+        product.setVariants(variants);
+        return product;
+    }
+
+    public boolean addProduct(ProductRequest request) {
+        if(productRepository.findByProductName(request.getProductName()).isPresent()) {
             return false;
         }
         else{
+            Product product = toEntity(request);
             productRepository.save(product);
             return true;
         }
@@ -41,42 +100,59 @@ public class ProductService {
         return false;
     }
 
-    public boolean updateProduct(Product product) {
-        Optional<Product> productOptional = productRepository.findByProductId(product.getProductId());
-        if(productOptional.isPresent()) {
-            Product oldProduct = productOptional.get();
-            if(product.getProductName() != null) oldProduct.setProductName(product.getProductName());
-            if(product.getDescription() != null) oldProduct.setDescription(product.getDescription());
-            if(product.getPrice() != null) oldProduct.setPrice(product.getPrice());
-            if(product.getImageUrl() != null) oldProduct.setImageUrl(product.getImageUrl());
-            if(product.getStockQuantity() != null) oldProduct.setStockQuantity(product.getStockQuantity());
-            if(product.getCategoryId() != null) oldProduct.setCategoryId(product.getCategoryId());
-            if(product.getBrandId() != null) oldProduct.setBrandId(product.getBrandId());
-            if(product.getIsActive() != null) oldProduct.setIsActive(product.getIsActive());
-            oldProduct.setUpdatedAt(LocalDateTime.now());
+    public void updateProduct(ProductRequest request) {
+        Product product = toEntity(request);
+        product.setUpdatedAt(LocalDateTime.now());
+        productRepository.save(product);
+    }
 
-            productRepository.save(oldProduct);
-            return true;
+    public ProductDTO getProductById(Integer productId) {
+        if(productRepository.findById(productId).isPresent()) {
+            return  toDTO(productRepository.findById(productId).get());
         }
-        else return false;
+        return null;
     }
 
-    public Optional<Product> getProductById(Integer productId) {
-        return productRepository.findById(productId);
-    }
-
-    public List<Product> getProductsByCategory(String categoryName) {
+    public List<ProductDTO> getProductsByCategory(String categoryName) {
         Optional<Category> category = categoryRepository.findByCategoryNameIgnoreCase(categoryName);
         if(category.isPresent()) {
-            return productRepository.findByCategoryId(category.get().getCategoryId());
+            List<Product> products = productRepository.findByCategoryId(category.get().getCategoryId());
+            List<ProductDTO> productDTOs = new ArrayList<>();
+            for(Product product : products) {
+                ProductDTO dto = toDTO(product);
+                productDTOs.add(dto);
+            }
+            return productDTOs;
         }
         else return null;
 
     }
 
-    public List<Product> searchProductByName(String search) {
-        return productRepository.findByProductNameContainingIgnoreCase(search);
+    public List<ProductDTO> searchProductsByName(String search) {
+
+        List<Product> products = productRepository.findByProductNameContainingIgnoreCase(search);
+        List<ProductDTO> productDTOs = new ArrayList<>();
+        for(Product product : products) {
+            ProductDTO dto = toDTO(product);
+            productDTOs.add(dto);
+        }
+        return productDTOs;
     }
+
+    public List<ProductDTO> getProductByCategoryAndBrand(String categoryName, String brandName) {
+        Integer categoryId = categoryRepository.findByCategoryNameIgnoreCase(categoryName).get().getCategoryId();
+        Integer brandId = categoryRepository.findByCategoryNameIgnoreCase(categoryName).get().getCategoryId();
+
+
+        List<Product> products = productRepository.findProductsByCategoryIdAndBrandId(categoryId, brandId);
+        List<ProductDTO> productDTOs = new ArrayList<>();
+        for(Product product : products) {
+            ProductDTO dto = toDTO(product);
+            productDTOs.add(dto);
+        }
+        return productDTOs;
+    }
+
 
 
 

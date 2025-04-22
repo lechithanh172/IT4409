@@ -1,8 +1,6 @@
 import React, { useState,  useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import './otpPage.css';  
-import Header from '../../Components/Header/Header';
-import Footer from '../../Components/Footer/Footer';
 
 function OtpPage() {
     const [otp, setOtp] = useState(new Array(6).fill(''));
@@ -61,8 +59,6 @@ function OtpPage() {
   
     return (
       <div>
-        <Header />
-  
         <div className="otp-container">
           <form onSubmit={handleSubmit} className="otp-form">
             <h2>xác minh mã OTP</h2>
@@ -94,8 +90,6 @@ function OtpPage() {
             </button>
           </form>
         </div>
-  
-        <Footer />
       </div>
     );
   }

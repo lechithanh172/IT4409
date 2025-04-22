@@ -1,8 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate,Link } from 'react-router-dom';
 import './loginPage.css';  
-import Header from '../../Components/Header/Header';
-import Footer from '../../Components/Footer/Footer';
 import axios from 'axios';
 
 const login = async (username, password) => {
@@ -47,8 +45,6 @@ function LoginPage() {
 
   return (
     <div>
-      <Header />
-
       <div className="login-container">
         <form onSubmit={handleLogin} className="login-form">
           <h2>Đăng nhập</h2>
@@ -70,8 +66,6 @@ function LoginPage() {
           <button type="submit">Đăng nhập</button>
         </form>
       </div>
-
-      <Footer />
     </div>
   );
 }

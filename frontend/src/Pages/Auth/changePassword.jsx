@@ -1,7 +1,5 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import Header from '../../Components/Header/Header';
-import Footer from '../../Components/Footer/Footer';
 import { AiOutlineEye, AiOutlineEyeInvisible } from 'react-icons/ai';
 import './changePassword.css';
 
@@ -32,8 +30,6 @@ function ChangePassword() {
   
     return (
       <div>
-        <Header />
-  
         <div className="reset-password-container">
           <form onSubmit={handleSubmit} className="reset-password-form">
             <h2>Đặt lại mật khẩu</h2>
@@ -69,8 +65,6 @@ function ChangePassword() {
             <button type="submit">Xác nhận</button>
           </form>
         </div>
-  
-        <Footer />
       </div>
     );
 }

@@ -1,0 +1,13 @@
+.layoutContainer {
+    display: flex; /* Sử dụng Flexbox */
+    flex-direction: column; /* Sắp xếp các phần tử theo chiều dọc (Header -> Main -> Footer) */
+    min-height: 100vh; /* QUAN TRỌNG: Đảm bảo container chính cao ít nhất bằng chiều cao màn hình */
+    background-color: #f4f4f4; /* Hoặc màu nền mong muốn cho trang */
+  }
+  
+  .mainContent {
+    flex-grow: 1; /* QUAN TRỌNG: Cho phép khu vực <main> giãn nở và chiếm hết không gian thừa theo chiều dọc, đẩy Footer xuống đáy */
+    /* Thêm padding nếu cần để nội dung không sát lề */
+    /* padding: 20px; */ /* Padding này có thể gây ra khoảng trắng không mong muốn nếu các trang con đã có padding riêng. Hãy cân nhắc. */
+    width: 100%; /* Đảm bảo chiếm hết chiều ngang */
+  }

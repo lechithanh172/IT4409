@@ -1,53 +1,244 @@
+/* src/pages/ProductDetailPage/ProductDetailPage.module.css */
+
 .pageContainer {
-    max-width: 1200px;
-    margin: 20px auto;
-    padding: 0 15px;
+    max-width: 1200px; /* Giới hạn chiều rộng trang */
+    margin: 25px auto; /* Căn giữa và tạo khoảng cách trên dưới */
+    padding: 0 15px; /* Padding trái phải */
   }
   
+  /* --- Breadcrumbs --- */
+  .breadcrumbs {
+    margin-bottom: 20px;
+    font-size: 0.9rem;
+    color: #6b7280; /* Màu xám */
+    padding: 10px 0;
+    border-bottom: 1px solid #e5e7eb; /* Phân cách */
+  }
+  .breadcrumbs a {
+    color: #3b82f6; /* Xanh dương */
+    text-decoration: none;
+    transition: color 0.2s ease;
+  }
+  .breadcrumbs a:hover {
+    color: #2563eb;
+    text-decoration: underline;
+  }
+  .breadcrumbs span {
+    color: #9ca3af; /* Màu xám nhạt cho dấu / hoặc tên SP */
+    margin: 0 8px; /* Tăng khoảng cách */
+  }
+  .breadcrumbs span:last-child { /* Tên sản phẩm cuối */
+      color: #1f2937; /* Đen đậm */
+      font-weight: 500;
+  }
+  
+  
+  /* --- Error Container --- */
   .errorContainer {
     text-align: center;
-    padding: 40px 0;
+    padding: 60px 20px; /* Tăng padding */
+    min-height: 50vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background-color: #fff; /* Thêm nền trắng */
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
   }
   
   .errorMessage {
-    color: #dc3545; /* Màu đỏ báo lỗi */
-    font-size: 1.1rem;
-    margin-bottom: 20px;
+    color: #ef4444; /* Màu đỏ lỗi */
+    font-size: 1.2rem; /* To hơn */
+    margin-bottom: 25px;
+    font-weight: 500;
+  }
+  .backLink { /* Style cho link quay lại */
+      color: #3b82f6;
+      text-decoration: underline;
+      font-weight: 500;
+  }
+  .backLink:hover {
+      color: #2563eb;
   }
   
-  /* Style cho Breadcrumbs (tùy chọn) */
-  .breadcrumbs {
-      margin-bottom: 20px;
-      font-size: 0.9rem;
-      color: #555;
+  /* --- Khu vực Nội dung Chi tiết (2 cột) --- */
+  .detailsColumns {
+      display: flex;
+      flex-wrap: wrap; /* Cho phép xuống hàng trên mobile */
+      gap: 30px; /* Khoảng cách giữa 2 cột */
+      margin-top: 30px; /* Khoảng cách với ProductDisplay */
   }
-  .breadcrumbs a {
-      color: #007bff;
-      text-decoration: none;
+  
+  .descriptionColumn {
+      flex: 1 1 55%; /* Mô tả chiếm nhiều hơn chút */
+      min-width: 300px; /* Đảm bảo không quá hẹp */
+      order: 1; /* Luôn ở bên trái trên desktop */
   }
-  .breadcrumbs a:hover {
+  
+  .specsColumn {
+      flex: 1 1 40%; /* Specs chiếm phần còn lại */
+      min-width: 300px;
+      order: 2; /* Luôn ở bên phải trên desktop */
+  }
+  
+  
+  /* --- Style chung cho các Section Phụ (Mô tả, Specs, ...) --- */
+  .extraSection {
+      padding: 30px;
+      background-color: #fff;
+      border-radius: 12px; /* Bo góc nhiều hơn */
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06); /* Shadow nhẹ */
+      height: 100%; /* Giúp các section trong cột cao bằng nhau nếu dùng Grid */
+      /* Bỏ margin-top vì đã có gap ở .detailsColumns */
+  }
+  
+  .sectionTitle {
+      font-size: 1.5rem;
+      font-weight: 600;
+      color: #111827;
+      margin: 0 0 20px 0; /* Giảm margin dưới */
+      padding-bottom: 12px;
+      border-bottom: 2px solid #3b82f6; /* Gạch chân màu xanh */
+      display: inline-block;
+  }
+  
+  /* Style riêng cho section Specs */
+  .specsSection .sectionTitle {
+      /* margin-bottom: 15px; */ /* Giảm khoảng cách dưới tiêu đề specs */
+  }
+  
+  /* --- Style cho phần Preview Specs (Cột phải) --- */
+  .specsPreviewContainer {
+      position: relative;
+      max-height: 450px; /* Giới hạn chiều cao hiển thị ban đầu */
+      overflow: hidden; /* Ẩn phần nội dung thừa */
+  }
+  
+  .fadeOverlay {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 100px; /* Chiều cao của vùng mờ */
+      background: linear-gradient(to bottom, rgba(255, 255, 255, 0), #ffffff 90%); /* Gradient mờ dần về màu trắng */
+      pointer-events: none; /* Cho phép click xuyên qua */
+      z-index: 1;
+      border-bottom-left-radius: 12px; /* Bo góc theo container */
+      border-bottom-right-radius: 12px;
+  }
+  
+  .viewFullSpecsButton {
+      position: absolute;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 2; /* Nằm trên lớp phủ */
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 20px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: #fff;
+      background-color: #007bff;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background-color 0.2s ease, box-shadow 0.2s ease;
+      box-shadow: 0 2px 5px rgba(0, 123, 255, 0.3);
+  }
+  .viewFullSpecsButton:hover {
+      background-color: #0056b3;
+      box-shadow: 0 4px 8px rgba(0, 123, 255, 0.4);
+  }
+  .viewFullSpecsButton svg {
+      font-size: 1rem;
+  }
+  
+  /* Đảm bảo nội dung cuối trong preview không bị che khuất hoàn toàn */
+  .specsPreviewContainer .specTable {
+      margin-bottom: 0; /* Bỏ margin dưới của bảng */
+  }
+  .specsPreviewContainer .specGroup:last-child {
+       margin-bottom: 60px; /* Tăng khoảng trống ở dưới cho nút */
+  }
+  .specsPreviewContainer .specGroup:last-child .specTable {
+      margin-bottom: 0; /* Đảm bảo bảng cuối không có margin */
+  }
+  
+  
+  /* --- Style cho Mô tả --- */
+  .descriptionContent {
+      line-height: 1.8;
+      color: #374151;
+      font-size: 1rem;
+  }
+  .descriptionContent p {
+      margin-bottom: 1.3em;
+  }
+  .descriptionContent p:last-child {
+      margin-bottom: 0;
+  }
+  .descriptionContent strong {
+      color: #1f2937;
+      font-weight: 600;
+  }
+  .descriptionContent em {
+      font-style: italic;
+      color: #4b5563;
+  }
+  .descriptionContent a {
+      color: #3b82f6;
       text-decoration: underline;
   }
-  .breadcrumbs span {
-      color: #777;
+  .descriptionContent a:hover {
+      color: #2563eb;
   }
   
-  /* Style cho các section bổ sung (tùy chọn) */
-  .descriptionSection,
-  .reviewSection {
-      margin-top: 40px;
-      padding-top: 30px;
-      border-top: 1px solid #eee;
+  /* --- Responsive --- */
+  @media (max-width: 992px) {
+      .descriptionColumn,
+      .specsColumn {
+          flex-basis: 100%; /* Mỗi cột chiếm 1 hàng */
+          order: unset; /* Bỏ order */
+      }
+      .descriptionColumn {
+          margin-bottom: 30px; /* Khoảng cách khi xếp chồng */
+      }
+       .detailsColumns {
+          gap: 0;
+          margin-top: 25px;
+      }
+      /* Option: Bỏ giới hạn chiều cao specs khi xếp chồng */
+      /* .specsPreviewContainer { max-height: none; overflow: visible; } */
+      /* .fadeOverlay, .viewFullSpecsButton { display: none; } */
   }
   
-  .descriptionSection h2,
-  .reviewSection h2 {
-      font-size: 1.5rem;
-      margin-bottom: 20px;
-      color: #333;
+  @media (max-width: 768px) {
+      .extraSection {
+          padding: 20px;
+      }
+      .sectionTitle {
+          font-size: 1.4rem;
+          margin-bottom: 15px;
+      }
+      .descriptionContent {
+          font-size: 0.95rem;
+          line-height: 1.7;
+      }
+       .specsPreviewContainer {
+          max-height: 400px; /* Giảm chiều cao preview trên tablet */
+      }
+      .fadeOverlay { height: 80px; }
+      .viewFullSpecsButton { padding: 8px 16px; font-size: 0.9rem; bottom: 15px; }
   }
   
-  .descriptionSection p {
-      line-height: 1.7;
-      color: #555;
+  @media (max-width: 480px) {
+      .pageContainer { margin: 15px auto; }
+       .breadcrumbs { margin-bottom: 15px; font-size: 0.85rem; }
+      .extraSection { padding: 15px; }
+       .sectionTitle { font-size: 1.3rem; margin-bottom: 15px; }
+      .detailsColumns { margin-top: 20px; }
+       .descriptionColumn { margin-bottom: 20px; }
   }

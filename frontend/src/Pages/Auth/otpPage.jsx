@@ -10,7 +10,7 @@ function OtpPage() {
     const navigate = useNavigate();
     const location = useLocation();
     const queryParams = new URLSearchParams(location.search);
-    const mode = queryParams.get('mode'); 
+    const type = queryParams.get('type'); 
     // đếm ngược
     useEffect(() => {
       if (secondsLeft === 0) return;
@@ -43,16 +43,11 @@ function OtpPage() {
       e.preventDefault();
   
       const otpCode = otp.join('');
-      if (otpCode.length === 6) {
-        navigate('/register');
-      } else {
-        alert('Vui lòng nhập đủ 6 số');
-      }
-      if (otp === '123456') {  
-        if (mode === 'reset-password') {
-          navigate('/reset-password'); 
-        } else if (mode === 'register') {
-          navigate('/register'); 
+      if (otpCode === '123456') {  
+        if (type === 'reset') {
+          navigate('/change-password'); 
+        } else if (type === 'signup') {
+          navigate('/signup'); 
         }
       } else {
         alert('OTP không đúng!');

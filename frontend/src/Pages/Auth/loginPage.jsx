@@ -31,6 +31,8 @@ function LoginPage() {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const navigate = useNavigate();
+  
+  
   const handleLogin = async(e) => {
     e.preventDefault();
     if (!userName || !password) {
@@ -44,6 +46,7 @@ function LoginPage() {
       setError('Login failed, please try again!');
     }
   };
+
 
   return (
     <div>
@@ -65,8 +68,12 @@ function LoginPage() {
             onChange={(e) => setPassword(e.target.value)}
           />
           <p className="forgot-password">
-            <Link to="/otp?mode=change-password">Quên mật khẩu?</Link>
+            <Link to="/phone?type=reset" >Quên mật khẩu?</Link>
           </p>
+          <p className='register'>
+            Chưa có tài khoản ? <Link to='/phone?type=signup'>Đăng ký</Link>
+          </p>
+          
           <button type="submit">Đăng nhập</button>
         </form>
       </div>

@@ -1,98 +1,77 @@
-// src/contexts/ProductContext.jsx (phần mockProducts)
+import React, { createContext, useState, useEffect, useContext } from 'react';
+// import { fetchProducts } from '../services/productAPI'; // Giả sử có hàm fetch
 
+// Dữ liệu giả lập ban đầu
 const mockProducts = [
-    {
-      id: 1,
-      name: 'iPhone 15 Pro 256GB',
-      category: 'Smartphone',
-      description: 'Chip A17 Pro siêu mạnh, camera Pro đột phá, thiết kế Titan chuẩn hàng không vũ trụ, nút Action mới và cổng USB-C tiện lợi.',
-      rating: 4.8, // Thêm rating
-      reviewCount: 215, // Thêm số lượt đánh giá
-      variants: [ // Sử dụng variants để quản lý màu sắc/options
-        {
-          sku: 'IP15P-256-BLK', // Mã định danh duy nhất cho biến thể
-          colorName: 'Titan Đen',
-          colorHex: '#464749', // Mã màu (tùy chọn)
-          price: 28990000, // Giá VND
-          oldPrice: 30990000, // Giá cũ (tùy chọn)
-          stock: 15,
-          images: [ // Nhiều ảnh cho mỗi màu
-            '/images/products/iphone15pro/black_1.jpg', // Đường dẫn ảnh mẫu
-            '/images/products/iphone15pro/black_2.jpg',
-            '/images/products/iphone15pro/black_3.jpg',
-          ],
-          thumbnail: '/images/products/iphone15pro/thumb_black.jpg' // Ảnh nhỏ đại diện
-        },
-        {
-          sku: 'IP15P-256-NAT',
-          colorName: 'Titan Tự Nhiên',
-          colorHex: '#BDB6AD',
-          price: 28990000,
-          oldPrice: 30990000,
-          stock: 10,
-          images: [
-            '/images/products/iphone15pro/natural_1.jpg',
-            '/images/products/iphone15pro/natural_2.jpg',
-            '/images/products/iphone15pro/natural_3.jpg',
-          ],
-          thumbnail: '/images/products/iphone15pro/thumb_natural.jpg'
-        },
-         {
-          sku: 'IP15P-256-BLU',
-          colorName: 'Titan Xanh',
-          colorHex: '#4A5464',
-          price: 29190000, // Giá có thể khác nhau
-          oldPrice: 30990000,
-          stock: 8,
-          images: [
-            '/images/products/iphone15pro/blue_1.jpg',
-            '/images/products/iphone15pro/blue_2.jpg',
-            '/images/products/iphone15pro/blue_3.jpg',
-          ],
-          thumbnail: '/images/products/iphone15pro/thumb_blue.jpg'
-        }
-      ]
-    },
-    {
-      id: 2,
-      name: 'MacBook Air 13 inch M3 8GB/256GB',
-      category: 'Laptop',
-      description: 'Siêu mỏng nhẹ, hiệu năng M3 đáng kinh ngạc, thời lượng pin lên đến 18 giờ. Hoàn hảo cho công việc và giải trí mọi lúc mọi nơi.',
-      rating: 4.9,
-      reviewCount: 180,
-      variants: [
-        {
-          sku: 'MBA-M3-13-256-SVR',
-          colorName: 'Bạc (Silver)',
-          colorHex: '#E3E4E6',
-          price: 27990000,
-          oldPrice: 28990000,
-          stock: 20,
-          images: [
-            '/images/products/macbookair_m3/silver_1.jpg',
-            '/images/products/macbookair_m3/silver_2.jpg',
-            '/images/products/macbookair_m3/silver_3.jpg',
-          ],
-          thumbnail: '/images/products/macbookair_m3/thumb_silver.jpg'
-        },
-        {
-          sku: 'MBA-M3-13-256-GRY',
-          colorName: 'Xám (Space Gray)',
-          colorHex: '#8A8A8D',
-          price: 27990000,
-          oldPrice: 28990000,
-          stock: 18,
-          images: [
-            '/images/products/macbookair_m3/gray_1.jpg',
-            '/images/products/macbookair_m3/gray_2.jpg',
-            '/images/products/macbookair_m3/gray_3.jpg',
-          ],
-          thumbnail: '/images/products/macbookair_m3/thumb_gray.jpg'
-        }
-      ]
-    },
-    // Thêm sản phẩm khác...
-  ];
-  
-  // Nhớ tạo thư mục public/images/products... và đặt ảnh mẫu vào đó
-  // Hoặc thay thế bằng URL ảnh thật
+  { id: 1, name: 'iPhone 15 Pro', price: 1000, category: 'Smartphone', image: '/path/to/iphone.jpg' },
+  { id: 2, name: 'MacBook Air M3', price: 1200, category: 'Laptop', image: '/path/to/macbook.jpg' },
+  { id: 3, name: 'Samsung Galaxy S24', price: 900, category: 'Smartphone', image: '/path/to/samsung.jpg' },
+  // Thêm sản phẩm khác...
+];
+
+
+// 1. Tạo Context
+const ProductContext = createContext();
+
+// 2. Tạo Provider Component
+export const ProductProvider = ({ children }) => {
+  const [products, setProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    // Simulate fetching data
+    const loadProducts = async () => {
+      setLoading(true);
+      setError(null);
+      try {
+        // Thay thế bằng lời gọi API thật
+        // const data = await fetchProducts();
+        // setProducts(data);
+
+        // --- Sử dụng dữ liệu giả lập ---
+        await new Promise(resolve => setTimeout(resolve, 500)); // Giả lập độ trễ mạng
+        setProducts(mockProducts);
+        // --- Kết thúc dữ liệu giả lập ---
+
+      } catch (err) {
+        setError('Failed to fetch products.');
+        console.error(err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadProducts();
+  }, []); // Chạy 1 lần khi component mount
+
+  // Hàm lấy sản phẩm theo ID (ví dụ)
+  const getProductById = (id) => {
+    // Chuyển id sang number nếu cần
+    const productId = parseInt(id, 10);
+    return products.find(product => product.id === productId);
+  }
+
+
+  const value = {
+    products,
+    loading,
+    error,
+    getProductById, // Cung cấp hàm này qua context
+  };
+
+  return (
+    <ProductContext.Provider value={value}>
+      {children}
+    </ProductContext.Provider>
+  );
+};
+
+// 3. Tạo Custom Hook để sử dụng Context (tiện lợi hơn)
+export const useProducts = () => {
+  const context = useContext(ProductContext);
+  if (context === undefined) {
+    throw new Error('useProducts must be used within a ProductProvider');
+  }
+  return context;
+};

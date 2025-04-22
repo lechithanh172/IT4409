@@ -1,0 +1,53 @@
+.pageContainer {
+    max-width: 1200px;
+    margin: 20px auto;
+    padding: 0 15px;
+  }
+  
+  .errorContainer {
+    text-align: center;
+    padding: 40px 0;
+  }
+  
+  .errorMessage {
+    color: #dc3545; /* Màu đỏ báo lỗi */
+    font-size: 1.1rem;
+    margin-bottom: 20px;
+  }
+  
+  /* Style cho Breadcrumbs (tùy chọn) */
+  .breadcrumbs {
+      margin-bottom: 20px;
+      font-size: 0.9rem;
+      color: #555;
+  }
+  .breadcrumbs a {
+      color: #007bff;
+      text-decoration: none;
+  }
+  .breadcrumbs a:hover {
+      text-decoration: underline;
+  }
+  .breadcrumbs span {
+      color: #777;
+  }
+  
+  /* Style cho các section bổ sung (tùy chọn) */
+  .descriptionSection,
+  .reviewSection {
+      margin-top: 40px;
+      padding-top: 30px;
+      border-top: 1px solid #eee;
+  }
+  
+  .descriptionSection h2,
+  .reviewSection h2 {
+      font-size: 1.5rem;
+      margin-bottom: 20px;
+      color: #333;
+  }
+  
+  .descriptionSection p {
+      line-height: 1.7;
+      color: #555;
+  }

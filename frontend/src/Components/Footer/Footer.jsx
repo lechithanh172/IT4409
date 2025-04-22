@@ -1,4 +1,5 @@
 import React from 'react';
+import './Footer.css';
 
 const Footer = () => {
     return (
@@ -34,14 +35,15 @@ const Footer = () => {
             <section className="container text-center text-md-start mt-5">
                 <div className="row mt-3">
                     <div className="col-md-3 col-lg-4 col-xl-3 mx-auto mb-4">
-                        <h6 className="text-uppercase fw-bold">Company name</h6>
+                        <h6 className="text-uppercase fw-bold">SENA Shop</h6>
                         <hr
                             className="mb-4 mt-0 d-inline-block mx-auto"
                             style={{ width: '60px', backgroundColor: '#fff', height: '2px' }}
                         />
                         <p>
-                            Here you can use rows and columns to organize your footer content. Lorem ipsum dolor sit
-                            amet.
+                            Cam kết về chất lượng và dịch vụ chuyên nghiệp, chúng tôi luôn đảm bảo rằng
+                            mỗi khách hàng đều có trải nghiệm mua sắm tốt nhất khi đến với chúng tôi. Hãy ghé thăm cửa
+                            hàng của chúng tôi ngay hôm nay để khám phá thế giới công nghệ đầy sáng tạo và tiện ích!
                         </p>
                     </div>
 
@@ -81,17 +83,17 @@ const Footer = () => {
                         />
                         <p>
                             <a href="#" className="text-white">
-                            Thông tin khuyến mại
+                                Thông tin khuyến mại
                             </a>
                         </p>
                         <p>
                             <a href="#" className="text-white">
-                            Sản phẩm khuyến mại
+                                Sản phẩm khuyến mại
                             </a>
                         </p>
                         <p>
                             <a href="#" className="text-white">
-                            Sản phẩm mới
+                                Sản phẩm mới
                             </a>
                         </p>
                         <p>
@@ -108,16 +110,16 @@ const Footer = () => {
                             style={{ width: '60px', backgroundColor: '#fff', height: '2px' }}
                         />
                         <p>
-                            <i className="fas fa-home mr-3"></i> New York, NY 10012, US
+                            <i className="fas fa-home mr-3"></i>Hai Bà Trưng, Hà Nội
                         </p>
                         <p>
-                            <i className="fas fa-envelope mr-3"></i> info@example.com
+                            <i className="fas fa-envelope mr-3"></i> info@techzone.com
                         </p>
                         <p>
-                            <i className="fas fa-phone mr-3"></i> +01 234 567 88
+                            <i className="fas fa-phone mr-3"></i> 0366699999
                         </p>
                         <p>
-                            <i className="fas fa-print mr-3"></i> +01 234 567 89
+                            <i className="fas fa-print mr-3"></i> 099998888
                         </p>
                     </div>
                 </div>
@@ -126,8 +128,8 @@ const Footer = () => {
             {/* Copyright */}
             <div className="text-center p-3" style={{ backgroundColor: 'rgba(0, 0, 0, 0.2)' }}>
                 © 2025 Copyright:{' '}
-                <a className="text-white" href="https://hacom.vn/">
-                    Hacom
+                <a className="text-white" href="/">
+                    SENA Shop
                 </a>
             </div>
 

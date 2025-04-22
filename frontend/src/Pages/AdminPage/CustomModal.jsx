@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import ReactDOM from 'react-dom';
 import { Modal, Input, Button } from 'antd';
 
-const CustomModal = ({ isVisible, onClose, selectedUser, socket }) => {
+const CustomModal = ({ isVisible, onClose, selectedUser }) => {
   const [message, setMessage] = useState('');
 
   // Nếu `selectedUser.mes` là một chuỗi đơn giản, hiển thị trực tiếp
@@ -32,30 +32,6 @@ const CustomModal = ({ isVisible, onClose, selectedUser, socket }) => {
             </div>
           ))}
         </div>
-        <Input.TextArea
-          rows={2}
-          placeholder="Nhập tin nhắn..."
-          value={message}
-          onChange={(e) => setMessage(e.target.value)}
-          onPressEnter={() => {
-            if (message.trim()) {
-              socket.emit('send_message', { text: message, userId: selectedUser.id, sender: 'admin' });
-              setMessage(''); // Xóa nội dung sau khi gửi
-            }
-          }}
-        />
-        <Button
-          type="primary"
-          onClick={() => {
-            if (message.trim()) {
-              socket.emit('send_message', { text: message, userId: selectedUser.id, sender: 'admin' });
-              setMessage(''); // Xóa nội dung sau khi gửi
-            }
-          }}
-          style={{ marginTop: 10 }}
-        >
-          Gửi
-        </Button>
       </div>
     </Modal>,
     document.body

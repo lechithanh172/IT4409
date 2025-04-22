@@ -7,8 +7,8 @@ const Tooltip = ({ visible, content, position, onClose }) => {
     <div
       style={{
         position: "fixed",
-        top: position.top,
-        left: position.left,
+        top: "62.75px",
+        left: "1103.24px",
         zIndex: 9999,
         backgroundColor: "#fff",
         boxShadow: "0 4px 10px rgba(0, 0, 0, 0.2)",

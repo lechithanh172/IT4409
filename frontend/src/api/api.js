@@ -1,18 +1,21 @@
 import axios from "axios";
 
-// Base URL local cho API
-export const base_url = "http://localhost:5000";
+// =========================
+// 🔧 Cấu hình axios instance
+// =========================
+export const base_url = "http://3.27.90.134:8080";
 axios.defaults.withCredentials = true;
 
 const apiInstance = axios.create({
   baseURL: base_url,
-  timeout: 60000, // Timeout 10 giây
+  timeout: 60000,
 });
 
-// Interceptor để thêm token vào header Authorization
+// ✅ Interceptor: Thêm token vào Authorization header
 apiInstance.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem("authToken"); // Lấy token từ localStorage
+    const token = localStorage.getItem("accessToken");
+    // token = '';
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
@@ -21,7 +24,7 @@ apiInstance.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
-// Interceptor để xử lý lỗi phản hồi
+// ❌ Interceptor: Xử lý lỗi phản hồi
 apiInstance.interceptors.response.use(
   (response) => response,
   (error) => {
@@ -30,72 +33,64 @@ apiInstance.interceptors.response.use(
   }
 );
 
-// **API Service**
+// ========================================
+// 📦 API Service – Gom nhóm theo chức năng
+// ========================================
 const apiService = {
 
-  // **Cart APIs**
-  getCart: () => apiInstance.get("cart"),
-  addProductToCart: (productId, variantColor, quantity) => apiInstance.post("cart/add", { productId, variantColor, quantity }),
-  updateCartQuantity: (productId, variantColor, quantity) => apiInstance.put("cart/update", { productId, variantColor, quantity }),
-  removeProductFromCart: (productId, variantColor) => apiInstance.delete("cart/delete", { data: { productId, variantColor } }),
-  clearCart: () => apiInstance.delete("cart/clear"),
+  // -------------------------------
+  // 🗂 CATEGORY APIs
+  // -------------------------------
+  updateCategory: (data) => apiInstance.put("/category/update", data),
+  deleteCategory: (categoryId) =>
+    apiInstance.delete("/category/delete", {
+      params: { categoryId },
+    }),
+  getProductsByCategory: (categoryName) =>
+    apiInstance.get(`/product/category=${categoryName}`),
 
-
-  // **Comment and Rating APIs**
-  addReview: (productId, userId, stars, text) => apiInstance.post(`/product/${productId}/review`, {productId, userId, stars, text}),
-  addComment: (productId, userId, text, rating) => apiInstance.post(`/comments`, { productId, userId, text, rating }),
-  getComments: (productId) => apiInstance.get(`/comments/${productId}`),
-
-  // **User APIs**
-  registerUser: (newUser) => apiInstance.post("/register", newUser),
-  loginUser: (user) => apiInstance.post("/login", user),
-  getUserProfile: () => apiInstance.get("/profile"),
-  getProducts: () => apiInstance.get("/product"),
-  updateUserProfile: (userData) => apiInstance.put("/profile", userData), // Chỉnh sửa thông tin cá nhân
-  changePassword: (oldPassword, newPassword) => apiInstance.put("/change-password", {
-      oldPassword,
-      newPassword
-  }),
-
-  // **Product APIs**//
-  getProductById: (productId) => apiInstance.get(`/product/${productId}`),
-  // Lấy danh sách sản phẩm liên quan
-  getRelatedProducts: (productId) => apiInstance.get(`/product/${productId}/related`),
-
-  // **Order APIs** 
-  createOrder: (orderData) => apiInstance.post("/orders", orderData),
-  getUserOrders: (userId) => apiInstance.get(`/orders/${userId}`),
-  updateOrderStatus: (orderId, status) =>
-    apiInstance.put(`/orders/${orderId}/status`, { status }),
-  deleteOrder: (orderId) =>
-    apiInstance.delete(`/orders/${orderId}`),
-  cancelOrder: (orderId) => apiInstance.patch(`/orders/${orderId}`), 
-
-  // **Admin APIs**
-  getAdminDashboard: () => apiInstance.get("/admin/dashboard"),
-  getAdminProfile: () => apiInstance.get("/admin/profile"),
-  updateAdminProfile: (adminData) =>
-    apiInstance.patch("/admin/profile", adminData),
-  changeAdminPassword: (passwordData) =>
-    apiInstance.patch("/admin/change-password", passwordData),
-
-  // **Admin User Management**
-  getAllUsers: () => apiInstance.get("/admin/users"),
-  deleteUser: (userId) => apiInstance.delete(`/admin/users/${userId}`),
-
-  // **Admin Product Management**
-  getAllProducts: () => apiInstance.get("/admin/products"),
-  createProduct: (productData) =>
-    apiInstance.post("/admin/products", productData),
+  // -------------------------------
+  // 🛍 PRODUCT APIs
+  // -------------------------------
+  addProduct: (data) => apiInstance.post("/product/add", data),
+  updateProduct: (data) => apiInstance.put("/product/update", data),
   deleteProduct: (productId) =>
-    apiInstance.delete(`/admin/products/${productId}`),
-  updateProduct: (productId, productData) =>
-    apiInstance.patch(`/admin/products/${productId}`, productData),
+    apiInstance.delete("/product/delete", {
+      params: { productId },
+    }),
+  searchProducts: (keyword) =>
+    apiInstance.get(`/product/search=${keyword}`),
+  // -------------------------------
+  // 🛒 CART ITEM APIs
+  // -------------------------------
+  addToCart: (data) => apiInstance.post("/cart-item/add", data),
+  updateCartItem: (data) => apiInstance.put("/cart-item/update", data),
+  removeCartItem: (data) => apiInstance.post("/cart-item/remove", data),
 
-  // **Admin Order Management**
-  getAllOrders: () => apiInstance.get("/admin/order"),
-  updateOrderAdmin: (orderId, newStatus) =>
-    apiInstance.put("/admin/order/update-status", { orderId, newStatus }),
+  // -------------------------------
+  // 📦 ORDER APIs
+  // -------------------------------
+  createOrder: (data) => apiInstance.post("/order/create", data),
+  getOrderHistory: (username) => apiInstance.get(`/order/history/${username}`),
+  getOrderById: (orderId) => apiInstance.get(`/order/view/${orderId}`),
+  getOrdersByStatus: (status) => apiInstance.get(`/order/status/${status}`),
+  approveOrder: (orderId) => apiInstance.post(`/order/approve/${orderId}`),
+
+  // -------------------------------
+  // 👤 USER APIs
+  // -------------------------------
+  getUserInfo: (username) => apiInstance.get(`/user/info/${username}`),
+  updateUserInfo: (data) => apiInstance.put("/user/update", data),
+  deleteUser: (userId) =>
+    apiInstance.delete("/user/delete", {
+      params: { userId },
+    }),
+  changePassword: (data) => apiInstance.put("/user/change-password", data),
+  forgetPassword: (email) =>
+    apiInstance.post("/user/forget-password", null, {
+      params: { email },
+    }),
+  resetPassword: (data) => apiInstance.post("/user/reset-password", data),
 };
 
 export default apiService;

@@ -4,7 +4,7 @@
     flex-wrap: wrap !important;
     gap: 10px;
     margin-bottom: 15px;
-    margin: 15px auto;
+    margin: 15px calc((25vw - 10px)/2) 0px calc((25vw + 10px )/2);
     width: 75vw;
 }
 
@@ -17,4 +17,9 @@
 
 .category-loadmore:hover {
     text-decoration: underline;
+}
+
+.all-product-list {
+    width: 100vw;
+    color: #444444;
 }

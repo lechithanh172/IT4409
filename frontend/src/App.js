@@ -10,7 +10,7 @@ function App() {
               {publicRoutes.map((route, index) => {
                 const Page = route.component;
                 const Layout = route.layout;
-                let category = route.category;
+                // let category = route.category;
 
                 return (
                   <Route

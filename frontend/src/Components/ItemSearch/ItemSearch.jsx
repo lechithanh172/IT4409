@@ -16,7 +16,7 @@ function ItemSearch(props) {
     );
   }
 
-  const discountPrice = props.price * (1 - props.sale / 100);
+  // const discountPrice = props.price * (1 - props.sale / 100);
   return (
     <div className="item1">
       <div className="item-info">

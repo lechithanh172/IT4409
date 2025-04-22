@@ -1,8 +1,6 @@
 import axios from "axios";
 
-// =========================
-// 🔧 Cấu hình axios instance
-// =========================
+// Cấu hình axios instance
 export const base_url = "http://3.27.90.134:8080";
 axios.defaults.withCredentials = true;
 
@@ -11,7 +9,7 @@ const apiInstance = axios.create({
   timeout: 60000,
 });
 
-// ✅ Interceptor: Thêm token vào Authorization header
+// Interceptor: Thêm token vào Authorization header
 apiInstance.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem("accessToken");
@@ -24,7 +22,7 @@ apiInstance.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
-// ❌ Interceptor: Xử lý lỗi phản hồi
+// Interceptor: Xử lý lỗi phản hồi
 apiInstance.interceptors.response.use(
   (response) => response,
   (error) => {
@@ -33,14 +31,9 @@ apiInstance.interceptors.response.use(
   }
 );
 
-// ========================================
-// 📦 API Service – Gom nhóm theo chức năng
-// ========================================
+// API Service – Gom nhóm theo chức năng
 const apiService = {
-
-  // -------------------------------
-  // 🗂 CATEGORY APIs
-  // -------------------------------
+  // CATEGORY APIs
   updateCategory: (data) => apiInstance.put("/category/update", data),
   deleteCategory: (categoryId) =>
     apiInstance.delete("/category/delete", {
@@ -49,9 +42,7 @@ const apiService = {
   getProductsByCategory: (categoryName) =>
     apiInstance.get(`/product/category=${categoryName}`),
 
-  // -------------------------------
-  // 🛍 PRODUCT APIs
-  // -------------------------------
+  // PRODUCT APIs
   addProduct: (data) => apiInstance.post("/product/add", data),
   updateProduct: (data) => apiInstance.put("/product/update", data),
   deleteProduct: (productId) =>
@@ -60,25 +51,20 @@ const apiService = {
     }),
   searchProducts: (keyword) =>
     apiInstance.get(`/product/search=${keyword}`),
-  // -------------------------------
-  // 🛒 CART ITEM APIs
-  // -------------------------------
+
+  // CART ITEM APIs
   addToCart: (data) => apiInstance.post("/cart-item/add", data),
   updateCartItem: (data) => apiInstance.put("/cart-item/update", data),
   removeCartItem: (data) => apiInstance.post("/cart-item/remove", data),
 
-  // -------------------------------
-  // 📦 ORDER APIs
-  // -------------------------------
+  // ORDER APIs
   createOrder: (data) => apiInstance.post("/order/create", data),
   getOrderHistory: (username) => apiInstance.get(`/order/history/${username}`),
   getOrderById: (orderId) => apiInstance.get(`/order/view/${orderId}`),
   getOrdersByStatus: (status) => apiInstance.get(`/order/status/${status}`),
   approveOrder: (orderId) => apiInstance.post(`/order/approve/${orderId}`),
 
-  // -------------------------------
-  // 👤 USER APIs
-  // -------------------------------
+  // USER APIs
   getUserInfo: (username) => apiInstance.get(`/user/info/${username}`),
   updateUserInfo: (data) => apiInstance.put("/user/update", data),
   deleteUser: (userId) =>

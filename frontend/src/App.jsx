@@ -7,7 +7,7 @@ import LoginPage from './pages/AuthPage/loginPage';
 import EmailInputPage from './pages/AuthPage/emailPage';
 import SignupPage from './pages/AuthPage/signupPage';
 import ChangePassword from './pages/AuthPage/changePasswordPage';
-// import OtpPage from './pages/AuthPage/otpPage';
+import OtpPage from './pages/AuthPage/otpPage';
 function App() {
   return (
     <Routes>
@@ -19,6 +19,7 @@ function App() {
         <Route path="email" element={<EmailInputPage />} />
         <Route path="signup" element={<SignupPage />} />
         <Route path="change-password" element={<ChangePassword />} />
+        <Route path="otp" element={<OtpPage />} />
       </Route>
     </Routes>
   );

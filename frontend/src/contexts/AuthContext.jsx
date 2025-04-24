@@ -131,7 +131,7 @@ export const AuthProvider = ({ children }) => {
     }
   };
   //hàm lấy otp
-  const Otp = (onSuccessCallback) => {
+  const useOtp = (onSuccessCallback) => {
     const [otp, setOtp] = useState(new Array(6).fill(''));
     const [secondsLeft, setSecondsLeft] = useState(300);
 
@@ -155,11 +155,11 @@ export const AuthProvider = ({ children }) => {
       if (element.nextSibling) element.nextSibling.focus();
     };
 
-    const handleSubmit = (e, type, navigate) => {
+    const handleSubmit = (e) => {
       e.preventDefault();
       const otpCode = otp.join('');
       if (otpCode === '123456') {
-        if (onSuccessCallback) onSuccessCallback(type, navigate);
+        if (onSuccessCallback) onSuccessCallback();
       } else {
         alert('OTP không đúng!');
       }
@@ -206,7 +206,7 @@ export const AuthProvider = ({ children }) => {
     logout,
     changePassword,
     signup,
-    Otp,
+    useOtp,
     EmailInput
   };
 

@@ -18,6 +18,19 @@ import {
   FiUserCheck // Ví dụ icon cho profile khi đăng nhập
 } from 'react-icons/fi'; // Chọn bộ icon bạn thích (Feather icons)
 
+const Category = [
+  { "categoryId": 1, "name": "Laptop", "description": "Portable personal computers" },
+  { "categoryId": 2, "name": "Tablet", "description": "Touchscreen mobile devices" },
+  { "categoryId": 3, "name": "Smartphone", "description": "Mobile phones" },
+  { "categoryId": 4, "name": "Accessory", "description": "Computer accessories" },
+  { "categoryId": 5, "name": "Monitor", "description": "Display devices" },
+  { "categoryId": 6, "name": "Printer", "description": "Printing machines" },
+  { "categoryId": 7, "name": "Router", "description": "Network routers" },
+  { "categoryId": 8, "name": "Speaker", "description": "Audio output devices" },
+  { "categoryId": 9, "name": "Camera", "description": "Photography and video" },
+  { "categoryId": 10, "name": "Smartwatch", "description": "Wearable smart devices" }
+]
+
 const Header = () => {
   const { cartItemCount } = useCart();
   const navigate = useNavigate();
@@ -26,6 +39,8 @@ const Header = () => {
   // State giả lập đăng nhập (thay bằng context/logic thật sau này)
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [userName, setUserName] = useState('User Name'); // Tên user khi đăng nhập
+  const [categories, setCategories] = useState([]);
+  
 
   const [searchTerm, setSearchTerm] = useState('');
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -103,6 +118,11 @@ const Header = () => {
        // navigate('/signup'); // Chuyển đến trang signup thật
    }
 
+   useEffect(() => {
+     setCategories(Category); // Giả lập lấy danh mục từ API (thay bằng API thật sau này)
+   })
+
+
   // --- RENDER ---
   return (
     <header className={styles.header}>
@@ -125,12 +145,20 @@ const Header = () => {
             </button>
             {isCategoryDropdownOpen && (
               <div className={`${styles.dropdownMenu} ${styles.categoryDropdown}`}>
-                <Link to="/products?category=Smartphone" className={styles.dropdownItem} onClick={toggleCategoryDropdown}>
+                {
+                  categories.map((category) => (
+                    <Link to={`/products?category=${category.name}`} className={styles.dropdownItem} key={category.id} onClick={toggleCategoryDropdown}>
+                      {/* <span className={styles.categoryEmoji}>📦</span>  */}
+                      {category.name}
+                    </Link>
+                  ))
+                }
+                {/* <Link to="/products?category=Smartphone" className={styles.dropdownItem} onClick={toggleCategoryDropdown}>
                   <span className={styles.categoryEmoji}>📱</span> Smartphones
                 </Link>
                 <Link to="/products?category=Laptop" className={styles.dropdownItem} onClick={toggleCategoryDropdown}>
                  <span className={styles.categoryEmoji}>💻</span> Laptops
-                </Link>
+                </Link> */}
                 {/* Thêm danh mục khác nếu cần */}
                  <Link to="/products" className={styles.dropdownItem} onClick={toggleCategoryDropdown}>
                    Tất cả sản phẩm

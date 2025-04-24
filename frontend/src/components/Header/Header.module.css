@@ -128,6 +128,8 @@
        opacity: 1;
        visibility: visible;
        transform: translateY(0);
+       max-height: 50vh;
+       overflow-y: auto; /* Scroll nếu nội dung dài */
   }
   
   
@@ -143,7 +145,7 @@
     transition: background-color 0.2s ease, color 0.2s ease;
     background: none;
     border: none;
-    width: 100%;
+    width: 80%;
     text-align: left;
     cursor: pointer;
   }
@@ -293,7 +295,7 @@
     right: -4px;
     background-color: #e74c3c; /* Màu đỏ nổi bật */
     color: white;
-    border-radius: 50%;
+    border-radius: 40px;
     padding: 2px 5px; /* Điều chỉnh padding */
     font-size: 0.7rem; /* Cỡ chữ nhỏ */
     font-weight: bold;

@@ -1,8 +1,10 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { useCart } from '../../contexts/CartContext';
+// import { useCart } from '../../contexts/CartContext';
 import styles from './ProductCard.module.css';
-import Button from '../Button/Button'; // Import Button component
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faStar } from "@fortawesome/free-solid-svg-icons";
+
 
 // Hàm định dạng tiền tệ (có thể đặt trong src/utils/formatters.js)
 const formatCurrency = (amount) => {
@@ -10,35 +12,58 @@ const formatCurrency = (amount) => {
 };
 
 const ProductCard = ({ product }) => {
-  const { addItemToCart } = useCart(); // Lấy hàm thêm vào giỏ hàng
-
-  const handleAddToCart = (e) => {
-    e.preventDefault(); // Ngăn Link chuyển trang nếu bấm vào nút
-    e.stopPropagation(); // Ngăn sự kiện nổi bọt lên Link cha
-    addItemToCart(product, 1); // Thêm 1 sản phẩm
-    // Optional: Hiển thị thông báo đã thêm thành công
-    alert(`${product.name} đã được thêm vào giỏ hàng!`);
-  };
-
-  if (!product) {
-    return null; // Hoặc hiển thị placeholder
-  }
 
   return (
     <Link to={`/products/${product.id}`} className={styles.cardLink}>
       <div className={styles.card}>
         <img
-          src={product.image || '/placeholder-image.png'} // Dùng ảnh placeholder nếu không có
+          src={product.imageUrl || '/placeholder-image.png'} // Dùng ảnh placeholder nếu không có
           alt={product.name}
           className={styles.productImage}
         />
         <div className={styles.cardBody}>
-          <h3 className={styles.productName}>{product.name}</h3>
-          <p className={styles.productPrice}>{formatCurrency(product.price * 25000)}</p> {/* Giả sử giá USD */}
-          <p className={styles.productCategory}>{product.category}</p>
-          <Button onClick={handleAddToCart} className={styles.addToCartButton}>
-             Thêm vào giỏ
-          </Button>
+          <h3 className={styles.productName}>{product.productName}</h3>
+          <div className={styles.boxPrice}>
+            <p className={styles.productPriceNew}>{formatCurrency(product.price)}</p> {/* Giả sử giá USD */}
+            <p className={styles.productPriceOld}>{formatCurrency(product.price)}</p> {/* Giả sử giá USD */}
+            <div className={styles.itemPricePercent}>
+              <p className={styles.itemPricePercentDetail}>
+                  Giảm&nbsp;
+                  {(100 - (product.price / product.price) * 100).toFixed(0)}%
+              </p>
+            </div>
+          </div>
+          {/* <p className={styles.productCategory}>{title}</p> */}
+
+          <div className="itemPromotions">
+            <div className="promotion">
+              <p className="couponPrice">
+                Không phí chuyển đổi khi trả góp 0% qua thẻ tín dụng kỳ hạn 3-6
+                tháng
+              </p>
+            </div>
+          </div>
+
+          <div className={styles.bottomDiv}>
+            <div className={styles.itemRating}>
+              <div className={styles.iconStar}>
+                <FontAwesomeIcon icon={faStar} />
+              </div>
+              <div className={styles.iconStar}>
+                <FontAwesomeIcon icon={faStar} />
+              </div>
+              <div className={styles.iconStar}>
+                <FontAwesomeIcon icon={faStar} />
+              </div>
+              <div className={styles.iconStar}>
+                <FontAwesomeIcon icon={faStar} />
+              </div>
+              <div className={styles.iconStar}>
+                <FontAwesomeIcon icon={faStar} />
+              </div>
+            </div>
+          </div>
+
         </div>
       </div>
     </Link>

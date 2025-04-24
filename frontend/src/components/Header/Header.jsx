@@ -82,26 +82,26 @@ const Header = () => {
     navigate('/');
   };
 
-   // Hàm tiện ích đóng tất cả dropdown/menu
-   const closeAllDropdowns = () => {
+  // Hàm tiện ích đóng tất cả dropdown/menu
+  const closeAllDropdowns = () => {
     setIsMobileMenuOpen(false);
     setIsCategoryDropdownOpen(false);
     setIsUserDropdownOpen(false);
   };
 
-   // Hàm xử lý khi click vào link trong mobile menu -> đóng menu
-   const handleMobileLinkClick = () => {
-       setIsMobileMenuOpen(false);
-   }
+  // Hàm xử lý khi click vào link trong mobile menu -> đóng menu
+  const handleMobileLinkClick = () => {
+    setIsMobileMenuOpen(false);
+  }
 
-   // Hàm giả lập đăng nhập/đăng ký (chỉ để demo)
-   const handleLoginClick = () => {
-       setIsLoggedIn(true); // Giả lập đăng nhập thành công
-       // navigate('/login'); // Hoặc chuyển đến trang login thật
-   }
-   const handleSignupClick = () => {
-       // navigate('/signup'); // Chuyển đến trang signup thật
-   }
+  // Hàm giả lập đăng nhập/đăng ký (chỉ để demo)
+  const handleLoginClick = () => {
+    //  setIsLoggedIn(true); // Giả lập đăng nhập thành công
+    navigate('/login'); // Hoặc chuyển đến trang login thật
+  }
+  const handleSignupClick = () => {
+    navigate('/signup'); // Chuyển đến trang signup thật
+  }
 
   // --- RENDER ---
   return (
@@ -129,18 +129,18 @@ const Header = () => {
                   <span className={styles.categoryEmoji}>📱</span> Smartphones
                 </Link>
                 <Link to="/products?category=Laptop" className={styles.dropdownItem} onClick={toggleCategoryDropdown}>
-                 <span className={styles.categoryEmoji}>💻</span> Laptops
+                  <span className={styles.categoryEmoji}>💻</span> Laptops
                 </Link>
                 {/* Thêm danh mục khác nếu cần */}
-                 <Link to="/products" className={styles.dropdownItem} onClick={toggleCategoryDropdown}>
-                   Tất cả sản phẩm
+                <Link to="/products" className={styles.dropdownItem} onClick={toggleCategoryDropdown}>
+                  Tất cả sản phẩm
                 </Link>
               </div>
             )}
           </div>
 
           {/* Thêm link khác nếu cần, ví dụ: Khuyến mãi */}
-           <NavLink to="/promotions" className={({ isActive }) => isActive ? `${styles.navLink} ${styles.active}` : styles.navLink}>
+          <NavLink to="/promotions" className={({ isActive }) => isActive ? `${styles.navLink} ${styles.active}` : styles.navLink}>
             Khuyến Mãi
           </NavLink>
         </nav>
@@ -176,19 +176,19 @@ const Header = () => {
                 <button onClick={toggleUserDropdown} className={`${styles.actionButton} ${styles.userButton}`} title="Tài khoản">
                   <FiUserCheck /> {/* Icon khác khi đăng nhập */}
                   {/* <span className={styles.userNameDesktop}>{userName}</span> */}
-                   <FiChevronDown className={`${styles.chevronIcon} ${styles.userChevron} ${isUserDropdownOpen ? styles.chevronOpen : ''}`} />
+                  <FiChevronDown className={`${styles.chevronIcon} ${styles.userChevron} ${isUserDropdownOpen ? styles.chevronOpen : ''}`} />
                 </button>
                 {isUserDropdownOpen && (
                   <div className={`${styles.dropdownMenu} ${styles.userDropdown}`}>
                     <div className={styles.dropdownHeader}>Chào, {userName}!</div>
                     <Link to="/profile" className={styles.dropdownItem} onClick={toggleUserDropdown}>
-                       <FiUser className={styles.dropdownIcon}/> Hồ sơ
+                      <FiUser className={styles.dropdownIcon} /> Hồ sơ
                     </Link>
                     <Link to="/orders" className={styles.dropdownItem} onClick={toggleUserDropdown}>
-                       <FiBox className={styles.dropdownIcon}/> Đơn hàng
+                      <FiBox className={styles.dropdownIcon} /> Đơn hàng
                     </Link>
                     <button onClick={handleLogout} className={`${styles.dropdownItem} ${styles.logoutButton}`}>
-                      <FiLogOut className={styles.dropdownIcon}/> Đăng xuất
+                      <FiLogOut className={styles.dropdownIcon} /> Đăng xuất
                     </button>
                   </div>
                 )}
@@ -223,21 +223,21 @@ const Header = () => {
 
         {/* --- Auth/User Info in Mobile Menu --- */}
         <div className={styles.mobileUserInfo}>
-           {isLoggedIn ? (
-             <>
-                <div className={styles.mobileWelcome}>
-                  <FiUserCheck className={styles.mobileUserIcon}/> Chào, {userName}!
-                </div>
-                <Link to="/profile" className={styles.mobileNavLink} onClick={handleMobileLinkClick}>Hồ sơ</Link>
-                <Link to="/orders" className={styles.mobileNavLink} onClick={handleMobileLinkClick}>Đơn hàng</Link>
-                <button onClick={handleLogout} className={`${styles.mobileNavLink} ${styles.mobileLogoutButton}`}>Đăng xuất</button>
-             </>
-           ) : (
-             <div className={styles.mobileAuthButtons}>
-                 <Button variant="primary" onClick={() => { handleLoginClick(); handleMobileLinkClick(); }} className={styles.mobileAuthBtn}>Đăng nhập</Button>
-                 <Button variant="secondary" onClick={() => { handleSignupClick(); handleMobileLinkClick(); }} className={styles.mobileAuthBtn}>Đăng ký</Button>
-             </div>
-           )}
+          {isLoggedIn ? (
+            <>
+              <div className={styles.mobileWelcome}>
+                <FiUserCheck className={styles.mobileUserIcon} /> Chào, {userName}!
+              </div>
+              <Link to="/profile" className={styles.mobileNavLink} onClick={handleMobileLinkClick}>Hồ sơ</Link>
+              <Link to="/orders" className={styles.mobileNavLink} onClick={handleMobileLinkClick}>Đơn hàng</Link>
+              <button onClick={handleLogout} className={`${styles.mobileNavLink} ${styles.mobileLogoutButton}`}>Đăng xuất</button>
+            </>
+          ) : (
+            <div className={styles.mobileAuthButtons}>
+              <Button variant="primary" onClick={() => { handleLoginClick(); handleMobileLinkClick(); }} className={styles.mobileAuthBtn}>Đăng nhập</Button>
+              <Button variant="secondary" onClick={() => { handleSignupClick(); handleMobileLinkClick(); }} className={styles.mobileAuthBtn}>Đăng ký</Button>
+            </div>
+          )}
         </div>
 
         <hr className={styles.mobileMenuDivider} />
@@ -247,21 +247,21 @@ const Header = () => {
 
         {/* --- Categories in Mobile Menu --- */}
         <div className={styles.mobileCategorySection}>
-             <div className={styles.mobileNavGroupTitle}>Danh Mục</div>
-            <Link to="/products?category=Smartphone" className={styles.mobileNavLink} onClick={handleMobileLinkClick}>📱 Smartphones</Link>
-            <Link to="/products?category=Laptop" className={styles.mobileNavLink} onClick={handleMobileLinkClick}>💻 Laptops</Link>
-            <Link to="/products" className={styles.mobileNavLink} onClick={handleMobileLinkClick}>Tất cả sản phẩm</Link>
+          <div className={styles.mobileNavGroupTitle}>Danh Mục</div>
+          <Link to="/products?category=Smartphone" className={styles.mobileNavLink} onClick={handleMobileLinkClick}>📱 Smartphones</Link>
+          <Link to="/products?category=Laptop" className={styles.mobileNavLink} onClick={handleMobileLinkClick}>💻 Laptops</Link>
+          <Link to="/products" className={styles.mobileNavLink} onClick={handleMobileLinkClick}>Tất cả sản phẩm</Link>
         </div>
 
-         <hr className={styles.mobileMenuDivider} />
+        <hr className={styles.mobileMenuDivider} />
 
-         {/* --- Other Links --- */}
-          <Link to="/promotions" className={styles.mobileNavLink} onClick={handleMobileLinkClick}>Khuyến Mãi</Link>
-          {/* Thêm link khác nếu cần */}
+        {/* --- Other Links --- */}
+        <Link to="/promotions" className={styles.mobileNavLink} onClick={handleMobileLinkClick}>Khuyến Mãi</Link>
+        {/* Thêm link khác nếu cần */}
 
       </nav>
-       {/* Lớp phủ khi mobile menu mở */}
-       {isMobileMenuOpen && <div className={styles.overlay} onClick={toggleMobileMenu}></div>}
+      {/* Lớp phủ khi mobile menu mở */}
+      {isMobileMenuOpen && <div className={styles.overlay} onClick={toggleMobileMenu}></div>}
     </header>
   );
 };

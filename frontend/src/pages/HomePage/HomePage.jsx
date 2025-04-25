@@ -3,18 +3,19 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { useProducts } from '../../contexts/ProductContext';
 import ProductCard from '../../Components/ProductCard/ProductCard';
-import Popular from '../../Components/Popular/Popular';
-import List from '../../components/List/List';
+// import Popular from '../../Components/Popular/Popular';
+import ListItem from '../../components/ListItem/ListItem';
 import Button from '../../components/Button/Button';
 import Spinner from '../../components/Spinner/Spinner';
 import styles from './HomePage.module.css';
+import apiService from '../../services/api';
 
 // Import hình ảnh (hoặc dùng URL trực tiếp)
 // import heroBg from '../../assets/images/hero-background.jpg'; // Ví dụ nếu có ảnh trong assets
 // import smartphoneCatImg from '../../assets/images/category-smartphone.jpg';
 // import laptopCatImg from '../../assets/images/category-laptop.jpg';
 
-const Category = [
+const allCategory = [
   { "categoryId": 1, "name": "Laptop", "description": "Portable personal computers" },
   { "categoryId": 2, "name": "Tablet", "description": "Touchscreen mobile devices" },
   { "categoryId": 3, "name": "Smartphone", "description": "Mobile phones" },
@@ -27,17 +28,17 @@ const Category = [
   { "categoryId": 10, "name": "Smartwatch", "description": "Wearable smart devices" }
 ]
 
-const Brand = [
-  { "brand_id": 1, "name": "Apple", "logoUrl": "https://cdn2.cellphones.com.vn/insecure/rs:fill:0:50/q:30/plain/https://cellphones.com.vn/media/tmp/catalog/product/f/r/frame_59.png" },
-  { "brand_id": 2, "name": "Samsung", "logoUrl": "https://cdn2.cellphones.com.vn/insecure/rs:fill:0:50/q:30/plain/https://cellphones.com.vn/media/tmp/catalog/product/f/r/frame_60.png" },
-  { "brand_id": 3, "name": "Dell", "logoUrl": "https://cdn2.cellphones.com.vn/insecure/rs:fill:0:50/q:30/plain/https://cellphones.com.vn/media/wysiwyg/Icon/brand_logo/Dell.png" },
-  { "brand_id": 4, "name": "HP", "logoUrl": "https://cdn2.cellphones.com.vn/insecure/rs:fill:0:50/q:30/plain/https://cellphones.com.vn/media/wysiwyg/Icon/brand_logo/HP.png" },
-  { "brand_id": 5, "name": "Lenovo", "logoUrl": "https://cdn2.cellphones.com.vn/insecure/rs:fill:0:50/q:30/plain/https://cellphones.com.vn/media/wysiwyg/Icon/brand_logo/Lenovo.png" },
-  { "brand_id": 6, "name": "Asus", "logoUrl": "https://cdn2.cellphones.com.vn/insecure/rs:fill:0:50/q:30/plain/https://cellphones.com.vn/media/wysiwyg/Icon/brand_logo/Asus.png" },
-  { "brand_id": 7, "name": "MSI", "logoUrl": "https://cdn2.cellphones.com.vn/insecure/rs:fill:0:50/q:30/plain/https://cellphones.com.vn/media/wysiwyg/Icon/brand_logo/MSI.png" },
-  { "brand_id": 8, "name": "Acer", "logoUrl": "https://cdn2.cellphones.com.vn/insecure/rs:fill:0:50/q:30/plain/https://cellphones.com.vn/media/wysiwyg/Icon/brand_logo/acer.png" },
-  { "brand_id": 9, "name": "Xiaomi", "logoUrl": "https://cdn2.cellphones.com.vn/insecure/rs:fill:0:50/q:30/plain/https://cellphones.com.vn/media/tmp/catalog/product/f/r/frame_61.png" },
-  { "brand_id": 10, "name": "Sony", "logoUrl": "https://cdn2.cellphones.com.vn/insecure/rs:fill:0:50/q:30/plain/https://cellphones.com.vn/media/catalog/product/b/r/brand-icon-sony_2.png" }
+const allBrand = [
+  { "brandId": 1, "name": "Apple", "logoUrl": "https://cdn2.cellphones.com.vn/insecure/rs:fill:0:50/q:30/plain/https://cellphones.com.vn/media/tmp/catalog/product/f/r/frame_59.png" },
+  { "brandId": 2, "name": "Samsung", "logoUrl": "https://cdn2.cellphones.com.vn/insecure/rs:fill:0:50/q:30/plain/https://cellphones.com.vn/media/tmp/catalog/product/f/r/frame_60.png" },
+  { "brandId": 3, "name": "Dell", "logoUrl": "https://cdn2.cellphones.com.vn/insecure/rs:fill:0:50/q:30/plain/https://cellphones.com.vn/media/wysiwyg/Icon/brand_logo/Dell.png" },
+  { "brandId": 4, "name": "HP", "logoUrl": "https://cdn2.cellphones.com.vn/insecure/rs:fill:0:50/q:30/plain/https://cellphones.com.vn/media/wysiwyg/Icon/brand_logo/HP.png" },
+  { "brandId": 5, "name": "Lenovo", "logoUrl": "https://cdn2.cellphones.com.vn/insecure/rs:fill:0:50/q:30/plain/https://cellphones.com.vn/media/wysiwyg/Icon/brand_logo/Lenovo.png" },
+  { "brandId": 6, "name": "Asus", "logoUrl": "https://cdn2.cellphones.com.vn/insecure/rs:fill:0:50/q:30/plain/https://cellphones.com.vn/media/wysiwyg/Icon/brand_logo/Asus.png" },
+  { "brandId": 7, "name": "MSI", "logoUrl": "https://cdn2.cellphones.com.vn/insecure/rs:fill:0:50/q:30/plain/https://cellphones.com.vn/media/wysiwyg/Icon/brand_logo/MSI.png" },
+  { "brandId": 8, "name": "Acer", "logoUrl": "https://cdn2.cellphones.com.vn/insecure/rs:fill:0:50/q:30/plain/https://cellphones.com.vn/media/wysiwyg/Icon/brand_logo/acer.png" },
+  { "brandId": 9, "name": "Xiaomi", "logoUrl": "https://cdn2.cellphones.com.vn/insecure/rs:fill:0:50/q:30/plain/https://cellphones.com.vn/media/tmp/catalog/product/f/r/frame_61.png" },
+  { "brandId": 10, "name": "Sony", "logoUrl": "https://cdn2.cellphones.com.vn/insecure/rs:fill:0:50/q:30/plain/https://cellphones.com.vn/media/catalog/product/b/r/brand-icon-sony_2.png" }
 ]
 
 const HomePage = () => {
@@ -50,8 +51,17 @@ const HomePage = () => {
   const featuredProducts = products;
   
   useEffect(() => {
-    setCategories(Category);
-    setBrands(Brand);
+    (async () => {
+      // const allCategory = await apiService.getAllCategories();
+      // const allBrand = await apiService.getAllBrands();
+      // console.log("allBrand", allBrand.data);
+      // console.log("allCategory", allCategory.data);
+      // setCategories(allCategory.data);
+      setCategories(allCategory);
+      setBrands(allBrand);
+      // setBrands(allBrand.data);
+      
+    })();
   },[])
 
   // URL ảnh mẫu (thay thế bằng ảnh của bạn)
@@ -103,7 +113,8 @@ const HomePage = () => {
                     </Link>
                  </div>
             )}
-            {/* <List className={styles.popularListItem} category="Smartphone"/> */}
+            <ListItem className={styles.popularListItem} category="Smartphone"/>
+            <ListItem className={styles.popularListItem} category="Laptop"/>
           </>
         )}
       </section>
@@ -111,8 +122,8 @@ const HomePage = () => {
       <section className={`${styles.section} ${styles.categoriesSectionBg}`}>
         <h2 className={styles.sectionTitle}>Khám Phá Thương Hiệu</h2>
         <div className={styles.brandList}>
-          {brands.map((brand) => (
-            <Link to={`/products?brand=${brand.name}`} key={brand.brand_id} className={styles.categoryCard}>
+          {brands.map((brand, index) => (
+            <Link to={`/products?brand=${brand.name}`} key={index} className={styles.categoryCard}>
               <div className={styles.brandImageWrapper}>
                 <img src={brand.logoUrl} alt={brand.name} className={styles.brandLogo} />
               </div>
@@ -120,8 +131,8 @@ const HomePage = () => {
           ))}
         </div>
         <div className={styles.categoryList}>
-          {categories.map((category) => (
-            <Link to={`/products?category=${category.name}`} key={category.categoryId} className={styles.categoryCard}>
+          {categories.map((category, index) => (
+            <Link to={`/products?category=${category.name}`} key={index} className={styles.categoryCard}>
               <div className={styles.categoryImageWrapper}>
                 <div className={styles.categoryOverlay}></div>
               </div>

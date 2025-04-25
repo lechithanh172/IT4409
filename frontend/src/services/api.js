@@ -41,7 +41,9 @@ const apiService = {
     }),
   getProductsByCategory: (categoryName) =>
     apiInstance.get(`/product/category=${categoryName}`),
-
+  getAllCategories: () => apiInstance.get("/category/"),
+  // BRAND APIs
+  getAllBrands: () => apiInstance.get("/brand/"),
   // PRODUCT APIs
   addProduct: (data) => apiInstance.post("/product/add", data),
   updateProduct: (data) => apiInstance.put("/product/update", data),

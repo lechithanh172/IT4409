@@ -66,7 +66,7 @@ const Header = () => {
   const handleSearchSubmit = (e) => {
     e.preventDefault();
     if (searchTerm.trim()) {
-      navigate(`/search?q=${encodeURIComponent(searchTerm.trim())}`); // Chuyển đến trang tìm kiếm
+      navigate(`/search?q=${encodeURIComponent(searchTerm)}`); // Chuyển đến trang tìm kiếm
       setSearchTerm(''); // Xóa ô tìm kiếm sau khi submit
       closeAllDropdowns(); // Đóng menu nếu đang mở
     }

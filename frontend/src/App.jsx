@@ -2,7 +2,6 @@ import React from 'react';
 import { Routes, Route } from 'react-router-dom';
 import MainLayout from './layouts/MainLayout';
 import HomePage from './pages/HomePage/HomePage';
-import adminLayout from './pages/AdminPage/adminLayout';
 import Admin from './pages/AdminPage/AdminPage';
 
 function App() {

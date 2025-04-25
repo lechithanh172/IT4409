@@ -32,11 +32,14 @@
   .popularTitle {
     text-align: center;
   }
+
+  .productListSwipper {
+    padding-bottom: 1vh
+  }
   
   .productList {
     display: flex;
-    gap: 20px;
-    overflow: hidden;
+    gap: 22px;
     width: 141%;
   }
   

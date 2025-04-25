@@ -9,6 +9,7 @@ import Button from '../../components/Button/Button';
 import Spinner from '../../components/Spinner/Spinner';
 import styles from './HomePage.module.css';
 import apiService from '../../services/api';
+import Banner from '../../components/Banner/Banner';
 
 // Import hình ảnh (hoặc dùng URL trực tiếp)
 // import heroBg from '../../assets/images/hero-background.jpg'; // Ví dụ nếu có ảnh trong assets
@@ -16,16 +17,16 @@ import apiService from '../../services/api';
 // import laptopCatImg from '../../assets/images/category-laptop.jpg';
 
 const allCategory = [
-  { "categoryId": 1, "name": "Laptop", "description": "Portable personal computers" },
-  { "categoryId": 2, "name": "Tablet", "description": "Touchscreen mobile devices" },
-  { "categoryId": 3, "name": "Smartphone", "description": "Mobile phones" },
-  { "categoryId": 4, "name": "Accessory", "description": "Computer accessories" },
-  { "categoryId": 5, "name": "Monitor", "description": "Display devices" },
-  { "categoryId": 6, "name": "Printer", "description": "Printing machines" },
-  { "categoryId": 7, "name": "Router", "description": "Network routers" },
-  { "categoryId": 8, "name": "Speaker", "description": "Audio output devices" },
-  { "categoryId": 9, "name": "Camera", "description": "Photography and video" },
-  { "categoryId": 10, "name": "Smartwatch", "description": "Wearable smart devices" }
+  { "categoryId": 1, "name": "Laptop", "description": "Portable personal computers", "image": "https://hanoicomputercdn.com/media/product/89677_laptop_lenovo_ideapad_slim_5_14irh10_83k0000avn_i5_13420h_24gb_ram_512gb_ssd_14_wuxga_win11_xam_0005_layer_2.jpg" },
+  { "categoryId": 2, "name": "Tablet", "description": "Touchscreen mobile devices", "image": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRtSLFI5VEetrtdyPEDnn55_2OTomtzGFwzSQ&s" },
+  { "categoryId": 3, "name": "Smartphone", "description": "Mobile phones", "image": "https://cdn2.cellphones.com.vn/insecure/rs:fill:358:358/q:90/plain/https://cellphones.com.vn/media/catalog/product/i/p/iphone-15-pro-256gb.png" },
+  { "categoryId": 4, "name": "Accessory", "description": "Computer accessories", "image": "https://i5.walmartimages.com/seo/Wireless-Charger-Magnetic-Fast-Charging-Stand-Compatible-iPhone-16-15-14-13-12-11-Pro-Max-Plus-XS-XR-X-8-Apple-Watch-9-8-7-6-5-4-3-2-SE-AirPods-3-2-P_66f5dc9c-ca3c-4097-8e8b-39ccfa66b6a0.b5cb13def4077c44bc9e6ffa883a35ee.jpeg?odnHeight=320&odnWidth=320&odnBg=FFFFFF" },
+  { "categoryId": 5, "name": "Monitor", "description": "Display devices", "image": "https://www.lg.com/content/dam/channel/wcms/vn/images/man-hinh-may-tinh/24mr400-b_atvq_eavh_vn_c/gallery/small03.jpg" },
+  { "categoryId": 6, "name": "Printer", "description": "Printing machines", "image": "https://cdn2.cellphones.com.vn/x/media/catalog/product/t/_/t_i_xu_ng_52__1_4.png" },
+  { "categoryId": 7, "name": "Router", "description": "Network routers", "image": "https://owlgaming.vn/wp-content/uploads/2024/06/Thiet-bi-phat-Wifi-6-Router-ASUS-TUF-Gaming-AX6000-1.jpg" },
+  { "categoryId": 8, "name": "Speaker", "description": "Audio output devices", "image": "https://product.hstatic.net/1000187560/product/loa-bluetooth-havit-sk832bt_2__459d04d6a66e4ff38bfa4f528e3cb2d5_large.png" },
+  { "categoryId": 9, "name": "Camera", "description": "Photography and video", "image": "https://www.bachkhoashop.com/wp-content/uploads/2022/12/gth788_1_.webp" },
+  { "categoryId": 10, "name": "Smartwatch", "description": "Wearable smart devices", "image": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQx-zhXJ2eJ5OxH7xxs0MnPpu5eNikP79VGbYQG_AEqHw57ezRC8BNLqqokP4n0KhtWCPo&usqp=CAU" }
 ]
 
 const allBrand = [
@@ -71,23 +72,11 @@ const HomePage = () => {
 
   return (
     <div className={styles.homePage}>
-      {/* Hero Section */}
-      <section
-        className={styles.heroSection}
-        style={{ backgroundImage: `url(${heroBgUrl})` }} // Set ảnh nền
-      >
-        <div className={styles.heroOverlay}></div> {/* Lớp phủ mờ */}
-        <div className={styles.heroContent}>
-          <h1 className={styles.heroTitle}>Khám Phá Thế Giới Công Nghệ</h1>
-          <p className={styles.heroSubtitle}>
-            Tìm kiếm Smartphone & Laptop mới nhất với giá tốt nhất.
-          </p>
-          <Link to="/products">
-            <Button variant="primary" className={styles.heroCtaButton}>
-              Mua Sắm Ngay
-            </Button>
-          </Link>
-        </div>
+      <section className={styles.bannerSection}>
+      {/* <div className={styles.heroOverlay}></div> */}
+      <div className={styles.bannerContent}>
+        <Banner />
+      </div>
       </section>
       
       {/* Featured Products Section */}
@@ -123,17 +112,20 @@ const HomePage = () => {
         <h2 className={styles.sectionTitle}>Khám Phá Thương Hiệu</h2>
         <div className={styles.brandList}>
           {brands.map((brand, index) => (
-            <Link to={`/products?brand=${brand.name}`} key={index} className={styles.categoryCard}>
+            <Link to={`/products?brand=${brand.name}`} key={index} className={styles.brandCard}>
               <div className={styles.brandImageWrapper}>
                 <img src={brand.logoUrl} alt={brand.name} className={styles.brandLogo} />
+                <div className={styles.brandOverlay}></div>
               </div>
             </Link>
           ))}
         </div>
+        <h2 className={styles.sectionTitle}>Khám Phá Danh Mục</h2>
         <div className={styles.categoryList}>
           {categories.map((category, index) => (
             <Link to={`/products?category=${category.name}`} key={index} className={styles.categoryCard}>
               <div className={styles.categoryImageWrapper}>
+                <img src={category.image} alt={category.name} className={styles.categoryLogo} />
                 <div className={styles.categoryOverlay}></div>
               </div>
               <h3 className={styles.categoryName}>{category.name}</h3>

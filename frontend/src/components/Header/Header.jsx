@@ -129,7 +129,7 @@ const Header = () => {
       <div className={styles.container}>
         {/* === Logo === */}
         <Link to="/" className={styles.logo} onClick={closeAllDropdowns}>
-          MyEshop
+          SENA Shop
         </Link>
 
         {/* === Desktop Navigation === */}

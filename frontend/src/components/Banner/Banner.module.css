@@ -1,0 +1,103 @@
+.contentStyle {
+    height: 160px;
+    color: #fff;
+    line-height: 160px;
+    text-align: center;
+    background: #364d79;
+}
+
+.bannerItem {
+    position: relative; /* Để định vị lớp phủ và nội dung */
+}
+
+.heroOverlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5); /* Lớp phủ màu đen mờ */
+    z-index: 2; /* Nằm trên ảnh nền nhưng dưới nội dung */
+}
+
+.contentStyle {
+    margin: 0;
+}
+
+.heroContent {
+    position: absolute; /* Để nằm trên lớp phủ */
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%); /* Căn giữa nội dung theo chiều ngang và dọc */
+    z-index: 3;
+    max-width: 800px; /* Giới hạn chiều rộng nội dung */
+    padding: 20px;
+}
+
+.bannerImage {
+    position: relative;
+    width: 100%;
+    height: 60vh;
+    display: block;
+    object-fit: cover;
+    z-index: 1;
+    /* opacity: 0.5; */
+}
+
+/* === Hero Section Elements === */
+.heroTitle {
+    font-size: 2.8rem;
+    font-weight: 700;
+    margin-bottom: 15px;
+    line-height: 1.2;
+    color: #fff; /* Màu chữ trên nền tối */
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+  }
+  
+  .heroSubtitle {
+    font-size: 1.2rem;
+    margin-bottom: 30px;
+    font-weight: 300;
+    color: #fff; /* Màu chữ trên nền tối */
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+  }
+  
+  .heroCtaButton {
+    padding: 12px 30px;
+    font-size: 1.1rem;
+    font-weight: 600;
+  }
+  
+  /* === Responsive tweaks === */
+  @media (max-width: 992px) {
+    .heroTitle {
+      font-size: 2.5rem;
+    }
+    .heroSubtitle {
+      font-size: 1.1rem;
+    }
+  }
+  
+  @media (max-width: 768px) {
+    .heroTitle {
+      font-size: 2rem;
+    }
+    .heroSubtitle {
+      font-size: 1rem;
+    }
+  }
+  
+  @media (max-width: 576px) {
+    .heroTitle {
+      font-size: 1.8rem;
+    }
+    .heroSubtitle {
+      font-size: 0.9rem;
+      margin-bottom: 20px;
+    }
+    .heroCtaButton {
+      padding: 10px 20px;
+      font-size: 1rem;
+    }
+  }
+  

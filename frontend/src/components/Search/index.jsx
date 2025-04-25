@@ -2,15 +2,17 @@ import React, { useState, useEffect, useRef } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faMagnifyingGlass } from "@fortawesome/free-solid-svg-icons";
 import { Spin } from 'antd';
-import "./Search.css";
+import styles from "./Search.module.css";
 import HeadlessTippy from "@tippyjs/react/headless";
 import ItemSearch from "../ItemSearch/ItemSearch";
-import apiService from "../../api/api";
+import apiService from "../../services/api"
+import { FiSearch } from "react-icons/fi";
 // import unidecode from 'unidecode';
 
 
 function Search(props) {
     const [searchValue, setSearchValue] = useState('');
+    const [isSearch, setIsSearch] = useState(false);
     const [searchResult, setSearchResult] = useState([]);
     const [showResult, setShowResult] = useState(props.overlay);
     const [loading, setLoading] = useState(false); // Trạng thái loading
@@ -69,32 +71,55 @@ function Search(props) {
         
     };
 
+    const handleSearchSubmit = (e) => {
+        e.preventDefault();
+        if (searchValue.trim()) {
+          navigate(`/search?=${searchValue}`); // Chuyển đến trang tìm kiếm
+          setSearchValue(''); // Xóa ô tìm kiếm sau khi submit
+          closeAllDropdowns(); // Đóng menu nếu đang mở
+        }
+    };
+
+    const handleSearch = () => {
+        setIsSearch(true);
+        // document.body.classList.add('no-scroll');
+    }
+
+    const handleSearchChange = (e) => {
+        setSearchValue(e.target.value);
+    };
+
     return (
         <div>
-            {showResult && <div className="overlay" onClick={handleHideResult}></div>}
+            {showResult && <div className={styles.overlay} onClick={handleHideResult}></div>}
             <HeadlessTippy
                 interactive
                 placement="bottom"
                 visible={showResult}
                 render={(attrs) => (
-                    <div className="search-results" tabIndex="-1" {...attrs}>
-                        <div>
-                            {loading ? (
-                                <Spin style={{ height: "400px", width: "320px"}} />
-                            ) : searchResult.length === 0 ? (
-                                <ItemSearch noResult={true} />
+                    <div className={styles.searchResult} tabIndex="-1" {...attrs}>
+                        <div className={styles.result}>
+                            {
+                            // loading ? (
+                            //     <Spin style={{ height: "400px", width: "320px"}} />
+                            // ) : 
+                            searchResult.length === 0 ? (
+                                <div className={styles.noResult}><ItemSearch noResult={true} /></div>
                             ) : (
-                                searchResult.map((item, index) => (
-                                    <div key={index} className="" onClick={handleClear}>
-                                        <ItemSearch
-                                            id={item.productId}
-                                            name={item.productName}
-                                            image={item.imageUrl}
-                                            price={item.price}
-                                            noResult={false}
-                                        />
-                                    </div>
-                                ))
+                                <div className={styles.listResult}>
+
+                                    {searchResult.map((item, index) => (
+                                        <div key={index} onClick={handleClear}>
+                                            <ItemSearch
+                                                id={item.productId}
+                                                name={item.productName}
+                                                image={item.imageUrl}
+                                                price={item.price}
+                                                noResult={false}
+                                            />
+                                        </div>
+                                    ))}
+                                </div>
                             )}
                         </div>
                     </div>
@@ -102,29 +127,19 @@ function Search(props) {
                 onClickOutside={handleHideResult}
             >
                 <div className="search">
-                    <div>
-                        <form className="form-y" onSubmit={(e) => e.preventDefault()}>
-                            <input
-                                className="input-y"
-                                ref={inputRef}
-                                value={searchValue}
-                                placeholder="Tìm kiếm..."
-                                spellCheck={false}
-                                onChange={handleChange}
-                                onFocus={() => setShowResult(true)}
-                            />
-                        </form>
-                    </div>
-                    <div className="input-btn" style={{ marginLeft: 5 }}>
-                        <button
-                            className="button-y"
-                            type="submit"
-                            onMouseDown={(e) => e.preventDefault()}
-                            onClick={() => inputRef.current.focus()}
-                        >
-                            <FontAwesomeIcon icon={faMagnifyingGlass} height={40} />
+                    <form onSubmit={handleSearchSubmit} className={styles.searchBar}>
+                        <input
+                        type="text"
+                        placeholder="Tìm kiếm sản phẩm..."
+                        className={styles.searchInput}
+                        value={searchValue}
+                        onChange={handleSearchChange}
+                        onClick={handleSearch}
+                        />
+                        <button type="submit" className={styles.searchButton}>
+                        <FiSearch />
                         </button>
-                    </div>
+                    </form>
                 </div>
             </HeadlessTippy>
         </div>

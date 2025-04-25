@@ -150,7 +150,6 @@ const data = [
     categoryId: 1,
     brandId: 1
     }
-
   ];
   
   const Brand = [

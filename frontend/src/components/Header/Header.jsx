@@ -42,6 +42,8 @@ const Header = () => {
   const [userName, setUserName] = useState('User Name'); // Tên user khi đăng nhập
   const [categories, setCategories] = useState([]);
   const [isSearch, setIsSearch] = useState(false);
+  const [isMenu, setIsMenu] = useState(false);
+  
   
 
   const [searchTerm, setSearchTerm] = useState('');
@@ -121,14 +123,19 @@ const Header = () => {
    }
 
    const handleSearch = () => {
-        setIsSearch(true);
-        // document.body.classList.add('no-scroll');
-   }
+    setIsSearch(true);
+    // document.body.classList.add('no-scroll');
+  }
 
    useEffect(() => {
      setCategories(Category); // Giả lập lấy danh mục từ API (thay bằng API thật sau này)
    })
-
+  
+   function closeOverlay() {
+    setIsMenu(false);
+    setIsSearch(false);
+    // document.body.classList.remove('no-scroll'); // Xóa class no-scroll
+}
 
   // --- RENDER ---
   return (
@@ -175,7 +182,11 @@ const Header = () => {
         {/* === Actions Area === */}
         <div className={styles.actions}>
           {/* --- Search Bar --- */}
-          <form onSubmit={handleSearchSubmit} className={styles.searchBar}>
+          <div className={styles.menuList} onClick={handleSearch}>
+            <Search overlay={isSearch} />
+          </div>
+          {isMenu || isSearch ? <div className={styles.overlay} onClick={closeOverlay}></div> : null}
+          {/* <form onSubmit={handleSearchSubmit} className={styles.searchBar}>
             <input
               type="text"
               placeholder="Tìm kiếm sản phẩm..."
@@ -188,7 +199,7 @@ const Header = () => {
             <button type="submit" className={styles.searchButton}>
               <FiSearch />
             </button>
-          </form>
+          </form> */}
 
           {/* --- Cart --- */}
           <Link to="/cart" className={styles.actionButton} title="Giỏ hàng" onClick={closeAllDropdowns}>

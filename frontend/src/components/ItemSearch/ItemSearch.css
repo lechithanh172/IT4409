@@ -14,7 +14,6 @@
 .item1 .item-info a {
     color: #444;
     display: flex;
-    margin: 15px;
 }
 
 .item1 .item-info a .item-image {
@@ -99,6 +98,7 @@
     font-size: 16px;
     margin: 20px 0;
     width: 320px;
+    height: 15rem;
 }
 
 @media only screen and (max-width: 1199px) {

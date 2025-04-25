@@ -44,7 +44,8 @@
   }
 
   .productList .listItem {
-    width: 18rem;
+    width: 17.1rem;
+    padding: 0.3rem;
   }
   
   /* Chỉnh sửa các nút điều khiển Prev và Next */

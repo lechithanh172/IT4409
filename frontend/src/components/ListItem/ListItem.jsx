@@ -292,7 +292,7 @@ const data = [
               let containerWidth;
         
               if (window.innerWidth > 1200) {
-                setOffset(index * 310);
+                setOffset(index * 305);
                 setMaxIndex(popularProducts.length - 4);
               } else if (window.innerWidth > 990) {
                 setOffset(index * (width / 3 ));
@@ -319,25 +319,28 @@ const data = [
           }, [index, width, popularProducts.length]);
 
         useEffect(() => {
-            if (index < -maxIndex) {
-            if (window.innerWidth > 1200) {
-                setIndex(
-                popularProducts.length > 4 ? -(popularProducts.length - 4) : 0
-                );
-            } else if (window.innerWidth > 990) {
-                setIndex(
-                popularProducts.length > 3 ? -(popularProducts.length - 3) : 0
-                );
-            } else if (window.innerWidth > 717) {
-                setIndex(
-                popularProducts.length > 3 ? -(popularProducts.length - 3) : 0
-                );
-            } else {
-                setIndex(
-                popularProducts.length > 2 ? -(popularProducts.length - 2) : 0
-                );
-            }
-            }
+            if (index < -maxIndex && index !== 0) {
+                setIndex(0);
+              }
+            // if (index < -maxIndex) {
+            // if (window.innerWidth > 1200) {
+            //     setIndex(
+            //     popularProducts.length > 4 ? -(popularProducts.length - 4) : 0
+            //     );
+            // } else if (window.innerWidth > 990) {
+            //     setIndex(
+            //     popularProducts.length > 3 ? -(popularProducts.length - 3) : 0
+            //     );
+            // } else if (window.innerWidth > 717) {
+            //     setIndex(
+            //     popularProducts.length > 3 ? -(popularProducts.length - 3) : 0
+            //     );
+            // } else {
+            //     setIndex(
+            //     popularProducts.length > 2 ? -(popularProducts.length - 2) : 0
+            //     );
+            // }
+            // }
         }, [maxIndex, index]);
     return (
         <>

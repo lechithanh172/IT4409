@@ -99,7 +99,58 @@ const data = [
       stockQuantity: 42,
       categoryId: 1,
       brandId: 1
+    },
+    {
+    productId: 10,
+    productName: "Apple MacBook Air M2 2024 8CPU 8GPU 16GB 256GB",
+    description: "Máy mới 100%, đầy đủ phụ kiện từ nhà sản xuất. Sản phẩm có mã SA/A (được Apple Việt Nam phân phối chính thức).\nMáy, Sách HDSD, Cáp sạc USB-C (2 m), Cốc sạc USB-C 30W\n1 ĐỔI 1 trong 30 ngày nếu có lỗi phần cứng nhà sản xuất. Bảo hành 12 tháng tại trung tâm bảo hành chính hãng Apple: CareS.vn(xem chi tiết)\nXem thông tin kích hoạt bảo hành các sản phẩm Apple (tại đây)\nGiá sản phẩm đã bao gồm VAT",
+    price: 24990000,
+    imageUrl: "https://cdn2.cellphones.com.vn/358x/media/catalog/product/m/a/macbook_air_m2_2_1_1_7.png",
+    stockQuantity: 42,
+    categoryId: 1,
+    brandId: 1
+    },
+    {
+    productId: 11,
+    productName: "Apple MacBook Air M2 2024 8CPU 8GPU 16GB 256GB",
+    description: "Máy mới 100%, đầy đủ phụ kiện từ nhà sản xuất. Sản phẩm có mã SA/A (được Apple Việt Nam phân phối chính thức).\nMáy, Sách HDSD, Cáp sạc USB-C (2 m), Cốc sạc USB-C 30W\n1 ĐỔI 1 trong 30 ngày nếu có lỗi phần cứng nhà sản xuất. Bảo hành 12 tháng tại trung tâm bảo hành chính hãng Apple: CareS.vn(xem chi tiết)\nXem thông tin kích hoạt bảo hành các sản phẩm Apple (tại đây)\nGiá sản phẩm đã bao gồm VAT",
+    price: 24990000,
+    imageUrl: "https://cdn2.cellphones.com.vn/358x/media/catalog/product/m/a/macbook_air_m2_2_1_1_7.png",
+    stockQuantity: 42,
+    categoryId: 1,
+    brandId: 1
+    },
+    {
+    productId: 12,
+    productName: "Apple MacBook Air M2 2024 8CPU 8GPU 16GB 256GB",
+    description: "Máy mới 100%, đầy đủ phụ kiện từ nhà sản xuất. Sản phẩm có mã SA/A (được Apple Việt Nam phân phối chính thức).\nMáy, Sách HDSD, Cáp sạc USB-C (2 m), Cốc sạc USB-C 30W\n1 ĐỔI 1 trong 30 ngày nếu có lỗi phần cứng nhà sản xuất. Bảo hành 12 tháng tại trung tâm bảo hành chính hãng Apple: CareS.vn(xem chi tiết)\nXem thông tin kích hoạt bảo hành các sản phẩm Apple (tại đây)\nGiá sản phẩm đã bao gồm VAT",
+    price: 24990000,
+    imageUrl: "https://cdn2.cellphones.com.vn/358x/media/catalog/product/m/a/macbook_air_m2_2_1_1_7.png",
+    stockQuantity: 42,
+    categoryId: 1,
+    brandId: 1
+    },
+    {
+    productId: 13,
+    productName: "Apple MacBook Air M2 2024 8CPU 8GPU 16GB 256GB",
+    description: "Máy mới 100%, đầy đủ phụ kiện từ nhà sản xuất. Sản phẩm có mã SA/A (được Apple Việt Nam phân phối chính thức).\nMáy, Sách HDSD, Cáp sạc USB-C (2 m), Cốc sạc USB-C 30W\n1 ĐỔI 1 trong 30 ngày nếu có lỗi phần cứng nhà sản xuất. Bảo hành 12 tháng tại trung tâm bảo hành chính hãng Apple: CareS.vn(xem chi tiết)\nXem thông tin kích hoạt bảo hành các sản phẩm Apple (tại đây)\nGiá sản phẩm đã bao gồm VAT",
+    price: 24990000,
+    imageUrl: "https://cdn2.cellphones.com.vn/358x/media/catalog/product/m/a/macbook_air_m2_2_1_1_7.png",
+    stockQuantity: 42,
+    categoryId: 1,
+    brandId: 1
+    },
+    {
+    productId: 13,
+    productName: "Apple MacBook Air M2 2024 8CPU 8GPU 16GB 256GB",
+    description: "Máy mới 100%, đầy đủ phụ kiện từ nhà sản xuất. Sản phẩm có mã SA/A (được Apple Việt Nam phân phối chính thức).\nMáy, Sách HDSD, Cáp sạc USB-C (2 m), Cốc sạc USB-C 30W\n1 ĐỔI 1 trong 30 ngày nếu có lỗi phần cứng nhà sản xuất. Bảo hành 12 tháng tại trung tâm bảo hành chính hãng Apple: CareS.vn(xem chi tiết)\nXem thông tin kích hoạt bảo hành các sản phẩm Apple (tại đây)\nGiá sản phẩm đã bao gồm VAT",
+    price: 24990000,
+    imageUrl: "https://cdn2.cellphones.com.vn/358x/media/catalog/product/m/a/macbook_air_m2_2_1_1_7.png",
+    stockQuantity: 42,
+    categoryId: 1,
+    brandId: 1
     }
+
   ];
   
   const Brand = [
@@ -241,10 +292,10 @@ const data = [
               let containerWidth;
         
               if (window.innerWidth > 1200) {
-                setOffset(index * 300);
-                setMaxIndex(popularProducts.length - 5);
+                setOffset(index * 310);
+                setMaxIndex(popularProducts.length - 4);
               } else if (window.innerWidth > 990) {
-                setOffset(index * (width / 4 + 2.5));
+                setOffset(index * (width / 3 ));
                 setMaxIndex(popularProducts.length - 4);
               } else if (window.innerWidth > 717) {
                 setOffset(index * (width / 3 + 3.33333));
@@ -271,11 +322,11 @@ const data = [
             if (index < -maxIndex) {
             if (window.innerWidth > 1200) {
                 setIndex(
-                popularProducts.length > 5 ? -(popularProducts.length - 5) : 0
+                popularProducts.length > 4 ? -(popularProducts.length - 4) : 0
                 );
             } else if (window.innerWidth > 990) {
                 setIndex(
-                popularProducts.length > 4 ? -(popularProducts.length - 4) : 0
+                popularProducts.length > 3 ? -(popularProducts.length - 3) : 0
                 );
             } else if (window.innerWidth > 717) {
                 setIndex(
@@ -310,7 +361,7 @@ const data = [
                                 >
                                     {popularProducts.length > 0 ? (
                                         popularProducts.map((product) => (
-                                        <ProductCard key={product.productId} product={product} />
+                                        <div className={styles.listItem}><ProductCard key={product.productId} product={product} /></div>
                                         ))
                                     ) : (
                                         <p>Chưa có sản phẩm nổi bật.</p>

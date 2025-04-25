@@ -24,8 +24,8 @@
 }
 
 .productImage {
-  width: 60%;
-  height: 30%;
+  width: 9rem;
+  height: 9rem;
   object-fit: cover;
   background-color: #ffffff;
   margin: auto;

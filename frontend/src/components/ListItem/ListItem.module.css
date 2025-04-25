@@ -42,6 +42,10 @@
     gap: 22px;
     width: 141%;
   }
+
+  .productList .listItem {
+    width: 18rem;
+  }
   
   /* Chỉnh sửa các nút điều khiển Prev và Next */
   .swiperButtonPrev,

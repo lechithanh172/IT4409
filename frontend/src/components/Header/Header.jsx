@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Link, NavLink, useNavigate } from 'react-router-dom';
 import { useCart } from '../../contexts/CartContext';
 import Button from '../Button/Button';
+import Search from '../Search';
 import styles from './Header.module.css';
 import useClickOutside from '../../hooks/useClickOutside'; // Import hook
 
@@ -40,6 +41,7 @@ const Header = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [userName, setUserName] = useState('User Name'); // Tên user khi đăng nhập
   const [categories, setCategories] = useState([]);
+  const [isSearch, setIsSearch] = useState(false);
   
 
   const [searchTerm, setSearchTerm] = useState('');
@@ -118,6 +120,11 @@ const Header = () => {
        // navigate('/signup'); // Chuyển đến trang signup thật
    }
 
+   const handleSearch = () => {
+        setIsSearch(true);
+        // document.body.classList.add('no-scroll');
+   }
+
    useEffect(() => {
      setCategories(Category); // Giả lập lấy danh mục từ API (thay bằng API thật sau này)
    })
@@ -148,19 +155,11 @@ const Header = () => {
                 {
                   categories.map((category) => (
                     <Link to={`/products?category=${category.name}`} className={styles.dropdownItem} key={category.id} onClick={toggleCategoryDropdown}>
-                      {/* <span className={styles.categoryEmoji}>📦</span>  */}
                       {category.name}
                     </Link>
                   ))
                 }
-                {/* <Link to="/products?category=Smartphone" className={styles.dropdownItem} onClick={toggleCategoryDropdown}>
-                  <span className={styles.categoryEmoji}>📱</span> Smartphones
-                </Link>
-                <Link to="/products?category=Laptop" className={styles.dropdownItem} onClick={toggleCategoryDropdown}>
-                 <span className={styles.categoryEmoji}>💻</span> Laptops
-                </Link> */}
-                {/* Thêm danh mục khác nếu cần */}
-                 <Link to="/products" className={styles.dropdownItem} onClick={toggleCategoryDropdown}>
+                <Link to="/products" className={styles.dropdownItem} onClick={toggleCategoryDropdown}>
                    Tất cả sản phẩm
                 </Link>
               </div>
@@ -183,7 +182,9 @@ const Header = () => {
               className={styles.searchInput}
               value={searchTerm}
               onChange={handleSearchChange}
+              onClick={handleSearch}
             />
+            <Search overlay={isSearch} />
             <button type="submit" className={styles.searchButton}>
               <FiSearch />
             </button>

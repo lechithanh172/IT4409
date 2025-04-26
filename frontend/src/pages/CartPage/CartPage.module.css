@@ -1,0 +1,213 @@
+/* src/pages/CartPage/CartPage.module.css */
+
+.cartPageContainer {
+    max-width: 1100px; /* Giới hạn chiều rộng trang */
+    margin: 30px auto;
+    padding: 20px;
+    background-color: #fff;
+    border-radius: 10px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.07);
+  }
+  
+  .pageTitle {
+    font-size: 1.8rem;
+    font-weight: 600;
+    color: #1f2937;
+    margin-bottom: 25px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    border-bottom: 1px solid #e5e7eb;
+    padding-bottom: 15px;
+  }
+  .pageTitle svg {
+      color: #007bff; /* Màu icon */
+  }
+  
+  /* --- Giao diện giỏ hàng trống --- */
+  .emptyCart {
+    text-align: center;
+    padding: 50px 20px;
+    min-height: 40vh; /* Chiều cao tối thiểu */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+  .emptyCartImage {
+      max-width: 150px;
+      margin-bottom: 25px;
+      opacity: 0.7;
+  }
+  .emptyCart h2 {
+    font-size: 1.5rem;
+    color: #374151;
+    margin-bottom: 10px;
+  }
+  .emptyCart p {
+    color: #6b7280;
+    margin-bottom: 30px;
+  }
+  
+  /* --- Giao diện có sản phẩm --- */
+  .cartContent {
+    display: flex;
+    flex-direction: column; /* Sắp xếp bảng và summary theo cột */
+    gap: 30px;
+  }
+  
+  .cartTableWrapper {
+      overflow-x: auto; /* Cho phép cuộn ngang bảng trên màn hình nhỏ */
+      border: 1px solid #e5e7eb;
+      border-radius: 8px;
+  }
+  
+  .cartTable {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  
+  .cartTable th, .cartTable td {
+    text-align: left;
+    padding: 12px 15px; /* Padding đồng đều */
+    font-size: 0.95rem;
+  }
+  
+  .cartTable th {
+    background-color: #f9fafb; /* Nền header bảng */
+    color: #4b5563; /* Màu chữ header */
+    font-weight: 600;
+    text-transform: uppercase; /* Viết hoa header */
+    font-size: 0.85rem; /* Cỡ chữ header nhỏ hơn */
+    border-bottom: 2px solid #e5e7eb; /* Đường kẻ đậm hơn dưới header */
+  }
+  
+  /* Định nghĩa độ rộng các cột */
+  .columnSelect { width: 5%; text-align: center; }
+  .columnProduct { width: 40%; }
+  .columnQuantity { width: 15%; text-align: center;}
+  .columnPrice { width: 15%; }
+  .columnTotal { width: 15%; }
+  .columnActions { width: 10%; text-align: center; }
+  
+  .alignRight {
+      text-align: right;
+  }
+  
+  /* --- Phần Tổng kết --- */
+  .cartSummary {
+    background-color: #f9fafb; /* Nền xám nhẹ */
+    padding: 25px;
+    border-radius: 8px;
+    border: 1px solid #e5e7eb;
+    display: flex;
+    flex-direction: column; /* Sắp xếp theo cột */
+    align-items: flex-end; /* Căn phải nội dung */
+    gap: 20px; /* Khoảng cách giữa details và actions */
+  }
+  
+  .summaryDetails {
+      width: 100%; /* Chiếm hết chiều rộng */
+      max-width: 400px; /* Giới hạn độ rộng phần tổng tiền */
+      display: flex;
+      flex-direction: column;
+      gap: 10px; /* Khoảng cách giữa các dòng */
+      margin-bottom: 10px; /* Khoảng cách nhỏ với nút */
+  }
+  
+  .summaryRow {
+      display: flex;
+      justify-content: space-between; /* Label và value cách xa nhau */
+      font-size: 1rem;
+      color: #4b5563;
+  }
+  .summaryRow span:last-child {
+      font-weight: 500;
+      color: #1f2937;
+  }
+  
+  .grandTotal {
+      padding-top: 15px;
+      border-top: 1px dashed #d1d5db; /* Đường đứt nét phân cách */
+      margin-top: 5px;
+  }
+  .grandTotal span {
+      font-size: 1.1rem; /* Tổng tiền to hơn */
+      font-weight: 600;
+      color: #1f2937;
+  }
+  .totalAmountValue {
+      color: #d70018 !important; /* Màu đỏ cho tổng tiền cuối */
+      font-size: 1.3rem !important; /* To và nổi bật */
+  }
+  
+  /* --- Các nút hành động --- */
+  .cartActions {
+    display: flex;
+    justify-content: flex-end; /* Đẩy nút sang phải */
+    align-items: center; /* Căn giữa các nút */
+    gap: 15px; /* Khoảng cách giữa các nút */
+    width: 100%; /* Chiếm hết chiều rộng */
+  }
+  
+  .clearCartButton, .checkoutButton {
+      padding: 10px 20px !important; /* Padding thống nhất */
+      font-size: 0.95rem !important;
+      border-radius: 6px !important;
+      display: inline-flex !important;
+      align-items: center;
+      gap: 8px;
+  }
+  
+  .clearCartButton {
+      /* Style cho nút danger (hoặc secondary) */
+      background-color: #fee2e2 !important;
+      color: #ef4444 !important;
+      border-color: #fca5a5 !important;
+  }
+  .clearCartButton:hover:not(:disabled) {
+       background-color: #fecaca !important;
+       border-color: #f87171 !important;
+  }
+  
+  .checkoutButton {
+      /* Kế thừa style primary */
+  }
+  
+  /* --- Responsive --- */
+  @media (max-width: 992px) {
+      /* Có thể ẩn bớt cột nếu cần */
+       .columnProduct { width: 45%; }
+       .columnPrice { width: 20%; }
+       .columnTotal { width: 20%; }
+  }
+  
+  @media (max-width: 768px) {
+       .pageTitle { font-size: 1.6rem; }
+       .cartSummary { align-items: stretch; }
+       .summaryDetails { max-width: none; }
+       .cartActions { flex-direction: column-reverse; align-items: stretch; gap: 10px;}
+       .clearCartButton, .checkoutButton { justify-content: center; }
+  
+       /* Ẩn header không cần thiết trên mobile */
+       .cartTable th { font-size: 0.8rem; }
+       .cartTable th:nth-child(4), /* Đơn giá */
+       .cartTable th:nth-child(5)  /* Thành tiền */
+        {
+          /* display: none; */ /* Tùy chọn ẩn */
+        }
+  }
+  
+  @media (max-width: 480px) {
+      .cartPageContainer { padding: 15px; }
+      .pageTitle { font-size: 1.4rem; margin-bottom: 20px; }
+      /* Ẩn cột Đơn giá */
+      .cartTable th:nth-child(4),
+      .cartTable td:nth-child(4) { display: none; }
+      /* Điều chỉnh lại width */
+      .columnProduct { width: 50%; }
+      .columnQuantity { width: 20%; }
+      .columnTotal { width: 20%; text-align: right;} /* Căn phải thành tiền */
+      .columnActions { width: 10%;}
+  
+  }

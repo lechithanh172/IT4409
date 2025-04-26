@@ -1,85 +1,101 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Link, NavLink, useNavigate } from 'react-router-dom';
+// Giả sử bạn vẫn dùng CartContext để lấy cartItemCount
 import { useCart } from '../../contexts/CartContext';
-import Button from '../Button/Button';
-import styles from './Header.module.css';
-import useClickOutside from '../../hooks/useClickOutside'; // Import hook
+import Button from '../Button/Button'; // Import Button component
+import styles from './Header.module.css'; // Import CSS Module
+import useClickOutside from '../../hooks/useClickOutside'; // Import hook click outside
 
 // Import icons
 import {
   FiShoppingCart,
   FiSearch,
-  FiUser,
+  FiUser,         // Icon mặc định khi chưa đăng nhập
   FiMenu,
   FiX,
   FiChevronDown,
   FiLogOut,
-  FiBox, // Ví dụ icon cho đơn hàng
-  FiUserCheck // Ví dụ icon cho profile khi đăng nhập
-} from 'react-icons/fi'; // Chọn bộ icon bạn thích (Feather icons)
+  FiBox,          // Icon cho đơn hàng
+  FiUserCheck     // Icon khi đã đăng nhập
+} from 'react-icons/fi'; // Sử dụng Feather Icons
 
 const Header = () => {
+  // Lấy dữ liệu giỏ hàng từ CartContext
   const { cartItemCount } = useCart();
+  // Hook để điều hướng
   const navigate = useNavigate();
 
-  // --- STATE QUẢN LÝ ---
-  // State giả lập đăng nhập (thay bằng context/logic thật sau này)
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [userName, setUserName] = useState('User Name'); // Tên user khi đăng nhập
+  // --- STATE QUẢN LÝ TRẠNG THÁI GIẢ LẬP ĐĂNG NHẬP CỤC BỘ ---
+  // Dùng state này để demo giao diện khi đăng nhập/chưa đăng nhập
+  const [isLoggedIn, setIsLoggedIn] = useState(false); // Ban đầu là chưa đăng nhập
+  // Tên người dùng giả lập, bạn có thể đổi
+  const [userName, setUserName] = useState('Tran Duc');
 
-  const [searchTerm, setSearchTerm] = useState('');
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [isCategoryDropdownOpen, setIsCategoryDropdownOpen] = useState(false);
-  const [isUserDropdownOpen, setIsUserDropdownOpen] = useState(false);
+  // --- State quản lý UI khác của Header ---
+  const [searchTerm, setSearchTerm] = useState(''); // Nội dung ô tìm kiếm
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false); // Trạng thái mở/đóng menu mobile
+  const [isCategoryDropdownOpen, setIsCategoryDropdownOpen] = useState(false); // Trạng thái mở/đóng dropdown danh mục
+  const [isUserDropdownOpen, setIsUserDropdownOpen] = useState(false); // Trạng thái mở/đóng dropdown người dùng
 
-  // --- REFS CHO DROPDOWN ---
-  const categoryDropdownRef = useRef(null);
-  const userDropdownRef = useRef(null);
-  const mobileMenuRef = useRef(null);
+  // --- REFS để xử lý click outside ---
+  const categoryDropdownRef = useRef(null); // Ref cho dropdown danh mục
+  const userDropdownRef = useRef(null);     // Ref cho dropdown người dùng
+  const mobileMenuRef = useRef(null);       // Ref cho menu mobile (nếu cần đóng khi click ngoài)
 
   // --- SỬ DỤNG HOOK useClickOutside ---
+  // Đóng dropdown danh mục khi click ra ngoài nó
   useClickOutside(categoryDropdownRef, () => setIsCategoryDropdownOpen(false));
+  // Đóng dropdown người dùng khi click ra ngoài nó
   useClickOutside(userDropdownRef, () => setIsUserDropdownOpen(false));
-  // Optional: Đóng mobile menu khi click ra ngoài (thường không cần thiết vì có nút X)
+  // Đóng menu mobile khi click ra ngoài (tùy chọn)
   // useClickOutside(mobileMenuRef, () => setIsMobileMenuOpen(false));
 
-  // --- HANDLERS ---
+  // --- HANDLERS (Hàm xử lý sự kiện) ---
+
+  // Cập nhật state searchTerm khi gõ vào ô tìm kiếm
   const handleSearchChange = (e) => {
     setSearchTerm(e.target.value);
   };
 
+  // Xử lý khi submit form tìm kiếm
   const handleSearchSubmit = (e) => {
-    e.preventDefault();
-    if (searchTerm.trim()) {
-      navigate(`/search?q=${encodeURIComponent(searchTerm.trim())}`); // Chuyển đến trang tìm kiếm
-      setSearchTerm(''); // Xóa ô tìm kiếm sau khi submit
-      closeAllDropdowns(); // Đóng menu nếu đang mở
+    e.preventDefault(); // Ngăn trang reload
+    if (searchTerm.trim()) { // Chỉ tìm khi có nội dung (đã bỏ khoảng trắng thừa)
+      // Điều hướng đến trang kết quả tìm kiếm (ví dụ: /search?q=keyword)
+      navigate(`/search?q=${encodeURIComponent(searchTerm.trim())}`);
+      setSearchTerm(''); // Xóa nội dung ô tìm kiếm
+      closeAllDropdowns(); // Đóng các menu/dropdown đang mở
     }
   };
 
+  // Đóng/mở menu mobile
   const toggleMobileMenu = () => {
     setIsMobileMenuOpen(!isMobileMenuOpen);
-    // Đảm bảo các dropdown khác đóng khi mở mobile menu
+    // Đóng các dropdown khác khi mở menu mobile
     setIsCategoryDropdownOpen(false);
     setIsUserDropdownOpen(false);
   };
 
+  // Đóng/mở dropdown danh mục
   const toggleCategoryDropdown = () => {
     setIsCategoryDropdownOpen(!isCategoryDropdownOpen);
-    setIsUserDropdownOpen(false); // Đóng menu user nếu mở
+    setIsUserDropdownOpen(false); // Đóng dropdown user nếu đang mở
   };
 
+  // Đóng/mở dropdown người dùng
   const toggleUserDropdown = () => {
     setIsUserDropdownOpen(!isUserDropdownOpen);
-    setIsCategoryDropdownOpen(false); // Đóng menu category nếu mở
+    setIsCategoryDropdownOpen(false); // Đóng dropdown danh mục nếu đang mở
   };
 
+  // --- HÀM GIẢ LẬP & CHUYỂN HƯỚNG AUTH ---
+  // Xử lý khi nhấn nút Đăng xuất (giả lập)
   const handleLogout = () => {
-    // Xử lý logic logout thật ở đây
-    setIsLoggedIn(false);
-    setIsUserDropdownOpen(false); // Đóng dropdown sau khi logout
-    // Có thể navigate về trang chủ
-    navigate('/');
+    setIsLoggedIn(false); // Đặt lại trạng thái đăng nhập là false
+    setIsUserDropdownOpen(false); // Đóng dropdown
+    // Có thể chuyển hướng về trang chủ nếu muốn
+    // navigate('/');
+    console.log("Đã đăng xuất (giả lập)");
   };
 
    // Hàm tiện ích đóng tất cả dropdown/menu
@@ -89,21 +105,26 @@ const Header = () => {
     setIsUserDropdownOpen(false);
   };
 
-   // Hàm xử lý khi click vào link trong mobile menu -> đóng menu
+   // Hàm đóng menu mobile khi click vào link bên trong
    const handleMobileLinkClick = () => {
        setIsMobileMenuOpen(false);
    }
 
-   // Hàm giả lập đăng nhập/đăng ký (chỉ để demo)
+   // Hàm chuyển hướng đến trang Đăng nhập
    const handleLoginClick = () => {
-       setIsLoggedIn(true); // Giả lập đăng nhập thành công
-       // navigate('/login'); // Hoặc chuyển đến trang login thật
-   }
-   const handleSignupClick = () => {
-       // navigate('/signup'); // Chuyển đến trang signup thật
-   }
+    closeAllDropdowns(); // Đóng menu/dropdown
+    navigate('/login'); // Điều hướng đến trang /login
+ };
 
-  // --- RENDER ---
+ // Hàm chuyển hướng đến trang Đăng ký
+ const handleSignupClick = () => {
+    closeAllDropdowns(); // Đóng menu/dropdown
+    navigate('/signup'); // Điều hướng đến trang /signup
+ };
+ // --- KẾT THÚC HANDLERS ---
+
+
+  // --- RENDER COMPONENT ---
   return (
     <header className={styles.header}>
       <div className={styles.container}>
@@ -114,15 +135,17 @@ const Header = () => {
 
         {/* === Desktop Navigation === */}
         <nav className={styles.desktopNav}>
+          {/* Link Trang Chủ */}
           <NavLink to="/" className={({ isActive }) => isActive ? `${styles.navLink} ${styles.active}` : styles.navLink} end>
             Trang Chủ
           </NavLink>
 
-          {/* --- Category Dropdown --- */}
+          {/* --- Dropdown Danh Mục --- */}
           <div className={styles.dropdownContainer} ref={categoryDropdownRef}>
             <button onClick={toggleCategoryDropdown} className={`${styles.navLink} ${styles.dropdownToggle}`}>
               Danh Mục <FiChevronDown className={`${styles.chevronIcon} ${isCategoryDropdownOpen ? styles.chevronOpen : ''}`} />
             </button>
+            {/* Nội dung dropdown chỉ hiện khi isCategoryDropdownOpen là true */}
             {isCategoryDropdownOpen && (
               <div className={`${styles.dropdownMenu} ${styles.categoryDropdown}`}>
                 <Link to="/products?category=Smartphone" className={styles.dropdownItem} onClick={toggleCategoryDropdown}>
@@ -131,21 +154,20 @@ const Header = () => {
                 <Link to="/products?category=Laptop" className={styles.dropdownItem} onClick={toggleCategoryDropdown}>
                  <span className={styles.categoryEmoji}>💻</span> Laptops
                 </Link>
-                {/* Thêm danh mục khác nếu cần */}
-                 <Link to="/products" className={styles.dropdownItem} onClick={toggleCategoryDropdown}>
+                <Link to="/products" className={styles.dropdownItem} onClick={toggleCategoryDropdown}>
                    Tất cả sản phẩm
                 </Link>
               </div>
             )}
           </div>
 
-          {/* Thêm link khác nếu cần, ví dụ: Khuyến mãi */}
+          {/* Link Khuyến Mãi */}
            <NavLink to="/promotions" className={({ isActive }) => isActive ? `${styles.navLink} ${styles.active}` : styles.navLink}>
             Khuyến Mãi
           </NavLink>
         </nav>
 
-        {/* === Actions Area === */}
+        {/* === Khu vực Actions (Search, Cart, Auth) === */}
         <div className={styles.actions}>
           {/* --- Search Bar --- */}
           <form onSubmit={handleSearchSubmit} className={styles.searchBar}>
@@ -155,38 +177,48 @@ const Header = () => {
               className={styles.searchInput}
               value={searchTerm}
               onChange={handleSearchChange}
+              aria-label="Tìm kiếm sản phẩm"
             />
-            <button type="submit" className={styles.searchButton}>
+            <button type="submit" className={styles.searchButton} aria-label="Tìm kiếm">
               <FiSearch />
             </button>
           </form>
 
-          {/* --- Cart --- */}
+          {/* --- Nút Giỏ hàng --- */}
           <Link to="/cart" className={styles.actionButton} title="Giỏ hàng" onClick={closeAllDropdowns}>
             <FiShoppingCart />
+            {/* Hiển thị số lượng chỉ khi lớn hơn 0 */}
             {cartItemCount > 0 && (
               <span className={styles.cartCount}>{cartItemCount}</span>
             )}
           </Link>
 
-          {/* --- Auth / User Menu (Desktop) --- */}
+          {/* --- Auth / User Menu (Cho Desktop) --- */}
           <div className={styles.desktopAuth}>
+            {/* Kiểm tra state isLoggedIn giả lập */}
             {isLoggedIn ? (
+              // --- Khi Đã Đăng Nhập ---
               <div className={styles.dropdownContainer} ref={userDropdownRef}>
                 <button onClick={toggleUserDropdown} className={`${styles.actionButton} ${styles.userButton}`} title="Tài khoản">
-                  <FiUserCheck /> {/* Icon khác khi đăng nhập */}
+                  <FiUserCheck /> {/* Icon user đã đăng nhập */}
+                  {/* Có thể hiển thị tên ngắn ở đây nếu muốn */}
                   {/* <span className={styles.userNameDesktop}>{userName}</span> */}
                    <FiChevronDown className={`${styles.chevronIcon} ${styles.userChevron} ${isUserDropdownOpen ? styles.chevronOpen : ''}`} />
                 </button>
+                {/* Dropdown menu người dùng */}
                 {isUserDropdownOpen && (
                   <div className={`${styles.dropdownMenu} ${styles.userDropdown}`}>
+                    {/* Chào mừng */}
                     <div className={styles.dropdownHeader}>Chào, {userName}!</div>
+                    {/* Link Hồ sơ */}
                     <Link to="/profile" className={styles.dropdownItem} onClick={toggleUserDropdown}>
                        <FiUser className={styles.dropdownIcon}/> Hồ sơ
                     </Link>
+                    {/* Link Đơn hàng */}
                     <Link to="/orders" className={styles.dropdownItem} onClick={toggleUserDropdown}>
                        <FiBox className={styles.dropdownIcon}/> Đơn hàng
                     </Link>
+                    {/* Nút Đăng xuất */}
                     <button onClick={handleLogout} className={`${styles.dropdownItem} ${styles.logoutButton}`}>
                       <FiLogOut className={styles.dropdownIcon}/> Đăng xuất
                     </button>
@@ -194,10 +226,13 @@ const Header = () => {
                 )}
               </div>
             ) : (
+              // --- Khi Chưa Đăng Nhập ---
               <>
+                {/* Nút Đăng nhập */}
                 <Button variant="secondary" size="small" onClick={handleLoginClick} className={styles.authButton}>
                   Đăng nhập
                 </Button>
+                {/* Nút Đăng ký */}
                 <Button variant="primary" size="small" onClick={handleSignupClick} className={styles.authButton}>
                   Đăng ký
                 </Button>
@@ -205,15 +240,17 @@ const Header = () => {
             )}
           </div>
 
-          {/* --- Mobile Menu Toggle --- */}
-          <button className={styles.mobileMenuToggle} onClick={toggleMobileMenu} aria-label="Mở menu">
+          {/* --- Nút bật/tắt Menu Mobile --- */}
+          <button className={styles.mobileMenuToggle} onClick={toggleMobileMenu} aria-label={isMobileMenuOpen ? "Đóng menu" : "Mở menu"}>
+            {/* Hiển thị icon X hoặc Hamburger tùy trạng thái */}
             {isMobileMenuOpen ? <FiX /> : <FiMenu />}
           </button>
         </div>
       </div>
 
-      {/* === Mobile Menu Drawer === */}
+      {/* === Mobile Menu Drawer (Thanh menu trượt ra từ bên phải) === */}
       <nav ref={mobileMenuRef} className={`${styles.mobileMenu} ${isMobileMenuOpen ? styles.mobileMenuOpen : ''}`}>
+        {/* Header của menu mobile */}
         <div className={styles.mobileMenuHeader}>
           <span className={styles.mobileMenuTitle}>Menu</span>
           <button onClick={toggleMobileMenu} className={styles.closeButton} aria-label="Đóng menu">
@@ -221,18 +258,22 @@ const Header = () => {
           </button>
         </div>
 
-        {/* --- Auth/User Info in Mobile Menu --- */}
+        {/* --- Thông tin User hoặc Nút Auth trong Mobile Menu --- */}
         <div className={styles.mobileUserInfo}>
+           {/* Kiểm tra state isLoggedIn giả lập */}
            {isLoggedIn ? (
+             // --- Khi Đã Đăng Nhập (Mobile) ---
              <>
                 <div className={styles.mobileWelcome}>
                   <FiUserCheck className={styles.mobileUserIcon}/> Chào, {userName}!
                 </div>
                 <Link to="/profile" className={styles.mobileNavLink} onClick={handleMobileLinkClick}>Hồ sơ</Link>
                 <Link to="/orders" className={styles.mobileNavLink} onClick={handleMobileLinkClick}>Đơn hàng</Link>
-                <button onClick={handleLogout} className={`${styles.mobileNavLink} ${styles.mobileLogoutButton}`}>Đăng xuất</button>
+                {/* Nút đăng xuất */}
+                <button onClick={() => {handleLogout(); handleMobileLinkClick();}} className={`${styles.mobileNavLink} ${styles.mobileLogoutButton}`}>Đăng xuất</button>
              </>
            ) : (
+             // --- Khi Chưa Đăng Nhập (Mobile) ---
              <div className={styles.mobileAuthButtons}>
                  <Button variant="primary" onClick={() => { handleLoginClick(); handleMobileLinkClick(); }} className={styles.mobileAuthBtn}>Đăng nhập</Button>
                  <Button variant="secondary" onClick={() => { handleSignupClick(); handleMobileLinkClick(); }} className={styles.mobileAuthBtn}>Đăng ký</Button>
@@ -240,12 +281,13 @@ const Header = () => {
            )}
         </div>
 
+        {/* Đường kẻ ngang phân cách */}
         <hr className={styles.mobileMenuDivider} />
 
-        {/* --- Main Links in Mobile Menu --- */}
+        {/* --- Các Link chính trong Mobile Menu --- */}
         <Link to="/" className={styles.mobileNavLink} onClick={handleMobileLinkClick}>Trang Chủ</Link>
 
-        {/* --- Categories in Mobile Menu --- */}
+        {/* --- Danh mục trong Mobile Menu --- */}
         <div className={styles.mobileCategorySection}>
              <div className={styles.mobileNavGroupTitle}>Danh Mục</div>
             <Link to="/products?category=Smartphone" className={styles.mobileNavLink} onClick={handleMobileLinkClick}>📱 Smartphones</Link>
@@ -253,14 +295,15 @@ const Header = () => {
             <Link to="/products" className={styles.mobileNavLink} onClick={handleMobileLinkClick}>Tất cả sản phẩm</Link>
         </div>
 
+         {/* Đường kẻ ngang */}
          <hr className={styles.mobileMenuDivider} />
 
-         {/* --- Other Links --- */}
+         {/* --- Các Link khác --- */}
           <Link to="/promotions" className={styles.mobileNavLink} onClick={handleMobileLinkClick}>Khuyến Mãi</Link>
-          {/* Thêm link khác nếu cần */}
+          {/* Thêm các link khác nếu cần */}
 
       </nav>
-       {/* Lớp phủ khi mobile menu mở */}
+       {/* Lớp phủ màu đen mờ khi menu mobile mở */}
        {isMobileMenuOpen && <div className={styles.overlay} onClick={toggleMobileMenu}></div>}
     </header>
   );

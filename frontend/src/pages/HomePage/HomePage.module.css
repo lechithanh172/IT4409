@@ -36,6 +36,12 @@
     padding: 20px;
   }
   
+  .bannerContent {
+    position: relative; /* Để nằm trên lớp phủ */
+    z-index: 2;
+    max-width: 100%; /* Giới hạn chiều rộng nội dung */
+  }
+
   .heroTitle {
     font-size: 2.8rem; /* Kích thước lớn cho tiêu đề */
     font-weight: 700;
@@ -60,9 +66,22 @@
   
   /* --- General Section Styles --- */
   .section {
-    padding: 60px 20px; /* Khoảng cách trên dưới và trái phải */
+    padding: 20px 20px; /* Khoảng cách trên dưới và trái phải */
     max-width: 1200px; /* Giới hạn chiều rộng nội dung */
     margin: 0 auto; /* Căn giữa section */
+  }
+
+  .bannerSection {
+    position: relative; /* Để định vị lớp phủ và nội dung */
+    min-height: 400px; /* Chiều cao tối thiểu */
+    background-size: cover; /* Bao phủ toàn bộ khu vực */
+    background-position: center center; /* Căn giữa ảnh nền */
+    background-repeat: no-repeat;
+    display: flex;
+    align-items: center; /* Căn giữa nội dung theo chiều dọc */
+    justify-content: center; /* Căn giữa nội dung theo chiều ngang */
+    text-align: center;
+    color: #fff; /* Màu chữ trên nền tối */
   }
   
   .sectionTitle {
@@ -91,7 +110,7 @@
   /* --- Featured Products Section --- */
   .productList {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
     gap: 25px;
   }
   
@@ -112,12 +131,22 @@
   
   .categoryList {
     display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); /* Linh hoạt hơn */
+    gap: 30px;
+    justify-content: center;
+    justify-items: center;
+    margin: 20px;
+  }
+
+  .brandList {
+    display: grid;
     grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); /* Linh hoạt hơn */
     gap: 30px;
     justify-content: center;
+    margin: 20px;
   }
   
-  .categoryCard {
+  .brandCard {
     display: block; /* Để link chiếm toàn bộ */
     position: relative; /* Để định vị tên danh mục */
     border-radius: 8px;
@@ -127,6 +156,27 @@
     transition: transform 0.3s ease, box-shadow 0.3s ease;
     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
   }
+
+  .categoryCard {
+    display: block; /* Để link chiếm toàn bộ */
+    position: relative; /* Để định vị tên danh mục */
+    border-radius: 8px;
+    overflow: hidden; /* Cắt ảnh tràn */
+    text-decoration: none;
+    color: #fff;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    height: 14rem;
+  }
+
+  .categoryLogo {
+    height: 14rem;
+  }
+
+  .brandCard:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+  }
   
   .categoryCard:hover {
     transform: translateY(-8px);
@@ -135,11 +185,18 @@
   
   .categoryImageWrapper {
       position: relative;
-      padding-top: 75%; /* Tỷ lệ khung hình 4:3 (height/width * 100) */
-      /* Hoặc height: 250px; nếu muốn cố định */
       overflow: hidden; /* Đảm bảo overlay và ảnh không tràn */
   }
+
+  .brandImageWrapper {
+    position: relative;
+    overflow: hidden; 
+    background-color: #fff;
+  }
   
+  .brandImageWrapper img {
+    margin: 0 4%;
+  }
   
   .categoryImage {
     position: absolute;
@@ -166,6 +223,17 @@
       transition: background 0.3s ease;
   }
   
+  .brandOverlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.1) 0%, rgba(0, 0, 0, 0) 60%); /* Gradient từ dưới lên */
+    z-index: 1;
+    transition: background 0.3s ease;
+  }
+
   .categoryCard:hover .categoryOverlay {
        background: linear-gradient(to top, rgba(0, 0, 0, 0.8) 0%, rgba(0, 0, 0, 0.1) 70%); /* Đậm hơn khi hover */
   }
@@ -181,6 +249,10 @@
     z-index: 2; /* Nằm trên overlay */
     margin: 0;
     text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.6);
+  }
+
+  .popularListItem {
+    width: 100%;
   }
   
   

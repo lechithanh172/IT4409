@@ -4,6 +4,7 @@ import { useCart } from '../../contexts/CartContext';
 import Button from '../Button/Button';
 import Search from '../Search';
 import styles from './Header.module.css';
+import logo from '../../../public/logosenashop.png'
 import useClickOutside from '../../hooks/useClickOutside'; // Import hook
 
 // Import icons
@@ -143,7 +144,8 @@ const Header = () => {
       <div className={styles.container}>
         {/* === Logo === */}
         <Link to="/" className={styles.logo} onClick={closeAllDropdowns}>
-          SENA Shop
+          <img src={logo} className={styles.logoShop} />
+          <p>SENA Shop</p>
         </Link>
 
         {/* === Desktop Navigation === */}

@@ -46,9 +46,9 @@
   box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25); /* Viền xanh khi focus */
 }
 
-.search .input-btn .buttonY:hover {
-  /* background-color: #d70018 */
-}
+/* .search .input-btn .buttonY:hover {
+  background-color: #d70018
+} */
 
 /* .search-results {
   background-color: #fff;
@@ -66,7 +66,6 @@
   left: 0;
   bottom: 0;
   width: 100%;
-  overflowY: auto;
   height: calc(100% - 64px); /* Chiều cao trừ đi chiều cao của header */
   background-color: rgba(0, 0, 0, 0.5); /* Màu nền mờ */
   z-index: 30; /* Đảm bảo overlay nằm dưới header */
@@ -78,7 +77,6 @@
   background: white;
   border-radius: 4px;
   max-height: 500px;
-  overflowY: auto;
   margin-left: -11.5vw;
   margin-top: 2vh;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
@@ -112,9 +110,9 @@
   width: 180px; /* Độ rộng mặc định */
   transition: width 0.3s ease;
 }
-.searchInput:focus {
-    /* width: 250px; */ /* Option: Mở rộng khi focus */
-}
+/* .searchInput:focus {
+
+} */
 .searchInput::placeholder {
     color: #888;
 }

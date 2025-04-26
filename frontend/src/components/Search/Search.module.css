@@ -62,13 +62,13 @@
 
 .overlay {
   position: fixed;
-  top: 64px; /* Đặt overlay bắt đầu ngay dưới header */
+  top: 68px; /* Đặt overlay bắt đầu ngay dưới header */
   left: 0;
   bottom: 0;
   width: 100%;
   height: calc(100% - 64px); /* Chiều cao trừ đi chiều cao của header */
   background-color: rgba(0, 0, 0, 0.5); /* Màu nền mờ */
-  z-index: 30; /* Đảm bảo overlay nằm dưới header */
+  z-index: 9999; /* Đảm bảo overlay nằm dưới header */
 }
 
 .search-results {
@@ -119,17 +119,23 @@
 
 .searchResult {
   background-color: #ccc;
+  border-radius: 8px;
+  box-shadow: 4px 4px 8px rgba(0, 0, 0, 0.2), -4px -4px 8px rgba(0, 0, 0, 0.2);
 }
 
 .searchResult .noResult {
   background-color: #fff;
-  height: 5rem;
+  height: 2rem;
   padding-top: 1rem;
+  border-radius: 8px;
+  padding: 2rem;
 }
 
 .searchResult .listResult {
   overflow-y: scroll;
-  height: 23rem;
+  height: auto;
+  max-height: 23rem;
+  border-radius: 8px;
 }
 
 .searchButton {
@@ -147,4 +153,31 @@
 .searchButton:hover {
     background-color: #e0e0e0;
     color: #333;
+}
+
+.listResult h4 {
+  padding: 5px 0;
+  margin: 0;
+  text-align: center;
+  background-color: rgb(229 229 229);
+}
+
+.listResult button {
+  background-color: #fff;
+  border: none;
+  color: #1e7e34;
+  padding: 10px 20px;
+  text-align: center;
+  text-decoration: none;
+  font-size: 16px;
+  border-radius: 4px;
+  transition: background-color 0.3s ease, color 0.3s ease;
+  display: inline-block;
+  width: 100%;
+}
+
+.loadingContainer {
+  padding: 8rem;
+  background-color: #fff;
+  border-radius: 8px;
 }

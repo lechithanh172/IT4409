@@ -1,10 +1,9 @@
-import React, { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { useCart } from '../../contexts/CartContext';
-import Button from '../Button/Button';
-import styles from './ProductDisplay.module.css'; // Sử dụng CSS Modules
+import React, { useState, useEffect } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { useCart } from "../../contexts/CartContext";
+import Button from "../Button/Button";
+import styles from "./ProductDisplay.module.css";
 
-// Import icons từ react-icons
 import {
   FaStar,
   FaRegStar,
@@ -12,16 +11,17 @@ import {
   FaChevronLeft,
   FaChevronRight,
   FaCartPlus,
-  FaCheck
-} from 'react-icons/fa'; // Font Awesome icons trong react-icons
+  FaCheck,
+} from "react-icons/fa";
 
-// Hàm định dạng tiền tệ (có thể lấy từ utils)
 const formatCurrency = (amount) => {
-  if (typeof amount !== 'number') return '';
-  return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(amount);
+  if (typeof amount !== "number") return "";
+  return new Intl.NumberFormat("vi-VN", {
+    style: "currency",
+    currency: "VND",
+  }).format(amount);
 };
 
-// Component hiển thị sao đánh giá
 const RatingStars = ({ rating, reviewCount }) => {
   const fullStars = Math.floor(rating);
   const hasHalfStar = rating % 1 !== 0;
@@ -33,37 +33,34 @@ const RatingStars = ({ rating, reviewCount }) => {
         {[...Array(fullStars)].map((_, i) => (
           <FaStar key={`full-${i}`} className={styles.starIcon} />
         ))}
-        {hasHalfStar && <FaStarHalfAlt key="half" className={styles.starIcon} />}
+        {hasHalfStar && (
+          <FaStarHalfAlt key="half" className={styles.starIcon} />
+        )}
         {[...Array(emptyStars)].map((_, i) => (
           <FaRegStar key={`empty-${i}`} className={styles.starIcon} />
         ))}
       </div>
       {reviewCount > 0 && (
-         <span className={styles.reviewCount}>({reviewCount} đánh giá)</span>
+        <span className={styles.reviewCount}>({reviewCount} đánh giá)</span>
       )}
     </div>
   );
 };
 
-
 const ProductDisplay = ({ product }) => {
   const { addItemToCart } = useCart();
   const navigate = useNavigate();
 
-  // State quản lý biến thể và ảnh được chọn
   const [selectedVariantIndex, setSelectedVariantIndex] = useState(0);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
-  // Lấy thông tin biến thể và ảnh hiện tại
   const selectedVariant = product.variants[selectedVariantIndex];
   const currentImages = selectedVariant.images;
 
-  // Reset ảnh về 0 khi đổi màu
   useEffect(() => {
     setCurrentImageIndex(0);
   }, [selectedVariantIndex]);
 
-  // --- Handlers ---
   const handleSelectVariant = (index) => {
     setSelectedVariantIndex(index);
   };
@@ -85,44 +82,39 @@ const ProductDisplay = ({ product }) => {
   };
 
   const handleAddToCart = () => {
-    // Tạo một đối tượng item rõ ràng cho giỏ hàng
     const itemToAdd = {
-      productId: product.id, // ID sản phẩm gốc
-      sku: selectedVariant.sku, // ID biến thể
+      productId: product.id,
+      sku: selectedVariant.sku,
       name: product.name,
-      variantName: selectedVariant.colorName, // Tên biến thể (màu sắc)
+      variantName: selectedVariant.colorName,
       price: selectedVariant.price,
-      image: selectedVariant.images[0], // Lấy ảnh đầu tiên làm đại diện
-      quantity: 1 // Mặc định thêm 1
+      image: selectedVariant.images[0],
+      quantity: 1,
     };
     addItemToCart(itemToAdd);
-     // Optional: Hiển thị thông báo hoặc animation
-     alert(`Đã thêm "${product.name} - ${selectedVariant.colorName}" vào giỏ hàng!`);
+    alert(
+      `Đã thêm "${product.name} - ${selectedVariant.colorName}" vào giỏ hàng!`
+    );
   };
 
-   const handleBuyNow = () => {
-     // Thêm vào giỏ và chuyển đến trang giỏ hàng
-     handleAddToCart(); // Gọi lại hàm thêm vào giỏ
-     navigate('/cart'); // Chuyển hướng
-   };
-
+  const handleBuyNow = () => {
+    handleAddToCart();
+    navigate("/cart");
+  };
 
   return (
     <div className={styles.productDisplayContainer}>
-      {/* --- Cột Trái: Hình ảnh --- */}
       <div className={styles.leftColumn}>
         <div className={styles.galleryContainer}>
-          {/* Ảnh lớn */}
           <div className={styles.mainImageWrapper}>
-             {/* Hiển thị loading hoặc placeholder nếu ảnh chưa load */}
             <img
               src={currentImages[currentImageIndex]}
-              alt={`${product.name} - ${selectedVariant.colorName} - Ảnh ${currentImageIndex + 1}`}
+              alt={`${product.name} - ${selectedVariant.colorName} - Ảnh ${
+                currentImageIndex + 1
+              }`}
               className={styles.mainImage}
-              // Thêm key để React re-render khi ảnh thay đổi
               key={currentImages[currentImageIndex]}
             />
-            {/* Nút điều hướng ảnh */}
             {currentImages.length > 1 && (
               <>
                 <button
@@ -143,13 +135,14 @@ const ProductDisplay = ({ product }) => {
             )}
           </div>
 
-          {/* Danh sách ảnh thumbnail */}
           {currentImages.length > 1 && (
             <div className={styles.thumbnailList}>
               {currentImages.map((imgSrc, index) => (
                 <button
                   key={index}
-                  className={`${styles.thumbnailItem} ${index === currentImageIndex ? styles.activeThumbnail : ''}`}
+                  className={`${styles.thumbnailItem} ${
+                    index === currentImageIndex ? styles.activeThumbnail : ""
+                  }`}
                   onClick={() => handleThumbnailClick(index)}
                   aria-label={`Xem ảnh ${index + 1}`}
                 >
@@ -161,14 +154,14 @@ const ProductDisplay = ({ product }) => {
         </div>
       </div>
 
-      {/* --- Cột Phải: Thông tin & Actions --- */}
       <div className={styles.rightColumn}>
-        {/* Tên sản phẩm & Rating */}
         <h1 className={styles.productName}>{product.name}</h1>
-        <RatingStars rating={product.rating} reviewCount={product.reviewCount} />
+        <RatingStars
+          rating={product.rating}
+          reviewCount={product.reviewCount}
+        />
         <hr className={styles.divider} />
 
-        {/* Chọn màu sắc/biến thể */}
         <div className={styles.variantSelector}>
           <p className={styles.selectorTitle}>
             Chọn màu sắc: <strong>{selectedVariant.colorName}</strong>
@@ -177,74 +170,76 @@ const ProductDisplay = ({ product }) => {
             {product.variants.map((variant, index) => (
               <li
                 key={variant.sku}
-                className={`${styles.variantItem} ${index === selectedVariantIndex ? styles.selectedVariant : ''}`}
+                className={`${styles.variantItem} ${
+                  index === selectedVariantIndex ? styles.selectedVariant : ""
+                }`}
                 onClick={() => handleSelectVariant(index)}
                 title={variant.colorName}
               >
-                 {/* Có thể dùng ảnh thumbnail hoặc màu nền */}
-                 <img
-                    src={variant.thumbnail}
-                    alt={variant.colorName}
-                    className={styles.variantThumbnail}
-                 />
-                 {/* <span className={styles.variantColorChip} style={{ backgroundColor: variant.colorHex }}></span> */}
-                 <span className={styles.variantName}>{variant.colorName}</span>
-                 <span className={styles.variantPrice}>{formatCurrency(variant.price)}</span>
-                 {index === selectedVariantIndex && (
-                   <FaCheck className={styles.checkmarkIcon} />
-                 )}
+                <img
+                  src={variant.thumbnail}
+                  alt={variant.colorName}
+                  className={styles.variantThumbnail}
+                />
+                <span className={styles.variantName}>{variant.colorName}</span>
+                <span className={styles.variantPrice}>
+                  {formatCurrency(variant.price)}
+                </span>
+                {index === selectedVariantIndex && (
+                  <FaCheck className={styles.checkmarkIcon} />
+                )}
               </li>
             ))}
           </ul>
         </div>
 
-         {/* Giá bán */}
-         <div className={styles.priceBox}>
-            <span className={styles.currentPrice}>{formatCurrency(selectedVariant.price)}</span>
-             {selectedVariant.oldPrice && selectedVariant.oldPrice > selectedVariant.price && (
-                 <span className={styles.oldPrice}>{formatCurrency(selectedVariant.oldPrice)}</span>
-             )}
-             {/* Có thể thêm % giảm giá nếu cần */}
-             {selectedVariant.oldPrice && selectedVariant.oldPrice > selectedVariant.price && (
-                 <span className={styles.discountBadge}>
-                    -{Math.round(((selectedVariant.oldPrice - selectedVariant.price) / selectedVariant.oldPrice) * 100)}%
-                 </span>
-             )}
-         </div>
-
-         {/* Thông tin khuyến mãi (nếu có) */}
-         {/* <div className={styles.promoBox}>
-             <h4>Khuyến mãi</h4>
-             <ul>
-                 <li>KM 1...</li>
-                 <li>KM 2...</li>
-             </ul>
-         </div> */}
-
-         {/* Nút Mua hàng */}
-         <div className={styles.actionButtons}>
-            <Button
-                variant="primary"
-                className={styles.buyNowButton}
-                onClick={handleBuyNow}
-                disabled={selectedVariant.stock <= 0} // Disable nếu hết hàng
-             >
-                <strong>MUA NGAY</strong>
-                <span>Giao hàng tận nơi hoặc nhận tại cửa hàng</span>
-             </Button>
-             <Button
-                variant="secondary" // Hoặc tạo variant 'outline'
-                className={styles.addToCartButton}
-                onClick={handleAddToCart}
-                 disabled={selectedVariant.stock <= 0} // Disable nếu hết hàng
-             >
-                <FaCartPlus className={styles.cartIcon} />
-                <span>Thêm vào giỏ</span>
-             </Button>
-         </div>
-           {selectedVariant.stock <= 0 && (
-                <p className={styles.outOfStockMessage}>Sản phẩm tạm hết hàng</p>
+        <div className={styles.priceBox}>
+          <span className={styles.currentPrice}>
+            {formatCurrency(selectedVariant.price)}
+          </span>
+          {selectedVariant.oldPrice &&
+            selectedVariant.oldPrice > selectedVariant.price && (
+              <span className={styles.oldPrice}>
+                {formatCurrency(selectedVariant.oldPrice)}
+              </span>
             )}
+          {selectedVariant.oldPrice &&
+            selectedVariant.oldPrice > selectedVariant.price && (
+              <span className={styles.discountBadge}>
+                -
+                {Math.round(
+                  ((selectedVariant.oldPrice - selectedVariant.price) /
+                    selectedVariant.oldPrice) *
+                    100
+                )}
+                %
+              </span>
+            )}
+        </div>
+
+        <div className={styles.actionButtons}>
+          <Button
+            variant="primary"
+            className={styles.buyNowButton}
+            onClick={handleBuyNow}
+            disabled={selectedVariant.stock <= 0}
+          >
+            <strong>MUA NGAY</strong>
+            <span>Giao hàng tận nơi hoặc nhận tại cửa hàng</span>
+          </Button>
+          <Button
+            variant="secondary"
+            className={styles.addToCartButton}
+            onClick={handleAddToCart}
+            disabled={selectedVariant.stock <= 0}
+          >
+            <FaCartPlus className={styles.cartIcon} />
+            <span>Thêm vào giỏ</span>
+          </Button>
+        </div>
+        {selectedVariant.stock <= 0 && (
+          <p className={styles.outOfStockMessage}>Sản phẩm tạm hết hàng</p>
+        )}
       </div>
     </div>
   );

@@ -1,17 +1,20 @@
-import React from 'react'
-import { Link } from 'react-router-dom'
-import './ItemSearch.css'
+import React from "react";
+import { Link } from "react-router-dom";
+import "./ItemSearch.css";
 
 function ItemSearch(props) {
   const formatPrice = (price) => {
-    let priceString = price.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' });
-    return priceString.replace(/\s/g, '');
+    let priceString = price.toLocaleString("vi-VN", {
+      style: "currency",
+      currency: "VND",
+    });
+    return priceString.replace(/\s/g, "");
   };
 
   if (props.noResult) {
     return (
       <div className="no-result">
-        <p className='text'>Không có kết quả nào phù hợp.</p>
+        <p className="text">Không có kết quả nào phù hợp.</p>
       </div>
     );
   }
@@ -28,13 +31,13 @@ function ItemSearch(props) {
             <h3>{props.name}</h3>
             <div className="box-price">
               <p className="item-price-new">{formatPrice(props.price)}</p>
-              <p className="item-price-old">{formatPrice(props.price)}</p>   
+              <p className="item-price-old">{formatPrice(props.price)}</p>
             </div>
           </div>
         </Link>
       </div>
     </div>
-  )
+  );
 }
 
 export default ItemSearch;

@@ -50,7 +50,7 @@ const FilterSortPanel = ({ currentFilters, onFilterChange, availableBrands = [],
            ]);
        }
    // Thêm minPrice, maxPrice vào dependency nếu chúng có thể thay đổi động
-   }, [price_gte, price_lte, minPrice, maxPrice, priceRange]);
+   }, [price_gte, price_lte, minPrice, maxPrice]);
 
 
   // Hàm gọi callback khi filter/sort thay đổi
@@ -153,12 +153,14 @@ const FilterSortPanel = ({ currentFilters, onFilterChange, availableBrands = [],
                                     </div>
                                 </div>
                                 )}
-                                renderThumb={({ props }) => (
+                                renderThumb={({ props, isDragged }) => (
                                 <div
                                     {...props}
                                     className={styles.rangeThumb}
                                     style={{
                                         ...props.style,
+                                        // Có thể thêm hiệu ứng khi kéo
+                                        // boxShadow: isDragged ? '0px 0px 8px rgba(99,102,241,0.5)' : 'none'
                                     }}
                                 />
                                 )}

@@ -4,16 +4,17 @@ import { Routes, Route } from 'react-router-dom';
 // Layouts
 import MainLayout from './layouts/MainLayout';
 // Import các layout khác nếu có (AdminLayout, ProductManagerLayout...)
+
+// Pages chung
+import HomePage from './pages/HomePage/HomePage';
+import ProductDetailPage from './pages/ProductDetailPage/ProductDetailPage';
+import CartPage from './pages/CartPage/CartPage';
+import UserProfilePage from './pages/UserProfilePage/UserProfilePage';
 import LoginPage from './pages/AuthPage/loginPage';
 import EmailInputPage from './pages/AuthPage/emailPage';
 import SignupPage from './pages/AuthPage/signupPage';
 import ChangePassword from './pages/AuthPage/changePasswordPage';
 import OtpPage from './pages/AuthPage/otpPage';
-// Pages chung
-import HomePage from './pages/HomePage/HomePage';
-import ProductDetailPage from './pages/ProductDetailPage/ProductDetailPage';
-import CartPage from './pages/CartPage/CartPage'; // Import trang giỏ hàng
-
 // Admin Pages (ví dụ)
 // import AdminDashboardPage from './pages/Admin/AdminDashboardPage';
 
@@ -26,47 +27,39 @@ import ProtectedRoute from './components/Auth/ProtectedRoute'; // Import compone
 function App() {
   return (
     <Routes>
-      {/* === PUBLIC & USER ROUTES trong MainLayout === */}
+      {/* === ROUTES TRONG MAINLAYOUT === */}
       <Route path="/" element={<MainLayout />}>
-        <Route index element={<HomePage />} /> {/* Trang chủ */}
-        <Route path="products/:productId" element={<ProductDetailPage />} /> {/* Trang chi tiết SP */}
-          <Route path="login" element={<LoginPage />} />
-                  <Route path="email" element={<EmailInputPage />} />
-                  <Route path="signup" element={<SignupPage />} />
-                  <Route path="change-password" element={<ChangePassword />} />
-                  <Route path="otp" element={<OtpPage />} />
-        {/* --- ROUTE GIỎ HÀNG ĐƯỢC BẢO VỆ --- */}
+        {/* Public Routes */}
+        <Route index element={<HomePage />} />
+        <Route path="products/:productId" element={<ProductDetailPage />} />
+
+        {/* Auth Routes (VẪN NẰM TRONG MAINLAYOUT NẾU MUỐN CÓ HEADER/FOOTER) */}
+        {/* Nếu muốn các trang này không có Header/Footer, hãy đưa ra ngoài MainLayout */}
+        <Route path="login" element={<LoginPage />} />
+        <Route path="email" element={<EmailInputPage />} />
+        <Route path="signup" element={<SignupPage />} />
+        <Route path="change-password" element={<ChangePassword />} />
+        <Route path="otp" element={<OtpPage />} />
+
+        {/* Protected Routes (Cần đăng nhập) */}
         <Route
           path="cart"
           element={
-            // Chỉ cần đăng nhập, không cần vai trò cụ thể
-            <ProtectedRoute>
+            <ProtectedRoute> {/* Chỉ yêu cầu đăng nhập */}
               <CartPage />
             </ProtectedRoute>
           }
         />
-        {/* --- KẾT THÚC ROUTE GIỎ HÀNG --- */}
-
-        {/* Thêm các route public hoặc cần login khác trong MainLayout nếu có */}
-        {/* Ví dụ: Trang profile người dùng */}
-        {/* <Route path="profile" element={<ProtectedRoute><UserProfilePage /></ProtectedRoute>} /> */}
+        {/* --- ROUTE PROFILE ĐƯỢC BẢO VỆ --- */}
+        <Route
+          path="profile"
+          element={
+             <ProtectedRoute> {/* Chỉ yêu cầu đăng nhập */}
+               <UserProfilePage />
+             </ProtectedRoute>
+          }
+        />
       </Route>
-
-      {/* === AUTH ROUTES (Ngoài MainLayout) === */}
-      {/* === ADMIN PROTECTED ROUTES (Ví dụ) === */}
-      {/* <Route path="/admin" element={<ProtectedRoute requiredRole="admin"><AdminLayout /></ProtectedRoute>}> */}
-        {/* <Route index element={<AdminDashboardPage />} /> */}
-        {/* ... các route con của admin */}
-      {/* </Route> */}
-
-      {/* === PRODUCT MANAGER PROTECTED ROUTES (Ví dụ) === */}
-      {/* <Route path="/pm" element={<ProtectedRoute requiredRole="productmanager"><ProductManagerLayout /></ProtectedRoute>}> */}
-         {/* <Route index element={<ProductManagerListPage />} /> */}
-         {/* ... các route con của pm */}
-      {/* </Route> */}
-
-
-      {/* === NOT FOUND ROUTE (Luôn đặt cuối cùng) === */}
 
     </Routes>
   );

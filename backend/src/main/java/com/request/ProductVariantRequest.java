@@ -7,7 +7,7 @@ public class ProductVariantRequest {
 
     private String color;
 
-    private Double discountPercentage;
+    private Integer discountPercentage;
 
     private Integer stockQuantity;
 

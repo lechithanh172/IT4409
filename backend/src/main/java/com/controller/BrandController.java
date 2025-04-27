@@ -29,9 +29,9 @@ public class BrandController {
         return ResponseEntity.status(404).body(new StatusResponse("This brand does not exist"));
     }
     @PostMapping("/add")
-    public ResponseEntity<StatusResponse> addBrand(@RequestBody Brand request) {
+    public ResponseEntity<?> addBrand(@RequestBody Brand request) {
         if(brandService.addBrand(request)) {
-            return ResponseEntity.status(200).body(new StatusResponse("Brand added successfully"));
+            return ResponseEntity.status(200).body(brandService.getByName(request.getBrandName()).get());
         }
         else return ResponseEntity.status(409).body(new StatusResponse("This brand already exists"));
     }

@@ -25,10 +25,11 @@ public class ProductVariant {
     private String color;
 
     @Column(name = "discount_percentage")
-    private Double discountPercentage = 0.0;
+    private Integer discountPercentage = 0;
 
     @Column(name = "stock_quantity")
     private Integer stockQuantity;
 
+    @Column(name = "image_url")
     private String imageUrl;
 }

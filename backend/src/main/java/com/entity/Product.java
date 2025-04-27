@@ -5,6 +5,8 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -28,7 +30,12 @@ public class Product {
     @Column(columnDefinition = "TEXT")
     private String description;
 
-    private Integer weight;
+//    @Type(value = StringArrayType.class)
+    @JdbcTypeCode(SqlTypes.ARRAY)
+    @Column(name = "specifications", columnDefinition = "TEXT[]")
+    private List<String> specifications;
+
+    private Double weight;
 
     @Column(nullable = false, precision = 10, scale = 2)
     private Long price;

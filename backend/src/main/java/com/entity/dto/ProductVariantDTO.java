@@ -8,5 +8,5 @@ public class ProductVariantDTO {
     private String color;
     private String imageUrl;
     private Integer stockQuantity;
-    private Double discount;
+    private Integer discount;
 }

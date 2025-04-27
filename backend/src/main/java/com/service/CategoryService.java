@@ -43,11 +43,12 @@ public class CategoryService {
     }
 
     public boolean updateCategory(Category category) {
-        Optional<Category> categoryOptional = categoryRepository.findByCategoryNameIgnoreCase(category.getCategoryName());
+        Optional<Category> categoryOptional = categoryRepository.findByCategoryId(category.getCategoryId());
         if(categoryOptional.isPresent()) {
             Category oldCategory = categoryOptional.get();
-            if(category.getCategoryName() != null) {oldCategory.setCategoryName(category.getCategoryName());}
-            if(category.getDescription() != null) {oldCategory.setDescription(category.getDescription());}
+            oldCategory.setCategoryName(category.getCategoryName());
+            oldCategory.setDescription(category.getDescription());
+            oldCategory.setImageUrl(category.getImageUrl());
             categoryRepository.save(oldCategory);
             return true;
         }

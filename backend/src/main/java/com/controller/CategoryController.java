@@ -29,9 +29,9 @@ public class CategoryController {
         return ResponseEntity.status(404).body(new StatusResponse("This category does not exist"));
     }
     @PostMapping("/add")
-    public ResponseEntity<StatusResponse> addCategory(@RequestBody Category request) {
+    public ResponseEntity<?> addCategory(@RequestBody Category request) {
         if(categoryService.addCategory(request)) {
-            return ResponseEntity.status(200).body(new StatusResponse("Category added successfully"));
+            return ResponseEntity.status(200).body(categoryService.getByName(request.getCategoryName()).get());
         }
         else return ResponseEntity.status(409).body(new StatusResponse("This category already exists"));
     }

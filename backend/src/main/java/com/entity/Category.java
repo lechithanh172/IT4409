@@ -22,6 +22,9 @@ public class Category {
     @Column(name = "name")
     private String categoryName;
 
+    @Column(name = "image_url")
+    private String imageUrl;
+
     @Column(name = "description")
     private String description;
 }

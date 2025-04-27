@@ -32,6 +32,7 @@ public class ProductService {
         dto.setProductId(product.getProductId());
         dto.setProductName(product.getProductName());
         dto.setDescription(product.getDescription());
+        dto.setSpecifications(product.getSpecifications());
         dto.setPrice(product.getPrice());
         dto.setWeight(product.getWeight());
         dto.setSupportRushOrder(product.getSupportRushOrder());
@@ -54,6 +55,7 @@ public class ProductService {
         Product product = new Product();
         product.setProductName(request.getProductName());
         product.setDescription(request.getDescription());
+        product.setSpecifications(request.getSpecifications());
         product.setWeight(request.getWeight());
         product.setPrice(request.getPrice());
         Integer categoryId = categoryRepository.findByCategoryNameIgnoreCase(request.getCategoryName()).get().getCategoryId();
@@ -79,6 +81,9 @@ public class ProductService {
 
         product.setVariants(variants);
         return product;
+    }
+    public Product getProductByProductName(String productName) {
+        return productRepository.findByProductName(productName).get();
     }
 
     public boolean addProduct(ProductRequest request) {

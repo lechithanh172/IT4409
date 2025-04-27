@@ -43,16 +43,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             filterChain.doFilter(request, response);
             return;
         }
-
         String username = jwtService.extractUsername(token);
         Role role = jwtService.extractRole(token); // e.g. ADMIN, CUSTOMER
 
-        // Tạo authorities để Spring Security hiểu
         List<GrantedAuthority> authorities = List.of(new SimpleGrantedAuthority("ROLE_" + role));
 
         UsernamePasswordAuthenticationToken authToken =
                 new UsernamePasswordAuthenticationToken(username, null, authorities);
-
         SecurityContextHolder.getContext().setAuthentication(authToken);
         filterChain.doFilter(request, response);
     }

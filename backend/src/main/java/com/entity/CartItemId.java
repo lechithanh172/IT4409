@@ -12,4 +12,5 @@ import java.io.Serializable;
 public class CartItemId implements Serializable {
     private Integer userId;
     private Integer productId;
+    private Integer variantId;
 }

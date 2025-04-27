@@ -3,10 +3,8 @@ package com.service;
 import com.entity.User;
 import com.repository.UserRepository;
 import com.request.SignUpOTPRequest;
-import com.request.SignUpRequest;
 import com.request.UpdateInfoRequest;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 

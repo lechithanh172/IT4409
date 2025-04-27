@@ -1,86 +1,139 @@
-import { useEffect, useState } from 'react';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { useProducts } from '../../contexts/ProductContext';
-import ProductCard from '../../Components/ProductCard/ProductCard';
-// import Popular from '../../Components/Popular/Popular';
-import ListItem from '../../components/ListItem/ListItem';
-import Button from '../../components/Button/Button';
-import Spinner from '../../components/Spinner/Spinner';
-import styles from './HomePage.module.css';
-import apiService from '../../services/api';
-import Banner from '../../components/Banner/Banner';
+import ProductSlider from '../../components/ProductSlider/ProductSlider'; // Component Slider ngang
+import Button from '../../components/Button/Button';                     // Component Nút bấm
+import Spinner from '../../components/Spinner/Spinner';                 // Component Loading
+import styles from './HomePage.module.css';                             // CSS Module cho trang Home
+import apiService from '../../services/api';                     // Service gọi API
+import { FiChevronRight } from 'react-icons/fi';                      // Icon cho link "Xem thêm"
 
-// Import hình ảnh (hoặc dùng URL trực tiếp)
-// import heroBg from '../../assets/images/hero-background.jpg'; // Ví dụ nếu có ảnh trong assets
-// import smartphoneCatImg from '../../assets/images/category-smartphone.jpg';
-// import laptopCatImg from '../../assets/images/category-laptop.jpg';
+// Hàm fetch sản phẩm theo danh sách ID
+const fetchProductsByIds = async (productIds = []) => {
+  if (!Array.isArray(productIds) || productIds.length === 0) {
+    return []; // Trả về mảng rỗng nếu không có ID nào
+  }
+  try {
+    console.log(`Fetching products for IDs: ${productIds.join(', ')}`);
+    // Gọi API song song cho từng ID sản phẩm
+    const productPromises = productIds.map(id => apiService.getProductById(id));
+    const results = await Promise.allSettled(productPromises);
 
-const allCategory = [
-  { "categoryId": 1, "name": "Laptop", "description": "Portable personal computers", "image": "https://hanoicomputercdn.com/media/product/89677_laptop_lenovo_ideapad_slim_5_14irh10_83k0000avn_i5_13420h_24gb_ram_512gb_ssd_14_wuxga_win11_xam_0005_layer_2.jpg" },
-  { "categoryId": 2, "name": "Tablet", "description": "Touchscreen mobile devices", "image": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRtSLFI5VEetrtdyPEDnn55_2OTomtzGFwzSQ&s" },
-  { "categoryId": 3, "name": "Smartphone", "description": "Mobile phones", "image": "https://cdn2.cellphones.com.vn/insecure/rs:fill:358:358/q:90/plain/https://cellphones.com.vn/media/catalog/product/i/p/iphone-15-pro-256gb.png" },
-  { "categoryId": 4, "name": "Accessory", "description": "Computer accessories", "image": "https://i5.walmartimages.com/seo/Wireless-Charger-Magnetic-Fast-Charging-Stand-Compatible-iPhone-16-15-14-13-12-11-Pro-Max-Plus-XS-XR-X-8-Apple-Watch-9-8-7-6-5-4-3-2-SE-AirPods-3-2-P_66f5dc9c-ca3c-4097-8e8b-39ccfa66b6a0.b5cb13def4077c44bc9e6ffa883a35ee.jpeg?odnHeight=320&odnWidth=320&odnBg=FFFFFF" },
-  { "categoryId": 5, "name": "Monitor", "description": "Display devices", "image": "https://www.lg.com/content/dam/channel/wcms/vn/images/man-hinh-may-tinh/24mr400-b_atvq_eavh_vn_c/gallery/small03.jpg" },
-  { "categoryId": 6, "name": "Printer", "description": "Printing machines", "image": "https://cdn2.cellphones.com.vn/x/media/catalog/product/t/_/t_i_xu_ng_52__1_4.png" },
-  { "categoryId": 7, "name": "Router", "description": "Network routers", "image": "https://owlgaming.vn/wp-content/uploads/2024/06/Thiet-bi-phat-Wifi-6-Router-ASUS-TUF-Gaming-AX6000-1.jpg" },
-  { "categoryId": 8, "name": "Speaker", "description": "Audio output devices", "image": "https://product.hstatic.net/1000187560/product/loa-bluetooth-havit-sk832bt_2__459d04d6a66e4ff38bfa4f528e3cb2d5_large.png" },
-  { "categoryId": 9, "name": "Camera", "description": "Photography and video", "image": "https://www.bachkhoashop.com/wp-content/uploads/2022/12/gth788_1_.webp" },
-  { "categoryId": 10, "name": "Smartwatch", "description": "Wearable smart devices", "image": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQx-zhXJ2eJ5OxH7xxs0MnPpu5eNikP79VGbYQG_AEqHw57ezRC8BNLqqokP4n0KhtWCPo&usqp=CAU" }
-]
+    // Lọc ra những sản phẩm fetch thành công và có dữ liệu
+    const fetchedProducts = results
+      .filter(result => result.status === 'fulfilled' && result.value?.data)
+      .map(result => result.value.data);
 
-const allBrand = [
-  { "brandId": 1, "name": "Apple", "logoUrl": "https://cdn2.cellphones.com.vn/insecure/rs:fill:0:50/q:30/plain/https://cellphones.com.vn/media/tmp/catalog/product/f/r/frame_59.png" },
-  { "brandId": 2, "name": "Samsung", "logoUrl": "https://cdn2.cellphones.com.vn/insecure/rs:fill:0:50/q:30/plain/https://cellphones.com.vn/media/tmp/catalog/product/f/r/frame_60.png" },
-  { "brandId": 3, "name": "Dell", "logoUrl": "https://cdn2.cellphones.com.vn/insecure/rs:fill:0:50/q:30/plain/https://cellphones.com.vn/media/wysiwyg/Icon/brand_logo/Dell.png" },
-  { "brandId": 4, "name": "HP", "logoUrl": "https://cdn2.cellphones.com.vn/insecure/rs:fill:0:50/q:30/plain/https://cellphones.com.vn/media/wysiwyg/Icon/brand_logo/HP.png" },
-  { "brandId": 5, "name": "Lenovo", "logoUrl": "https://cdn2.cellphones.com.vn/insecure/rs:fill:0:50/q:30/plain/https://cellphones.com.vn/media/wysiwyg/Icon/brand_logo/Lenovo.png" },
-  { "brandId": 6, "name": "Asus", "logoUrl": "https://cdn2.cellphones.com.vn/insecure/rs:fill:0:50/q:30/plain/https://cellphones.com.vn/media/wysiwyg/Icon/brand_logo/Asus.png" },
-  { "brandId": 7, "name": "MSI", "logoUrl": "https://cdn2.cellphones.com.vn/insecure/rs:fill:0:50/q:30/plain/https://cellphones.com.vn/media/wysiwyg/Icon/brand_logo/MSI.png" },
-  { "brandId": 8, "name": "Acer", "logoUrl": "https://cdn2.cellphones.com.vn/insecure/rs:fill:0:50/q:30/plain/https://cellphones.com.vn/media/wysiwyg/Icon/brand_logo/acer.png" },
-  { "brandId": 9, "name": "Xiaomi", "logoUrl": "https://cdn2.cellphones.com.vn/insecure/rs:fill:0:50/q:30/plain/https://cellphones.com.vn/media/tmp/catalog/product/f/r/frame_61.png" },
-  { "brandId": 10, "name": "Sony", "logoUrl": "https://cdn2.cellphones.com.vn/insecure/rs:fill:0:50/q:30/plain/https://cellphones.com.vn/media/catalog/product/b/r/brand-icon-sony_2.png" }
-]
+    console.log("Fetched products by IDs:", fetchedProducts);
+    return fetchedProducts;
+
+  } catch (error) {
+    console.error(`Lỗi khi fetch sản phẩm theo IDs:`, error);
+    return []; // Trả về mảng rỗng nếu có lỗi
+  }
+};
+
 
 const HomePage = () => {
-  const { products, loading, error } = useProducts();
-  const [categories, setCategories] = useState(['']);
-  const [brands, setBrands] = useState(['']);
+  // State cho dữ liệu từ API
+  const [initialProducts, setInitialProducts] = useState([]); // State cho các sản phẩm ban đầu (ID 1-15)
+  const [categories, setCategories] = useState([]);
+  const [brands, setBrands] = useState([]);
 
-  // Lấy một số sản phẩm nổi bật (ví dụ: 4 sản phẩm đầu tiên)
-  // console.log("products", products);
-  const featuredProducts = products;
-  
+  // State quản lý loading
+  const [isInitialProductLoading, setIsInitialProductLoading] = useState(true); // Loading cho sản phẩm ban đầu
+  const [isCategoryLoading, setIsCategoryLoading] = useState(true);
+  const [isBrandLoading, setIsBrandLoading] = useState(true);
+
+  // State quản lý lỗi
+  const [error, setError] = useState(null);
+
+  // useEffect để fetch tất cả dữ liệu cần thiết
   useEffect(() => {
-    (async () => {
-      // const allCategory = await apiService.getAllCategories();
-      // const allBrand = await apiService.getAllBrands();
-      // console.log("allBrand", allBrand.data);
-      // console.log("allCategory", allCategory.data);
-      // setCategories(allCategory.data);
-      setCategories(allCategory);
-      setBrands(allBrand);
-      // setBrands(allBrand.data);
-      
-    })();
-  },[])
+    const loadHomePageData = async () => {
+      setIsInitialProductLoading(true);
+      setIsCategoryLoading(true);
+      setIsBrandLoading(true);
+      setError(null);
 
-  // URL ảnh mẫu (thay thế bằng ảnh của bạn)
-  const heroBgUrl = 'https://images.unsplash.com/photo-1517336714731-489689fd1ca8?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1920&q=80'; // Ví dụ ảnh nền Macbook
-  const smartphoneCatImgUrl = 'https://images.unsplash.com/photo-1604671368394-22ae7daced1 S?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80'; // Ví dụ ảnh smartphone
-  const laptopCatImgUrl = 'https://images.unsplash.com/photo-1588872657578-7efd1f1555ed?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80'; // Ví dụ ảnh laptop
+      // Tạo mảng ID từ 1 đến 15
+      const initialProductIds = Array.from({ length: 15 }, (_, i) => i + 1);
+
+      try {
+        console.log("Starting to fetch homepage data (initial products by ID)...");
+        // Gọi API song song
+        const [initialProductRes, categoryRes, brandRes] = await Promise.allSettled([
+          fetchProductsByIds(initialProductIds), // Fetch sản phẩm theo ID
+          apiService.getAllCategories(),
+          apiService.getAllBrands()
+        ]);
+
+        // Xử lý kết quả sản phẩm ban đầu
+        if (initialProductRes.status === 'fulfilled') {
+          console.log("Initial products (1-15) fetched:", initialProductRes.value);
+          setInitialProducts(initialProductRes.value);
+        } else {
+          console.error("Lỗi fetch Initial Products:", initialProductRes.reason);
+        }
+        setIsInitialProductLoading(false);
+
+        // Xử lý kết quả Categories
+        if (categoryRes.status === 'fulfilled' && Array.isArray(categoryRes.value?.data)) {
+          console.log("Categories data fetched:", categoryRes.value.data);
+          setCategories(categoryRes.value.data);
+        } else {
+          console.error("Lỗi fetch Categories:", categoryRes.reason || categoryRes.value);
+          setCategories([]);
+        }
+        setIsCategoryLoading(false);
+
+         // Xử lý kết quả Brands
+         if (brandRes.status === 'fulfilled' && Array.isArray(brandRes.value?.data)) {
+            console.log("Brands data fetched:", brandRes.value.data);
+            setBrands(brandRes.value.data);
+          } else {
+            console.error("Lỗi fetch Brands:", brandRes.reason || brandRes.value);
+            setBrands([]);
+          }
+         setIsBrandLoading(false);
+
+        // Gộp lỗi nếu có
+        const errors = [initialProductRes, categoryRes, brandRes]
+                            .filter(r => r.status === 'rejected')
+                            .map(r => r.reason?.message || 'Lỗi không xác định');
+        if (errors.length > 0) {
+            const combinedError = `Lỗi tải dữ liệu: ${errors.join('; ')}`;
+            setError(combinedError);
+            console.error(combinedError);
+        }
+
+      } catch (err) {
+        console.error("Lỗi hệ thống khi tải dữ liệu HomePage:", err);
+        setError("Đã xảy ra lỗi hệ thống. Vui lòng tải lại trang.");
+        // Đặt tất cả loading thành false nếu có lỗi chung
+        setIsInitialProductLoading(false);
+        setIsCategoryLoading(false);
+        setIsBrandLoading(false);
+      }
+    };
+
+    loadHomePageData();
+  }, []); // Chỉ chạy 1 lần
+
+  // URL ảnh nền Hero Section
+  const heroBgUrl = 'https://images.unsplash.com/photo-1517336714731-489689fd1ca8?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1920&q=80';
 
   return (
     <div className={styles.homePage}>
+      {/* --- Hero Section --- */}
       <section
         className={styles.heroSection}
-        style={{ backgroundImage: `url(${heroBgUrl})` }} // Set ảnh nền
+        style={{ backgroundImage: `url(${heroBgUrl})` }}
       >
-        <div className={styles.heroOverlay}></div> {/* Lớp phủ mờ */}
+        <div className={styles.heroOverlay}></div>
         <div className={styles.heroContent}>
           <h1 className={styles.heroTitle}>Khám Phá Thế Giới Công Nghệ</h1>
           <p className={styles.heroSubtitle}>
-            Tìm kiếm Smartphone & Laptop mới nhất với giá tốt nhất.
+            Sản phẩm chính hãng, giá tốt hàng đầu.
           </p>
           <Link to="/products">
             <Button variant="primary" className={styles.heroCtaButton}>
@@ -89,61 +142,73 @@ const HomePage = () => {
           </Link>
         </div>
       </section>
-      
-      {/* Featured Products Section */}
+
+      {error && <p className={`${styles.error} ${styles.pageError}`}>{error}</p>}
+
+      {/* --- Section Sản phẩm mới về (ID 1-15) --- */}
       <section className={styles.section}>
-        <h2 className={styles.sectionTitle}>Sản Phẩm Nổi Bật</h2>
-        {loading && <Spinner />}
-        {error && <p className={styles.error}>Lỗi tải sản phẩm: {error}</p>}
-        {!loading && !error && (
-          <>
-            <div className={styles.productList}>
-              {featuredProducts.length > 0 ? (
-                featuredProducts.map((product) => (
-                  <ProductCard key={product.productId} product={product} />
-                ))
-              ) : (
-                <p>Chưa có sản phẩm nổi bật.</p>
-              )}
-            </div>
-            {products.length > featuredProducts.length && ( // Chỉ hiện nút nếu còn sản phẩm khác
-                 <div className={styles.viewAllContainer}>
-                    <Link to="/products">
-                        <Button variant="secondary">Xem Tất Cả Sản Phẩm</Button>
-                    </Link>
-                 </div>
-            )}
-            <ListItem className={styles.popularListItem} category="Smartphone"/>
-            <ListItem className={styles.popularListItem} category="Laptop"/>
-          </>
+         <div className={styles.sectionHeader}>
+            <h2 className={styles.sectionTitle}>Sản Phẩm Mới Về</h2>
+             {/* Link tới trang tất cả sản phẩm */}
+             <Link to={`/products`} className={styles.viewAllLink}>Xem tất cả <FiChevronRight/></Link>
+         </div>
+        {isInitialProductLoading ? (
+             <div className={styles.loadingContainer}><Spinner /></div>
+        ) : initialProducts.length > 0 ? (
+            <ProductSlider products={initialProducts} />
+        ) : (
+            !error && <p className={styles.noProducts}>Hiện chưa có sản phẩm mới nào.</p>
         )}
       </section>
 
+       {/* --- Section Thương Hiệu --- */}
+       <section className={`${styles.section} ${styles.brandsSectionBg}`}>
+          <div className={styles.sectionHeader}>
+              <h2 className={styles.sectionTitle}>Thương Hiệu Hàng Đầu</h2>
+               <Link to={`/brands`} className={styles.viewAllLink}>Xem tất cả <FiChevronRight/></Link>
+          </div>
+          {isBrandLoading ? (
+             <div className={styles.loadingContainer}><Spinner /></div>
+          ) : brands.length > 0 ? (
+                <div className={styles.brandList}>
+                {brands.map((brand) => (
+                    <Link to={`/products?brand=${encodeURIComponent(brand.name)}`} key={brand.brandId} className={styles.brandCard} title={brand.name}>
+                    <div className={styles.brandImageWrapper}>
+                        <img src={brand.logoUrl} alt={brand.name} className={styles.brandLogo} onError={(e)=>{e.target.style.opacity='0.5'; e.target.style.filter='grayscale(1)'}}/>
+                    </div>
+                    </Link>
+                ))}
+                </div>
+            ) : (
+                 !error && <p className={styles.noProducts}>Không tìm thấy thông tin thương hiệu.</p>
+            )}
+       </section>
+
+       {/* --- Section Danh Mục --- */}
       <section className={`${styles.section} ${styles.categoriesSectionBg}`}>
-        <h2 className={styles.sectionTitle}>Khám Phá Thương Hiệu</h2>
-        <div className={styles.brandList}>
-          {brands.map((brand, index) => (
-            <Link to={`/products?brand=${brand.name}`} key={index} className={styles.brandCard}>
-              <div className={styles.brandImageWrapper}>
-                <img src={brand.logoUrl} alt={brand.name} className={styles.brandLogo} />
-                <div className={styles.brandOverlay}></div>
-              </div>
-            </Link>
-          ))}
+        <div className={styles.sectionHeader}>
+             <h2 className={styles.sectionTitle}>Khám Phá Danh Mục</h2>
+              <Link to={`/categories`} className={styles.viewAllLink}>Xem tất cả <FiChevronRight/></Link>
         </div>
-        <h2 className={styles.sectionTitle}>Khám Phá Danh Mục</h2>
-        <div className={styles.categoryList}>
-          {categories.map((category, index) => (
-            <Link to={`/products?category=${category.name}`} key={index} className={styles.categoryCard}>
-              <div className={styles.categoryImageWrapper}>
-                <img src={category.image} alt={category.name} className={styles.categoryLogo} />
-                <div className={styles.categoryOverlay}></div>
-              </div>
-              <h3 className={styles.categoryName}>{category.name}</h3>
-            </Link>
-          ))}
-        </div>
+         {isCategoryLoading ? (
+             <div className={styles.loadingContainer}><Spinner /></div>
+         ) : categories.length > 0 ? (
+            <div className={styles.categoryList}>
+            {categories.map((category) => (
+                <Link to={`/products?category=${encodeURIComponent(category.name)}`} key={category.categoryId} className={styles.categoryCard}>
+                <div className={styles.categoryImageWrapper}>
+                    <img src={category.image} alt={category.name} className={styles.categoryImage} onError={(e)=>{e.target.src='/images/placeholder-category.png'}}/>
+                    <div className={styles.categoryOverlay}></div>
+                </div>
+                <h3 className={styles.categoryName}>{category.name}</h3>
+                </Link>
+            ))}
+            </div>
+         ) : (
+             !error && <p className={styles.noProducts}>Không tìm thấy danh mục nào.</p>
+         )}
       </section>
+
     </div>
   );
 };

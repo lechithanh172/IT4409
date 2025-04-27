@@ -1,322 +1,313 @@
+/* src/pages/HomePage/HomePage.module.css */
+
 /* --- General Page Styles --- */
 .homePage {
-    width: 100%;
-    overflow-x: hidden; /* Tránh scroll ngang không mong muốn */
-  }
-  
-  /* --- Hero Section --- */
-  .heroSection {
-    position: relative; /* Để định vị lớp phủ và nội dung */
-    height: 60vh; /* Chiều cao tương đối */
-    min-height: 400px; /* Chiều cao tối thiểu */
-    background-size: cover; /* Bao phủ toàn bộ khu vực */
-    background-position: center center; /* Căn giữa ảnh nền */
-    background-repeat: no-repeat;
+  width: 100%;
+  overflow-x: hidden;
+}
+
+/* --- Hero Section --- */
+.heroSection {
+  position: relative;
+  height: 60vh;
+  min-height: 400px;
+  background-size: cover;
+  background-position: center center;
+  background-repeat: no-repeat;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  color: #fff;
+}
+
+.heroOverlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.55); /* Tăng độ đậm lớp phủ */
+  z-index: 1;
+}
+
+.heroContent {
+  position: relative;
+  z-index: 2;
+  max-width: 800px;
+  padding: 20px;
+  /* Animation cho nội dung */
+  animation: fadeInHero 1s ease-out forwards;
+  opacity: 0;
+}
+@keyframes fadeInHero {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.heroTitle {
+  font-size: 3rem; /* To hơn */
+  font-weight: 700;
+  margin-bottom: 15px;
+  line-height: 1.2;
+  text-shadow: 2px 2px 6px rgba(0, 0, 0, 0.6);
+}
+
+.heroSubtitle {
+  font-size: 1.3rem; /* To hơn */
+  margin-bottom: 35px; /* Khoảng cách lớn hơn */
+  font-weight: 300;
+  text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
+}
+
+.heroCtaButton {
+  padding: 14px 35px !important; /* Nút to hơn */
+  font-size: 1.1rem !important;
+  font-weight: 600 !important;
+  border-radius: 8px !important; /* Bo góc nút */
+  transition: transform 0.2s ease, box-shadow 0.2s ease !important;
+}
+.heroCtaButton:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0, 123, 255, 0.4);
+}
+
+/* --- General Section Styles --- */
+.section {
+  padding: 50px 20px; /* Giảm padding trên dưới chút */
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+/* --- Section Header (Title + View All Link) --- */
+.sectionHeader {
     display: flex;
-    align-items: center; /* Căn giữa nội dung theo chiều dọc */
-    justify-content: center; /* Căn giữa nội dung theo chiều ngang */
-    text-align: center;
-    color: #fff; /* Màu chữ trên nền tối */
-  }
-  
-  .heroOverlay {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.5); /* Lớp phủ màu đen mờ */
-    z-index: 1; /* Nằm trên ảnh nền nhưng dưới nội dung */
-  }
-  
-  .heroContent {
-    position: relative; /* Để nằm trên lớp phủ */
-    z-index: 2;
-    max-width: 800px; /* Giới hạn chiều rộng nội dung */
-    padding: 20px;
-  }
-  
-  .bannerContent {
-    position: relative; /* Để nằm trên lớp phủ */
-    z-index: 2;
-    max-width: 100%; /* Giới hạn chiều rộng nội dung */
-  }
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px; /* Khoảng cách với slider/grid */
+    padding-bottom: 10px; /* Khoảng cách với đường kẻ dưới (nếu có) */
+    border-bottom: 1px solid #e5e7eb; /* Đường kẻ phân cách nhẹ */
+}
 
-  .heroTitle {
-    font-size: 2.8rem; /* Kích thước lớn cho tiêu đề */
-    font-weight: 700;
-    margin-bottom: 15px;
-    line-height: 1.2;
-    /* Hiệu ứng text shadow nhẹ */
-    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
-  }
-  
-  .heroSubtitle {
-    font-size: 1.2rem;
-    margin-bottom: 30px;
-    font-weight: 300;
-    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
-  }
-  
-  .heroCtaButton {
-    padding: 12px 30px; /* Nút CTA lớn hơn */
-    font-size: 1.1rem;
-    font-weight: 600;
-  }
-  
-  /* --- General Section Styles --- */
-  .section {
-    padding: 20px 20px; /* Khoảng cách trên dưới và trái phải */
-    max-width: 1200px; /* Giới hạn chiều rộng nội dung */
-    margin: 0 auto; /* Căn giữa section */
-  }
+.sectionTitle {
+  text-align: left; /* Căn trái */
+  font-size: 1.8rem; /* Giảm cỡ chữ */
+  font-weight: 600; /* Đậm vừa */
+  color: #1f2937;
+  margin: 0; /* Reset margin */
+  padding: 0; /* Reset padding */
+  border: none; /* Reset border */
+}
+.sectionTitle::after { /* Bỏ gạch chân mặc định */
+    display: none;
+}
 
-  .bannerSection {
-    position: relative; /* Để định vị lớp phủ và nội dung */
-    min-height: 400px; /* Chiều cao tối thiểu */
-    background-size: cover; /* Bao phủ toàn bộ khu vực */
-    background-position: center center; /* Căn giữa ảnh nền */
-    background-repeat: no-repeat;
+
+.viewAllLink {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    color: #007bff;
+    text-decoration: none;
+    font-weight: 500;
+    font-size: 0.95rem;
+    padding: 5px 0;
+    transition: color 0.2s ease;
+    white-space: nowrap;
+}
+.viewAllLink:hover {
+    color: #0056b3;
+    text-decoration: underline;
+}
+.viewAllLink svg {
+    transition: transform 0.2s ease;
+    margin-top: 2px; /* Căn icon với text */
+}
+.viewAllLink:hover svg {
+    transform: translateX(3px);
+}
+
+
+/* --- Loading & Error States --- */
+.loadingContainer {
     display: flex;
-    align-items: center; /* Căn giữa nội dung theo chiều dọc */
-    justify-content: center; /* Căn giữa nội dung theo chiều ngang */
-    text-align: center;
-    color: #fff; /* Màu chữ trên nền tối */
-  }
-  
-  .sectionTitle {
-    text-align: center;
-    font-size: 2rem;
-    font-weight: 600;
-    color: #333;
-    margin-bottom: 40px;
-    position: relative; /* Cho gạch chân trang trí */
-    padding-bottom: 10px;
-  }
-  
-  /* Gạch chân trang trí cho tiêu đề section */
-  .sectionTitle::after {
-      content: '';
-      position: absolute;
-      bottom: 0;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 60px;
-      height: 3px;
-      background-color: #007bff; /* Màu chính */
-  }
-  
-  
-  /* --- Featured Products Section --- */
-  .productList {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-    gap: 25px;
-  }
-  
-  .viewAllContainer {
-      text-align: center;
-      margin-top: 40px;
-  }
-  
-  .error {
-    color: red;
-    text-align: center;
-  }
-  
-  /* --- Categories Section --- */
-  .categoriesSectionBg {
-    background-color: #f8f9fa; /* Màu nền nhẹ cho section danh mục */
-  }
-  
-  .categoryList {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); /* Linh hoạt hơn */
-    gap: 30px;
     justify-content: center;
-    justify-items: center;
-    margin: 20px;
-  }
+    align-items: center;
+    min-height: 200px;
+}
+.error, .noProducts {
+  color: #ef4444;
+  text-align: center;
+  margin-top: 30px; /* Tăng khoảng cách */
+  padding: 15px;
+  background-color: #fff5f5; /* Nền đỏ nhạt */
+  border: 1px solid #fecaca;
+  border-radius: 6px;
+  font-size: 1rem;
+  font-weight: 500;
+}
+.pageError {
+    margin: 20px; /* Lỗi chung thì có margin */
+}
+.noProducts {
+     color: #6b7280;
+     font-style: normal; /* Bỏ italic */
+     background-color: #f9fafb;
+     border-color: #e5e7eb;
+}
 
-  .brandList {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); /* Linh hoạt hơn */
-    gap: 30px;
-    justify-content: center;
-    margin: 20px;
-  }
-  
-  .brandCard {
-    display: block; /* Để link chiếm toàn bộ */
-    position: relative; /* Để định vị tên danh mục */
-    border-radius: 8px;
-    overflow: hidden; /* Cắt ảnh tràn */
-    text-decoration: none;
-    color: #fff;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-  }
+/* --- Product List (Slider sẽ xử lý bên trong component của nó) --- */
+/* Bỏ style cũ của .productList */
+/* .productList { ... } */
+/* Bỏ style cũ của .viewAllContainer */
+/* .viewAllContainer { ... } */
 
-  .categoryCard {
-    display: block; /* Để link chiếm toàn bộ */
-    position: relative; /* Để định vị tên danh mục */
-    border-radius: 8px;
-    overflow: hidden; /* Cắt ảnh tràn */
-    text-decoration: none;
-    color: #fff;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-    height: 14rem;
-  }
 
-  .categoryLogo {
-    height: 14rem;
-  }
-
-  .brandCard:hover {
-    transform: translateY(-8px);
-    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
-  }
-  
-  .categoryCard:hover {
-    transform: translateY(-8px);
-    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
-  }
-  
-  .categoryImageWrapper {
-      position: relative;
-      overflow: hidden; /* Đảm bảo overlay và ảnh không tràn */
-  }
-
-  .brandImageWrapper {
-    position: relative;
-    overflow: hidden; 
+/* --- Brands Section --- */
+.brandsSectionBg {
     background-color: #fff;
-  }
-  
-  .brandImageWrapper img {
-    margin: 0 4%;
-  }
-  
-  .categoryImage {
+    border-top: 1px solid #f0f0f0; /* Phân cách nhẹ với section trên */
+    border-bottom: 1px solid #f0f0f0;
+}
+.brandList {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); /* Tăng minmax */
+    gap: 20px;
+    justify-content: center;
+    padding: 10px 0; /* Padding nhỏ cho brand list */
+}
+.brandCard {
+    display: block;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    padding: 20px 15px; /* Tăng padding */
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    background-color: #fff;
+    text-decoration: none;
+}
+.brandCard:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.08);
+}
+.brandImageWrapper {
+    aspect-ratio: 16 / 9; /* Tỷ lệ cho logo */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.brandLogo {
+    max-width: 100%;
+    max-height: 45px; /* Giảm chiều cao logo chút */
+    height: auto;
+    object-fit: contain;
+    filter: grayscale(60%);
+    opacity: 0.9;
+    transition: filter 0.3s ease, opacity 0.3s ease;
+}
+.brandCard:hover .brandLogo {
+    filter: grayscale(0%);
+    opacity: 1;
+}
+
+/* --- Categories Section --- */
+.categoriesSectionBg {
+  background-color: #f8f9fa;
+}
+.categoryList {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); /* Giảm minmax */
+  gap: 20px; /* Giảm gap */
+  justify-content: center;
+}
+.categoryCard {
+  display: block;
+  position: relative;
+  border-radius: 10px;
+  overflow: hidden;
+  text-decoration: none;
+  color: #fff;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.1);
+}
+.categoryCard:hover {
+  transform: translateY(-6px); /* Ít hơn */
+  box-shadow: 0 10px 22px rgba(0, 0, 0, 0.13);
+}
+.categoryImageWrapper {
+    position: relative;
+    padding-top: 100%; /* Tỷ lệ 1:1 cho category */
+    overflow: hidden;
+    background-color: #e5e5e5;
+}
+.categoryImage {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+}
+.categoryCard:hover .categoryImage {
+  transform: scale(1.04);
+}
+.categoryOverlay {
     position: absolute;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    object-fit: cover; /* Luôn bao phủ, giữ tỷ lệ */
-    transition: transform 0.3s ease; /* Hiệu ứng zoom nhẹ khi hover */
-  }
-  
-  .categoryCard:hover .categoryImage {
-    transform: scale(1.05); /* Zoom ảnh khi hover card */
-  }
-  
-  .categoryOverlay {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: linear-gradient(to top, rgba(0, 0, 0, 0.7) 0%, rgba(0, 0, 0, 0) 60%); /* Gradient từ dưới lên */
-      z-index: 1;
-      transition: background 0.3s ease;
-  }
-  
-  .brandOverlay {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(to top, rgba(0, 0, 0, 0.1) 0%, rgba(0, 0, 0, 0) 60%); /* Gradient từ dưới lên */
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.7) 0%, rgba(0, 0, 0, 0) 70%);
     z-index: 1;
     transition: background 0.3s ease;
-  }
+}
+.categoryCard:hover .categoryOverlay {
+     background: linear-gradient(to top, rgba(0, 0, 0, 0.8) 0%, rgba(0, 0, 0, 0.1) 75%);
+}
+.categoryName {
+  position: absolute;
+  bottom: 15px; /* Điều chỉnh vị trí */
+  left: 15px;
+  right: 15px;
+  font-size: 1.1rem; /* Giảm cỡ chữ */
+  font-weight: 600;
+  z-index: 2;
+  margin: 0;
+  text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.6);
+  line-height: 1.3;
+  text-align: center; /* Căn giữa tên category */
+}
 
-  .categoryCard:hover .categoryOverlay {
-       background: linear-gradient(to top, rgba(0, 0, 0, 0.8) 0%, rgba(0, 0, 0, 0.1) 70%); /* Đậm hơn khi hover */
-  }
-  
-  
-  .categoryName {
-    position: absolute;
-    bottom: 15px;
-    left: 15px;
-    right: 15px; /* Để text không tràn */
-    font-size: 1.4rem;
-    font-weight: 600;
-    z-index: 2; /* Nằm trên overlay */
-    margin: 0;
-    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.6);
-  }
+/* --- Responsive --- */
+@media (max-width: 992px) {
+    .heroTitle { font-size: 2.5rem; }
+    .heroSubtitle { font-size: 1.2rem; }
+    .brandList { grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); }
+    .categoryList { grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); }
+}
 
-  .popularListItem {
-    width: 100%;
-  }
-  
-  
-  /* --- Responsive --- */
-  @media (max-width: 992px) {
-      .heroTitle {
-          font-size: 2.5rem;
-      }
-      .heroSubtitle {
-          font-size: 1.1rem;
-      }
-       .productList {
-          grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-      }
-       .categoryList {
-          grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-      }
-  }
-  
-  @media (max-width: 768px) {
-    .heroSection {
-      height: 50vh;
-      min-height: 350px;
-    }
-    .heroTitle {
-      font-size: 2rem;
-    }
-    .heroSubtitle {
-      font-size: 1rem;
-    }
-     .section {
-        padding: 40px 15px;
-    }
-    .sectionTitle {
-        font-size: 1.8rem;
-        margin-bottom: 30px;
-    }
-     .productList {
-      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-      gap: 15px;
-    }
-     .categoryList {
-      grid-template-columns: 1fr; /* 1 cột trên mobile */
-      gap: 20px;
-    }
-    .categoryName {
-        font-size: 1.3rem;
-    }
-  }
-  
-  @media (max-width: 576px) {
-      .heroTitle {
-          font-size: 1.8rem;
-      }
-      .heroSubtitle {
-          font-size: 0.9rem;
-          margin-bottom: 20px;
-      }
-      .heroCtaButton {
-          padding: 10px 20px;
-          font-size: 1rem;
-      }
-       .productList {
-          /* Có thể chuyển thành 1 cột nếu cần */
-          grid-template-columns: 1fr;
-      }
-  }
+@media (max-width: 768px) {
+  .heroSection { height: 55vh; min-height: 380px; }
+  .heroTitle { font-size: 2.2rem; }
+  .heroSubtitle { font-size: 1.1rem; }
+   .section { padding: 40px 15px; } /* Giảm padding section */
+   .sectionHeader { margin-bottom: 20px; }
+   .sectionTitle { font-size: 1.6rem; } /* Giảm cỡ chữ title */
+   .viewAllLink { font-size: 0.9rem; }
+   .categoryList { gap: 15px; }
+   .categoryName { font-size: 1rem; bottom: 12px; left: 10px; right: 10px; }
+   .brandList { grid-template-columns: repeat(auto-fit, minmax(80px, 1fr)); gap: 15px;}
+    .brandCard { padding: 15px 10px; }
+}
+
+@media (max-width: 576px) {
+    .heroTitle { font-size: 2rem; }
+    .heroSubtitle { font-size: 1rem; margin-bottom: 25px; }
+    .heroCtaButton { padding: 12px 30px !important; font-size: 1rem !important; }
+     .section { padding: 30px 10px; } /* Giảm padding nữa */
+     .sectionTitle { font-size: 1.5rem; }
+     .categoryList { grid-template-columns: repeat(2, 1fr); gap: 12px; } /* Luôn 2 cột category */
+     .brandList { grid-template-columns: repeat(3, 1fr); gap: 10px;} /* 3 cột logo */
+     .brandCard { padding: 10px 8px; }
+     .brandLogo { max-height: 35px; }
+}

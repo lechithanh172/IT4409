@@ -13,7 +13,7 @@ const formatCurrency = (amount) => {
 
 const ProductCard = ({ product }) => {
   return (
-    <Link to={`/products/${product.id}`} className={styles.cardLink}>
+    <Link to={`/products/${product.productId}`} className={styles.cardLink}>
       <div className={styles.card}>
         <img
           src={product.imageUrl || "/placeholder-image.png"}

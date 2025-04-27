@@ -1,553 +1,273 @@
+/* src/components/Header/Header.module.css */
+
 /* --- Base Header Styles --- */
 .header {
-    background-color: #ffffff;
-    padding: 10px 0; /* Giảm padding một chút */
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.08);
-    position: sticky;
-    top: 0;
-    z-index: 1000; /* Đảm bảo header luôn ở trên */
-    transition: box-shadow 0.3s ease;
-  }
-  
-  .header:hover {
-      /* box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); */ /* Option: tăng shadow khi hover */
-  }
-  
-  .container {
-    max-width: 1300px; /* Tăng max-width */
-    margin: 0 auto;
-    padding: 0 20px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 20px; /* Khoảng cách giữa logo, nav, actions */
-  }
-  
-  .logo {
-    font-size: 1.8rem; /* Tăng kích thước logo */
-    font-weight: 700; /* Đậm hơn */
-    color: #2c3e50; /* Màu tối hơn */
-    text-decoration: none;
-    flex-shrink: 0; /* Không co lại */
-  }
-  
-  /* --- Desktop Navigation --- */
-  .desktopNav {
-    display: flex;
-    align-items: center;
-    gap: 5px; /* Giảm gap để các nút gần nhau hơn */
-  }
-  
-  .navLink {
-    color: #34495e; /* Màu text nav */
-    padding: 10px 15px; /* Tăng padding */
-    border-radius: 6px; /* Bo góc nhẹ */
-    text-decoration: none;
-    font-weight: 500; /* Medium weight */
-    transition: background-color 0.2s ease, color 0.2s ease;
-    display: flex; /* Để căn chỉnh icon */
-    align-items: center;
-    gap: 5px;
-    background: none; /* Xóa background mặc định của button */
-    border: none; /* Xóa border mặc định của button */
-    cursor: pointer;
-    font-size: 1rem; /* Đảm bảo font size như link */
-    font-family: inherit; /* Kế thừa font */
-  }
-  
-  .navLink:hover,
-  .dropdownToggle:hover {
-    background-color: #f4f6f8; /* Màu nền khi hover */
-    color: #007bff; /* Màu chữ khi hover */
-  }
-  
-  .navLink.active {
-    background-color: #eaf2ff; /* Màu nền cho link active */
-    color: #0056b3; /* Màu chữ đậm hơn cho active */
-    font-weight: 600; /* Đậm hơn khi active */
-  }
-  
-  /* --- Dropdown Styles --- */
-  .dropdownContainer {
-    position: relative;
-  }
-  
-  .dropdownToggle {
-    /* Kế thừa style từ navLink */
-  }
-  
-  .chevronIcon {
-    transition: transform 0.2s ease;
-    font-size: 0.8em; /* Nhỏ hơn text */
-    margin-left: 3px;
-  }
-  
-  .userChevron {
-      font-size: 1em; /* Kích thước bình thường cho user menu */
-      margin-left: 5px;
-  }
-  
-  .chevronOpen {
-    transform: rotate(180deg);
-  }
-  
-  .dropdownMenu {
-    position: absolute;
-    top: calc(100% + 8px); /* Khoảng cách với nút trigger */
-    left: 0;
-    background-color: #fff;
-    border-radius: 8px;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15);
-    padding: 8px 0; /* Padding trên dưới cho menu */
-    min-width: 200px; /* Độ rộng tối thiểu */
-    z-index: 1001; /* Cao hơn header */
-    opacity: 0;
-    visibility: hidden;
-    transform: translateY(10px);
-    transition: opacity 0.2s ease, visibility 0.2s ease, transform 0.2s ease;
-    overflow: hidden; /* Giấu các phần tử con tràn ra */
-  }
-  
-  .dropdownContainer:focus-within .dropdownMenu, /* Hỗ trợ focus */
-  .dropdownContainer:hover .dropdownMenu, /* Option: Hiện khi hover (cần JS để ổn định hơn) */
-  .dropdownMenu /* Class này sẽ được quản lý bởi state is...Open */
-   {
-    /* State mở sẽ được quản lý bằng JS, không nên dựa hoàn toàn vào hover/focus */
-  }
-  
-  /* Selector state mở bằng JS */
-  .dropdownContainer > button + .dropdownMenu {
-      /* Style khi dropdown mở (JS sẽ toggle class hoặc trực tiếp style) */
-       /* Ví dụ nếu JS thêm class 'open' vào .dropdownMenu */
-      /* &.open {
-          opacity: 1;
-          visibility: visible;
-          transform: translateY(0);
-      } */
-      /* Hoặc style trực tiếp khi state là true */
-       opacity: 1;
-       visibility: visible;
-       transform: translateY(0);
-  }
-  
-  
-  .dropdownItem {
-    display: flex; /* Để căn icon và text */
-    align-items: center;
-    gap: 10px; /* Khoảng cách icon và text */
-    padding: 10px 18px; /* Padding cho item */
-    color: #34495e;
-    text-decoration: none;
-    font-size: 0.95rem;
-    white-space: nowrap; /* Không xuống dòng */
-    transition: background-color 0.2s ease, color 0.2s ease;
-    background: none;
-    border: none;
-    width: 100%;
-    text-align: left;
-    cursor: pointer;
-  }
-  
-  .dropdownItem:hover {
-    background-color: #f4f6f8;
-    color: #0056b3;
-  }
-  
-  .categoryEmoji {
-      font-size: 1.1em;
-      margin-right: 5px; /* Khoảng cách nhẹ với text */
-  }
-  
-  /* User Dropdown Specific */
-  .userDropdown {
-    left: auto; /* Reset left */
-    right: 0; /* Căn phải */
-    min-width: 220px; /* Rộng hơn chút */
-  }
-  
-  .dropdownHeader {
-      padding: 10px 18px;
-      font-weight: 600;
-      color: #555;
-      font-size: 0.9rem;
-      border-bottom: 1px solid #eee;
-      margin-bottom: 5px;
-  }
-  
-  .dropdownIcon {
-      font-size: 1.1em;
-      color: #555; /* Màu icon mặc định */
-       transition: color 0.2s ease;
-  }
-  .dropdownItem:hover .dropdownIcon {
-       color: #0056b3; /* Đổi màu icon khi hover item */
-  }
-  
-  .logoutButton {
-    color: #e74c3c; /* Màu đỏ cho logout */
-  }
-  .logoutButton:hover {
-     background-color: #fdf2f2;
-     color: #c0392b;
-  }
-  .logoutButton:hover .dropdownIcon {
-      color: #c0392b;
-  }
-  
-  /* --- Actions Area --- */
-  .actions {
-    display: flex;
-    align-items: center;
-    gap: 10px; /* Khoảng cách giữa các nút action */
-    flex-shrink: 0; /* Không co lại */
-  }
-  
-  /* --- Search Bar --- */
-  .searchBar {
-    display: flex;
-    align-items: center;
-    background-color: #f4f6f8;
-    border-radius: 20px; /* Bo tròn nhiều hơn */
-    padding: 0px 5px 0px 15px; /* Padding bên trong */
-    transition: background-color 0.2s ease, box-shadow 0.2s ease;
-    /* Option: Ẩn trên mobile nhỏ */
-  }
-  
-  .searchBar:focus-within {
-    background-color: #ffffff;
-    box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25); /* Viền xanh khi focus */
-  }
-  
-  .searchInput {
-    border: none;
-    outline: none;
-    background: none;
-    padding: 8px 0; /* Padding input */
-    font-size: 0.9rem;
-    width: 180px; /* Độ rộng mặc định */
-    transition: width 0.3s ease;
-  }
-  .searchInput:focus {
-      /* width: 250px; */ /* Option: Mở rộng khi focus */
-  }
-  .searchInput::placeholder {
-      color: #888;
-  }
-  
-  .searchButton {
-    background: none;
-    border: none;
-    color: #555;
-    padding: 8px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    border-radius: 50%;
-    transition: background-color 0.2s ease, color 0.2s ease;
-  }
-  .searchButton:hover {
-      background-color: #e0e0e0;
-      color: #333;
-  }
-  
-  /* --- Action Buttons (Cart, User) --- */
-  .actionButton {
-    position: relative; /* Cho cart count */
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 10px; /* Kích thước nút vuông */
-    background: none;
-    border: none;
-    border-radius: 50%; /* Nút tròn */
-    color: #34495e;
-    cursor: pointer;
-    transition: background-color 0.2s ease, color 0.2s ease;
-    font-size: 1.3rem; /* Kích thước icon */
-  }
-  .actionButton:hover {
-    background-color: #f4f6f8;
-    color: #007bff;
-  }
-  /* User button có thể có thêm style riêng */
-  .userButton {
-      gap: 5px; /* Khoảng cách giữa icon và chevron */
-  }
-  .userNameDesktop { /* Ẩn tên trên mobile, hiện trên desktop nếu cần */
-      font-size: 0.9rem;
-      font-weight: 500;
-      margin-left: 5px;
-      display: none; /* Mặc định ẩn */
-  }
-  @media (min-width: 1200px) {
-      .userNameDesktop {
-          /* display: inline; */ /* Hiện trên màn hình lớn */
-      }
-  }
-  
-  
-  .cartCount {
-    position: absolute;
-    top: -2px;
-    right: -4px;
-    background-color: #e74c3c; /* Màu đỏ nổi bật */
-    color: white;
-    border-radius: 50%;
-    padding: 2px 5px; /* Điều chỉnh padding */
-    font-size: 0.7rem; /* Cỡ chữ nhỏ */
-    font-weight: bold;
-    min-width: 16px;
-    text-align: center;
-    line-height: 1;
-    border: 1px solid white; /* Viền trắng nhỏ */
-  }
-  
-  /* --- Auth Buttons (Desktop) --- */
-  .desktopAuth {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
-  .authButton {
-      padding: 6px 12px !important; /* Ghi đè padding của Button component nếu cần */
-      font-size: 0.9rem !important;
-  }
-  
-  /* --- Mobile Menu Toggle --- */
-  .mobileMenuToggle {
-    display: none; /* Ẩn mặc định */
-    background: none;
-    border: none;
-    font-size: 1.8rem; /* Kích thước icon hamburger/X */
-    color: #34495e;
-    cursor: pointer;
-    padding: 5px;
-  }
-  
-  /* --- Mobile Menu Drawer --- */
-  .mobileMenu {
-    position: fixed;
-    top: 0;
-    right: -100%; /* Bắt đầu ẩn bên phải */
-    width: 300px; /* Độ rộng menu */
-    max-width: 85%; /* Giới hạn độ rộng tối đa */
-    height: 100vh;
-    background-color: #ffffff;
-    box-shadow: -3px 0 15px rgba(0, 0, 0, 0.1);
-    z-index: 1100; /* Cao hơn cả overlay */
-    transition: right 0.3s ease-in-out;
-    overflow-y: auto; /* Scroll nếu nội dung dài */
-    display: flex;
-    flex-direction: column;
-  }
-  
-  .mobileMenuOpen {
-    right: 0; /* Hiện ra khi mở */
-  }
-  
-  .mobileMenuHeader {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 15px 20px;
-      border-bottom: 1px solid #eee;
-      flex-shrink: 0; /* Không co lại */
-  }
-  .mobileMenuTitle {
-      font-size: 1.2rem;
-      font-weight: 600;
-      color: #2c3e50;
-  }
-  .closeButton {
-      background: none;
-      border: none;
-      font-size: 1.6rem;
-      color: #555;
-      cursor: pointer;
-      padding: 5px;
-  }
-  
-  .mobileUserInfo {
-      padding: 20px;
-      border-bottom: 1px solid #eee;
-      flex-shrink: 0;
-  }
-  .mobileWelcome {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      font-weight: 600;
-      margin-bottom: 15px;
-      color: #333;
-  }
-  .mobileUserIcon {
-      font-size: 1.4rem;
-      color: #007bff;
-  }
-  .mobileAuthButtons {
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-  }
-  .mobileAuthBtn {
-      width: 100%; /* Nút chiếm cả chiều rộng */
-  }
-  
-  
-  .mobileNavLink {
-    display: block;
-    padding: 12px 20px;
-    color: #34495e;
-    text-decoration: none;
-    font-size: 1rem;
-    transition: background-color 0.2s ease, color 0.2s ease;
-    border: none; /* Reset style button nếu dùng button */
-    background: none; /* Reset style button nếu dùng button */
-    width: 100%; /* Cho button */
-    text-align: left; /* Cho button */
-    cursor: pointer; /* Cho button */
-    font-family: inherit;
-  }
-  
-  .mobileNavLink:hover {
-    background-color: #f4f6f8;
-    color: #007bff;
-  }
-  
-  .mobileNavGroupTitle {
-      padding: 10px 20px 5px 20px;
-      font-size: 0.85rem;
-      font-weight: 600;
-      color: #777;
-      text-transform: uppercase;
-      margin-top: 10px;
-  }
-  
-  .mobileCategorySection .mobileNavLink {
-      padding-left: 30px; /* Thụt lề cho danh mục con */
-  }
-  
-  
-  .mobileMenuDivider {
-      border: none;
-      border-top: 1px solid #eee;
-      margin: 10px 0;
-  }
-  
-  .mobileLogoutButton {
-      color: #e74c3c;
-  }
-  .mobileLogoutButton:hover {
-      background-color: #fdf2f2;
-      color: #c0392b;
-  }
-  
-  
-  /* --- Overlay for Mobile Menu --- */
-  .overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.4); /* Màu đen mờ */
-    z-index: 1050; /* Dưới mobile menu nhưng trên nội dung */
-    opacity: 0;
-    visibility: hidden;
-    transition: opacity 0.3s ease, visibility 0.3s ease;
-  }
-  /* Hiện overlay khi mobile menu mở */
-  .mobileMenuOpen + .overlay {
+  background-color: #ffffff;
+  padding: 12px 0; /* Padding trên dưới */
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.07); /* Shadow nhẹ nhàng */
+  position: sticky; /* Giữ header cố định khi cuộn */
+  top: 0;
+  z-index: 1000; /* Đảm bảo nằm trên các phần tử khác */
+  transition: box-shadow 0.2s ease;
+}
+
+.container {
+  max-width: 1300px; /* Chiều rộng tối đa của nội dung header */
+  margin: 0 auto; /* Căn giữa container */
+  padding: 0 20px; /* Padding trái phải */
+  display: flex;
+  justify-content: space-between; /* Đẩy các phần tử ra hai bên */
+  align-items: center; /* Căn giữa theo chiều dọc */
+  gap: 15px; /* Khoảng cách giữa logo, nav, actions */
+}
+
+.logo {
+  font-size: 1.7rem;
+  font-weight: 700;
+  color: #1a3b5d; /* Màu xanh navy đậm */
+  text-decoration: none;
+  flex-shrink: 0; /* Ngăn logo bị co lại */
+  letter-spacing: -0.5px;
+  transition: color 0.2s ease;
+}
+.logo:hover {
+    color: #007bff; /* Đổi màu khi hover */
+}
+
+
+/* --- Desktop Navigation --- */
+.desktopNav {
+  display: flex;
+  align-items: center;
+  gap: 8px; /* Khoảng cách giữa các mục nav */
+}
+
+.navLink, .dropdownToggle { /* Style chung cho link và nút dropdown */
+  color: #4a5568; /* Màu chữ chính */
+  padding: 8px 14px;
+  border-radius: 6px;
+  text-decoration: none;
+  font-weight: 500; /* Độ đậm vừa */
+  transition: background-color 0.2s ease, color 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 0.95rem;
+  font-family: inherit;
+  white-space: nowrap; /* Ngăn xuống dòng */
+}
+/* Style khi nút bị vô hiệu hóa (ví dụ: đang load category) */
+.dropdownToggle:disabled {
+    cursor: not-allowed;
+    opacity: 0.7;
+}
+/* Style spinner inline bên trong nút */
+.dropdownToggle .spinner > div {
+     width: 14px !important;
+     height: 14px !important;
+     border-width: 2px !important;
+     margin-left: 5px;
+     border-left-color: currentColor !important; /* Màu spinner theo màu chữ */
+     vertical-align: middle;
+}
+
+/* Hiệu ứng Hover (trừ khi đang active hoặc disabled) */
+.navLink:hover:not(.active):not(:disabled),
+.dropdownToggle:hover:not(:disabled) {
+  background-color: #f8fafc; /* Nền siêu nhạt */
+  color: #2b6cb0; /* Xanh đậm khi hover */
+}
+
+/* Style cho link đang active */
+.navLink.active {
+  background-color: #ebf4ff; /* Nền xanh nhạt */
+  color: #2b6cb0; /* Xanh đậm */
+  font-weight: 600; /* Đậm hơn */
+}
+
+/* --- Dropdown Styles --- */
+.dropdownContainer {
+  position: relative; /* Container cho dropdown */
+}
+
+.chevronIcon {
+  transition: transform 0.2s ease;
+  font-size: 0.8em;
+  margin-left: 2px;
+  color: #a0aec0; /* Màu chevron nhạt */
+}
+.dropdownToggle:hover .chevronIcon { color: #2b6cb0; }
+.userChevron { font-size: 1em; margin-left: 4px; }
+/* Xoay chevron khi dropdown mở */
+.chevronOpen {
+  transform: rotate(180deg);
+}
+
+.dropdownMenu {
+  position: absolute;
+  top: calc(100% + 10px); /* Vị trí dưới nút toggle */
+  left: 0; /* Căn trái với nút toggle */
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+  padding: 8px 0;
+  min-width: 220px; /* Độ rộng tối thiểu */
+  z-index: 1001; /* Nằm trên các phần tử khác */
+  border: 1px solid #e2e8f0; /* Viền nhẹ */
+  /* Mặc định ẩn */
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(5px);
+  transition: opacity 0.25s ease, visibility 0.25s ease, transform 0.25s ease;
+  overflow: hidden; /* Giấu phần tràn nếu cần */
+}
+
+/* *** QUAN TRỌNG: Style để hiển thị dropdown khi có class .show *** */
+.dropdownMenu.show {
     opacity: 1;
     visibility: visible;
-  }
-  
-  
-  /* --- Responsive --- */
-  @media (max-width: 1024px) {
-      .desktopNav {
-          display: none; /* Ẩn nav desktop */
-      }
-       .desktopAuth {
-          display: none; /* Ẩn auth desktop */
-      }
-      .mobileMenuToggle {
-          display: block; /* Hiện nút mobile menu */
-      }
-       .searchBar {
-          /* Option: thu gọn search bar */
-          /* padding: 0 5px; */
-      }
-      .searchInput {
-          /* width: 150px; */ /* Giảm độ rộng input */
-          /* Option: Ẩn hoàn toàn chỉ hiện icon */
-           /* width: 0;
-           padding: 8px 0;
-           opacity: 0;
-           pointer-events: none; */
-      }
-       /* .searchBar:focus-within .searchInput {
-           width: 150px;
-           opacity: 1;
-           pointer-events: auto;
-       } */
-  }
-  
-  @media (max-width: 768px) {
-      .container {
-          padding: 0 15px;
-          gap: 15px;
-      }
-      .logo {
-          font-size: 1.6rem;
-      }
-      .searchBar {
-          /* Có thể ẩn hẳn nếu cần thêm không gian */
-          /* display: none; */
-           /* Hoặc chỉ còn icon */
-           background: none;
-           padding: 0;
-      }
-      .searchInput {
-          display: none; /* Ẩn input hẳn */
-      }
-       .searchButton {
-           padding: 10px; /* Giữ lại nút search như action button */
-           border-radius: 50%;
-           font-size: 1.3rem;
-           color: #34495e;
-       }
-        .searchButton:hover {
-           background-color: #f4f6f8;
-           color: #007bff;
-       }
-  
-      .actionButton {
-          font-size: 1.2rem; /* Giảm nhẹ icon size */
-          padding: 8px;
-      }
-       .cartCount {
-          font-size: 0.65rem;
-          min-width: 14px;
-          padding: 1px 4px;
-      }
-  }
-  
-  @media (max-width: 480px) {
-      .container {
-          padding: 0 10px;
-          gap: 10px;
-      }
-      .logo {
-          font-size: 1.4rem;
-      }
-      .actions {
-          gap: 5px; /* Giảm gap action buttons */
-      }
-       .actionButton {
-           padding: 7px;
-       }
-       /* Có thể ẩn luôn nút search nếu quá chật */
-        /* .searchButton { display: none; } */
-  }
+    transform: translateY(0);
+}
+
+/* Style cho dropdown category */
+.categoryDropdown {
+    max-height: 400px; /* Giới hạn chiều cao */
+    overflow-y: auto; /* Thêm thanh cuộn nếu quá dài */
+}
+
+.dropdownItem {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 18px;
+  color: #4a5568;
+  text-decoration: none;
+  font-size: 0.95rem;
+  white-space: nowrap;
+  transition: background-color 0.2s ease, color 0.2s ease, padding-left 0.2s ease;
+  background: none;
+  border: none;
+  width: 100%;
+  text-align: left;
+  cursor: pointer;
+}
+.dropdownItem:hover {
+  background-color: #f7fafc;
+  color: #2b6cb0;
+  padding-left: 22px; /* Hiệu ứng thụt vào */
+}
+
+.categoryIcon { /* Icon "Tất cả sản phẩm" */
+    font-size: 1.1em;
+    color: #718096;
+    margin-right: 8px;
+    vertical-align: middle;
+}
+.categoryEmoji { /* Emoji hoặc icon cho từng category */
+    font-size: 1em;
+    width: 1.2em;
+    text-align: center;
+    display: inline-block;
+    color: #718096;
+    margin-right: 8px;
+}
+.dropdownItem:hover .categoryIcon,
+.dropdownItem:hover .categoryEmoji,
+.dropdownItem:hover .dropdownIcon {
+     color: #2b6cb0; /* Đổi màu icon khi hover */
+}
+
+.dropdownDivider { border: none; border-top: 1px solid #f1f5f9; margin: 6px 0; }
+.dropdownError, .dropdownLoading { padding: 10px 18px; color: #a0aec0; font-style: italic; font-size: 0.9rem; display: flex; align-items: center; gap: 8px; }
+.dropdownLoading .spinner > div { width: 14px !important; height: 14px !important; border-width: 2px !important;}
+
+/* User Dropdown */
+.userDropdown { left: auto; right: 0; min-width: 200px; }
+.dropdownHeader { padding: 10px 18px; font-weight: 600; color: #4a5568; font-size: 0.9rem; border-bottom: 1px solid #f1f5f9; margin-bottom: 5px; }
+.dropdownIcon { font-size: 1.1em; color: #718096; transition: color 0.2s ease; }
+.logoutButton { color: #e53e3e; }
+.logoutButton:hover { background-color: #fff5f5; color: #c53030; padding-left: 22px; }
+.logoutButton:hover .dropdownIcon { color: #c53030; }
+
+/* --- Actions Area --- */
+.actions { display: flex; align-items: center; gap: 12px; flex-shrink: 0; }
+
+/* --- Search Bar --- */
+.searchBar { display: flex; align-items: center; background-color: #f1f5f9; border-radius: 20px; padding: 2px 5px 2px 15px; transition: all 0.2s ease; border: 1px solid transparent; }
+.searchBar:focus-within { background-color: #ffffff; border-color: #cbd5e0; box-shadow: 0 0 0 3px rgba(203, 213, 224, 0.3); }
+.searchInput { border: none; outline: none; background: none; padding: 8px 0; font-size: 0.9rem; width: 160px; transition: width 0.3s ease; color: #4a5568; }
+.searchInput::placeholder { color: #a0aec0; }
+.searchButton { background: none; border: none; color: #718096; padding: 8px; display: flex; cursor: pointer; border-radius: 50%; transition: background-color 0.2s ease, color 0.2s ease; }
+.searchButton:hover { background-color: #e2e8f0; color: #4a5568; }
+
+/* --- Action Buttons (Cart, User) --- */
+.actionButton { position: relative; display: flex; align-items: center; justify-content: center; padding: 9px; background: none; border: none; border-radius: 50%; color: #4a5568; cursor: pointer; transition: background-color 0.2s ease, color 0.2s ease; font-size: 1.25rem; }
+.actionButton:hover { background-color: #f1f5f9; color: #2b6cb0; }
+.userButton { gap: 5px; padding-left: 6px; padding-right: 6px;} /* Giảm padding ngang cho nút user */
+.userNameDesktop { font-size: 0.9rem; font-weight: 500; margin: 0 4px 0 2px; color: #4a5568; display: inline; /* Luôn hiển thị tên ngắn */ white-space: nowrap; max-width: 100px; /* Giới hạn độ rộng tên */ overflow: hidden; text-overflow: ellipsis; vertical-align: middle; }
+.cartCount { position: absolute; top: 0px; right: 0px; background-color: #e53e3e; color: white; border-radius: 50%; padding: 1px 5px; font-size: 0.7rem; font-weight: 600; min-width: 16px; text-align: center; line-height: 1; border: 1px solid white; transform: translate(30%, -30%); }
+
+/* --- Auth Buttons (Desktop) --- */
+.desktopAuth { display: flex; align-items: center; gap: 8px; }
+.authButton { padding: 6px 14px !important; font-size: 0.9rem !important; border-radius: 6px !important; font-weight: 500 !important; }
+.authButton svg { margin-right: 5px; font-size: 1em; vertical-align: middle; margin-top: -2px;}
+
+/* --- Mobile Menu Toggle --- */
+.mobileMenuToggle { display: none; background: none; border: none; font-size: 1.6rem; color: #4a5568; cursor: pointer; padding: 5px; }
+
+/* --- Mobile Menu Drawer --- */
+.mobileMenu { position: fixed; top: 0; right: -100%; width: 280px; max-width: 80%; height: 100vh; background-color: #ffffff; box-shadow: -4px 0 20px rgba(0, 0, 0, 0.1); z-index: 1100; transition: right 0.35s ease-in-out; overflow-y: auto; display: flex; flex-direction: column; }
+.mobileMenuOpen { right: 0; }
+.mobileMenuHeader { display: flex; justify-content: space-between; align-items: center; padding: 15px 20px; border-bottom: 1px solid #f1f5f9; flex-shrink: 0; }
+.mobileMenuTitle { font-size: 1.1rem; font-weight: 600; color: #1a3b5d; }
+.closeButton { background: none; border: none; font-size: 1.5rem; color: #718096; cursor: pointer; padding: 5px; }
+.mobileUserInfo { padding: 20px; border-bottom: 1px solid #f1f5f9; flex-shrink: 0; }
+.mobileWelcome { display: flex; align-items: center; gap: 10px; font-weight: 600; margin-bottom: 15px; color: #333; font-size: 0.95rem; }
+.mobileUserIcon { font-size: 1.3rem; color: #6366f1; }
+.mobileAuthButtons { display: flex; flex-direction: column; gap: 10px; }
+.mobileAuthBtn { width: 100%; padding: 10px 15px !important; font-size: 0.95rem !important; }
+.mobileNavLink { display: flex; align-items: center; gap: 10px; padding: 11px 20px; /* Giảm padding dọc */ color: #4a5568; text-decoration: none; font-size: 0.95rem; /* Giảm font size */ transition: background-color 0.2s ease, color 0.2s ease, padding-left 0.2s ease; border: none; background: none; width: 100%; text-align: left; cursor: pointer; font-family: inherit; border-radius: 6px; margin: 1px 0; /* Giảm margin */ }
+.mobileNavLink:hover { background-color: #f7fafc; color: #2b6cb0; padding-left: 25px; }
+.mobileNavGroupTitle { padding: 12px 20px 6px 20px; font-size: 0.8rem; font-weight: 600; color: #a0aec0; text-transform: uppercase; letter-spacing: 0.5px; }
+.mobileCategorySection .mobileNavLink { padding-left: 20px; font-size: 0.9rem; }
+.mobileCategorySection .mobileNavLink:hover { padding-left: 25px; }
+.mobileCategoryIcon { font-size: 1rem; color: #718096; width: 1.2em; text-align: center; flex-shrink: 0; }
+.mobileNavLink:hover .mobileCategoryIcon { color: #2b6cb0; }
+.mobileMenuDivider { border: none; border-top: 1px solid #f1f5f9; margin: 6px 0; }
+.mobileLogoutButton { color: #e53e3e; }
+.mobileLogoutButton:hover { background-color: #fff5f5; color: #c53030; padding-left: 25px; }
+.mobileLoading, .mobileError { padding: 12px 20px; color: #a0aec0; font-style: italic; font-size: 0.9rem; display: flex; align-items: center; gap: 8px; }
+.mobileError { color: #e53e3e; }
+
+/* Overlay */
+.overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.5); z-index: 1050; opacity: 0; visibility: hidden; transition: opacity 0.35s ease, visibility 0.35s ease; }
+.mobileMenuOpen + .overlay { opacity: 1; visibility: visible; }
+
+/* --- Responsive Adjustments --- */
+@media (max-width: 1024px) {
+    .desktopNav, .desktopAuth { display: none; }
+    .mobileMenuToggle { display: block; }
+    .searchInput { width: 140px; }
+}
+@media (max-width: 768px) {
+    .container { padding: 0 15px; gap: 12px; }
+    .logo { font-size: 1.5rem; }
+    .searchBar { display: none; } /* Ẩn hẳn search bar */
+    .actionButton { font-size: 1.2rem; padding: 8px; }
+    .cartCount { font-size: 0.65rem; min-width: 15px; padding: 1px 4px; top: -1px; right: -2px;}
+     .mobileMenu { width: 260px; }
+}
+@media (max-width: 480px) {
+    .container { padding: 0 10px; gap: 8px; }
+    .header { padding: 10px 0; }
+    .logo { font-size: 1.4rem; }
+    .actions { gap: 6px; }
+    .actionButton { font-size: 1.1rem; padding: 7px; }
+     .mobileMenu { max-width: 90%; width: 250px; }
+     .mobileNavLink { padding: 10px 15px; font-size: 0.9rem; }
+     .mobileCategorySection .mobileNavLink { padding-left: 15px; font-size: 0.9rem; }
+     .mobileUserInfo { padding: 15px; }
+}

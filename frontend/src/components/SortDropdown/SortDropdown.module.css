@@ -1,0 +1,30 @@
+/* src/components/SortDropdown/SortDropdown.module.css */
+.sortContainer {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  
+  .sortLabel {
+    font-size: 0.9rem;
+    color: #4b5563;
+    font-weight: 500;
+    white-space: nowrap; /* Không xuống dòng */
+  }
+  
+  .sortSelect {
+    padding: 8px 12px;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    background-color: #fff;
+    cursor: pointer;
+    min-width: 150px; /* Độ rộng tối thiểu */
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  }
+  
+  .sortSelect:focus {
+    outline: none;
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+  }

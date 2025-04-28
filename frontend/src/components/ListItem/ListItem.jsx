@@ -7,6 +7,7 @@ import {
   faChevronLeft,
   faChevronRight,
 } from "@fortawesome/free-solid-svg-icons";
+import apiService from "../../services/api.js";
 
 const data = [
   {
@@ -144,6 +145,7 @@ function ListItem({ category }) {
   useEffect(() => {
     const fetchData = () => {
       try {
+        // const products = apiService.getProductsByCategory(category)
         const products = data;
         let id;
         switch (category) {

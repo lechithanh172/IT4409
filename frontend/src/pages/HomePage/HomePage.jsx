@@ -50,20 +50,24 @@ const HomePage = () => {
   // Lấy một số sản phẩm nổi bật (ví dụ: 4 sản phẩm đầu tiên)
   // console.log("products", products);
   const featuredProducts = products;
-  
+
   useEffect(() => {
-    (async () => {
-      // const allCategory = await apiService.getAllCategories();
-      // const allBrand = await apiService.getAllBrands();
-      // console.log("allBrand", allBrand.data);
-      // console.log("allCategory", allCategory.data);
-      // setCategories(allCategory.data);
-      setCategories(allCategory);
-      setBrands(allBrand);
-      // setBrands(allBrand.data);
-      
-    })();
-  },[])
+    const fetchData = async () => {
+      try {
+        // const allCategory = await apiService.getAllCategories();
+        // const allBrand = await apiService.getAllBrands();
+        // console.log("allBrand", allBrand.data);
+        // console.log("allCategory", allCategory.data);
+        setCategories(allCategory);
+        setBrands(allBrand);
+      } catch (error) {
+        console.error("Có lỗi xảy ra khi gọi API:", error);
+      }
+    };
+  
+    fetchData();
+  }, []);
+  
 
   // URL ảnh mẫu (thay thế bằng ảnh của bạn)
   const heroBgUrl = 'https://images.unsplash.com/photo-1517336714731-489689fd1ca8?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1920&q=80'; // Ví dụ ảnh nền Macbook
@@ -79,7 +83,6 @@ const HomePage = () => {
       </div>
       </section>
       
-      {/* Featured Products Section */}
       <section className={styles.section}>
         <h2 className={styles.sectionTitle}>Sản Phẩm Nổi Bật</h2>
         {loading && <Spinner />}

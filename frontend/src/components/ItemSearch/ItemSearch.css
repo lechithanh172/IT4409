@@ -34,7 +34,6 @@
 }
 
 .item1 .item-info .item-name h3 {
-  -webkit-line-clamp: 3;
   -webkit-box-orient: vertical;
   display: -webkit-box;
   font-size: 12px;

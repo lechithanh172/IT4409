@@ -1,107 +1,174 @@
 /* AdminPage.module.css */
 
-/* Header Styles */
+/* Keep existing html, body, #root styles if they work for you */
+html, body {
+  height: 100%;
+  margin: 0;
+  overflow: hidden; /* Prevent double scrollbars */
+}
+
+#root {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Header Styles - Keep as is */
 .header {
-  position: fixed;
-  top: 0;
-  width: 100%;
+  /* position: fixed; top: 0; width: 100%; */ /* Already defined */
   height: 60px;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 10px 20px;
+  padding: 0 20px; /* Consistent padding */
   background-color: #1f2937;
   color: white;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   z-index: 1000;
-  overflow: hidden;
+  flex-shrink: 0; /* Prevent header from shrinking */
 }
 
 .headerTitle {
   margin: 0;
   font-size: 1.5em;
   font-weight: 600;
-  color: #61dafb;
+  color: #61dafb; /* Example color */
 }
 
-.notification-icon {
-  display: flex;
-  align-items: center;
-  margin-right: 15px;
-}
-
-.headerButton {
+.headerButton { /* Style for logout button */
   padding: 8px 16px;
-  background-color: #2563eb;
-  border: none;
+  background-color: transparent; /* Make it ghost-like */
+  border: 1px solid #61dafb; /* Match title color */
   border-radius: 5px;
   cursor: pointer;
-  color: white;
+  color: #61dafb;
   font-weight: bold;
-  transition: background-color 0.3s ease;
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 .headerButton:hover {
-  background-color: #1e40af;
+  background-color: #61dafb;
+  color: #1f2937; /* Dark text on hover */
 }
 
-/* Tooltip Styles */
-.tooltip-noti {
-  background: #f9fafb;
-  color: #333;
-  padding: 15px;
-  border-radius: 8px;
-  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
-  font-size: 0.9em;
-  white-space: nowrap;
-  position: relative;
-  top: 50px;
-  left: -20px;
-  z-index: 10000;
-  width: 200px;
+.notificationIcon /* If needed for specific bell styling */ {
+  /* Add styles if needed */
 }
 
-/* Menu and Content Styles */
-.menuContainer {
-  width: 160px;
-  position: fixed;
-  top: 70px;
-  bottom: 0;
-  overflow-y: auto;
-  background-color: #1f2937;
-  padding-top: 20px;
+/* === NEW Layout Structure === */
+
+.mainLayout {
+  display: flex;
+  flex-grow: 1; /* Takes remaining height in the #root flex column */
+  /* No margin-top needed as it naturally sits below the header in the flex flow */
+  overflow: hidden; /* Prevent layout issues */
+  background-color: #f3f4f6; /* Background for the overall content area */
+}
+
+/* Sidebar Wrapper */
+.sidebarWrapper {
+  width: 180px; /* Your desired expanded width */
+  flex-shrink: 0; /* Don't shrink */
+  background-color: #1f2937; /* Dark background */
   color: #d1d5db;
+  display: flex;
+  flex-direction: column; /* Stack button and menu */
+  transition: width 0.2s ease-in-out;
+  overflow: hidden; /* Hide menu text overflow during transition */
+  height: 100vh; /* Fill parent height */
+  align-items: center;
 }
 
-.menuContainer .ant-menu-item {
-  background: transparent;
+.sidebarWrapperCollapsed {
+  width: 80px; /* Ant Design default collapsed width */
+}
+
+/* Collapse Button */
+.collapseButton {
+  height: 40px; /* Adjust height */
   color: #d1d5db;
-  transition: background 0.3s ease;
-  padding-left: 20px;
+  text-align: center;
+  line-height: 40px;
+  cursor: pointer;
+  background-color: rgba(255, 254, 254, 0.05); /* Subtle background */
+  color: rgb(255, 255, 255);
+  flex-shrink: 0; /* Don't shrink */
+  margin-inline: 4px;
+  margin-block: 4px;
+  width: calc(100% - 8px) !important;
+}
+.collapseButton:hover {
+  background-color: rgba(255, 255, 255, 0.516) !important;
 }
 
-.menuContainer .ant-menu-item-selected {
-  background: #3b82f6;
-  color: white;
-  font-weight: bold;
+/* Ant Design Menu inside the sidebar */
+.menuAntd {
+  flex-grow: 1; /* Take remaining space */
+  overflow-y: auto; /* Scroll if needed */
+  overflow-x: hidden;
+  background-color: transparent !important; /* Ensure menu uses wrapper background */
+  border-right: none !important; /* Override default border */
+}
+
+.menuAntd .ant-menu-item {
+  color: #d1d5db;
+  margin: 4px 8px !important; /* Add some margin */
+  width: calc(100% - 16px) !important; /* Adjust width considering margin */
   border-radius: 5px;
 }
 
-.menuContainer .ant-menu-item:hover {
-  background: #3b82f6;
+.menuAntd .ant-menu-item:hover {
+  background-color: #3b82f6 !important;
+  color: white !important;
+}
+
+.menuAntd .ant-menu-item-selected {
+  background-color: #2563eb !important; /* Slightly darker blue for selected */
+  color: white !important;
+  font-weight: bold;
+}
+
+/* Adjust icon color */
+.menuAntd .ant-menu-item .anticon {
+  color: #9ca3af;
+}
+.menuAntd .ant-menu-item:hover .anticon,
+.menuAntd .ant-menu-item-selected .anticon {
   color: white;
 }
 
-.content {
-  margin-left: 160px;
-  padding-left: 20px;
-  padding-right: 20px;
-  height: calc(100vh - 60px);
-  overflow-y: auto;
-  background-color: #f3f4f6;
+
+/* Content Wrapper */
+.contentWrapper {
+  flex-grow: 1; /* Take remaining horizontal space */
+  padding: 20px; /* Padding around content */
+  overflow-y: auto; /* Allow content itself to scroll */
+  height: 100%; /* Fill parent height */
+  background-color: #f3f4f6; /* Light background for content */
+  min-width: 0; /* Prevent flex overflow issues */
 }
 
-/* Table and Button Styles */
+/* Remove old fixed positioning styles */
+/*
+.menuContainer { ... } -> Replaced by .sidebarWrapper
+.content { ... } -> Replaced by .contentWrapper
+*/
+
+/* Keep your existing styles for Tooltip, Table, Buttons etc. */
+/* Ensure Tooltip position: fixed works as intended */
+.tooltip {
+  position: fixed; /* Keep fixed for tooltip */
+  top: 65px; /* Position below header */
+  right: 20px;
+  z-index: 9999;
+  background-color: #fff;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+  padding: 10px;
+  border-radius: 8px;
+  width: 250px; /* Adjust as needed */
+  color: #333; /* Ensure text is visible */
+}
+
 .ant-table-placeholder {
   display: flex;
   align-items: center;
@@ -130,68 +197,3 @@
 .add-product-button:hover {
   background-color: #1e40af;
 }
-
-/* Đặt chiều cao 100% cho toàn bộ màn hình */
-html, body {
-  height: 100%;
-  margin: 0;
-  overflow: auto; /* Ẩn scrollbar tổng thể */
-}
-
-#root {
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-}
-
-/* Header Styles */
-.header {
-  position: fixed;
-  top: 0;
-  width: 100%;
-  height: 60px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 8px 20px;
-  background-color: #1f2937;
-  color: white;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  z-index: 1000;
-}
-
-/* Menu và Content Styles */
-.menuContainer {
-  width: 150px;
-  position: fixed;
-  top: 60px; /* Đặt vị trí dưới header */
-  bottom: 0; /* Chiều cao tính từ dưới lên để cố định */
-  overflow-y: auto; /* Cho phép scroll trong menu nếu vượt chiều cao */
-  background-color: #f0f2f5;
-}
-
-.content {
-  margin-top: 80px;
-  margin-left: 150px;
-  height: calc(100vh - 80px); /* Đặt chiều cao để vừa màn hình */
-  overflow-y: auto; /* Nếu nội dung dài, cuộn trong phần content */
-  padding: 8px 8px;
-  background-color: #f8f9fa;
-}
-
-.tooltip {
-  position: fixed; /* Hiển thị ở vị trí cố định */
-  top: 60px; /* Tùy chỉnh vị trí hiển thị */
-  right: 20px;
-  z-index: 9999; /* Hiển thị trên các phần tử khác */
-  background-color: #fff;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-  padding: 10px;
-  border-radius: 8px;
-  width: 250px;
-}
-
-.notificationIcon {
-  position: relative;
-}
-

@@ -1,19 +1,17 @@
 import axios from "axios";
 
-// Cấu hình axios instance
 export const base_url = "http://ducable.id.vn:8080";
-axios.defaults.withCredentials = true;
+axios.defaults.withCredentials = true; // Quan trọng đối với xác thực dựa trên session/cookie nếu được sử dụng
 
 const apiInstance = axios.create({
   baseURL: base_url,
-  timeout: 60000,
+  timeout: 60000, // Thời gian chờ 60 giây
 });
 
-// Interceptor: Thêm token vào Authorization header
+// Interceptor yêu cầu để thêm Bearer token
 apiInstance.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem("accessToken");
-    // token = '';
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
@@ -22,63 +20,88 @@ apiInstance.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
-// Interceptor: Xử lý lỗi phản hồi
+// Interceptor phản hồi để xử lý lỗi toàn cục
 apiInstance.interceptors.response.use(
   (response) => response,
   (error) => {
-    console.error("API Error:", error.response || error.message);
+    console.error(
+      "Lỗi API:",
+      error.response?.data || error.response?.statusText || error.message
+    );
     return Promise.reject(error);
   }
 );
 
-// API Service – Gom nhóm theo chức năng
 const apiService = {
+  // AUTH APIs
+  requestSignup: (data) => apiInstance.post("/auth/signup", data), // 1. API Yêu cầu đăng ký
+  signupWithOtp: (data) => apiInstance.post("/auth/signup-otp", data), // 2. API Đăng ký khi có otp
+  login: (data) => apiInstance.post("/auth/login", data), // 3. API Login
+
   // CATEGORY APIs
-  updateCategory: (data) => apiInstance.put("/category/update", data),
-  deleteCategory: (categoryId) =>
+  getAllCategories: () => apiInstance.get("/category/"), // 4. API Lấy tất cả danh mục
+  getCategoryByName: (categoryName) => // 5. API Lấy danh mục theo tên
+    apiInstance.get("/category", { params: { category: categoryName } }),
+  addCategory: (data) => apiInstance.post("/category/add", data), // 6. API Thêm danh mục
+  deleteCategory: (categoryId) => // 7. API Xoá danh mục
     apiInstance.delete("/category/delete", {
       params: { categoryId },
     }),
-  getProductsByCategory: (categoryName) =>
-    apiInstance.get(`/product/category=${categoryName}`),
-  getAllCategories: () => apiInstance.get("/category/"),
+  updateCategory: (data) => apiInstance.put("/category/update", data), // 8. API Cập nhật danh mục
+
   // BRAND APIs
-  getAllBrands: () => apiInstance.get("/brand/"),
+  getAllBrands: () => apiInstance.get("/brand/"), // 9. API Lấy tất cả brand
+  getBrandByName: (brandName) => // 10. API Lấy brand theo tên
+    apiInstance.get("/brand", { params: { brand: brandName } }),
+  addBrand: (data) => apiInstance.post("/brand/add", data), // 11. API Thêm brand
+  deleteBrand: (brandId) => // 12. API Xoá brand (Đã sửa đường dẫn từ tài liệu)
+    apiInstance.delete("/brand/delete", {
+      params: { brandId },
+    }),
+  updateBrand: (data) => apiInstance.put("/brand/update", data), // 13. API Cập nhật brand
+
   // PRODUCT APIs
-  addProduct: (data) => apiInstance.post("/product/add", data),
-  updateProduct: (data) => apiInstance.put("/product/update", data),
-  deleteProduct: (productId) =>
+  addProduct: (data) => apiInstance.post("/product/add", data), // 14. API Thêm sản phẩm
+  deleteProduct: (productId) => // 15. API Xoá sản phẩm
     apiInstance.delete("/product/delete", {
       params: { productId },
     }),
-  searchProducts: (keyword) =>
+  updateProduct: (data) => apiInstance.put("/product/update", data), // 16. API Cập nhật sản phẩm
+  getProductById: (productId) => apiInstance.get(`/product/${productId}`), // 33. API Xem sản phẩm
+  getProductsByCategory: (categoryName) => // 34. API Xem sản phẩm theo danh mục (Hiện có)
+    apiInstance.get(`/product/category=${categoryName}`),
+  searchProducts: (keyword) => // 35. API Search sản phẩm (Hiện có)
     apiInstance.get(`/product/search=${keyword}`),
 
   // CART ITEM APIs
-  addToCart: (data) => apiInstance.post("/cart-item/add", data),
-  updateCartItem: (data) => apiInstance.put("/cart-item/update", data),
-  removeCartItem: (data) => apiInstance.post("/cart-item/remove", data),
+  checkCartItemStock: (data) => apiInstance.post("/cart-item/check", data), // 17. API Kiểm tra số lượng sản phẩm
+  addToCart: (data) => apiInstance.post("/cart-item/add", data), // 18. API Thêm sản phẩm vào giỏ hàng (Hiện có)
+  updateCartItem: (data) => apiInstance.put("/cart-item/update", data), // 19. API Cập nhật sản phẩm trong giỏ hàng (Hiện có)
+  removeCartItem: (data) => apiInstance.post("/cart-item/remove", data), // 20. API Xoá sản phẩm khỏi giỏ hàng (Hiện có)
 
   // ORDER APIs
-  createOrder: (data) => apiInstance.post("/order/create", data),
-  getOrderHistory: (username) => apiInstance.get(`/order/history/${username}`),
-  getOrderById: (orderId) => apiInstance.get(`/order/view/${orderId}`),
-  getOrdersByStatus: (status) => apiInstance.get(`/order/status/${status}`),
-  approveOrder: (orderId) => apiInstance.post(`/order/approve/${orderId}`),
+  createOrder: (data) => apiInstance.post("/order/create", data), // 21. API Tạo đơn hàng (Hiện có)
+  getOrderHistory: (username) => apiInstance.get(`/order/history/${username}`), // 22. API Xem lịch sử đơn hàng (Hiện có)
+  getOrderById: (orderId) => apiInstance.get(`/order/view/${orderId}`), // 23. API Xem đơn hàng cụ thể (Hiện có)
+  getOrdersByStatus: (status) => apiInstance.get(`/order/status/${status}`), // 24. API Lọc đơn theo trạng thái (Hiện có)
+  approveOrder: (orderId) => apiInstance.post(`/order/approve/${orderId}`), // 25. API Duyệt đơn hàng (Hiện có)
 
   // USER APIs
-  getUserInfo: (username) => apiInstance.get(`/user/info/${username}`),
-  updateUserInfo: (data) => apiInstance.put("/user/update", data),
-  deleteUser: (userId) =>
+  getUserInfo: (username) => apiInstance.get(`/user/info/${username}`), // 26. API Lấy thông tin người dùng (Hiện có)
+  updateUserInfo: (data) => apiInstance.put("/user/update", data), // 27. API Cập nhật thông tin người dùng (Hiện có)
+  deleteUser: (userId) => // 28. API Xóa người dùng (Hiện có)
     apiInstance.delete("/user/delete", {
       params: { userId },
     }),
-  changePassword: (data) => apiInstance.put("/user/change-password", data),
-  forgetPassword: (email) =>
-    apiInstance.post("/user/forget-password", null, {
+  changePassword: (data) => apiInstance.put("/user/change-password", data), // 29. API Đổi mật khẩu (Hiện có)
+  forgetPassword: (email) => // 30. API Quên mật khẩu (Hiện có)
+    apiInstance.post("/user/forget-password", null, { // Gửi body là null cho POST chỉ có query params
       params: { email },
     }),
-  resetPassword: (data) => apiInstance.post("/user/reset-password", data),
+  resetPassword: (data) => apiInstance.post("/user/reset-password", data), // 31. API Đặt lại mật khẩu (Hiện có)
+
+  // PAYMENT APIs
+  createVnPayPayment: (data) => apiInstance.post("/api/vnpay/create", data), // 32. API Tạo thanh toán
 };
 
 export default apiService;

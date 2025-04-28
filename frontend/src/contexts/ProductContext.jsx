@@ -1,6 +1,5 @@
 import React, { createContext, useState, useEffect, useContext } from 'react';
-// import { fetchProducts } from '../services/productAPI'; // Giả sử có hàm fetch
-
+import apiService from '../services/api';
 // Dữ liệu giả lập ban đầu
 const mockProducts = [
   {

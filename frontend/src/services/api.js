@@ -88,7 +88,7 @@ const apiService = {
   deleteProduct: (productId) => apiInstance.delete(`/product/delete?productId=${productId}`),
   searchProducts: (keyword) => apiInstance.get(`/product/search=${encodeURIComponent(keyword)}`),
   getProductById: (productId) => apiInstance.get(`/product/${productId}`),
-  getAllProducts: () => apiInstance.get("/product/"),
+  getAllProducts: () => apiInstance.get("/product/all"),
 
   // CART ITEM
   // ... (giữ nguyên hoặc điều chỉnh endpoint/payload)

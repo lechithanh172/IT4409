@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Link, NavLink, useNavigate } from 'react-router-dom';
 import { useCart } from '../../contexts/CartContext';
 import { useAuth } from '../../contexts/AuthContext';
-import apiService from '../../services/api'; // Hoặc import từ api.js nếu bạn đổi tên
+import apiService from '../../services/api'; // Đảm bảo đường dẫn đúng
 import Button from '../Button/Button';
 import styles from './Header.module.css';
 import useClickOutside from '../../hooks/useClickOutside';
@@ -11,13 +11,13 @@ import Spinner from '../Spinner/Spinner';
 // Import icons
 import {
   FiShoppingCart, FiSearch, FiUser, FiMenu, FiX, FiChevronDown,
-  FiLogOut, FiBox, FiUserCheck, FiLogIn, FiGrid
+  FiLogOut, FiBox, FiUserCheck, FiLogIn, FiGrid, FiSettings, FiShield, FiPackage // Thêm icon cho Admin/PM
 } from 'react-icons/fi';
 
 const Header = () => {
   // Hooks và Context
   const { cartItemCount } = useCart();
-  const { user, isAuthenticated, logout } = useAuth();
+  const { user, isAuthenticated, logout } = useAuth(); // Lấy user, trạng thái đăng nhập, hàm logout
   const navigate = useNavigate();
 
   // State UI
@@ -44,11 +44,10 @@ const Header = () => {
     const fetchCategories = async () => {
       setIsCategoryLoading(true);
       try {
-        const response = await apiService.getAllCategories(); // Gọi API
+        const response = await apiService.getAllCategories();
         if (response && Array.isArray(response.data)) {
           setCategories(response.data);
         } else {
-          console.warn("API getAllCategories không trả về mảng hợp lệ:", response?.data);
           setCategories([]);
         }
       } catch (error) {
@@ -59,24 +58,19 @@ const Header = () => {
       }
     };
     fetchCategories();
-  }, []); // Chỉ chạy 1 lần
+  }, []);
 
   // Handlers
   const handleSearchChange = (e) => setSearchTerm(e.target.value);
-
-  // *** SỬA LẠI ĐƯỜNG DẪN KHI SUBMIT SEARCH ***
   const handleSearchSubmit = (e) => {
     e.preventDefault();
     const trimmedSearchTerm = searchTerm.trim();
     if (trimmedSearchTerm) {
-      // Điều hướng đến trang SearchProductListPage với query param 'q'
       navigate(`/search?q=${encodeURIComponent(trimmedSearchTerm)}`);
-      setSearchTerm(''); // Xóa ô tìm kiếm
-      closeAllDropdowns(); // Đóng menu/dropdown
+      setSearchTerm('');
+      closeAllDropdowns();
     }
   };
-  // *** KẾT THÚC SỬA ĐỔI ***
-
   const toggleMobileMenu = () => {
       setIsMobileMenuOpen(prev => !prev);
       setIsCategoryDropdownOpen(false);
@@ -103,10 +97,12 @@ const Header = () => {
   const handleLogout = () => {
       logout();
       setIsUserDropdownOpen(false);
+      // navigate('/'); // Chuyển về trang chủ nếu cần
   };
 
-  // Lấy tên hiển thị
+  // Lấy tên hiển thị và vai trò (chuyển role về chữ thường để dễ so sánh)
   const displayName = user?.firstName || user?.username || 'Tài khoản';
+  const userRole = user?.role?.toLowerCase(); // Lấy role và chuyển thành chữ thường
 
   return (
     <header className={styles.header}>
@@ -117,23 +113,37 @@ const Header = () => {
         {/* Desktop Navigation */}
         <nav className={styles.desktopNav}>
              <NavLink to="/" className={({ isActive }) => isActive ? `${styles.navLink} ${styles.active}` : styles.navLink} end>Trang Chủ</NavLink>
+
               {/* Dropdown Danh Mục */}
               <div className={styles.dropdownContainer} ref={categoryDropdownRef}>
                 <button onClick={toggleCategoryDropdown} className={`${styles.navLink} ${styles.dropdownToggle}`} disabled={isCategoryLoading} aria-haspopup="true" aria-expanded={isCategoryDropdownOpen}>
                   Danh Mục {isCategoryLoading ? <Spinner size="inline" /> : <FiChevronDown className={`${styles.chevronIcon} ${isCategoryDropdownOpen ? styles.chevronOpen : ''}`} />}
                 </button>
-                <div className={`${styles.dropdownMenu} ${styles.categoryDropdown} ${isCategoryDropdownOpen ? styles.show : ''}`} role="menu">
-                    {isCategoryLoading ? <div className={styles.dropdownLoading} role="menuitem" aria-disabled="true"><Spinner size="small"/> Đang tải...</div>
+                <div className={` ${styles.dropdownMenu} ${styles.categoryDropdown} ${isCategoryDropdownOpen ? styles.show : ''} `} role="menu">
+                    {isCategoryLoading ? ( <div className={styles.dropdownLoading} role="menuitem" aria-disabled="true"><Spinner size="small"/> Đang tải...</div> )
                      : categories.length > 0 ? ( <>
                            <Link to="/products" className={styles.dropdownItem} onClick={closeAllDropdowns} role="menuitem"><FiGrid className={styles.categoryIcon} /> Tất cả sản phẩm</Link>
                            <hr className={styles.dropdownDivider}/>
                            {categories.map((category) => (<Link to={`/products?category=${encodeURIComponent(category.categoryName)}`} key={category.categoryId} className={styles.dropdownItem} onClick={closeAllDropdowns} role="menuitem"><span className={styles.categoryEmoji}></span>{category.categoryName}</Link>))}
-                         </>)
-                     : (<div className={styles.dropdownError} role="menuitem" aria-disabled="true"><p>Không tải được danh mục.</p></div>)
-                    }
+                         </>
+                    ) : ( <div className={styles.dropdownError} role="menuitem" aria-disabled="true"><p>Không tải được danh mục.</p></div> )}
                 </div>
               </div>
+
               <NavLink to="/promotions" className={({ isActive }) => isActive ? `${styles.navLink} ${styles.active}` : styles.navLink}>Khuyến Mãi</NavLink>
+
+              {/* === LIÊN KẾT ADMIN/PM (CHỈ HIỂN THỊ KHI ĐÚNG ROLE) === */}
+              {isAuthenticated && userRole === 'admin' && (
+                   <NavLink to="/admin" className={({ isActive }) => isActive ? `${styles.navLink} ${styles.active}` : styles.navLink}>
+                       <FiShield className={styles.roleIcon} /> Admin Panel
+                   </NavLink>
+              )}
+               {isAuthenticated && userRole === 'product_manager' && ( // *** ĐẢM BẢO TÊN ROLE KHỚP ***
+                   <NavLink to="/pm" className={({ isActive }) => isActive ? `${styles.navLink} ${styles.active}` : styles.navLink}>
+                       <FiPackage className={styles.roleIcon} /> Quản lý SP
+                   </NavLink>
+              )}
+              {/* === KẾT THÚC LIÊN KẾT ADMIN/PM === */}
         </nav>
 
         {/* Khu vực Actions */}
@@ -143,34 +153,51 @@ const Header = () => {
                 <input type="text" placeholder="Tìm kiếm sản phẩm..." className={styles.searchInput} value={searchTerm} onChange={handleSearchChange} aria-label="Tìm kiếm sản phẩm"/>
                 <button type="submit" className={styles.searchButton} aria-label="Tìm kiếm"><FiSearch /></button>
              </form>
+
              {/* Nút Giỏ hàng */}
              <Link to="/cart" className={styles.actionButton} title="Giỏ hàng" onClick={closeAllDropdowns}>
                 <FiShoppingCart />
                 {cartItemCount > 0 && (<span className={styles.cartCount}>{cartItemCount}</span>)}
              </Link>
+
              {/* Auth / User Menu (Desktop) */}
              <div className={styles.desktopAuth}>
-                {isAuthenticated ? (
+                {isAuthenticated ? ( // Kiểm tra đã đăng nhập chưa
                   <div className={styles.dropdownContainer} ref={userDropdownRef}>
+                    {/* Nút hiển thị tên và mở dropdown */}
                     <button onClick={toggleUserDropdown} className={`${styles.actionButton} ${styles.userButton}`} title={displayName} aria-haspopup="true" aria-expanded={isUserDropdownOpen}>
                       <FiUserCheck />
                       <span className={styles.userNameDesktop}>{displayName}</span>
                       <FiChevronDown className={`${styles.chevronIcon} ${styles.userChevron} ${isUserDropdownOpen ? styles.chevronOpen : ''}`} />
                     </button>
-                    <div className={`${styles.dropdownMenu} ${styles.userDropdown} ${isUserDropdownOpen ? styles.show : ''}`} role="menu">
+                    {/* Dropdown User */}
+                    <div className={` ${styles.dropdownMenu} ${styles.userDropdown} ${isUserDropdownOpen ? styles.show : ''} `} role="menu">
                         <div className={styles.dropdownHeader}>Chào, {displayName}!</div>
                         <Link to="/profile" className={styles.dropdownItem} onClick={closeAllDropdowns} role="menuitem"><FiUser className={styles.dropdownIcon}/> Hồ sơ</Link>
                         <Link to="/orders" className={styles.dropdownItem} onClick={closeAllDropdowns} role="menuitem"><FiBox className={styles.dropdownIcon}/> Đơn hàng</Link>
+                        {/* Thêm link Admin/PM vào dropdown user */}
+                        {userRole === 'admin' && (
+                           <Link to="/admin" className={styles.dropdownItem} onClick={closeAllDropdowns} role="menuitem">
+                               <FiShield className={styles.dropdownIcon} /> Admin Panel
+                           </Link>
+                        )}
+                         {userRole === 'product_manager' && (
+                           <Link to="/pm" className={styles.dropdownItem} onClick={closeAllDropdowns} role="menuitem">
+                               <FiPackage className={styles.dropdownIcon} /> Quản lý SP
+                           </Link>
+                        )}
+                        <hr className={styles.dropdownDivider}/> {/* Phân cách trước khi logout */}
                         <button onClick={handleLogout} className={`${styles.dropdownItem} ${styles.logoutButton}`} role="menuitem"><FiLogOut className={styles.dropdownIcon}/> Đăng xuất</button>
                     </div>
                   </div>
-                ) : (
+                ) : ( // Khi chưa đăng nhập
                   <>
                     <Button variant="secondary" size="small" onClick={handleLoginClick} className={styles.authButton}><FiLogIn /> Đăng nhập</Button>
                     <Button variant="primary" size="small" onClick={handleSignupClick} className={styles.authButton}>Đăng ký</Button>
                   </>
                 )}
              </div>
+
              {/* Nút bật/tắt Menu Mobile */}
              <button className={styles.mobileMenuToggle} onClick={toggleMobileMenu} aria-label={isMobileMenuOpen ? "Đóng menu" : "Mở menu"}>{isMobileMenuOpen ? <FiX /> : <FiMenu />}</button>
         </div>
@@ -189,6 +216,13 @@ const Header = () => {
                 <div className={styles.mobileWelcome}><FiUserCheck className={styles.mobileUserIcon}/> Chào, {displayName}!</div>
                 <Link to="/profile" className={styles.mobileNavLink} onClick={handleMobileLinkClick}>Hồ sơ</Link>
                 <Link to="/orders" className={styles.mobileNavLink} onClick={handleMobileLinkClick}>Đơn hàng</Link>
+                 {/* Thêm link Admin/PM vào mobile menu */}
+                 {userRole === 'admin' && (
+                     <Link to="/admin" className={styles.mobileNavLink} onClick={handleMobileLinkClick}><FiShield className={styles.mobileRoleIcon}/> Admin Panel</Link>
+                 )}
+                  {userRole === 'product_manager' && (
+                     <Link to="/pm" className={styles.mobileNavLink} onClick={handleMobileLinkClick}><FiPackage className={styles.mobileRoleIcon}/> Quản lý SP</Link>
+                 )}
                 <button onClick={() => { handleLogout(); handleMobileLinkClick(); }} className={`${styles.mobileNavLink} ${styles.mobileLogoutButton}`}>Đăng xuất</button>
              </>
            ) : (

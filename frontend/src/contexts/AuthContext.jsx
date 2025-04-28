@@ -1,167 +1,172 @@
 import React, { createContext, useState, useContext, useEffect } from 'react';
-import apiService from '../services/api'; // Import apiService
+import apiService from '../services/api';
 import Spinner from '../components/Spinner/Spinner';
 
 const AuthContext = createContext();
 
-// Hàm lấy thông tin user từ API sử dụng username đã lưu tạm
+// --- Hàm fetchUserInfo (Giả sử API trả về đầy đủ trừ username và role cần chuẩn hóa) ---
 const fetchUserInfo = async (username) => {
-    if (!username) {
-        console.error("fetchUserInfo: Cần username để gọi API.");
-        throw new Error("Thiếu thông tin người dùng.");
-    }
+    if (!username) throw new Error("Thiếu username để fetch info.");
     try {
-        console.log(`Fetching user info for: ${username}`);
         const response = await apiService.getUserInfo(username);
-        console.log("Fetched user info:", response.data);
-        if (response.data && typeof response.data === 'object') {
-             // **QUAN TRỌNG: Thêm username và role mặc định vào đây**
-             // Vì API info không trả về role, chúng ta cần tự gán
-             // Bạn cần có logic để xác định role (ví dụ: dựa vào username?)
-             // Tạm thời gán role 'user' cho tất cả
-            const userDataWithRole = {
+        if (response?.data && typeof response.data === 'object' && response.data.role) {
+            return {
                 ...response.data,
-                username: username, // Thêm trường username vào object user
-                role: 'user' // **GÁN ROLE MẶC ĐỊNH - CẦN ĐIỀU CHỈNH LOGIC NÀY**
-                // Hoặc logic phức tạp hơn:
-                // role: determineRoleBasedOnUsername(username) // Nếu có hàm xác định role
+                username: username, // Thêm username
+                role: String(response.data.role).toLowerCase() // Chuẩn hóa role
             };
-            return userDataWithRole;
         } else {
-            throw new Error("Dữ liệu người dùng trả về không hợp lệ.");
+            throw new Error("Dữ liệu user info không hợp lệ từ API.");
         }
     } catch (error) {
-        console.error(`Lỗi khi fetch user info cho ${username}:`, error);
-        throw error; // Ném lỗi để hàm gọi xử lý
+        console.error(`Lỗi fetch user info cho ${username}:`, error);
+        throw error; // Ném lỗi lên
     }
 };
 
-
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
-  const [isLoading, setIsLoading] = useState(true); // Loading kiểm tra token ban đầu
+  const [isLoading, setIsLoading] = useState(true);
 
-  // Hàm logout dùng chung
-  const logout = () => {
-    console.log("Logging out...");
+  const logout = (triggeredByError = false) => { // Thêm tham số để biết logout do lỗi hay do người dùng
+    if (!triggeredByError) console.log("[AuthContext] Logging out (user action)...");
+    else console.warn("[AuthContext] Logging out due to error or invalid state...");
+
     localStorage.removeItem('accessToken');
     localStorage.removeItem('refreshToken');
-    localStorage.removeItem('pendingUsername'); // Xóa username tạm
-    localStorage.removeItem('userData');
+    localStorage.removeItem('pendingUsername');
+    localStorage.removeItem('userData'); // Quan trọng: Xóa user data khi logout
     setUser(null);
-    console.log("Logged out successfully.");
   };
 
-
-  // Kiểm tra token và lấy thông tin user khi tải ứng dụng
+  // Kiểm tra Auth khi tải ứng dụng
   useEffect(() => {
     const checkAuthStatus = async () => {
       const token = localStorage.getItem('accessToken');
-      const pendingUsername = localStorage.getItem('pendingUsername'); // Lấy username đã lưu
+      let usernameFromStorage = null;
 
-      if (token && pendingUsername) {
-        console.log(`Auth Check: Tìm thấy token và username (${pendingUsername}), đang lấy thông tin user...`);
+      // Ưu tiên lấy username từ userData đã lưu
+      const storedUserData = localStorage.getItem('userData');
+      if (storedUserData) {
         try {
-          const userInfo = await fetchUserInfo(pendingUsername); // Gọi API info
-          if (userInfo && userInfo.role) { // API info giờ đã có role (tự gán)
-            setUser(userInfo);
-            localStorage.setItem('userData', JSON.stringify(userInfo)); // Lưu data đầy đủ
-            console.log("Auth Check: Token hợp lệ, user đã được đặt:", userInfo);
+          usernameFromStorage = JSON.parse(storedUserData)?.username;
+        } catch (e) {
+          console.error("Lỗi parse userData, sẽ xóa:", e);
+          localStorage.removeItem('userData'); // Xóa data lỗi
+        }
+      }
+
+      // Nếu không có username từ userData, thử lấy từ pending (ít xảy ra khi hoạt động đúng)
+      if (!usernameFromStorage) {
+        usernameFromStorage = localStorage.getItem('pendingUsername');
+      }
+
+      if (token && usernameFromStorage) {
+        console.log(`[AuthContext] Auth Check: Found token & username (${usernameFromStorage}). Validating...`);
+        try {
+          // Gọi API để xác thực token VÀ lấy thông tin user mới nhất
+          const currentUserInfo = await fetchUserInfo(usernameFromStorage);
+          if (currentUserInfo && currentUserInfo.role) {
+            setUser(currentUserInfo);
+            localStorage.setItem('userData', JSON.stringify(currentUserInfo)); // Cập nhật data mới nhất
+            localStorage.removeItem('pendingUsername'); // Dọn dẹp pending
+            console.log("[AuthContext] Auth Check: Valid session restored.", currentUserInfo);
           } else {
-            console.warn("Auth Check: Thông tin user trả về không hợp lệ sau khi fetch.");
-            logout(); // Xóa token và username nếu info không hợp lệ
+            // API trả về data không hợp lệ
+            console.warn("[AuthContext] Auth Check: Fetched user info is invalid.");
+            logout(true); // Logout do trạng thái không hợp lệ
           }
         } catch (error) {
-          console.error("Auth Check: Lỗi khi xác thực token/lấy user info.", error);
-          logout(); // Xóa token nếu có lỗi (vd: 401)
+          // API fetchUserInfo lỗi (vd: 401 do token hết hạn)
+          console.error("[AuthContext] Auth Check: Error fetching user info.", error);
+          logout(true); // Logout do lỗi xác thực
         }
       } else {
-        console.log("Auth Check: Không tìm thấy token hoặc username.");
-        logout(); // Đảm bảo trạng thái sạch sẽ
+        // Không có token hoặc không có username -> không thể khôi phục session
+        console.log("[AuthContext] Auth Check: No valid token or username found.");
+        if (user !== null) setUser(null); // Đảm bảo user state là null nếu không có session
+        // Không cần gọi logout() ở đây nữa vì các giá trị đã là null/không tồn tại
       }
-      setIsLoading(false); // Hoàn tất kiểm tra
+      setIsLoading(false); // Kết thúc kiểm tra
     };
 
     checkAuthStatus();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []); // Chỉ chạy 1 lần
 
   // --- Hàm Đăng nhập ---
   const login = async (username, password) => {
-    console.log(`Attempting login for user: ${username}`);
-    // 1. Lưu username vào localStorage TRƯỚC KHI gọi API login
+    console.log(`[AuthContext] Attempting login: ${username}`);
+    localStorage.removeItem('pendingUsername'); // Xóa cái cũ
+    localStorage.removeItem('userData');      // Xóa data cũ
+
+    // Lưu username tạm thời để gọi API info sau khi có token
     localStorage.setItem('pendingUsername', username);
-    console.log("Login: Stored pending username:", username);
 
     try {
-      // 2. Gọi API đăng nhập
       const loginResponse = await apiService.loginUser({ username, password });
-      console.log("API Login Response:", loginResponse);
-
       const token = loginResponse.data?.accessToken;
       const refreshToken = loginResponse.data?.refreshToken;
 
-      if (token) {
-        console.log("Login successful, received token.");
-        // 3. Lưu token
-        localStorage.setItem('accessToken', token);
-        if (refreshToken) {
-            localStorage.setItem('refreshToken', refreshToken);
-        }
+      if (!token) throw new Error('Không nhận được token xác thực.');
 
-        // 4. Gọi API lấy thông tin user bằng username đã lưu
-        console.log("Login: Fetching user info using stored username...");
-        const userInfo = await fetchUserInfo(username); // Dùng username từ tham số
+      localStorage.setItem('accessToken', token);
+      if (refreshToken) localStorage.setItem('refreshToken', refreshToken);
+      console.log("[AuthContext] Login: Token received and stored.");
 
-        if (userInfo && userInfo.role) {
-            // 5. Cập nhật state và lưu userData đầy đủ
-            setUser(userInfo);
-            localStorage.setItem('userData', JSON.stringify(userInfo));
-            // Xóa username tạm đi sau khi đã lấy được info thành công
-            localStorage.removeItem('pendingUsername');
-            console.log("Login: User info fetched and state updated:", userInfo);
-            return userInfo; // Trả về user cho LoginPage điều hướng
-        } else {
-            console.error("Lỗi: Lấy được token nhưng không lấy được thông tin user hợp lệ.");
-            logout(); // Logout để xóa token và username tạm
-            throw new Error("Không thể lấy thông tin tài khoản.");
-        }
+      // Lấy thông tin user ngay sau khi có token
+      const userInfo = await fetchUserInfo(username); // Dùng username vừa nhập
+
+      if (userInfo && userInfo.role) {
+        setUser(userInfo);
+        localStorage.setItem('userData', JSON.stringify(userInfo)); // Lưu user data đầy đủ
+        localStorage.removeItem('pendingUsername'); // Xóa username tạm
+        console.log("[AuthContext] Login: User state updated:", userInfo);
+        return userInfo; // Trả về cho LoginPage
       } else {
-        console.error("API trả về OK nhưng không có accessToken:", loginResponse.data);
-         localStorage.removeItem('pendingUsername'); // Xóa username tạm nếu login lỗi
-        throw new Error('Không nhận được thông tin xác thực.');
+        // Lỗi không mong muốn: Có token nhưng không lấy được info hợp lệ
+        throw new Error("Không thể lấy thông tin tài khoản.");
       }
     } catch (error) {
-      console.error("Context Login Error:", error);
-      logout(); // Đảm bảo dọn dẹp khi có lỗi
-
+      console.error("[AuthContext] Login failed:", error);
+      logout(true); // Dọn dẹp triệt để khi login lỗi
       const message = error.response?.data?.message ||
                       (error.response?.status === 401 ? 'Sai tên đăng nhập hoặc mật khẩu' : null) ||
                       error.message ||
-                      'Đăng nhập thất bại, vui lòng kiểm tra lại.';
-      throw new Error(message);
+                      'Đăng nhập thất bại.';
+      throw new Error(message); // Ném lỗi cho LoginPage hiển thị
     }
   };
 
-   // --- Hàm Đăng ký --- (Giữ nguyên logic gọi API)
-   const signup = async (signupData) => { /* ... */ };
-
-
-  // --- Giá trị cung cấp bởi Context ---
-  const value = {
-    user,
-    isAuthenticated: !!user,
-    isLoading, // Trạng thái loading ban đầu
-    login,
-    logout,
-    signup
+  // --- Hàm Đăng ký ---
+  const signup = async (signupData) => {
+    // Code hàm signup giữ nguyên
+     console.log("[AuthContext] Attempting signup with data:", signupData);
+        try {
+            const response = await apiService.signupUser(signupData);
+            console.log("[AuthContext] API Signup Response:", response);
+            if (response.status === 200 || response.status === 201) {
+                console.log("[AuthContext] Signup successful");
+                return response.data;
+            } else {
+                 console.error("[AuthContext] Signup API returned unexpected status:", response.status, response.data);
+                 throw new Error("Đăng ký không thành công.");
+            }
+        } catch (error) {
+            console.error("[AuthContext] Context Signup Error:", error);
+            const message = error.response?.data?.message || error.message || "Đăng ký không thành công.";
+            throw new Error(message);
+        }
   };
 
-  // Hiển thị spinner trong khi kiểm tra token ban đầu
-  if (isLoading) {
-      return <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}><Spinner size="large" /></div>;
-  }
+  // Giá trị context
+  const value = { user, isAuthenticated: !!user, isLoading, login, logout, signup };
 
-  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
+  // Render children khi loading xong, hoặc luôn render và để ProtectedRoute xử lý
+  return <AuthContext.Provider value={value}>{!isLoading ? children : null}</AuthContext.Provider>;
+  // Hoặc nếu muốn hiện spinner toàn trang:
+  // if (isLoading) return <div style={{...}}><Spinner size="large" /></div>;
+  // return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
 
 // Custom hook

@@ -1,13 +1,13 @@
 // AdminCategories.jsx
 import React, { useEffect, useRef, useState } from 'react';
-import { Button, Modal, Space, Table, message, Input, Image } from 'antd'; // Thêm Image
+import { Button, Modal, Space, Table, message, Input, Image } from 'antd';
 import { PlusCircleFilled, DeleteFilled, ExclamationCircleFilled, SearchOutlined } from '@ant-design/icons';
 import Highlighter from 'react-highlight-words';
 import AddCategory from './AddCategory';
-import EditCategory from './EditCategory'; // Import EditCategory để mở modal sửa
-import apiService from '../../../services/api';
-// import { width } from '@fortawesome/free-solid-svg-icons/fa0'; // Bỏ import không dùng
-const { confirm } = Modal; // Lấy confirm trực tiếp
+import EditCategory from './EditCategory';
+import apiService from '../../../services/api'; // Đảm bảo import service
+
+const { confirm } = Modal;
 
 // Dữ liệu cứng (key không có ngoặc kép, đã có imageUrl)
 const allCategory = [
@@ -21,11 +21,17 @@ const allCategory = [
   { categoryId: 8, name: "Speaker", description: "Audio output devices", imageUrl: "https://product.hstatic.net/1000187560/product/loa-bluetooth-havit-sk832bt_2__459d04d6a66e4ff38bfa4f528e3cb2d5_large.png" },
   { categoryId: 9, name: "Camera", description: "Photography and video", imageUrl: "https://www.bachkhoashop.com/wp-content/uploads/2022/12/gth788_1_.webp" },
   { categoryId: 10, name: "Smartwatch", description: "Wearable smart devices", imageUrl: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQx-zhXJ2eJ5OxH7xxs0MnPpu5eNikP79VGbYQG_AEqHw57ezRC8BNLqqokP4n0KhtWCPo&usqp=CAU" },
-  { categoryId: 13, name: "bàn phím", description: "Keyboards", imageUrl: null }, // Ví dụ category không có ảnh
+  { categoryId: 13, name: "bàn phím", description: "Keyboards", imageUrl: null },
   { categoryId: 14, name: "chuột", description: "Mice", imageUrl: null },
   { categoryId: 16, name: "tv", description: "Televisions", imageUrl: null }
 ];
 
+// Giả định apiService có hàm deleteCategory như sau:
+// apiService = {
+//   ...
+//   deleteCategory: (categoryId) => apiInstance.delete("/category/delete", { params: { categoryId } }),
+//   ...
+// }
 
 const AdminCategories = () => {
     const [refresh, setRefresh] = useState(false);
@@ -40,9 +46,9 @@ const AdminCategories = () => {
         const fetchData = async () => {
             setLoading(true);
             try {
-                // --- Gọi API (comment) ---
+                // --- Gọi API ---
                 // const response = await apiService.getAllCategories();
-                // const rawData = response.data || []; // Kiểm tra cấu trúc trả về
+                // const rawData = response.data || [];
 
                 // --- Dùng dữ liệu cứng ---
                 const rawData = allCategory;
@@ -55,7 +61,7 @@ const AdminCategories = () => {
                 }
             } catch (error) {
                 console.error('Error fetching categories:', error);
-                // message.error('Không thể lấy dữ liệu danh mục');
+                // message.error('Không thể lấy dữ liệu danh mục'); // Tạm ẩn nếu dùng data cứng
                 setCategories([]);
             } finally {
                 setLoading(false);
@@ -65,124 +71,136 @@ const AdminCategories = () => {
     }, [refresh]);
 
     const onRefresh = () => setRefresh((prev) => !prev);
-    const handleSearch = (selectedKeys, confirm, dataIndex) => { /* ... */ };
-    const handleReset = (clearFilters, confirm, dataIndex) => { /* ... */ };
+
+    const handleSearch = (selectedKeys, confirm, dataIndex) => {
+        confirm();
+        setSearchText(selectedKeys[0]);
+        setSearchedColumn(dataIndex);
+    };
+
+    const handleReset = (clearFilters, confirm, dataIndex) => {
+        clearFilters && clearFilters();
+        setSearchText('');
+        confirm({ closeDropdown: false });
+        setSearchedColumn('');
+    };
 
     const getColumnSearchProps = (dataIndex) => ({
         filterDropdown: ({ setSelectedKeys, selectedKeys, confirm, clearFilters, close }) => (
             <div style={{ padding: 8 }} onKeyDown={(e) => e.stopPropagation()}>
-                <Input ref={searchInput} placeholder={`Tìm ${dataIndex}`} value={selectedKeys[0]} onChange={(e) => setSelectedKeys(e.target.value ? [e.target.value] : [])} onPressEnter={() => handleSearch(selectedKeys, confirm, dataIndex)} style={{ marginBottom: 8, display: 'block' }} />
-                <Space> <Button type="primary" onClick={() => handleSearch(selectedKeys, confirm, dataIndex)} icon={<SearchOutlined />} size="small" style={{ width: 90 }}>Tìm</Button> <Button onClick={() => handleReset(clearFilters, confirm, dataIndex)} size="small" style={{ width: 90 }}>Reset</Button> <Button type="link" size="small" onClick={() => close()}>Đóng</Button> </Space>
+                <Input ref={searchInput} placeholder={`Tìm ${dataIndex === 'categoryId' ? 'mã' : 'tên'}`} value={selectedKeys[0]} onChange={(e) => setSelectedKeys(e.target.value ? [e.target.value] : [])} onPressEnter={() => handleSearch(selectedKeys, confirm, dataIndex)} style={{ marginBottom: 8, display: 'block' }} />
+                <Space> <Button type="primary" onClick={() => handleSearch(selectedKeys, confirm, dataIndex)} icon={<SearchOutlined />} size="small" style={{ width: 90 }}>Tìm</Button> <Button onClick={() => clearFilters && handleReset(clearFilters, confirm, dataIndex)} size="small" style={{ width: 90 }}>Reset</Button> <Button type="link" size="small" onClick={() => close()}>Đóng</Button> </Space>
             </div>
         ),
         filterIcon: (filtered) => <SearchOutlined style={{ color: filtered ? '#1677ff' : undefined }} />,
         onFilter: (value, record) => record[dataIndex] ? record[dataIndex].toString().toLowerCase().includes(value.toLowerCase()) : '',
-        onFilterDropdownVisibleChange: (visible) => { if (visible) { setTimeout(() => searchInput.current?.select(), 100); } },
+        onFilterDropdownOpenChange: (visible) => { if (visible) { setTimeout(() => searchInput.current?.select(), 100); } },
         render: (text) => searchedColumn === dataIndex ? ( <Highlighter highlightStyle={{ backgroundColor: '#ffc069', padding: 0 }} searchWords={[searchText]} autoEscape textToHighlight={text ? text.toString() : ''} /> ) : ( text ),
     });
 
-    // Hàm xóa category
+    // --- HÀM XÓA CATEGORY (ĐÃ IMPLEMENT) ---
     const deleteCategory = async (categoryToDelete) => {
+        if (!categoryToDelete || !categoryToDelete.categoryId) {
+             message.error('Không tìm thấy ID danh mục để xóa.');
+             return;
+        }
+        setLoading(true);
         try {
-            console.log('Deleting Category:', categoryToDelete);
-             // --- Gọi API (comment) ---
-            // await apiService.deleteCategory(categoryToDelete.categoryId);
+            // --- Gọi API ---
+            // await apiService.deleteCategory(categoryToDelete.categoryId); // BỎ COMMENT KHI KẾT NỐI API THẬT
 
-            // --- Xử lý state (dữ liệu cứng) ---
+            // --- Xử lý state (dữ liệu cứng / giả lập) ---
+            console.log('Simulating delete for Category ID:', categoryToDelete.categoryId); // Log giả lập
             const updatedCategories = categories.filter((cat) => cat.categoryId !== categoryToDelete.categoryId);
             setCategories(updatedCategories);
-            message.success(`Đã xóa danh mục: ${categoryToDelete.name}`);
+            message.success(`(Giả lập) Đã xóa danh mục: ${categoryToDelete.name}`);
+             // Nếu dùng API thật thì bỏ '(Giả lập)' và comment dòng console.log trên
+
         } catch (error) {
             console.error('Lỗi khi xóa danh mục:', error);
             const errorMessage = error.response?.data?.message || error.message || `Xóa danh mục thất bại: ${categoryToDelete.name}`;
             message.error(errorMessage);
+        } finally {
+             setLoading(false);
         }
     };
 
-    // Hàm xác nhận xóa
-    const showDeleteConfirm = (category) => { // Đổi tên tham số
+    // --- HÀM XÁC NHẬN XÓA (ĐÃ IMPLEMENT) ---
+    const showDeleteConfirm = (category) => {
         confirm({
-            title: `Xác nhận xóa danh mục ${category.name}?`, // Sửa title
+            title: `Xác nhận xóa danh mục ${category.name}?`,
             icon: <ExclamationCircleFilled />,
-            content: `Mã danh mục: ${category.categoryId}`, // Sửa content
-            okText: 'Xóa', okType: 'danger', cancelText: 'Hủy',
-            onOk() { deleteCategory(category); }, // Gọi hàm deleteCategory
+            content: `Mã danh mục: ${category.categoryId}. Thao tác này không thể hoàn tác!`,
+            okText: 'Xóa',
+            okType: 'danger',
+            cancelText: 'Hủy',
+            onOk() {
+                deleteCategory(category); // Gọi hàm xóa đã implement
+            },
             onCancel() {},
         });
     };
 
-    // --- Cập nhật Columns ---
     const columns = [
         {
             title: 'Mã',
             dataIndex: 'categoryId',
             key: 'categoryId',
-            width: 80, // Giảm chiều rộng nếu cần
+            align: 'center',
+            width: 80, // Giảm lại chút
             sorter: (a, b) => a.categoryId - b.categoryId,
             ...getColumnSearchProps('categoryId'),
         },
-        // --- Thêm cột Ảnh ---
         {
             title: 'Ảnh',
             dataIndex: 'imageUrl',
             key: 'imageUrl',
-            width: 100, // Đặt chiều rộng phù hợp
-            align: 'center', // Căn giữa ảnh
+            width: 120, // Giảm lại chút
+            align: 'center',
             render: (imageUrl) => imageUrl ? (
                 <Image
-                    width={60} // Kích thước ảnh trong ô
+                    width={60}
                     src={imageUrl}
-                    style={{ objectFit: 'contain' }} // Đảm bảo ảnh hiển thị đẹp
-                    preview={true} // Cho phép xem trước ảnh lớn khi click (tùy chọn)
+                    style={{ objectFit: 'contain', maxHeight: '40px' }}
+                    preview={true}
                 />
             ) : (
-                <span style={{ color: '#bfbfbf' }}>N/A</span> // Hiển thị nếu không có ảnh
+                <span style={{ color: '#bfbfbf' }}>N/A</span>
             ),
         },
-        // --- Kết thúc thêm cột Ảnh ---
         {
             title: 'Tên Danh mục',
             dataIndex: 'name',
             key: 'name',
             ellipsis: true,
-            sorter: (a, b) => a.name.localeCompare(b.name), // Sửa lại logic sort
-            ...getColumnSearchProps('name'), // Sửa lại dataIndex cho search
+            sorter: (a, b) => a.name.localeCompare(b.name),
+            ...getColumnSearchProps('name'),
         },
-        // Bỏ cột số lượng sản phẩm vì không có trong data gốc
-        // {
-        //     title: 'Số lượng sản phẩm',
-        //     dataIndex: 'totalProducts', // Cần xử lý dữ liệu này
-        //     key: 'totalProducts',
-        //     sorter: (a, b) => a.totalProducts - b.totalProducts, // Giả sử là số
-        //     ellipsis: true,
-        // },
         {
             title: 'Hành động',
-            key: 'action', // Thêm key
-            width: 100,
+            key: 'action',
+            width: 100, // Giảm lại
             align: 'center',
             render: (_, record) => (
-                <Space size="middle"> {/* Dùng Space để có khoảng cách nếu thêm nút Sửa */}
+                <Space size="middle">
                     <Button
                         type="text"
-                        size="small"
+                        size="large" // Hoặc middle
                         danger
                         icon={<DeleteFilled />}
                         onClick={(e) => {
-                            e.stopPropagation(); // Ngăn click vào hàng
-                            showDeleteConfirm(record); // Gọi hàm xóa
+                            e.stopPropagation();
+                            showDeleteConfirm(record); // Gọi hàm xác nhận xóa
                         }}
                     />
-                    {/* Có thể thêm nút sửa ở đây nếu cần */}
-                    {/* <Button type="link" size="small" onClick={(e) => { e.stopPropagation(); setModalChild(<EditCategory category={record} ... />) }}>Sửa</Button> */}
                 </Space>
             ),
         },
     ];
-    // --- Kết thúc Cập nhật Columns ---
 
     return (
-        <div>
+        // Bọc div giới hạn chiều rộng
+        <div style={{ maxWidth: '900px', margin: '20px auto' }}>
             <Space style={{ marginBottom: 16 }}>
                 <Button
                     type="primary"
@@ -201,6 +219,7 @@ const AdminCategories = () => {
                 {modalChild}
             </Modal>
             <Table
+                bordered // Thêm viền
                 onRow={(record) => ({
                     onClick: () => { setModalChild( <EditCategory category={record} setModalChild={setModalChild} handleRefresh={onRefresh} /> ); },
                     onMouseEnter: (event) => { event.currentTarget.style.cursor = 'pointer'; },
@@ -208,10 +227,16 @@ const AdminCategories = () => {
                 })}
                 columns={columns}
                 dataSource={categories}
-                rowKey="categoryId" // Sử dụng categoryId làm key
+                rowKey="categoryId"
                 loading = {loading}
-                pagination={{ pageSizeOptions: ['5', '10', '15'], showSizeChanger: true, defaultPageSize: 5, style: { marginTop: '20px' } }}
-                size="small" // Cho bảng gọn hơn
+                pagination={{
+                    pageSizeOptions: ['5', '10', '15'],
+                    size: 'default',
+                    showSizeChanger: true,
+                    defaultPageSize: 5,
+                    style: { marginTop: '24px' } // Tăng khoảng cách, bỏ margin thừa
+                 }}
+                size="middle" // Đổi thành middle
             />
         </div>
     );

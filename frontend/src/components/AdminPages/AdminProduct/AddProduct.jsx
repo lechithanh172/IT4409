@@ -1,22 +1,26 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { Button, Form, Input, InputNumber, Space, Row, Col, message, Image, Select, Divider } from 'antd'; // Đã thêm lại InputNumber nếu cần
+import React, { useState, useEffect } from 'react';
+import { Button, Form, Input, InputNumber, Space, Row, Col, message, Image, Select, Divider } from 'antd';
 import { PlusOutlined, MinusCircleOutlined } from '@ant-design/icons';
 import apiService from '../../../services/api'; // Đảm bảo đường dẫn đúng
 
 const AddProduct = ({ setModalChild, handleRefresh }) => {
     const [form] = Form.useForm();
-    const [variants, setVariants] = useState([{ key: Date.now() + '_initial', color: '', quantity: 0, sale: 0, image: '' }]);
+    // Đổi tên các trường trong state variants cho nhất quán với API và EditProduct
+    const [variants, setVariants] = useState([{ key: Date.now() + '_initial', color: '', stockQuantity: 0, discount: 0, imageUrl: '' }]);
     const [selectedBrand, setSelectedBrand] = useState(null);
     const [brandOptions, setBrandOptions] = useState([]);
-    const [isAddingNewBrand, setIsAddingNewBrand] = useState(false);
-    const [newBrandImagePreview, setNewBrandImagePreview] = useState(null);
+    // --- Bỏ state liên quan đến thêm brand mới ---
+    // const [isAddingNewBrand, setIsAddingNewBrand] = useState(false);
+    // const [newBrandImagePreview, setNewBrandImagePreview] = useState(null);
 
     // Dữ liệu cứng - Nên fetch từ API
     const allBrand = [
-        { "brandId": 1, "name": "Apple", "logoUrl": "https://cdn2.cellphones.com.vn/insecure/rs:fill:0:50/q:30/plain/https://cellphones.com.vn/media/tmp/catalog/product/f/r/frame_59.png" },
-        { "brandId": 2, "name": "Samsung", "logoUrl": "https://cdn2.cellphones.com.vn/insecure/rs:fill:0:50/q:30/plain/https://cellphones.com.vn/media/tmp/catalog/product/f/r/frame_60.png" },
-        { "brandId": 9, "name": "Xiaomi", "logoUrl": "https://cdn2.cellphones.com.vn/insecure/rs:fill:0:50/q:30/plain/https://cellphones.com.vn/media/tmp/catalog/product/f/r/frame_61.png" },
-        // ... add other brands if needed
+        { brandId: 1, name: "Apple", logoUrl: "https://cdn2.cellphones.com.vn/insecure/rs:fill:0:50/q:30/plain/https://cellphones.com.vn/media/tmp/catalog/product/f/r/frame_59.png" },
+        { brandId: 2, name: "Samsung", logoUrl: "https://cdn2.cellphones.com.vn/insecure/rs:fill:0:50/q:30/plain/https://cellphones.com.vn/media/tmp/catalog/product/f/r/frame_60.png" },
+        { brandId: 9, name: "Xiaomi", logoUrl: "https://cdn2.cellphones.com.vn/insecure/rs:fill:0:50/q:30/plain/https://cellphones.com.vn/media/tmp/catalog/product/f/r/frame_61.png" },
+        // ... add other brands
+        { brandId: 3, name: "Dell", logoUrl: "https://cdn2.cellphones.com.vn/insecure/rs:fill:0:50/q:30/plain/https://cellphones.com.vn/media/wysiwyg/Icon/brand_logo/Dell.png" },
+        { brandId: 5, name: "Lenovo", logoUrl: "https://cdn2.cellphones.com.vn/insecure/rs:fill:0:50/q:30/plain/https://cellphones.com.vn/media/wysiwyg/Icon/brand_logo/Lenovo.png" },
     ];
 
     const allCategory = [
@@ -33,9 +37,9 @@ const AddProduct = ({ setModalChild, handleRefresh }) => {
             try {
                 // const response = await apiService.getAllBrands();
                 // const fetchedBrands = response.data || [];
-                const fetchedBrands = allBrand;
+                const fetchedBrands = allBrand; // Dùng data cứng
                 const options = fetchedBrands.map((brand) => ({
-                    value: brand.brandId,
+                    value: brand.brandId, // Sử dụng brandId làm value
                     label: brand.name,
                     image: brand.logoUrl,
                 }));
@@ -51,26 +55,13 @@ const AddProduct = ({ setModalChild, handleRefresh }) => {
     const handleSelectBrandChange = (value) => {
         const selected = brandOptions.find((b) => b.value === value);
         setSelectedBrand(selected || null);
-        setIsAddingNewBrand(false);
-        form.setFieldsValue({ newBrandName: '', newBrandLogoUrl: '' });
-        setNewBrandImagePreview(null);
+        // --- Bỏ logic liên quan đến isAddingNewBrand ---
     };
 
-    const handleShowAddBrandForm = () => {
-        setIsAddingNewBrand(true);
-        setSelectedBrand(null);
-        form.setFieldsValue({ selectedBrandId: null });
-    };
-
-    const handleCancelAddBrand = () => {
-        setIsAddingNewBrand(false);
-        form.setFieldsValue({ newBrandName: '', newBrandLogoUrl: '' });
-        setNewBrandImagePreview(null);
-    };
-
-    const handleNewBrandImageChange = (e) => {
-        setNewBrandImagePreview(e.target.value);
-    }
+    // --- Bỏ các hàm xử lý thêm brand mới ---
+    // const handleShowAddBrandForm = () => { ... };
+    // const handleCancelAddBrand = () => { ... };
+    // const handleNewBrandImageChange = (e) => { ... };
 
     const onFinishFailed = (errorInfo) => {
         console.log('Failed:', errorInfo);
@@ -78,7 +69,8 @@ const AddProduct = ({ setModalChild, handleRefresh }) => {
     };
 
     const addVariant = () => {
-        setVariants([...variants, { key: Date.now() + Math.random(), color: '', quantity: 0, sale: 0, image: '' }]);
+        // Sử dụng tên trường nhất quán
+        setVariants([...variants, { key: Date.now() + Math.random(), color: '', stockQuantity: 0, discount: 0, imageUrl: '' }]);
     };
 
     const removeVariant = (keyToRemove) => {
@@ -94,48 +86,51 @@ const AddProduct = ({ setModalChild, handleRefresh }) => {
     };
 
     const onFinish = async (values) => {
-        if (!selectedBrand && !isAddingNewBrand) {
-            message.error('Vui lòng chọn thương hiệu hoặc thêm thương hiệu mới!');
-            form.validateFields(['selectedBrandId']);
+        // Đơn giản hóa kiểm tra brand: chỉ cần selectedBrand có giá trị
+        if (!selectedBrand) {
+            message.error('Vui lòng chọn thương hiệu!');
+            form.validateFields(['selectedBrandId']); // Trigger validation cho select
             return;
         }
-        if (isAddingNewBrand && !values.newBrandName) {
-             message.error('Vui lòng nhập tên cho thương hiệu mới!');
-             form.validateFields(['newBrandName']);
-             return;
-        }
+        // --- Bỏ kiểm tra isAddingNewBrand ---
 
-        const invalidVariant = variants.some(v => !v.color || v.quantity === null || v.quantity === undefined || v.quantity < 0);
+        // Kiểm tra variants (dùng tên trường đã đổi)
+        const invalidVariant = variants.some(v => !v.color || v.stockQuantity === null || v.stockQuantity === undefined || v.stockQuantity < 0);
         if (invalidVariant) {
             message.error('Vui lòng nhập đầy đủ thông tin hợp lệ (Màu sắc, Số lượng >= 0) cho tất cả các biến thể!');
-            return;
+            // Không cần return ở đây nếu muốn kiểm tra hết rồi mới báo lỗi chung
+            // return; // Có thể giữ lại để dừng ngay khi gặp lỗi variant đầu tiên
         }
 
+        // Nếu có lỗi variant, dừng lại (sau khi đã hiển thị message)
+        if (invalidVariant) return;
+
+
         try {
-            // *** Thêm lại weight vào data object ***
             const data = {
                 productName: values.productName || '',
                 description: values.description || '',
-                // specifications: values.specifications || '', // Giữ lại nếu API cần
-                price: values.price === null || values.price === undefined ? 0 : values.price,
-                weight: values.weight === null || values.weight === undefined ? 0 : values.weight, // Thêm lại weight
+                price: values.price ?? 0,
+                weight: values.weight ?? 0,
                 categoryName: values.categoryName || '',
-                brandName: isAddingNewBrand
-                           ? values.newBrandName
-                           : (selectedBrand ? selectedBrand.label : ''),
-                // supportRushOrder: values.supportRushOrder || false, // Giữ lại nếu API cần
+                // Lấy brandName từ selectedBrand
+                brandName: selectedBrand.label,
+                // --- Bỏ logic isAddingNewBrand ---
                 variants: variants.map(variant => ({
                     color: variant.color,
-                    imageUrl: variant.image || '',
-                    stockQuantity: variant.quantity === null || variant.quantity === undefined ? 0 : variant.quantity,
-                    discount: variant.sale === null || variant.sale === undefined ? 0 : variant.sale,
+                    imageUrl: variant.imageUrl || '',
+                    stockQuantity: variant.stockQuantity ?? 0,
+                    discount: variant.discount ?? 0,
                 })),
             };
 
             console.log('Data to send to API:', data);
 
-            await apiService.addProduct(data); // Gọi API addProduct
-            message.success('Sản phẩm được thêm thành công!');
+            // --- Gọi API (Giả lập) ---
+            // await apiService.addProduct(data);
+            message.success(`(Giả lập) Sản phẩm ${data.productName} được thêm thành công!`);
+            // --- Kết thúc Giả lập ---
+
             handleRefresh();
             setModalChild(null);
         } catch (e) {
@@ -147,7 +142,7 @@ const AddProduct = ({ setModalChild, handleRefresh }) => {
 
     return (
         <div style={{ width: '80vw', maxWidth: '1200px', minWidth: '700px', margin: 'auto' }}>
-            <h2 style={{ marginTop: 0, marginBottom: 20, textAlign: 'center', fontSize: '24px' }}>Thêm Sản Phẩm Mới</h2>
+            <h2 style={{ marginTop: 0, marginBottom: 0, textAlign: 'center', fontSize: '24px' }}>Thêm Sản Phẩm Mới</h2>
 
             <Form
                 form={form}
@@ -181,20 +176,15 @@ const AddProduct = ({ setModalChild, handleRefresh }) => {
                             />
                         </Form.Item>
 
+                        {/* Label chung cho Thương hiệu */}
                         <Form.Item label="Thương Hiệu" required>
-                            <Row gutter={16} align="bottom">
+                             <Row gutter={16} align="middle"> {/* Đổi align thành middle */}
                                 <Col flex="auto">
+                                    {/* Form Item chỉ chứa Select */}
                                     <Form.Item
-                                        name="selectedBrandId"
-                                        noStyle
-                                        rules={[{
-                                            validator: async (_, value) => {
-                                                if (!isAddingNewBrand && !selectedBrand) {
-                                                    return Promise.reject(new Error('Hãy chọn thương hiệu!'));
-                                                }
-                                                return Promise.resolve();
-                                            }
-                                        }]}
+                                        name="selectedBrandId" // Vẫn giữ name để form quản lý value và validation
+                                        noStyle // Không hiển thị label/style mặc định của Form.Item
+                                        rules={[{ required: true, message: 'Hãy chọn thương hiệu!' }]} // Quy tắc đơn giản
                                     >
                                         <Select
                                             showSearch
@@ -203,7 +193,7 @@ const AddProduct = ({ setModalChild, handleRefresh }) => {
                                             onChange={handleSelectBrandChange}
                                             options={brandOptions}
                                             value={selectedBrand ? selectedBrand.value : undefined}
-                                            disabled={isAddingNewBrand}
+                                            // --- Bỏ disabled ---
                                             style={{ width: '100%' }}
                                             allowClear
                                             onClear={() => setSelectedBrand(null)}
@@ -211,7 +201,8 @@ const AddProduct = ({ setModalChild, handleRefresh }) => {
                                     </Form.Item>
                                 </Col>
                                 <Col>
-                                    {selectedBrand && !isAddingNewBrand && (
+                                     {/* Hiển thị logo nếu đã chọn */}
+                                    {selectedBrand && (
                                         <div style={{ height: '32px', display: 'flex', alignItems: 'center', marginLeft: '8px' }}>
                                             <Image
                                                 height={32}
@@ -222,58 +213,12 @@ const AddProduct = ({ setModalChild, handleRefresh }) => {
                                         </div>
                                     )}
                                 </Col>
-                                <Col>
-                                    <Button
-                                        onClick={handleShowAddBrandForm}
-                                        disabled={isAddingNewBrand}
-                                        style={{ marginLeft: '8px' }}
-                                    >
-                                        Hoặc thêm mới
-                                    </Button>
-                                </Col>
+                                {/* --- Bỏ nút "Hoặc thêm mới" --- */}
                             </Row>
                         </Form.Item>
 
-                        {isAddingNewBrand && (
-                            <div style={{ border: '1px dashed #d9d9d9', padding: '16px', borderRadius: '8px', marginBottom: '16px', position: 'relative' }}>
-                                <Button
-                                    icon={<MinusCircleOutlined />}
-                                    onClick={handleCancelAddBrand}
-                                    type="text"
-                                    danger
-                                    style={{ position: 'absolute', top: 5, right: 5, zIndex: 1 }}
-                                    title="Hủy thêm thương hiệu mới"
-                                />
-                                <Row gutter={16}>
-                                    <Col xs={24} sm={16}>
-                                        <Form.Item
-                                            label="Tên Thương Hiệu Mới"
-                                            name="newBrandName"
-                                            rules={[{ required: true, message: 'Hãy nhập tên thương hiệu mới!' }]}
-                                        >
-                                            <Input />
-                                        </Form.Item>
-                                        <Form.Item
-                                            label="Url Logo Mới"
-                                            name="newBrandLogoUrl"
-                                        >
-                                            <Input onChange={handleNewBrandImageChange} />
-                                        </Form.Item>
-                                    </Col>
-                                    <Col xs={24} sm={8}>
-                                        <Form.Item label="Xem trước logo mới">
-                                            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100px', border: '1px dashed #ccc', borderRadius: '4px' }}>
-                                                {newBrandImagePreview ? (
-                                                    <Image height={90} src={newBrandImagePreview} style={{ objectFit: 'contain' }}/>
-                                                ) : (
-                                                    <span style={{ color: '#bfbfbf' }}>Logo</span>
-                                                )}
-                                            </div>
-                                        </Form.Item>
-                                    </Col>
-                                </Row>
-                            </div>
-                        )}
+                        {/* --- Bỏ khối form thêm brand mới --- */}
+                        {/* {isAddingNewBrand && ( ... )} */}
 
                         <Form.Item
                             label="Mô tả sản phẩm"
@@ -283,12 +228,7 @@ const AddProduct = ({ setModalChild, handleRefresh }) => {
                             <Input.TextArea rows={4} />
                         </Form.Item>
 
-                        {/* Thông số kỹ thuật và Hỗ trợ giao nhanh có thể giữ lại nếu API add cần */}
-                        {/* <Form.Item label="Thông số kỹ thuật" name="specifications">
-                            <Input.TextArea rows={4} placeholder="Mỗi thông số trên một dòng" />
-                        </Form.Item> */}
-
-                         {/* *** Thêm lại Row cho Price và Weight *** */}
+                         {/* Row cho Price và Weight */}
                          <Row gutter={16}>
                             <Col xs={24} sm={12}>
                                 <Form.Item
@@ -304,10 +244,10 @@ const AddProduct = ({ setModalChild, handleRefresh }) => {
                                         formatter={(value) => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
                                         parser={(value) => value.replace(/\$\s?|(,*)/g, '')}
                                         style={{ width: '100%' }}
+                                        defaultValue={0} // Giá trị mặc định
                                     />
                                 </Form.Item>
                             </Col>
-                             {/* *** Thêm lại Form.Item cho Weight *** */}
                              <Col xs={24} sm={12}>
                                 <Form.Item
                                     label="Cân nặng (kg)"
@@ -317,17 +257,18 @@ const AddProduct = ({ setModalChild, handleRefresh }) => {
                                         { type: 'number', min: 0, message: 'Cân nặng phải là số không âm!'}
                                      ]}
                                 >
-                                    <InputNumber min={0} step={0.1} style={{ width: '100%' }}/>
+                                    <InputNumber
+                                        min={0}
+                                        step={0.1}
+                                        style={{ width: '100%' }}
+                                        defaultValue={0} // Giá trị mặc định
+                                    />
                                 </Form.Item>
                             </Col>
                          </Row>
-
-                        {/* <Form.Item label="Hỗ trợ giao hàng nhanh" name="supportRushOrder" valuePropName="checked">
-                            <Switch />
-                        </Form.Item> */}
                     </Col>
 
-                     {/* Cột biến thể (giữ nguyên) */}
+                     {/* Cột biến thể */}
                     <Col xs={24} md={12}>
                         <h3 style={{ marginBottom: 16, textAlign: 'center' }}>Biến thể Sản Phẩm</h3>
                         <div style={{ maxHeight: '60vh', overflowY: 'auto', paddingRight: '10px' }}>
@@ -347,9 +288,10 @@ const AddProduct = ({ setModalChild, handleRefresh }) => {
                                         <Col xs={24} sm={14}>
                                             <Form.Item
                                                 label={`Màu sắc #${index + 1}`}
-                                                required
-                                                validateStatus={!variant.color ? 'error' : ''}
-                                                help={!variant.color ? 'Vui lòng nhập màu sắc' : ''}
+                                                required // Vẫn hiển thị dấu * yêu cầu
+                                                // --- Bỏ validateStatus và help ---
+                                                // validateStatus={!variant.color ? 'error' : ''}
+                                                // help={!variant.color ? 'Vui lòng nhập màu sắc' : ''}
                                             >
                                                 <Input
                                                     placeholder="VD: Xanh dương"
@@ -362,9 +304,9 @@ const AddProduct = ({ setModalChild, handleRefresh }) => {
                                             <Form.Item label={`Url ảnh #${index + 1}`}>
                                                 <Input
                                                     placeholder="https://example.com/anh-bien-the.jpg"
-                                                    value={variant.image}
+                                                    value={variant.imageUrl} // Đổi tên state
                                                     onChange={(e) => {
-                                                        handleVariantChange(variant.key, 'image', e.target.value);
+                                                        handleVariantChange(variant.key, 'imageUrl', e.target.value); // Đổi tên field
                                                     }}
                                                 />
                                             </Form.Item>
@@ -373,14 +315,15 @@ const AddProduct = ({ setModalChild, handleRefresh }) => {
                                                     <Form.Item
                                                         label={`Số lượng #${index + 1}`}
                                                         required
-                                                        validateStatus={variant.quantity === null || variant.quantity === undefined || variant.quantity < 0 ? 'error' : ''}
-                                                        help={variant.quantity === null || variant.quantity === undefined || variant.quantity < 0 ? 'Số lượng >= 0' : ''}
+                                                        // --- Bỏ validateStatus và help ---
+                                                        // validateStatus={variant.stockQuantity === null || ... ? 'error' : ''}
+                                                        // help={variant.stockQuantity === null || ... ? 'Số lượng >= 0' : ''}
                                                     >
                                                         <InputNumber
                                                             min={0}
-                                                            value={variant.quantity}
+                                                            value={variant.stockQuantity} // Đổi tên state
                                                             onChange={(value) =>
-                                                                handleVariantChange(variant.key, 'quantity', value)
+                                                                handleVariantChange(variant.key, 'stockQuantity', value) // Đổi tên field
                                                             }
                                                             style={{ width: '100%' }}
                                                             defaultValue={0}
@@ -390,14 +333,15 @@ const AddProduct = ({ setModalChild, handleRefresh }) => {
                                                 <Col span={12}>
                                                     <Form.Item
                                                         label={`Giảm giá (%) #${index + 1}`}
-                                                        validateStatus={variant.sale < 0 || variant.sale > 100 ? 'error' : ''}
-                                                        help={variant.sale < 0 || variant.sale > 100 ? 'Từ 0 đến 100' : ''}
+                                                        // --- Bỏ validateStatus và help ---
+                                                        // validateStatus={variant.discount < 0 || ... ? 'error' : ''}
+                                                        // help={variant.discount < 0 || ... ? 'Từ 0 đến 100' : ''}
                                                     >
                                                         <InputNumber
                                                             min={0}
                                                             max={100}
-                                                            value={variant.sale}
-                                                            onChange={(value) => handleVariantChange(variant.key, 'sale', value)}
+                                                            value={variant.discount} // Đổi tên state
+                                                            onChange={(value) => handleVariantChange(variant.key, 'discount', value)} // Đổi tên field
                                                             style={{ width: '100%' }}
                                                             defaultValue={0}
                                                         />
@@ -408,10 +352,10 @@ const AddProduct = ({ setModalChild, handleRefresh }) => {
                                         <Col xs={24} sm={10}>
                                             <Form.Item label={`Ảnh xem trước #${index + 1}`}>
                                                 <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '120px', border: '1px dashed #ccc', borderRadius: '4px' }}>
-                                                    {variant.image ? (
+                                                    {variant.imageUrl ? ( // Đổi tên state
                                                         <Image
                                                             height={110}
-                                                            src={variant.image}
+                                                            src={variant.imageUrl} // Đổi tên state
                                                             style={{ objectFit: 'contain' }}
                                                         />
                                                     ) : (
@@ -436,9 +380,10 @@ const AddProduct = ({ setModalChild, handleRefresh }) => {
                     </Col>
                 </Row>
 
-                <Divider />
+                <Divider style={{ flexShrink: 0, margin: '8px 0' }} />
+               
 
-                <Form.Item style={{ textAlign: 'right', marginBottom: 0 }}>
+                <Form.Item style={{ textAlign: 'right', margin: 0 }}>
                     <Space>
                         <Button type="default" onClick={() => setModalChild(null)}>
                             Hủy Bỏ

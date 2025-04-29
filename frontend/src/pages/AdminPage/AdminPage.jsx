@@ -10,7 +10,7 @@ import {
 } from "@ant-design/icons";
 import { Badge, Button, Menu } from "antd";
 import AdminUser from "../../Components/AdminPages/AdminUser/AdminUser";
-import AdminProduct from "../../Components/AdminPages/AdminProduct/AdminProduct";
+import AdminProduct from "../../components/AdminPages/AdminProduct/AdminProduct";
 import AdminOrder from "../../Components/AdminPages/AdminOrder/AdminOrder";
 import AdminProfile from "../../Components/AdminPages/AdminProfile/AdminProfile";
 import AdminBrands from "../../components/AdminPages/AdminBrand/AdminBrands";
@@ -125,7 +125,7 @@ const Admin = () => {
             mode="inline"
             theme="dark" // Match your original background color intent
             selectedKeys={[keySelected]}
-            style={{ height: 'calc(100% - 60px)', borderRight: 0 }} // Adjust height considering button
+            style={{ height: 'auto', minHeight: '83vh', borderRight: 0 }} // Adjust height considering button
             items={items}
             inlineCollapsed={collapsed}
             onClick={handleOnClick}

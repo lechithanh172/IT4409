@@ -75,7 +75,7 @@ html, body {
   flex-direction: column; /* Stack button and menu */
   transition: width 0.2s ease-in-out;
   overflow: hidden; /* Hide menu text overflow during transition */
-  height: 100vh; /* Fill parent height */
+  height: auto; /* Fill parent height */
   align-items: center;
 }
 

@@ -174,7 +174,8 @@ const AdminBrands = () => {
             title: 'Mã',
             dataIndex: 'brandId', // Đúng dataIndex
             key: 'brandId',      // Đúng key
-            width: 50,
+            width: 80,
+            align: 'center',
             sorter: (a, b) => a.brandId - b.brandId, // Sắp xếp số
             sortDirections: ['descend', 'ascend'],
             ...getColumnSearchProps('brandId'), // Tìm kiếm theo brandId
@@ -205,7 +206,7 @@ const AdminBrands = () => {
                 <Button
                     // style={{ transform: 'scale(1.5,1.5)', textAlign: 'center' }} // Có thể bỏ scale
                     type="text"
-                    size="small"
+                    size="large"
                     danger
                     icon={<DeleteFilled />}
                     onClick={(e) => {
@@ -270,6 +271,7 @@ const AdminBrands = () => {
                     pageSizeOptions: ['5', '10', '15'],
                     showSizeChanger: true,
                     defaultPageSize: 5,
+                    size: 'default',
                     style: { marginTop: '20px' }, // Đổi thành marginTop
                 }}
             />

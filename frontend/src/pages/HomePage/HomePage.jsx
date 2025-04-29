@@ -70,9 +70,9 @@ const HomePage = () => {
   
 
   // URL ảnh mẫu (thay thế bằng ảnh của bạn)
-  const heroBgUrl = 'https://images.unsplash.com/photo-1517336714731-489689fd1ca8?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1920&q=80'; // Ví dụ ảnh nền Macbook
-  const smartphoneCatImgUrl = 'https://images.unsplash.com/photo-1604671368394-22ae7daced1 S?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80'; // Ví dụ ảnh smartphone
-  const laptopCatImgUrl = 'https://images.unsplash.com/photo-1588872657578-7efd1f1555ed?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80'; // Ví dụ ảnh laptop
+  const heroBgUrl = 'https://cdn.hoanghamobile.com/i/home/Uploads/2025/04/02/iphone-16-series-w.png'; // Ví dụ ảnh nền Macbook
+  const smartphoneCatImgUrl = 'https://cdn.hoanghamobile.com/i/home/Uploads/2025/04/15/m4-w.png'; // Ví dụ ảnh smartphone
+  const laptopCatImgUrl = 'https://cdn.hoanghamobile.com/i/home/Uploads/2025/04/28/1200x375-manlg-220425.jpg'; // Ví dụ ảnh laptop
 
   return (
     <div className={styles.homePage}>

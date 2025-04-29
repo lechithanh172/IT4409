@@ -1,103 +1,122 @@
-.contentStyle {
-    height: 160px;
-    color: #fff;
-    line-height: 160px;
-    text-align: center;
-    background: #364d79;
+/* Banner.module.css */
+
+/* --- Carousel Container --- */
+.bannerCarousel {
+  /* Optional: Set a max-width if needed, but usually it's full width */
+  width: 100%;
+  line-height: 0; /* Prevent extra space below images/containers */
 }
 
+/* --- Targeting Slick structure --- */
+/* IMPORTANT: Ensure the direct child div of the slick-slide takes up height */
+/* This is often the key fix */
+.bannerCarousel :global(.slick-slide > div),
+.bannerCarousel :global(.slick-slide > div > div) { /* Target potential nested div */
+  height: 100%; /* Make generated wrappers fill height */
+  display: block !important; /* Ensure it behaves like a block */
+}
+.bannerCarousel :global(.slick-list) {
+    /* overflow: visible !important; */ /* Sometimes helps, but can cause other issues - try if needed */
+}
+
+
+/* --- Slide Item (Where background is applied) --- */
 .bannerItem {
-    position: relative; /* Để định vị lớp phủ và nội dung */
-}
-
-.heroOverlay {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.5); /* Lớp phủ màu đen mờ */
-    z-index: 2; /* Nằm trên ảnh nền nhưng dưới nội dung */
-}
-
-.contentStyle {
-    margin: 0;
-}
-
-.heroContent {
-    position: absolute; /* Để nằm trên lớp phủ */
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%); /* Căn giữa nội dung theo chiều ngang và dọc */
-    z-index: 3;
-    max-width: 800px; /* Giới hạn chiều rộng nội dung */
-    padding: 20px;
-}
-
-.bannerImage {
     position: relative;
     width: 100%;
-    height: 70vh;
-    display: block;
-    object-fit: cover;
-    z-index: 1;
-    /* opacity: 0.5; */
+    height: 70vh;      /* DEFINE HEIGHT HERE */
+    min-height: 400px; /* Add a minimum height */
+    overflow: hidden;
+    display: flex;     /* Use flex for centering overlay content */
+    align-items: center;
+    justify-content: center;
+
+    /* Background properties */
+    background-size: cover;
+    background-position: center center;
+    background-repeat: no-repeat;
+
+    /* Add a fallback background color for testing */
+    /* background-color: #222;  */ /* Uncomment this to test if the div size is correct */
 }
 
-/* === Hero Section Elements === */
+/* --- Overlay --- */
+.heroOverlay {
+    position: absolute;
+    inset: 0; /* Shortcut for top: 0; left: 0; right: 0; bottom: 0; */
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 1;
+}
+
+/* --- Content --- */
+.heroContent {
+    position: relative; /* Relative to the flex container now */
+    z-index: 2;         /* Above overlay */
+    max-width: 800px;
+    width: 90%;
+    padding: 20px;
+    text-align: center;
+    color: #fff;
+}
+
+/* --- Text/Button Styles (Keep as is from your original) --- */
 .heroTitle {
     font-size: 2.8rem;
     font-weight: 700;
     margin-bottom: 15px;
     line-height: 1.2;
-    color: #fff; /* Màu chữ trên nền tối */
-    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
-  }
-  
-  .heroSubtitle {
+    color: #fff;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.6);
+}
+
+.heroSubtitle {
     font-size: 1.2rem;
     margin-bottom: 30px;
     font-weight: 300;
-    color: #fff; /* Màu chữ trên nền tối */
-    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
-  }
-  
-  .heroCtaButton {
-    padding: 12px 30px;
-    font-size: 1.1rem;
-    font-weight: 600;
-  }
-  
-  /* === Responsive tweaks === */
-  @media (max-width: 992px) {
-    .heroTitle {
-      font-size: 2.5rem;
-    }
-    .heroSubtitle {
-      font-size: 1.1rem;
-    }
-  }
-  
-  @media (max-width: 768px) {
-    .heroTitle {
-      font-size: 2rem;
-    }
-    .heroSubtitle {
-      font-size: 1rem;
-    }
-  }
-  
-  @media (max-width: 576px) {
-    .heroTitle {
-      font-size: 1.8rem;
-    }
-    .heroSubtitle {
-      font-size: 0.9rem;
-      margin-bottom: 20px;
-    }
+    color: rgba(255, 255, 255, 0.95);
+    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
+}
+
+.heroCtaButton {
+    padding: 10px 25px !important;
+    font-size: 1.1rem !important;
+    font-weight: 600 !important;
+    /* Ghost button styles usually work well */
+}
+
+/* --- Responsive (Keep as is from your original) --- */
+@media (max-width: 992px) {
+    .bannerItem { height: 65vh; min-height: 350px; }
+    .heroTitle { font-size: 2.5rem; }
+    .heroSubtitle { font-size: 1.1rem; }
+}
+
+@media (max-width: 768px) {
+    .bannerItem { height: 60vh; min-height: 300px; }
+    .heroTitle { font-size: 2rem; }
+    .heroSubtitle { font-size: 1rem; }
+    .heroContent { width: 95%; padding: 15px; }
+}
+
+@media (max-width: 576px) {
+    .bannerItem { height: 55vh; min-height: 280px; }
+    .heroTitle { font-size: 1.8rem; margin-bottom: 10px; }
+    .heroSubtitle { font-size: 0.9rem; margin-bottom: 20px; }
     .heroCtaButton {
-      padding: 10px 20px;
-      font-size: 1rem;
+        padding: 8px 20px !important;
+        font-size: 1rem !important;
     }
-  }
-  
+}
+
+/* --- Carousel Dots Styling (Keep or adjust) --- */
+.bannerCarousel :global(.slick-dots li button) {
+    background: rgba(255, 255, 255, 0.5) !important;
+    height: 8px !important;
+    width: 8px !important;
+    border-radius: 50% !important;
+}
+.bannerCarousel :global(.slick-dots li.slick-active button) {
+    background: #fff !important;
+    width: 10px !important;
+    border-radius: 4px !important;
+}

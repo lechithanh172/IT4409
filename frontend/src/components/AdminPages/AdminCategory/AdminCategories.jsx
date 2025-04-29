@@ -147,7 +147,7 @@ const AdminCategories = () => {
             dataIndex: 'categoryId',
             key: 'categoryId',
             align: 'center',
-            width: 80, // Giảm lại chút
+            width: 100, // Giảm lại chút
             sorter: (a, b) => a.categoryId - b.categoryId,
             ...getColumnSearchProps('categoryId'),
         },
@@ -155,13 +155,13 @@ const AdminCategories = () => {
             title: 'Ảnh',
             dataIndex: 'imageUrl',
             key: 'imageUrl',
-            width: 120, // Giảm lại chút
+            width: 200, // Giảm lại chút
             align: 'center',
             render: (imageUrl) => imageUrl ? (
                 <Image
-                    width={60}
+                    width={90}
                     src={imageUrl}
-                    style={{ objectFit: 'contain', maxHeight: '40px' }}
+                    style={{ objectFit: 'contain', maxHeight: '130px' }}
                     preview={true}
                 />
             ) : (
@@ -200,7 +200,7 @@ const AdminCategories = () => {
 
     return (
         // Bọc div giới hạn chiều rộng
-        <div style={{ maxWidth: '900px', margin: '20px auto' }}>
+        <div style={{ maxWidth: '1200px', margin: '20px auto' }}>
             <Space style={{ marginBottom: 16 }}>
                 <Button
                     type="primary"

@@ -27,19 +27,23 @@ public class OrderService {
     @Autowired
     JwtService jwtService;
 
-    public boolean createOrder(OrderRequest orderRequest, String token) {
-        if(orderRequest.getItems().length == 0) return false;
+    public Integer createOrder(OrderRequest orderRequest, String token) {
+        if(orderRequest.getItems().length == 0) return -1;
         User user = userService.getInfo(token).get();
         Order order = new Order(orderRequest, user.getUserId());
-        order.setShippingFee(shippingFeeCalculate(orderRequest));
+//        order.setShippingFee(shippingFeeCalculate(orderRequest));
+        // tạm thời trước khi update địa chỉ
+        order.setShippingFee(50000);
+
         Long totalAmount = 0L;
         for(Item item : orderRequest.getItems()) {
             Product product = productRepository.findById(item.getProductId()).get();
             totalAmount += product.getPrice() * item.getQuantity();
         }
         order.setTotalAmount(totalAmount);
+        order.setNote(orderRequest.getNote());
         orderRepository.save(order);
-        return true;
+        return order.getOrderId();
     }
 
     public Integer shippingFeeCalculate(OrderRequest orderRequest) {
@@ -62,8 +66,12 @@ public class OrderService {
     public List<Order> getOrderHistory(Integer userId) {
         return orderRepository.findOrdersByUserId(userId);
     }
+
     public List<Order> getOrderByStatus(OrderStatus status) {
         return orderRepository.findOrdersByStatus(status);
+    }
+    public List<Order> getAllOrders() {
+        return orderRepository.findAll();
     }
 
 }

@@ -41,7 +41,7 @@ public class ProductService {
         dto.setWeight(product.getWeight());
         String category = categoryRepository.findByCategoryId(product.getCategoryId()).get().getCategoryName();
 
-        System.out.println(category);
+//        System.out.println(category);
         String brand = brandRepository.findByBrandId(product.getBrandId()).get().getBrandName();
         dto.setCategoryName(category);
         dto.setBrandName(brand);
@@ -92,6 +92,9 @@ public class ProductService {
 
         product.setVariants(variants);
         return product;
+    }
+    public List<Product> getAllProducts() {
+        return productRepository.findAll();
     }
     public Product getProductByProductName(String productName) {
         return productRepository.findByProductName(productName).get();
@@ -220,6 +223,14 @@ public class ProductService {
             return response;
         }
         else return null;
+    }
+
+    public boolean deleteVariant(Integer variantId) {
+        if (!productVariantRepository.existsById(variantId)) {
+            return false;
+        }
+        productVariantRepository.deleteById(variantId);
+        return true;
     }
 
 

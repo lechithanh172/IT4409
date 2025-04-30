@@ -30,10 +30,16 @@ public class Order {
 
     private Long totalAmount;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "status")
     private OrderStatus status = OrderStatus.PENDING;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "payment_method")
     private PaymentMethod paymentMethod;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "delivery_method")
     private DeliveryMethod deliveryMethod;
 
     private LocalDateTime createdAt = LocalDateTime.now();

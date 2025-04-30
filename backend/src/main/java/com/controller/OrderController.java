@@ -29,8 +29,9 @@ public class OrderController {
 
     @PostMapping("/create")
     public ResponseEntity<?> createOrder(@RequestBody OrderRequest request, @RequestHeader("Authorization") String token) {
-        if(orderService.createOrder(request, token)) {
-            return ResponseEntity.status(200).body("Order created successfully");
+        Integer orderCodeReturn = orderService.createOrder(request, token);
+        if(orderCodeReturn != -1) {
+            return ResponseEntity.status(200).body(orderService.getOrderById(orderCodeReturn));
         }
         else return ResponseEntity.status(400).body("Order creation failed");
     }
@@ -45,13 +46,17 @@ public class OrderController {
         }
         else return ResponseEntity.status(404).body(new StatusResponse("User not found"));
     }
+    @GetMapping("view/all")
+    public ResponseEntity<?> viewAllOrders() {
+        return ResponseEntity.status(200).body(orderService.getAllOrders());
+    }
     @GetMapping("/view/{orderId}")
     public ResponseEntity<?> viewOrders(@PathVariable Integer orderId, @RequestHeader("Authorization") String token) {
         Optional<User> u = userService.getInfo(token);
         Optional<Order> order = orderService.getOrderById(orderId);
         if(u.isPresent() && order.isPresent()) {
-            if(u.get().getUserId().equals(order.get().getUserId()) || jwtService.extractRole(token).equals(Role.ADMIN) || jwtService.extractRole(token).equals(Role.PRODUCT_MANAGER)) {
-                return ResponseEntity.status(200).body(orderService.getOrderHistory(u.get().getUserId()));
+            if(u.get().getUserId().equals(order.get().getUserId()) || jwtService.extractRole(token).equals(Role.ADMIN)) {
+                return ResponseEntity.status(200).body(order.get());
             }
             else return ResponseEntity.status(403).body(new StatusResponse("Access Denied"));
         }
@@ -68,14 +73,22 @@ public class OrderController {
         catch (IllegalArgumentException e) {
             return ResponseEntity.status(400).body(new StatusResponse("Invalid order status"));
         }
-
     }
     @PostMapping("/approve/{orderId}")
     public ResponseEntity<?> approveOrder(@PathVariable Integer orderId) {
         Optional<Order> order = orderService.getOrderById(orderId);
         if(order.isPresent()) {
             order.get().setStatus(OrderStatus.APPROVED);
-            return ResponseEntity.status(200).body("Order approved successfully");
+            return ResponseEntity.status(200).body("Approve order successfully");
+        }
+        else return ResponseEntity.status(404).body(new StatusResponse("Order not found"));
+    }
+    @PostMapping("/reject/{orderId}")
+    public ResponseEntity<?> rejectOrder(@PathVariable Integer orderId) {
+        Optional<Order> order = orderService.getOrderById(orderId);
+        if(order.isPresent()) {
+            order.get().setStatus(OrderStatus.REJECTED);
+            return ResponseEntity.status(200).body("Reject order successfully");
         }
         else return ResponseEntity.status(404).body(new StatusResponse("Order not found"));
     }

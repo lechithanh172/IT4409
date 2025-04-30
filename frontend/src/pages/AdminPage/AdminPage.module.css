@@ -1,10 +1,11 @@
 /* AdminPage.module.css */
 
-/* Keep existing html, body, #root styles if they work for you */
+/* --- Global Styles (Keep if they work) --- */
 html, body {
   height: 100%;
   margin: 0;
-  overflow: hidden; /* Prevent double scrollbars */
+  /* overflow: hidden; Consider removing if content needs to scroll window */
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
 }
 
 #root {
@@ -13,151 +14,186 @@ html, body {
   flex-direction: column;
 }
 
-/* Header Styles - Keep as is */
+/* --- Header Styles (Using Ant Design Layout.Header) --- */
 .header {
-  /* position: fixed; top: 0; width: 100%; */ /* Already defined */
-  height: 60px;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 0 20px; /* Consistent padding */
-  background-color: #1f2937;
-  color: white;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  z-index: 1000;
-  flex-shrink: 0; /* Prevent header from shrinking */
+  padding: 0 24px;
+  background-color: #001529; /* Ant Design dark theme color */
+  color: #fff;
+  height: 64px;
+  position: sticky; /* Make header sticky */
+  top: 0;
+  z-index: 100;
+  border-bottom: 1px solid #002140; /* Subtle separator */
+  flex-shrink: 0; /* Prevent header shrinking */
 }
 
-.headerTitle {
-  margin: 0;
-  font-size: 1.5em;
-  font-weight: 600;
-  color: #61dafb; /* Example color */
-}
-
-.headerButton { /* Style for logout button */
-  padding: 8px 16px;
-  background-color: transparent; /* Make it ghost-like */
-  border: 1px solid #61dafb; /* Match title color */
-  border-radius: 5px;
-  cursor: pointer;
-  color: #61dafb;
-  font-weight: bold;
-  transition: background-color 0.3s ease, color 0.3s ease;
-}
-
-.headerButton:hover {
-  background-color: #61dafb;
-  color: #1f2937; /* Dark text on hover */
-}
-
-.notificationIcon /* If needed for specific bell styling */ {
-  /* Add styles if needed */
-}
-
-/* === NEW Layout Structure === */
-
-.mainLayout {
+.logoArea {
   display: flex;
-  flex-grow: 1; /* Takes remaining height in the #root flex column */
-  /* No margin-top needed as it naturally sits below the header in the flex flow */
-  overflow: hidden; /* Prevent layout issues */
-  background-color: #f3f4f6; /* Background for the overall content area */
-}
-
-/* Sidebar Wrapper */
-.sidebarWrapper {
-  width: 180px; /* Your desired expanded width */
-  flex-shrink: 0; /* Don't shrink */
-  background-color: #1f2937; /* Dark background */
-  color: #d1d5db;
-  display: flex;
-  flex-direction: column; /* Stack button and menu */
-  transition: width 0.2s ease-in-out;
-  overflow: hidden; /* Hide menu text overflow during transition */
-  height: auto; /* Fill parent height */
   align-items: center;
 }
 
-.sidebarWrapperCollapsed {
-  width: 80px; /* Ant Design default collapsed width */
+.logoImg { /* Style if using an image logo */
+  height: 32px;
+  margin-right: 16px;
 }
 
-/* Collapse Button */
-.collapseButton {
-  height: 40px; /* Adjust height */
-  color: #d1d5db;
-  text-align: center;
-  line-height: 40px;
+.headerTitle {
+  color: rgba(255, 255, 255, 0.85) !important;
+  margin: 0 !important;
+  font-weight: 600;
+  font-size: 20px;
+}
+
+.headerRight {
+  /* Container for right-side elements */
+}
+
+.headerIcon {
+  color: rgba(255, 255, 255, 0.85) !important;
+  font-size: 18px;
+}
+.headerIcon:hover {
+   color: #fff !important;
+}
+
+.avatarLink {
+  display: inline-block;
   cursor: pointer;
-  background-color: rgba(255, 254, 254, 0.05); /* Subtle background */
-  color: rgb(255, 255, 255);
-  flex-shrink: 0; /* Don't shrink */
-  margin-inline: 4px;
-  margin-block: 4px;
-  width: calc(100% - 8px) !important;
+  padding: 0 8px; /* Add some padding for easier clicking */
+  border-radius: 4px;
+  transition: background-color 0.3s;
+}
+.avatarLink:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.avatar {
+  background-color: rgba(255, 255, 255, 0.25);
+  vertical-align: middle; /* Align avatar nicely with text/icons */
+}
+
+.username { /* Style for optional username */
+  color: rgba(255, 255, 255, 0.85);
+  margin-left: 8px;
+  vertical-align: middle;
+}
+
+
+/* --- Sidebar Styles (Using Ant Design Layout.Sider) --- */
+.sidebar {
+  height: calc(100vh - 64px); /* Full height minus header */
+  position: sticky !important; /* Make sidebar sticky */
+  top: 64px; /* Position below the header */
+  left: 0;
+  overflow: hidden; /* Hide scrollbars, menu handles its own scroll */
+  background-color: #001529 !important; /* Ensure bg color */
+  display: flex; /* Use flex to position collapse button */
+  flex-direction: column; /* Stack menu and button */
+}
+
+/* --- Ant Design Menu Styles within Sidebar --- */
+/* Let Menu handle its own scrolling within the flex container */
+.sidebar .ant-menu {
+  flex-grow: 1; /* Allow menu to take up available space */
+  background: transparent !important; /* Inherit Sider background */
+  border-right: none !important;
+}
+
+.sidebar .ant-menu-item,
+.sidebar .ant-menu-submenu-title {
+  color: rgba(255, 255, 255, 0.65); /* Default menu item color */
+  margin: 4px 8px !important; /* Item margin */
+  width: calc(100% - 16px) !important; /* Item width accounting for margin */
+  border-radius: 4px;
+}
+
+.sidebar .ant-menu-item:hover,
+.sidebar .ant-menu-submenu-title:hover {
+  color: #fff !important;
+  background-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+.sidebar .ant-menu-item-selected {
+  background-color: #1677ff !important; /* Ant Design primary blue */
+  color: #fff !important;
+  font-weight: 600;
+}
+
+.sidebar .ant-menu-item .anticon,
+.sidebar .ant-menu-submenu-title .anticon {
+  color: rgba(255, 255, 255, 0.65); /* Default icon color */
+}
+.sidebar .ant-menu-item:hover .anticon,
+.sidebar .ant-menu-submenu-title:hover .anticon,
+.sidebar .ant-menu-item-selected .anticon {
+  color: #fff; /* Icon color on hover/selected */
+}
+
+/* --- Custom Collapse Button --- */
+.collapseButton {
+  height: 48px; /* Button height */
+  line-height: 48px; /* Center icon vertically */
+  color: rgba(255, 255, 255, 0.65) !important;
+  background: #002140 !important; /* Slightly different background */
+  border: none !important;
+  border-radius: 0 !important; /* Square edges */
+  width: 100% !important; /* Full width */
+  text-align: center;
+  cursor: pointer;
+  font-size: 16px;
+  flex-shrink: 0; /* Prevent button shrinking */
+  transition: color 0.3s;
 }
 .collapseButton:hover {
-  background-color: rgba(255, 255, 255, 0.516) !important;
+   color: #fff !important;
+   background: #002a52 !important; /* Darker hover */
 }
 
-/* Ant Design Menu inside the sidebar */
-.menuAntd {
-  flex-grow: 1; /* Take remaining space */
-  overflow-y: auto; /* Scroll if needed */
-  overflow-x: hidden;
-  background-color: transparent !important; /* Ensure menu uses wrapper background */
-  border-right: none !important; /* Override default border */
+/* --- Content Area Styles --- */
+.contentLayout {
+  padding: 24px;
+  background-color: #f0f2f5; /* Light grey background for the area outside content */
+  min-height: calc(100vh - 64px);
+  overflow-y: auto; /* Allow this layout part to scroll if needed */
 }
 
-.menuAntd .ant-menu-item {
-  color: #d1d5db;
-  margin: 4px 8px !important; /* Add some margin */
-  width: calc(100% - 16px) !important; /* Adjust width considering margin */
-  border-radius: 5px;
-}
-
-.menuAntd .ant-menu-item:hover {
-  background-color: #3b82f6 !important;
-  color: white !important;
-}
-
-.menuAntd .ant-menu-item-selected {
-  background-color: #2563eb !important; /* Slightly darker blue for selected */
-  color: white !important;
-  font-weight: bold;
-}
-
-/* Adjust icon color */
-.menuAntd .ant-menu-item .anticon {
-  color: #9ca3af;
-}
-.menuAntd .ant-menu-item:hover .anticon,
-.menuAntd .ant-menu-item-selected .anticon {
-  color: white;
-}
-
-
-/* Content Wrapper */
 .contentWrapper {
-  flex-grow: 1; /* Take remaining horizontal space */
-  padding: 20px; /* Padding around content */
-  overflow-y: auto; /* Allow content itself to scroll */
-  height: 100%; /* Fill parent height */
-  background-color: #f3f4f6; /* Light background for content */
-  min-width: 0; /* Prevent flex overflow issues */
+  background-color: #fff; /* White background for the main content */
+  padding: 24px;
+  min-height: 100%; /* Fill the padded area */
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
 }
 
-/* Remove old fixed positioning styles */
-/*
-.menuContainer { ... } -> Replaced by .sidebarWrapper
-.content { ... } -> Replaced by .contentWrapper
-*/
 
-/* Keep your existing styles for Tooltip, Table, Buttons etc. */
-/* Ensure Tooltip position: fixed works as intended */
+/* --- Responsive Adjustments (Example) --- */
+@media (max-width: 768px) {
+  .header {
+    padding: 0 16px;
+  }
+  .headerTitle {
+    font-size: 18px;
+  }
+  .username {
+    display: none; /* Hide username on small screens */
+  }
+  .contentLayout {
+    padding: 16px;
+  }
+  .contentWrapper {
+    padding: 16px;
+  }
+  /* Consider auto-collapsing sidebar on small screens */
+  /* .sidebar { width: 80px !important; } */
+}
+
+/* Keep your specific component styles (Tooltip, Table etc.) */
 .tooltip {
-  position: fixed; /* Keep fixed for tooltip */
+  /* ... your existing tooltip styles ... */
+  position: fixed;
   top: 65px; /* Position below header */
   right: 20px;
   z-index: 9999;
@@ -169,31 +205,4 @@ html, body {
   color: #333; /* Ensure text is visible */
 }
 
-.ant-table-placeholder {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #9ca3af;
-  font-size: 1em;
-  padding: 20px;
-  background-color: #f9fafb;
-  border-radius: 8px;
-  margin-top: 20px;
-}
-
-.add-product-button {
-  display: inline-block;
-  margin: 20px 0;
-  padding: 10px 20px;
-  background-color: #2563eb;
-  color: white;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  font-weight: bold;
-  transition: background-color 0.3s ease;
-}
-
-.add-product-button:hover {
-  background-color: #1e40af;
-}
+/* ... other specific styles for tables, buttons inside content ... */

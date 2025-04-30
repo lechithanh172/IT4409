@@ -174,7 +174,7 @@ const AdminBrands = () => {
             title: 'Mã',
             dataIndex: 'brandId', // Đúng dataIndex
             key: 'brandId',      // Đúng key
-            width: 80,
+            width: 150,
             align: 'center',
             sorter: (a, b) => a.brandId - b.brandId, // Sắp xếp số
             sortDirections: ['descend', 'ascend'],
@@ -184,14 +184,14 @@ const AdminBrands = () => {
             title: 'Logo',
             dataIndex: 'logoUrl',
             key: 'logoUrl',
-            width: 150,
-            render: (logoUrl) => logoUrl ? <Image width={100} src={logoUrl} style={{objectFit:'contain'}} /> : null,
+            align: 'center',
+            width: 300,
+            render: (logoUrl) => logoUrl ? <Image width={100} src={logoUrl} preview={false} style={{objectFit:'contain'}} /> : null,
         },
         {
             title: 'Tên Thương Hiệu',
             dataIndex: 'name', // Đúng dataIndex
             key: 'name',       // Đúng key
-            width: 150,
             ellipsis: true,
             sorter: (a, b) => a.name.localeCompare(b.name), // Sắp xếp theo tên
             sortDirections: ['descend', 'ascend'],
@@ -247,6 +247,7 @@ const AdminBrands = () => {
                 {modalChild}
             </Modal>
             <Table
+                bordered // Thêm viền
                 onRow={(record, rowIndex) => {
                     return {
                         onClick: () => {

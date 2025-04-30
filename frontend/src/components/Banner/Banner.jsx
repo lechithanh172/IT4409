@@ -1,59 +1,42 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import Button from '../../components/Button/Button';
-import { Carousel } from 'antd';
-import styles from './Banner.module.css';
-const heroBgUrl = 'https://images.unsplash.com/photo-1517336714731-489689fd1ca8?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1920&q=80'; // Ví dụ ảnh nền Macbook
-const laptopCatImgUrl = 'https://cdn.hoanghamobile.com/i/home/Uploads/2025/04/04/xiaomi-14-5g-mo-ban-web_638793576531280349.jpg'; // Ví dụ ảnh laptop
-const smartphoneCatImgUrl = 'https://cdn.hoanghamobile.com/i/home/Uploads/2025/04/22/a56-a36-1200x375-2.jpg'; // Ví dụ ảnh smartphone
+import { Carousel, Button as AntButton } from 'antd'; // Import Ant Button
+import styles from './Banner.module.css'; // Use your specific CSS module
+
+// Image URLs
+const heroBgUrl = 'https://cdn.hoanghamobile.com/i/home/Uploads/2025/04/02/iphone-16-series-w.png';
+const smartphoneCatImgUrl = 'https://cdn.hoanghamobile.com/i/home/Uploads/2025/04/15/m4-w.png';
+const laptopCatImgUrl = 'https://cdn.hoanghamobile.com/i/home/Uploads/2025/04/28/1200x375-manlg-220425.jpg';
+
+// Define Banner Slides Data
+const bannerSlides = [
+  { key: 'slide1', imageUrl: heroBgUrl, alt: '...', title: 'Khám Phá iPhone 16 Series', subtitle: '...', link: '/products?brand=Apple', buttonText: 'Xem Ngay' },
+  { key: 'slide2', imageUrl: smartphoneCatImgUrl, alt: '...', title: 'Sức Mạnh M4 Mới', subtitle: '...', link: '/products?category=Tablet', buttonText: 'Tìm Hiểu Thêm' },
+  { key: 'slide3', imageUrl: laptopCatImgUrl, alt: '...', title: 'Màn Hình LG Chất Lượng Cao', subtitle: '...', link: '/products?brand=LG', buttonText: 'Khám Phá Màn Hình' },
+];
 
 const Banner = () => (
-  <Carousel autoplay={{ dotDuration: true }} autoplaySpeed={2000} >
-    <div className={styles.bannerItem}>
-      <img src={heroBgUrl} alt="Banner 1" className={styles.bannerImage} />
-      <div className={styles.heroOverlay}></div> {/* Lớp phủ mờ */}
-      <div className={styles.heroContent}>
-        <h1 className={styles.heroTitle}>Khám Phá Thế Giới Công Nghệ</h1>
-        <p className={styles.heroSubtitle}>
-          Tìm kiếm Smartphone & Laptop mới nhất với giá tốt nhất.
-        </p>
-        <Link to="/products">
-          <Button variant="primary" className={styles.heroCtaButton}>
-            Mua Sắm Ngay
-          </Button>
-        </Link>
+  <Carousel autoplay autoplaySpeed={3000} effect="fade" className={styles.bannerCarousel}>
+    {bannerSlides.map(slide => (
+      <div key={slide.key}> {/* Outer div for Carousel */}
+        <div
+          className={styles.bannerItem}
+          style={{ backgroundImage: `url(${slide.imageUrl})` }}
+          aria-label={slide.alt}
+        >
+          <div className={styles.heroOverlay}></div>
+          <div className={styles.heroContent}>
+            <h1 className={styles.heroTitle}>{slide.title}</h1>
+            <p className={styles.heroSubtitle}>{slide.subtitle}</p>
+            <Link to={slide.link}>
+              <AntButton type="primary" size="large" ghost className={styles.heroCtaButton}>
+                {slide.buttonText}
+              </AntButton>
+            </Link>
+          </div>
+        </div>
       </div>
-    </div>
-    <div className={styles.bannerItem}>
-      <img src={smartphoneCatImgUrl} alt="Banner 1" className={styles.bannerImage} />
-      <div className={styles.heroOverlay}></div> {/* Lớp phủ mờ */}
-      <div className={styles.heroContent}>
-        <h1 className={styles.heroTitle}>Khám Phá Thế Giới Công Nghệ</h1>
-        <p className={styles.heroSubtitle}>
-          Tìm kiếm Smartphone & Laptop mới nhất với giá tốt nhất.
-        </p>
-        <Link to="/products">
-          <Button variant="primary" className={styles.heroCtaButton}>
-            Mua Sắm Ngay
-          </Button>
-        </Link>
-      </div>
-    </div>
-    <div className={styles.bannerItem}>
-      <img src={laptopCatImgUrl} alt="Banner 1" className={styles.bannerImage} />
-      <div className={styles.heroOverlay}></div> {/* Lớp phủ mờ */}
-      <div className={styles.heroContent}>
-        <h1 className={styles.heroTitle}>Khám Phá Thế Giới Công Nghệ</h1>
-        <p className={styles.heroSubtitle}>
-          Tìm kiếm Smartphone & Laptop mới nhất với giá tốt nhất.
-        </p>
-        <Link to="/products">
-          <Button variant="primary" className={styles.heroCtaButton}>
-            Mua Sắm Ngay
-          </Button>
-        </Link>
-      </div>
-    </div>
+    ))}
   </Carousel>
 );
 export default Banner;

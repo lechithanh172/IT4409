@@ -1,15 +1,20 @@
 // AdminCategories.jsx
 import React, { useEffect, useRef, useState } from 'react';
+// --- Import các component từ Ant Design ---
 import { Button, Modal, Space, Table, message, Input, Image } from 'antd';
+// --- Import các icon ---
 import { PlusCircleFilled, DeleteFilled, ExclamationCircleFilled, SearchOutlined } from '@ant-design/icons';
-import Highlighter from 'react-highlight-words';
-import AddCategory from './AddCategory';
-import EditCategory from './EditCategory';
+// --- Import các component/module khác ---
+import Highlighter from 'react-highlight-words'; // Component để highlight text tìm kiếm
+import AddCategory from './AddCategory';      // Component để thêm danh mục
+import EditCategory from './EditCategory';    // Component để sửa danh mục
 import apiService from '../../../services/api'; // Đảm bảo import service
 
+// Destructure confirm từ Modal để dùng trực tiếp
 const { confirm } = Modal;
 
-// Dữ liệu cứng (key không có ngoặc kép, đã có imageUrl)
+// --- Dữ liệu cứng (Hardcoded Data) ---
+// Dữ liệu mẫu dùng khi chưa kết nối API
 const allCategory = [
   { categoryId: 1, name: "Laptop", description: "Portable personal computers", imageUrl: "https://hanoicomputercdn.com/media/product/89677_laptop_lenovo_ideapad_slim_5_14irh10_83k0000avn_i5_13420h_24gb_ram_512gb_ssd_14_wuxga_win11_xam_0005_layer_2.jpg" },
   { categoryId: 2, name: "Tablet", description: "Touchscreen mobile devices", imageUrl: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRtSLFI5VEetrtdyPEDnn55_2OTomtzGFwzSQ&s" },
@@ -26,217 +31,208 @@ const allCategory = [
   { categoryId: 16, name: "tv", description: "Televisions", imageUrl: null }
 ];
 
-// Giả định apiService có hàm deleteCategory như sau:
+// --- API Giả định (Commented out) ---
 // apiService = {
 //   ...
 //   deleteCategory: (categoryId) => apiInstance.delete("/category/delete", { params: { categoryId } }),
+//   getAllCategories: () => apiInstance.get("/categories"),
 //   ...
 // }
 
+// --- Component Chính ---
 const AdminCategories = () => {
-    const [refresh, setRefresh] = useState(false);
-    const [categories, setCategories] = useState([]);
-    const [modalChild, setModalChild] = useState(null);
-    const [loading, setLoading] = useState(false);
-    const [searchText, setSearchText] = useState('');
-    const [searchedColumn, setSearchedColumn] = useState('');
-    const searchInput = useRef(null);
+    // --- State Hooks ---
+    const [refresh, setRefresh] = useState(false);            // State trigger làm mới
+    const [categories, setCategories] = useState([]);         // State lưu danh sách danh mục
+    const [modalChild, setModalChild] = useState(null);       // State chứa component con cho Modal (Add/Edit)
+    const [loading, setLoading] = useState(false);            // State loading bảng
+    const [searchText, setSearchText] = useState('');         // State text tìm kiếm
+    const [searchedColumn, setSearchedColumn] = useState(''); // State cột đang tìm kiếm
+    const searchInput = useRef(null);                         // Ref input tìm kiếm
 
+    // --- useEffect để tải dữ liệu ---
     useEffect(() => {
         const fetchData = async () => {
-            setLoading(true);
+            setLoading(true); // Bắt đầu loading
             try {
-                // --- Gọi API ---
+                // --- Phần gọi API thật (Đang comment) ---
                 // const response = await apiService.getAllCategories();
                 // const rawData = response.data || [];
 
-                // --- Dùng dữ liệu cứng ---
+                // --- Sử dụng dữ liệu cứng ---
                 const rawData = allCategory;
 
+                // Kiểm tra dữ liệu có phải mảng không
                 if (Array.isArray(rawData)) {
-                    setCategories(rawData);
+                    setCategories(rawData); // Cập nhật state
                 } else {
                     console.error('Dữ liệu category không phải mảng:', rawData);
-                    setCategories([]);
+                    setCategories([]); // Set mảng rỗng nếu lỗi
                 }
-            } catch (error) {
-                console.error('Error fetching categories:', error);
+            } catch (error) { // Xử lý lỗi API
+                console.error('Lỗi khi tải danh mục:', error);
                 // message.error('Không thể lấy dữ liệu danh mục'); // Tạm ẩn nếu dùng data cứng
                 setCategories([]);
             } finally {
-                setLoading(false);
+                setLoading(false); // Kết thúc loading
             }
         };
-        fetchData();
-    }, [refresh]);
+        fetchData(); // Gọi hàm tải dữ liệu
+    }, [refresh]); // Chạy lại khi `refresh` thay đổi
 
+    // --- Hàm làm mới dữ liệu ---
     const onRefresh = () => setRefresh((prev) => !prev);
 
+    // --- Logic Tìm kiếm trong cột ---
     const handleSearch = (selectedKeys, confirm, dataIndex) => {
-        confirm();
-        setSearchText(selectedKeys[0]);
-        setSearchedColumn(dataIndex);
+        confirm(); // Xác nhận filter
+        setSearchText(selectedKeys[0]); // Lưu text
+        setSearchedColumn(dataIndex); // Lưu cột
     };
-
     const handleReset = (clearFilters, confirm, dataIndex) => {
-        clearFilters && clearFilters();
-        setSearchText('');
-        confirm({ closeDropdown: false });
-        setSearchedColumn('');
+        clearFilters && clearFilters(); // Xóa filter của Ant Table
+        setSearchText('');             // Reset text
+        confirm({ closeDropdown: false }); // Xác nhận, giữ dropdown mở
+        setSearchedColumn('');         // Reset cột
     };
-
+    // Hàm cấu hình tìm kiếm cho cột
     const getColumnSearchProps = (dataIndex) => ({
-        filterDropdown: ({ setSelectedKeys, selectedKeys, confirm, clearFilters, close }) => (
+        filterDropdown: ({ setSelectedKeys, selectedKeys, confirm, clearFilters, close }) => ( // Giao diện dropdown filter
             <div style={{ padding: 8 }} onKeyDown={(e) => e.stopPropagation()}>
                 <Input ref={searchInput} placeholder={`Tìm ${dataIndex === 'categoryId' ? 'mã' : 'tên'}`} value={selectedKeys[0]} onChange={(e) => setSelectedKeys(e.target.value ? [e.target.value] : [])} onPressEnter={() => handleSearch(selectedKeys, confirm, dataIndex)} style={{ marginBottom: 8, display: 'block' }} />
                 <Space> <Button type="primary" onClick={() => handleSearch(selectedKeys, confirm, dataIndex)} icon={<SearchOutlined />} size="small" style={{ width: 90 }}>Tìm</Button> <Button onClick={() => clearFilters && handleReset(clearFilters, confirm, dataIndex)} size="small" style={{ width: 90 }}>Reset</Button> <Button type="link" size="small" onClick={() => close()}>Đóng</Button> </Space>
             </div>
         ),
-        filterIcon: (filtered) => <SearchOutlined style={{ color: filtered ? '#1677ff' : undefined }} />,
-        onFilter: (value, record) => record[dataIndex] ? record[dataIndex].toString().toLowerCase().includes(value.toLowerCase()) : '',
-        onFilterDropdownOpenChange: (visible) => { if (visible) { setTimeout(() => searchInput.current?.select(), 100); } },
-        render: (text) => searchedColumn === dataIndex ? ( <Highlighter highlightStyle={{ backgroundColor: '#ffc069', padding: 0 }} searchWords={[searchText]} autoEscape textToHighlight={text ? text.toString() : ''} /> ) : ( text ),
+        filterIcon: (filtered) => <SearchOutlined style={{ color: filtered ? '#1677ff' : undefined }} />, // Icon trên header cột
+        onFilter: (value, record) => record[dataIndex] ? record[dataIndex].toString().toLowerCase().includes(value.toLowerCase()) : '', // Hàm lọc client-side
+        onFilterDropdownOpenChange: (visible) => { if (visible) { setTimeout(() => searchInput.current?.select(), 100); } }, // Focus input khi mở
+        render: (text) => searchedColumn === dataIndex ? ( <Highlighter highlightStyle={{ backgroundColor: '#ffc069', padding: 0 }} searchWords={[searchText]} autoEscape textToHighlight={text ? text.toString() : ''} /> ) : ( text ), // Highlight text tìm kiếm
     });
 
-    // --- HÀM XÓA CATEGORY (ĐÃ IMPLEMENT) ---
+    // --- HÀM XÓA CATEGORY (Giả lập) ---
     const deleteCategory = async (categoryToDelete) => {
-        if (!categoryToDelete || !categoryToDelete.categoryId) {
-             message.error('Không tìm thấy ID danh mục để xóa.');
-             return;
-        }
-        setLoading(true);
+        if (!categoryToDelete || !categoryToDelete.categoryId) { message.error('Không tìm thấy ID danh mục để xóa.'); return; } // Kiểm tra ID
+        setLoading(true); // Bật loading
         try {
-            // --- Gọi API ---
-            // await apiService.deleteCategory(categoryToDelete.categoryId); // BỎ COMMENT KHI KẾT NỐI API THẬT
+            // --- Gọi API thật (Đang comment) ---
+            // await apiService.deleteCategory(categoryToDelete.categoryId);
 
-            // --- Xử lý state (dữ liệu cứng / giả lập) ---
-            console.log('Simulating delete for Category ID:', categoryToDelete.categoryId); // Log giả lập
-            const updatedCategories = categories.filter((cat) => cat.categoryId !== categoryToDelete.categoryId);
-            setCategories(updatedCategories);
-            message.success(`(Giả lập) Đã xóa danh mục: ${categoryToDelete.name}`);
-             // Nếu dùng API thật thì bỏ '(Giả lập)' và comment dòng console.log trên
+            // --- Xử lý state cục bộ (Giả lập) ---
+            console.log('Giả lập xóa Category ID:', categoryToDelete.categoryId);
+            const updatedCategories = categories.filter((cat) => cat.categoryId !== categoryToDelete.categoryId); // Lọc bỏ item đã xóa
+            setCategories(updatedCategories); // Cập nhật state
+            message.success(`(Giả lập) Đã xóa danh mục: ${categoryToDelete.name}`); // Thông báo thành công (giả lập)
 
-        } catch (error) {
+        } catch (error) { // Xử lý lỗi API
             console.error('Lỗi khi xóa danh mục:', error);
             const errorMessage = error.response?.data?.message || error.message || `Xóa danh mục thất bại: ${categoryToDelete.name}`;
             message.error(errorMessage);
-        } finally {
-             setLoading(false);
-        }
+        } finally { setLoading(false); } // Tắt loading
     };
 
-    // --- HÀM XÁC NHẬN XÓA (ĐÃ IMPLEMENT) ---
+    // --- HÀM XÁC NHẬN XÓA ---
     const showDeleteConfirm = (category) => {
         confirm({
-            title: `Xác nhận xóa danh mục ${category.name}?`,
-            icon: <ExclamationCircleFilled />,
-            content: `Mã danh mục: ${category.categoryId}. Thao tác này không thể hoàn tác!`,
-            okText: 'Xóa',
-            okType: 'danger',
-            cancelText: 'Hủy',
-            onOk() {
-                deleteCategory(category); // Gọi hàm xóa đã implement
-            },
-            onCancel() {},
+            title: `Xác nhận xóa danh mục ${category.name}?`, // Tiêu đề
+            icon: <ExclamationCircleFilled />, // Icon
+            content: `Mã danh mục: ${category.categoryId}. Thao tác này không thể hoàn tác!`, // Nội dung
+            okText: 'Xóa', okType: 'danger', cancelText: 'Hủy', // Text và kiểu nút
+            onOk() { deleteCategory(category); }, // Gọi hàm xóa khi nhấn OK
+            onCancel() {}, // Hàm khi nhấn Cancel
         });
     };
 
+    // --- Định nghĩa Cột cho Bảng ---
     const columns = [
         {
-            title: 'Mã',
-            dataIndex: 'categoryId',
-            key: 'categoryId',
-            align: 'center',
-            width: 80, // Giảm lại chút
-            sorter: (a, b) => a.categoryId - b.categoryId,
-            ...getColumnSearchProps('categoryId'),
+            title: 'Mã', dataIndex: 'categoryId', key: 'categoryId', align: 'center', width: 100,
+            sorter: (a, b) => a.categoryId - b.categoryId, // Sắp xếp theo Mã
+            ...getColumnSearchProps('categoryId'), // Tìm kiếm theo Mã
         },
         {
-            title: 'Ảnh',
-            dataIndex: 'imageUrl',
-            key: 'imageUrl',
-            width: 120, // Giảm lại chút
-            align: 'center',
-            render: (imageUrl) => imageUrl ? (
-                <Image
-                    width={60}
-                    src={imageUrl}
-                    style={{ objectFit: 'contain', maxHeight: '40px' }}
-                    preview={true}
-                />
-            ) : (
+            title: 'Ảnh', dataIndex: 'imageUrl', key: 'imageUrl', width: 120, align: 'center', // Giảm chiều rộng cột ảnh
+            render: (imageUrl, record) => imageUrl ? ( // Render ảnh
+                <Image width={80} height={80} src={imageUrl} alt={record.name} style={{ objectFit: 'contain' }} preview={false} /> // Cho phép xem trước
+            ) : ( // Hiển thị N/A nếu không có ảnh
                 <span style={{ color: '#bfbfbf' }}>N/A</span>
             ),
         },
         {
-            title: 'Tên Danh mục',
-            dataIndex: 'name',
-            key: 'name',
-            ellipsis: true,
-            sorter: (a, b) => a.name.localeCompare(b.name),
-            ...getColumnSearchProps('name'),
+            title: 'Tên Danh mục', dataIndex: 'name', key: 'name', ellipsis: true, // Thêm ellipsis
+            sorter: (a, b) => a.name.localeCompare(b.name), // Sắp xếp theo Tên
+            ...getColumnSearchProps('name'), // Tìm kiếm theo Tên
+        },
+        { // Thêm cột Mô tả
+            title: 'Mô tả', dataIndex: 'description', key: 'description', ellipsis: true,
         },
         {
-            title: 'Hành động',
-            key: 'action',
-            width: 100, // Giảm lại
-            align: 'center',
-            render: (_, record) => (
+            title: 'Hành động', key: 'action', width: 120, align: 'center', fixed: 'right', // Cố định cột Hành động
+            render: (_, record) => ( // Render nút Xóa và Sửa (nếu có)
                 <Space size="middle">
-                    <Button
-                        type="text"
-                        size="large" // Hoặc middle
-                        danger
-                        icon={<DeleteFilled />}
+                     {/* Nút Sửa (chưa có logic mở modal sửa trong code gốc này) */}
+                     {/* <Button type="text" icon={<EditOutlined />} onClick={(e) => { e.stopPropagation(); setModalChild(<EditCategory category={record} setModalChild={setModalChild} handleRefresh={onRefresh} />); }} /> */}
+                     {/* Nút Xóa */}
+                    <Button type="text" size="large" danger icon={<DeleteFilled />}
                         onClick={(e) => {
-                            e.stopPropagation();
-                            showDeleteConfirm(record); // Gọi hàm xác nhận xóa
+                            e.stopPropagation(); // Ngăn click vào hàng
+                            showDeleteConfirm(record); // Hiển thị xác nhận xóa
                         }}
+                        aria-label={`Xóa danh mục ${record.name}`} // Thêm aria-label
                     />
                 </Space>
             ),
         },
     ];
 
+    // --- Render JSX ---
     return (
-        // Bọc div giới hạn chiều rộng
-        <div style={{ maxWidth: '900px', margin: '20px auto' }}>
+        // Bọc div giới hạn chiều rộng (tùy chọn)
+        <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
+            {/* Nút Thêm Danh Mục */}
             <Space style={{ marginBottom: 16 }}>
-                <Button
-                    type="primary"
-                    onClick={() => setModalChild(<AddCategory setModalChild={setModalChild} handleRefresh={onRefresh} />)}
-                    icon={<PlusCircleFilled />}
+                <Button type="primary"
+                    onClick={() => setModalChild(<AddCategory setModalChild={setModalChild} handleRefresh={onRefresh} />)} // Mở modal AddCategory
+                    icon={<PlusCircleFilled />} // Icon nút
                 >
                     Thêm Danh Mục
                 </Button>
             </Space>
 
+            {/* Modal dùng chung */}
             <Modal
-                title={false} centered open={modalChild !== null}
-                onCancel={() => setModalChild(null)} maskClosable={false}
-                footer={null} destroyOnClose={true} width="auto"
+                title={false} // Tạm ẩn title chung, component con sẽ có title riêng
+                centered // Căn giữa modal
+                open={modalChild !== null} // Hiển thị khi modalChild có nội dung
+                onCancel={() => setModalChild(null)} // Đóng modal
+                maskClosable={false} // Không cho đóng khi click ra ngoài
+                footer={null} // Footer trong component con
+                destroyOnClose={true} // Hủy state con khi đóng
+                width="auto" // Tự động điều chỉnh chiều rộng hoặc set cố định (vd: 600)
             >
-                {modalChild}
+                {modalChild} {/* Render component AddCategory hoặc EditCategory */}
             </Modal>
+
+            {/* Bảng hiển thị */}
             <Table
                 bordered // Thêm viền
+                // Sự kiện khi click vào một hàng -> mở modal EditCategory
                 onRow={(record) => ({
                     onClick: () => { setModalChild( <EditCategory category={record} setModalChild={setModalChild} handleRefresh={onRefresh} /> ); },
-                    onMouseEnter: (event) => { event.currentTarget.style.cursor = 'pointer'; },
+                    onMouseEnter: (event) => { event.currentTarget.style.cursor = 'pointer'; }, // Đổi con trỏ khi hover
                     onMouseLeave: (event) => { event.currentTarget.style.cursor = 'default'; },
                 })}
-                columns={columns}
-                dataSource={categories}
-                rowKey="categoryId"
-                loading = {loading}
-                pagination={{
-                    pageSizeOptions: ['5', '10', '15'],
-                    size: 'default',
-                    showSizeChanger: true,
-                    defaultPageSize: 5,
-                    style: { marginTop: '24px' } // Tăng khoảng cách, bỏ margin thừa
+                columns={columns} // Các cột
+                dataSource={categories} // Dữ liệu
+                rowKey="categoryId" // Key của mỗi hàng
+                loading={loading} // Trạng thái loading
+                pagination={{ // Cấu hình phân trang
+                    pageSizeOptions: ['5', '10', '15'], // Tùy chọn số item/trang
+                    showSizeChanger: true, // Hiển thị dropdown chọn kích thước trang
+                    defaultPageSize: 5, // Kích thước trang mặc định
+                    style: { marginTop: '24px' } // Khoảng cách trên
                  }}
-                size="middle" // Đổi thành middle
+                size="middle" // Kích thước bảng
+                scroll={{ x: 800 }} // Thêm cuộn ngang nếu cần
             />
         </div>
     );

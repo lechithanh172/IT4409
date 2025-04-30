@@ -23,16 +23,16 @@ function OtpPage() {
         secondsLeft = 0,
         formatTime = () => '00:00',
         handleChange = () => { },
-        handleSubmit: submitHandler = (e) => e.preventDefault(), // Đổi tên để tránh trùng
+        handleSubmit: submitHandler = (e) => e.preventDefault(),
         error: otpError = '',
         clearError = () => { }
-    } = useOtp(handleOtpSuccess) || {}; // Truyền callback vào đây
+    } = useOtp(handleOtpSuccess) || {};
 
     return (
         <div className={styles.container}>
             <div className={styles['otp-form-container']}>
                 <form
-                    onSubmit={submitHandler} // Sử dụng submitHandler đã đổi tên
+                    onSubmit={submitHandler}
                     className={styles['otp-form']}
                 >
                     <h2 className={styles.title}>Xác minh OTP</h2>

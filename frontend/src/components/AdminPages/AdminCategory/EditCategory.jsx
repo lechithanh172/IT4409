@@ -9,7 +9,7 @@ const EditCategory = ({ category, setModalChild, handleRefresh }) => {
     useEffect(() => {
         setCategoryImage(category?.imageUrl || null);
         form.setFieldsValue({
-            categoryName: category?.name || '',
+            categoryName: category?.categoryName || '',
             imageUrl: category?.imageUrl || '',
             description: category?.description || '',
         });
@@ -36,7 +36,7 @@ const EditCategory = ({ category, setModalChild, handleRefresh }) => {
 
         console.log('Sending update data to API:', data);
 
-        if (data.categoryName === category.name &&
+        if (data.categoryName === category.categoryName &&
             data.imageUrl === category.imageUrl &&
             data.description === category.description) {
             message.info('Không có thay đổi nào để cập nhật.');
@@ -75,7 +75,7 @@ const EditCategory = ({ category, setModalChild, handleRefresh }) => {
                 name="suaDanhMuc"
                 layout="vertical"
                 initialValues={{
-                    categoryName: category.name,
+                    categoryName: category.categoryName,
                     imageUrl: category.imageUrl,
                     description: category.description,
                 }}

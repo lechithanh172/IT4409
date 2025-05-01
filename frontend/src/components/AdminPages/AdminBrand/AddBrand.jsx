@@ -1,4 +1,3 @@
-// AddBrand.jsx
 import React, { useState } from 'react';
 import { Button, Form, Input, Row, Col, message, Image } from 'antd';
 import apiService from '../../../services/api'; // Đảm bảo đường dẫn đúng
@@ -57,7 +56,6 @@ const AddBrand = ({ setModalChild, handleRefresh }) => {
                 <Row gutter={16}>
                     <Col xs={24} sm={16}>
                         <Form.Item
-                            // Sửa label
                             label="Tên Thương Hiệu"
                             name="brandName" // Khớp với data object
                             rules={[

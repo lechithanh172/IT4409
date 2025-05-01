@@ -5,13 +5,14 @@ axios.defaults.withCredentials = true; // Quan trọng đối với xác thực 
 
 const apiInstance = axios.create({
   baseURL: base_url,
-  timeout: 60000, // Thời gian chờ 60 giây
+  timeout: 60000,
 });
 
 // Interceptor yêu cầu để thêm Bearer token
 apiInstance.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem("accessToken");
+    
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
@@ -60,7 +61,8 @@ const apiService = {
     }),
   updateBrand: (data) => apiInstance.put("/brand/update", data), // 13. API Cập nhật brand
 
-  // PRODUCT APIs
+  // PRODUCT APIs+
+  getAllProducts: () => apiInstance.get("/product/all"),
   addProduct: (data) => apiInstance.post("/product/add", data), // 14. API Thêm sản phẩm
   deleteProduct: (productId) => // 15. API Xoá sản phẩm
     apiInstance.delete("/product/delete", {
@@ -87,18 +89,52 @@ const apiService = {
   approveOrder: (orderId) => apiInstance.post(`/order/approve/${orderId}`), // 25. API Duyệt đơn hàng (Hiện có)
 
   // USER APIs
-  getUserInfo: (username) => apiInstance.get(`/user/info/${username}`), // 26. API Lấy thông tin người dùng (Hiện có)
-  updateUserInfo: (data) => apiInstance.put("/user/update", data), // 27. API Cập nhật thông tin người dùng (Hiện có)
-  deleteUser: (userId) => // 28. API Xóa người dùng (Hiện có)
-    apiInstance.delete("/user/delete", {
-      params: { userId },
-    }),
-  changePassword: (data) => apiInstance.put("/user/change-password", data), // 29. API Đổi mật khẩu (Hiện có)
-  forgetPassword: (email) => // 30. API Quên mật khẩu (Hiện có)
-    apiInstance.post("/user/forget-password", null, { // Gửi body là null cho POST chỉ có query params
-      params: { email },
-    }),
-  resetPassword: (data) => apiInstance.post("/user/reset-password", data), // 31. API Đặt lại mật khẩu (Hiện có)
+/**
+   * 26. API Lấy thông tin người dùng theo username (Không dùng cho bảng chính, giữ lại nếu cần)
+   * GET /user/info/{username}
+   */
+getUserInfo: (username) => apiInstance.get(`/user/info/${username}`),
+
+/**
+ * API Lấy thông tin người dùng theo role (Dùng cho các Tab trong AdminUser)
+ * GET /user/{role}
+ * role: CUSTOMER, PRODUCT_MANAGER, ADMIN (viết hoa/thường đều được - backend xử lý)
+ */
+getUsersByRole: (role) => apiInstance.get(`/user/${role}`),
+
+/**
+ * API Cập nhật thông tin người dùng (Dùng trong EditUser)
+ * PUT /user/update
+ * Body: { firstName, lastName, phoneNumber, address }
+ */
+updateUserInfo: (data) => apiInstance.put("/user/update", data), // data nên là object chứa các trường cần cập nhật
+
+/**
+ * API Xóa người dùng (Dùng trong AdminUser)
+ * DELETE /user/delete?userId={userId}
+ */
+deleteUser: (userId) =>
+  apiInstance.delete("/user/delete", {
+    params: { userId }, // Gửi userId như một query parameter
+  }),
+
+/**
+* API Set Role cho người dùng (Có thể thêm vào EditUser hoặc action riêng)
+* POST /user/set-role
+* Body: { userId: number, role: string }
+*/
+setUserRole: (data) => apiInstance.post('/user/set-role', data), // data = { userId, role }
+
+forgetPassword: (email) =>
+  apiInstance.post("/user/forget-password", null, { // Gửi body là null
+    params: { email }, // Gửi email như query parameter
+  }),
+
+
+resetPassword: (data) => apiInstance.post("/user/reset-password", data), // Gửi email, otp, newPassword trong body
+
+changePassword: (data) => apiInstance.post("/user/change-password", data),
+
 
   // PAYMENT APIs
   createVnPayPayment: (data) => apiInstance.post("/api/vnpay/create", data), // 32. API Tạo thanh toán

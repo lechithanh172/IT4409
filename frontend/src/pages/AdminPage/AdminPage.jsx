@@ -14,9 +14,9 @@ import { Badge, Button, Menu, Layout, Space, Avatar, Dropdown, Typography } from
 import AdminUser from "../../Components/AdminPages/AdminUser/AdminUser";
 import AdminProduct from "../../components/AdminPages/AdminProduct/AdminProduct";
 import AdminOrder from "../../Components/AdminPages/AdminOrder/AdminOrder";
-import AdminProfile from "../../Components/AdminPages/AdminProfile/AdminProfile";
 import AdminBrands from "../../components/AdminPages/AdminBrand/AdminBrands";
 import AdminCategories from "../../components/AdminPages/AdminCategory/AdminCategories";
+import AdminProfile from "../../components/AdminPages/AdminProfile/AdminProfile";
 import styles from "./AdminPage.module.css";
 
 const { Header, Sider, Content } = Layout; // Destructure Layout components
@@ -55,10 +55,13 @@ const Admin = () => {
   const [tooltipPosition, setTooltipPosition] = useState({ top: 0, left: 0 }); // Tooltip position
   const [isRead, setIsRead] = useState(true); // Notification read status (set false for dot)
 
+  localStorage.setItem("accessToken", "eyJhbGciOiJIUzI1NiJ9.eyJyb2xlIjoiQURNSU4iLCJzdWIiOiJ0cmFuZHVjdGhwdDEiLCJpYXQiOjE3NDYxMTUzNjAsImV4cCI6MTc0NjExODk2MH0.1KOZLrkiGB8DdsWMaCrv15TH6zFtx9JaQdfinlc1Sqc")
+
   // Toggle Sidebar Collapse
   const toggleCollapsed = () => {
     setCollapsed(!collapsed);
   };
+
 
   // Handle Notification Bell Click
   const handleBellClick = (event) => {

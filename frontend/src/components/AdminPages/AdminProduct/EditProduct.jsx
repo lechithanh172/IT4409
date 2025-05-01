@@ -1,5 +1,4 @@
-// EditProduct.jsx
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import {
   Button,
   Form,
@@ -12,117 +11,139 @@ import {
   message,
   Image,
   Select,
-  Checkbox, // Thêm Checkbox
+  Checkbox,
 } from "antd";
 import { PlusOutlined, MinusCircleOutlined } from "@ant-design/icons";
-import apiService from "../../../services/api";
+import apiService from "../../../services/api"; // Đảm bảo đường dẫn này chính xác
 
-// --- Dữ liệu cứng Category/Brand (Nên fetch từ API) ---
-const allCategory = [
-  { categoryId: 1, name: "Laptop" }, { categoryId: 2, name: "Tablet" }, { categoryId: 3, name: "Smartphone" },
-  { categoryId: 4, name: "Accessory" }, { categoryId: 5, name: "Monitor" }, { categoryId: 6, name: "Printer" },
-  { categoryId: 7, name: "Router" }, { categoryId: 8, name: "Speaker" }, { categoryId: 9, name: "Camera" },
-  { categoryId: 10, name: "Smartwatch" }, { categoryId: 13, name: "bàn phím" }, { categoryId: 14, name: "chuột" }, { categoryId: 16, name: "tv" },
-];
-const allBrand = [
-  { brandId: 1, name: "Apple", logoUrl: "https://cdn2.cellphones.com.vn/insecure/rs:fill:0:50/q:30/plain/https://cellphones.com.vn/media/tmp/catalog/product/f/r/frame_59.png" },
-  { brandId: 2, name: "Samsung", logoUrl: "https://cdn2.cellphones.com.vn/insecure/rs:fill:0:50/q:30/plain/https://cellphones.com.vn/media/tmp/catalog/product/f/r/frame_60.png" },
-  { brandId: 3, name: "Dell", logoUrl: "https://cdn2.cellphones.com.vn/insecure/rs:fill:0:50/q:30/plain/https://cellphones.com.vn/media/wysiwyg/Icon/brand_logo/Dell.png" },
-  { brandId: 4, name: "HP", logoUrl: "https://cdn2.cellphones.com.vn/insecure/rs:fill:0:50/q:30/plain/https://cellphones.com.vn/media/wysiwyg/Icon/brand_logo/HP.png" },
-  { brandId: 5, name: "Lenovo", logoUrl: "https://cdn2.cellphones.com.vn/insecure/rs:fill:0:50/q:30/plain/https://cellphones.com.vn/media/wysiwyg/Icon/brand_logo/Lenovo.png" },
-  { brandId: 6, name: "Asus", logoUrl: "https://cdn2.cellphones.com.vn/insecure/rs:fill:0:50/q:30/plain/https://cellphones.com.vn/media/wysiwyg/Icon/brand_logo/Asus.png" },
-  { brandId: 7, name: "MSI", logoUrl: "https://cdn2.cellphones.com.vn/insecure/rs:fill:0:50/q:30/plain/https://cellphones.com.vn/media/wysiwyg/Icon/brand_logo/MSI.png" },
-  { brandId: 8, name: "Acer", logoUrl: "https://cdn2.cellphones.com.vn/insecure/rs:fill:0:50/q:30/plain/https://cellphones.com.vn/media/wysiwyg/Icon/brand_logo/acer.png" },
-  { brandId: 9, name: "Xiaomi", logoUrl: "https://cdn2.cellphones.com.vn/insecure/rs:fill:0:50/q:30/plain/https://cellphones.com.vn/media/tmp/catalog/product/f/r/frame_61.png" },
-  { brandId: 10, name: "Sony", logoUrl: "https://cdn2.cellphones.com.vn/insecure/rs:fill:0:50/q:30/plain/https://cellphones.com.vn/media/catalog/product/f/r/frame_87.png" },
-  // Thêm các brand khác nếu cần
-];
-// --- Kết thúc dữ liệu cứng ---
 
-// Tạo options cho Select Category
-const categoryOptions = allCategory.map((cat) => ({
-  value: cat.name,
-  label: cat.name,
-}));
-// Tạo options cho Select Brand (bao gồm cả ảnh)
-const brandOptions = allBrand.map((brand) => ({
-  value: brand.name, // Dùng tên brand làm value (hoặc brandId nếu API backend dùng ID)
-  label: brand.name,
-  image: brand.logoUrl,
-}));
-
-// Component EditProduct nhận props: product (dữ liệu sản phẩm cần sửa), setModalChild (để đóng modal), handleRefresh (để refresh list)
-const EditProduct = ({ product, setModalChild, handleRefresh }) => {
+// Component EditProduct nhận props: product (dữ liệu sản phẩm cần sửa), setModalChild (để đóng modal), handleRefresh (để refresh list), categoriesList, brandsList
+const EditProduct = ({ product, setModalChild, handleRefresh, categoriesList = [], brandsList = [] }) => {
   const [form] = Form.useForm(); // Hook để quản lý Form Antd
 
   // State để lưu danh sách các biến thể (variants) của sản phẩm
-  // Khởi tạo state này từ dữ liệu `product.variants` truyền vào
-  const initialVariants = (product?.variants || []).map((variant, index) => ({
+  // Khởi tạo từ prop product.variants
+  const initialVariants = useMemo(() => (product?.variants || []).map((variant, index) => ({
     key: variant.variantId || `existing_${index}`, // Dùng variantId làm key nếu có, nếu không thì tạo key tạm
     variantId: variant.variantId, // Lưu lại variantId để gửi lên API khi cập nhật
     color: variant.color || "",
     imageUrl: variant.imageUrl || "",
     stockQuantity: variant.stockQuantity ?? 0,
     discount: variant.discount ?? 0,
-  }));
+  })), [product?.variants]); // Tính toán lại chỉ khi product.variants thay đổi
+
+
+  // Các options đã được memoize cho component Select
+  const categoryOptions = useMemo(() => (
+    categoriesList.map(cat => ({
+        value: cat.categoryName || `Danh mục ${cat.categoryId}`, // Value cần khớp với form item name="categoryName"
+        label: cat.categoryName || `Danh mục ${cat.categoryId}`
+    }))
+  ), [categoriesList]);
+
+  const brandOptions = useMemo(() => (
+    brandsList.map(brand => ({
+        value: brand.brandName || `Thương hiệu ${brand.brandId}`, // Value cần khớp với form item name="brandName"
+        label: brand.brandName || `Thương hiệu ${brand.brandId}`,
+        image: brand.logoUrl
+    }))
+  ), [brandsList]);
+
   const [variants, setVariants] = useState(initialVariants);
+  const [selectedBrandImage, setSelectedBrandImage] = useState(null); // State cho URL logo thương hiệu được chọn
 
-  // State để lưu URL ảnh của thương hiệu đang được chọn (để hiển thị logo)
-  const [selectedBrandImage, setSelectedBrandImage] = useState(null);
-
-  // useEffect để cập nhật form và state khi `product` prop thay đổi (khi mở modal)
+  // useEffect để cập nhật form và state khi prop `product` thay đổi (khi mở modal)
   useEffect(() => {
     if (product) {
-      // Đặt các giá trị ban đầu cho các trường trong Form Antd
+      // *** CHUYỂN ĐỔI CHUỖI SPECIFICATIONS THÀNH MẢNG ***
+      let parsedSpecifications = [];
+      if (product.specifications && typeof product.specifications === 'string') {
+        try {
+          parsedSpecifications = JSON.parse(product.specifications);
+          // Kiểm tra cơ bản: đảm bảo nó là một mảng và các đối tượng có key mong đợi
+          if (!Array.isArray(parsedSpecifications)) {
+            console.error("Thông số kỹ thuật đã parse không phải là mảng:", parsedSpecifications);
+            parsedSpecifications = []; // Reset nếu không phải là mảng
+          } else {
+            // Đảm bảo mỗi mục có các key cần thiết, cung cấp giá trị mặc định nếu thiếu
+            parsedSpecifications = parsedSpecifications.map(spec => ({
+                group: spec?.group || '',
+                title: spec?.title || '',
+                content: spec?.content || ''
+            }));
+          }
+        } catch (error) {
+          console.error("Không thể parse chuỗi JSON thông số kỹ thuật:", product.specifications, error);
+          message.error("Lỗi định dạng dữ liệu thông số kỹ thuật nhận được.");
+          parsedSpecifications = []; // Mặc định là mảng rỗng nếu có lỗi parse
+        }
+      } else if (Array.isArray(product.specifications)) {
+         // Xử lý trường hợp API đôi khi có thể trả về một mảng
+         console.warn("Nhận được thông số kỹ thuật dưới dạng mảng trực tiếp, mong đợi chuỗi JSON.");
+         parsedSpecifications = product.specifications.map(spec => ({
+             group: spec?.group || '',
+             title: spec?.title || '',
+             content: spec?.content || ''
+         }));
+      }
+      // *******************************************
+
+      // Đặt giá trị ban đầu cho các trường Form
       form.setFieldsValue({
         productName: product.productName,
         description: product.description,
         weight: product.weight,
         price: product.price,
         categoryName: product.categoryName,
-        brandName: product.brandName, // Giá trị này sẽ tự động khớp với option trong Select Brand
-        supportRushOrder: product.supportRushOrder || false, // Đặt giá trị cho Checkbox
-        // Đặt giá trị cho Form.List specifications
-        // Cần đảm bảo product.specifications là một mảng các object {group, title, content}
-        specifications: (product.specifications || []).map(spec => ({
-            group: spec.group || '',
-            title: spec.title || '',
-            content: spec.content || ''
-        })),
+        brandName: product.brandName, // Giá trị này sẽ khớp với một option trong Select Thương hiệu
+        supportRushOrder: product.supportRushOrder || false, // Đặt giá trị Checkbox
+        // Đặt mảng ĐÃ PARSE vào Form.List cho specifications
+        specifications: parsedSpecifications,
       });
 
-      // Tìm và đặt URL ảnh logo của thương hiệu ban đầu
-      const brandData = brandOptions.find(
-        (b) => b.value === product.brandName // So sánh theo tên brand (value của option)
+      // Tìm và đặt URL logo thương hiệu ban đầu
+      const initialBrandData = brandOptions.find(
+        (b) => b.value === product.brandName // So sánh theo tên thương hiệu (value của option)
       );
-      setSelectedBrandImage(brandData ? brandData.image : null); // Cập nhật state ảnh logo
+      setSelectedBrandImage(initialBrandData ? initialBrandData.image : null); // Cập nhật state logo
 
-      // Cập nhật lại state `variants` từ `product` prop phòng trường hợp dữ liệu bị stale
-      const updatedInitialVariants = (product.variants || []).map(
-        (variant, index) => ({
-          key: variant.variantId || `existing_${index}`,
-          variantId: variant.variantId,
-          color: variant.color || "",
-          imageUrl: variant.imageUrl || "",
-          stockQuantity: variant.stockQuantity ?? 0,
-          discount: variant.discount ?? 0,
-        })
-      );
-      setVariants(updatedInitialVariants);
+      // Cập nhật state `variants` từ prop `product` phòng trường hợp dữ liệu bị cũ
+       setVariants((product?.variants || []).map((variant, index) => ({
+         key: variant.variantId || `existing_${index}`,
+         variantId: variant.variantId,
+         color: variant.color || "",
+         imageUrl: variant.imageUrl || "",
+         stockQuantity: variant.stockQuantity ?? 0,
+         discount: variant.discount ?? 0,
+       })));
     }
-    // Dependency array: Chạy lại effect khi `product` hoặc `form` thay đổi
-  }, [product, form]);
+    // Mảng dependency: Chạy lại effect khi product, form, brandOptions hoặc categoryOptions thay đổi
+  }, [product, form, brandOptions, categoryOptions]); // Đã thêm categoryOptions và brandOptions dependencies
 
-  // Xử lý khi người dùng chọn một thương hiệu khác trong Select
-  const handleBrandChange = (value) => {
-    const selected = brandOptions.find((b) => b.value === value);
-    setSelectedBrandImage(selected ? selected.image : null); // Cập nhật ảnh logo hiển thị
-    // form.setFieldsValue({ brandName: value }); // Antd Select tự xử lý việc cập nhật giá trị vào form state
+  // Hàm xử lý khi thay đổi lựa chọn thương hiệu
+  const handleBrandChange = (value) => { // 'value' ở đây là chuỗi brandName được chọn
+    console.log('Sự kiện onChange của Select Thương hiệu được kích hoạt. Giá trị mới:', value); // Log debug
+    const selectedBrand = brandOptions.find((b) => b.value === value);
+    setSelectedBrandImage(selectedBrand ? selectedBrand.image : null);
+
+    // *** CẬP NHẬT TRẠNG THÁI FORM MỘT CÁCH TƯỜNG MINH ***
+    // Mặc dù Select bên trong Form.Item nên tự động xử lý việc này,
+    // việc đặt giá trị một cách tường minh đảm bảo trạng thái nội bộ của form được cập nhật chính xác.
+    if (value !== undefined) { // Tránh đặt undefined nếu lựa chọn bị xóa
+        form.setFieldsValue({ brandName: value });
+        console.log('Giá trị brandName của Form được đặt tường minh thành:', value); // Log debug để xác nhận
+    } else {
+        // Xử lý sự kiện xóa nếu cần (ví dụ: đặt thành null hoặc chuỗi rỗng nếu allowClear là true)
+         form.setFieldsValue({ brandName: undefined }); // Đặt thành undefined hoặc null tùy theo yêu cầu
+         setSelectedBrandImage(null); // Xóa ảnh khi thương hiệu bị xóa
+         console.log('Giá trị brandName của Form được xóa tường minh.'); // Log debug
+    }
   };
 
-  // Xử lý khi form submit thất bại (do validation errors)
+
+  // Hàm xử lý khi submit form thất bại (do lỗi validation)
   const onFinishFailed = (errorInfo) => {
-    console.log("Thất bại:", errorInfo);
+    console.log("Submit Thất Bại:", errorInfo);
     message.error("Vui lòng kiểm tra lại các trường thông tin còn thiếu hoặc không hợp lệ.");
   };
 
@@ -131,7 +152,7 @@ const EditProduct = ({ product, setModalChild, handleRefresh }) => {
     setVariants([
       ...variants,
       {
-        key: `new_${Date.now()}_${variants.length}`, // Tạo key mới, duy nhất cho biến thể mới
+        key: `new_${Date.now()}_${variants.length}`, // Tạo key mới, duy nhất
         variantId: undefined, // Biến thể mới chưa có ID từ DB
         color: "",
         imageUrl: "",
@@ -143,7 +164,7 @@ const EditProduct = ({ product, setModalChild, handleRefresh }) => {
 
   // Xóa một biến thể khỏi state `variants` dựa vào key
   const removeVariant = (keyToRemove) => {
-    // Ngăn không cho xóa nếu chỉ còn một biến thể
+    // Ngăn xóa nếu chỉ còn một biến thể
     if (variants.length <= 1) {
       message.warning("Sản phẩm phải có ít nhất một biến thể.");
       return;
@@ -152,7 +173,7 @@ const EditProduct = ({ product, setModalChild, handleRefresh }) => {
     // TODO: Nếu cần, gọi API để xóa biến thể này khỏi DB ngay lập tức hoặc đánh dấu để xóa khi submit
   };
 
-  // Cập nhật thông tin (field) của một biến thể cụ thể trong state `variants`
+  // Cập nhật một trường cụ thể của một biến thể trong state `variants`
   const handleVariantChange = (key, field, value) => {
     setVariants(
       variants.map((variant) =>
@@ -161,7 +182,7 @@ const EditProduct = ({ product, setModalChild, handleRefresh }) => {
     );
   };
 
-  // Xử lý khi submit form thành công (sau khi đã qua validation)
+  // Hàm xử lý khi submit form thành công (sau khi đã qua validation)
   const onFinish = async (values) => {
     // Kiểm tra ID sản phẩm có hợp lệ không
     if (!product || !product.productId) {
@@ -169,7 +190,7 @@ const EditProduct = ({ product, setModalChild, handleRefresh }) => {
       return;
     }
 
-    // Kiểm tra thông tin các biến thể trong state `variants`
+    // Kiểm tra thông tin biến thể trong state `variants`
     const invalidVariant = variants.some(
       (v) => !v.color || v.stockQuantity === null || v.stockQuantity === undefined || v.stockQuantity < 0
     );
@@ -180,15 +201,26 @@ const EditProduct = ({ product, setModalChild, handleRefresh }) => {
       return; // Dừng lại nếu có biến thể không hợp lệ
     }
 
-    // Kiểm tra thông tin các thông số kỹ thuật từ `values` (đã được Form quản lý)
+    // Kiểm tra thông tin thông số kỹ thuật từ `values` (do Form quản lý)
     const invalidSpecification = (values.specifications || []).some(spec => !spec || !spec.group || !spec.title || !spec.content);
     if (invalidSpecification) {
         message.error('Vui lòng nhập đầy đủ thông tin (Nhóm, Tiêu đề, Nội dung) cho tất cả các thông số kỹ thuật!');
-        // form.validateFields(['specifications']); // Có thể không focus đúng chỗ
+        // Cố gắng focus vào trường thông số kỹ thuật bị lỗi đầu tiên
+        const firstInvalidSpecIndex = (values.specifications || []).findIndex(spec => !spec || !spec.group || !spec.title || !spec.content);
+        if (firstInvalidSpecIndex !== -1) {
+            const fieldName = ['specifications', firstInvalidSpecIndex, 'group']; // Focus vào 'group' của mục bị lỗi đầu tiên
+             try {
+                 form.scrollToField(fieldName);
+             } catch(e){ console.warn("Không thể cuộn đến trường thông số kỹ thuật", e)}
+        }
         return;
     }
 
     try {
+      // *** CHUYỂN ĐỔI MẢNG SPECIFICATIONS THÀNH CHUỖI JSON TRƯỚC KHI GỬI ***
+      const specificationsString = JSON.stringify(values.specifications || []);
+      // *****************************************************
+
       // Chuẩn bị dữ liệu để gửi lên API
       const data = {
         productId: product.productId, // ID của sản phẩm cần cập nhật
@@ -197,14 +229,10 @@ const EditProduct = ({ product, setModalChild, handleRefresh }) => {
         weight: values.weight ?? 0,
         price: values.price ?? 0,
         categoryName: values.categoryName || "",
-        brandName: values.brandName || "", // Lấy từ form values
+        brandName: values.brandName || "", // Lấy từ form values (giờ đã được cập nhật đúng)
         supportRushOrder: values.supportRushOrder || false, // Lấy từ form values
-        // Lấy danh sách thông số kỹ thuật từ form values
-        specifications: (values.specifications || []).map(spec => ({
-            group: spec.group || '',
-            title: spec.title || '',
-            content: spec.content || ''
-        })),
+        // Gửi chuỗi JSON cho specifications
+        specifications: specificationsString,
         // Ánh xạ state `variants` sang định dạng API yêu cầu
         // Bao gồm `variantId` cho các biến thể đã tồn tại để backend biết cần update hay insert
         variants: variants.map((variant) => ({
@@ -218,11 +246,10 @@ const EditProduct = ({ product, setModalChild, handleRefresh }) => {
 
       console.log("Dữ liệu gửi lên API (Cập nhật):", data);
 
-      // --- Gọi API (Giả lập) ---
-      // TODO: Thay thế bằng gọi API thật
-      // await apiService.updateProduct(data);
-      message.success(`(Giả lập) Sản phẩm ${data.productName} đã được cập nhật!`);
-      // --- Kết thúc gọi API ---
+      // --- Gọi API ---
+      await apiService.updateProduct(data); // Thay thế bằng lệnh gọi API thực tế của bạn
+      message.success(`Sản phẩm ${data.productName} đã được cập nhật thành công!`);
+      // --- Kết thúc Gọi API ---
 
       handleRefresh(); // Refresh lại danh sách sản phẩm ở component cha
       setModalChild(null); // Đóng modal chỉnh sửa
@@ -236,7 +263,7 @@ const EditProduct = ({ product, setModalChild, handleRefresh }) => {
     }
   };
 
-  // Nếu chưa có dữ liệu `product`, hiển thị loading
+  // Hiển thị trạng thái đang tải nếu chưa có dữ liệu `product`
   if (!product) {
     return <div>Đang tải dữ liệu sản phẩm...</div>;
   }
@@ -251,16 +278,6 @@ const EditProduct = ({ product, setModalChild, handleRefresh }) => {
         margin: "auto", // Căn giữa
       }}
     >
-      <h2
-        style={{
-          marginTop: 0,
-          marginBottom: 20, // Tăng khoảng cách dưới tiêu đề
-          textAlign: "center",
-          fontSize: "24px",
-        }}
-      >
-        Chỉnh Sửa Sản Phẩm
-      </h2>
       {/* Component Form của Ant Design */}
       <Form
         form={form} // Liên kết form instance
@@ -271,48 +288,54 @@ const EditProduct = ({ product, setModalChild, handleRefresh }) => {
         autoComplete="off"
         // Không cần initialValues ở đây vì dùng form.setFieldsValue trong useEffect
       >
-        {/* Chia layout thành 2 cột */}
+        {/* Layout chia thành 2 cột */}
         <Row gutter={24}>
-          {/* === Cột 1: Thông tin chung và Thông số kỹ thuật === */}
+          {/* === Cột 1: Thông tin chung & Thông số kỹ thuật === */}
           <Col xs={24} md={12}>
-            {/* Trường Tên Sản Phẩm */}
+            {/* Tên Sản Phẩm */}
             <Form.Item
               label="Tên Sản Phẩm"
               name="productName"
-              rules={[{ required: true, message: "Hãy nhập tên sản phẩm!" }]}
+              rules={[{ required: true, message: "Vui lòng nhập tên sản phẩm!" }]}
             >
               <Input />
             </Form.Item>
-            {/* Trường Danh Mục */}
+            {/* Danh Mục */}
             <Form.Item
               label="Danh Mục"
               name="categoryName"
-              rules={[{ required: true, message: "Hãy chọn danh mục!" }]}
+              rules={[{ required: true, message: "Vui lòng chọn danh mục!" }]}
             >
               <Select
                 showSearch
                 placeholder="Chọn danh mục"
-                optionFilterProp="label"
+                optionFilterProp="label" // Tìm kiếm theo nội dung label
+                filterOption={(input, option) => // Hàm lọc tùy chỉnh
+                    (option?.label ?? '').toLowerCase().includes(input.toLowerCase())
+                }
                 options={categoryOptions}
               />
             </Form.Item>
-            {/* Trường Thương Hiệu */}
+            {/* Thương Hiệu */}
             <Form.Item
               label="Thương Hiệu"
-              name="brandName" // Tên field này phải khớp với key trong form.setFieldsValue
-              rules={[{ required: true, message: "Hãy chọn thương hiệu!" }]}
+              name="brandName" // Tên này phải khớp với key trong form.setFieldsValue
+              rules={[{ required: true, message: "Vui lòng chọn thương hiệu!" }]}
             >
               <Row gutter={16} align="middle">
                 <Col flex="auto">
                   <Select
                     showSearch
                     placeholder="Chọn thương hiệu"
-                    optionFilterProp="label"
+                    optionFilterProp="label" // Tìm kiếm theo nội dung label
+                    filterOption={(input, option) => // Hàm lọc tùy chỉnh
+                        (option?.label ?? '').toLowerCase().includes(input.toLowerCase())
+                    }
                     options={brandOptions}
-                    onChange={handleBrandChange} // Cập nhật ảnh logo khi thay đổi
+                    onChange={handleBrandChange} // Cập nhật logo và state form khi thay đổi
                     style={{ width: "100%" }}
                     allowClear
-                    onClear={() => setSelectedBrandImage(null)} // Xóa ảnh khi clear
+                    onClear={() => handleBrandChange(undefined)} // Xử lý rõ ràng sự kiện clear
                   />
                 </Col>
                 <Col>
@@ -336,17 +359,18 @@ const EditProduct = ({ product, setModalChild, handleRefresh }) => {
                           borderRadius: "4px",
                           padding: "2px",
                         }}
+                        fallback="/placeholder-image.png" // Cung cấp đường dẫn ảnh fallback
                       />
                     </div>
                   )}
                 </Col>
               </Row>
             </Form.Item>
-            {/* Trường Mô tả sản phẩm */}
+            {/* Mô tả */}
             <Form.Item
               label="Mô tả sản phẩm"
               name="description"
-              rules={[{ required: true, message: "Hãy nhập mô tả!" }]}
+              rules={[{ required: true, message: "Vui lòng nhập mô tả!" }]}
             >
               <Input.TextArea rows={4} />
             </Form.Item>
@@ -357,7 +381,7 @@ const EditProduct = ({ product, setModalChild, handleRefresh }) => {
                   label="Giá Gốc (VNĐ)"
                   name="price"
                   rules={[
-                    { required: true, message: "Hãy nhập giá sản phẩm!" },
+                    { required: true, message: "Vui lòng nhập giá sản phẩm!" },
                     { type: "number", min: 0, message: "Giá phải là số không âm!" },
                   ]}
                 >
@@ -374,7 +398,7 @@ const EditProduct = ({ product, setModalChild, handleRefresh }) => {
                   label="Cân nặng (kg)"
                   name="weight"
                   rules={[
-                    { required: true, message: "Hãy nhập cân nặng!" },
+                    { required: true, message: "Vui lòng nhập cân nặng!" },
                     { type: "number", min: 0, message: "Cân nặng phải là số không âm!" },
                   ]}
                 >
@@ -383,45 +407,45 @@ const EditProduct = ({ product, setModalChild, handleRefresh }) => {
               </Col>
             </Row>
 
-            {/* Trường Hỗ trợ giao hàng nhanh */}
+            {/* Checkbox Hỗ trợ giao hàng nhanh */}
             <Form.Item
               name="supportRushOrder"
-              valuePropName="checked" // Quan trọng cho Checkbox
+              valuePropName="checked" // Quan trọng cho Checkbox với Form
             >
               <Checkbox>Hỗ trợ giao hàng nhanh</Checkbox>
             </Form.Item>
 
             <Divider>Thông số kỹ thuật</Divider>
-            {/* Form.List để quản lý các thông số kỹ thuật */}
+            {/* Form.List để quản lý các thông số kỹ thuật động */}
             <Form.List name="specifications">
-              {(fields, { add, remove }) => (
+              {(fields, { add, remove }, { errors }) => ( // Destructure errors để hiển thị nếu cần
                 <>
                   {fields.map(({ key, name, ...restField }) => (
                     <Space key={key} style={{ display: 'flex', marginBottom: 8, alignItems: 'baseline' }} align="baseline">
-                      {/* Trường Nhóm */}
+                      {/* Nhóm */}
                       <Form.Item
                         {...restField}
                         name={[name, 'group']}
                         rules={[{ required: true, message: 'Nhập nhóm' }]}
-                        style={{ flex: 1 }}
+                        style={{ flex: 1, marginBottom: 0 }} // Điều chỉnh margin để căn chỉnh
                       >
                         <Input placeholder="Nhóm" />
                       </Form.Item>
-                       {/* Trường Tiêu đề */}
+                       {/* Tiêu đề */}
                       <Form.Item
                         {...restField}
                         name={[name, 'title']}
                         rules={[{ required: true, message: 'Nhập tiêu đề' }]}
-                         style={{ flex: 1 }}
+                         style={{ flex: 1, marginBottom: 0 }}
                       >
                         <Input placeholder="Tiêu đề" />
                       </Form.Item>
-                       {/* Trường Nội dung */}
+                       {/* Nội dung */}
                       <Form.Item
                         {...restField}
                         name={[name, 'content']}
                         rules={[{ required: true, message: 'Nhập nội dung' }]}
-                         style={{ flex: 2 }}
+                         style={{ flex: 2, marginBottom: 0 }}
                       >
                         <Input placeholder="Nội dung" />
                       </Form.Item>
@@ -434,6 +458,8 @@ const EditProduct = ({ product, setModalChild, handleRefresh }) => {
                     <Button type="dashed" onClick={() => add({ group: '', title: '', content: '' })} block icon={<PlusOutlined />}>
                       Thêm thông số kỹ thuật
                     </Button>
+                     {/* Tùy chọn: Hiển thị lỗi cấp Form.List */}
+                     <Form.ErrorList errors={errors} />
                   </Form.Item>
                 </>
               )}
@@ -441,7 +467,7 @@ const EditProduct = ({ product, setModalChild, handleRefresh }) => {
 
           </Col> {/* Kết thúc Cột 1 */}
 
-          {/* === Cột 2: Biến thể sản phẩm === */}
+          {/* === Cột 2: Biến thể Sản phẩm === */}
           <Col xs={24} md={12}>
             <h3 style={{ marginBottom: 16, textAlign: "center" }}>Biến thể Sản Phẩm</h3>
             {/* Container cho danh sách biến thể */}
@@ -449,26 +475,26 @@ const EditProduct = ({ product, setModalChild, handleRefresh }) => {
               {/* Render từng biến thể từ state `variants` */}
               {variants.map((variant, index) => (
                 <div key={variant.key} style={{ marginBottom: 16, padding: "16px", border: "1px solid #e8e8e8", borderRadius: "8px", position: "relative" }}>
-                  {/* Nút xóa biến thể */}
+                  {/* Nút Xóa Biến Thể */}
                   {variants.length > 1 && (
                     <Button icon={<MinusCircleOutlined />} onClick={() => removeVariant(variant.key)} type="text" danger style={{ position: "absolute", top: 5, right: 5, padding: 5, zIndex: 10, lineHeight: 0, cursor: "pointer" }} title="Xóa biến thể này" />
                   )}
-                  {/* Layout hàng cho mỗi biến thể */}
+                  {/* Hàng layout cho mỗi biến thể */}
                   <Row gutter={16}>
-                    {/* Cột con chứa thông tin */}
+                    {/* Cột con cho thông tin */}
                     <Col xs={24} sm={14}>
-                      {/* Trường Màu sắc */}
+                      {/* Màu sắc */}
                       <Form.Item label={`Màu sắc #${index + 1}`} required validateStatus={!variant.color ? "error" : ""} help={!variant.color ? "Vui lòng nhập màu sắc" : ""}>
                         <Input placeholder="VD: Xanh dương" value={variant.color} onChange={(e) => handleVariantChange(variant.key, "color", e.target.value)} />
                       </Form.Item>
-                      {/* Trường URL ảnh */}
+                      {/* URL Ảnh */}
                       <Form.Item label={`Url ảnh #${index + 1}`}>
                         <Input placeholder="https://example.com/anh-bien-the.jpg" value={variant.imageUrl} onChange={(e) => handleVariantChange(variant.key, "imageUrl", e.target.value)} />
                       </Form.Item>
-                      {/* Hàng con chứa Số lượng và Giảm giá */}
+                      {/* Hàng con cho Số lượng và Giảm giá */}
                       <Row gutter={8}>
                         <Col span={12}>
-                          <Form.Item label={`Số lượng #${index + 1}`} required validateStatus={variant.stockQuantity === null || variant.stockQuantity === undefined || variant.stockQuantity < 0 ? "error" : ""} help={variant.stockQuantity === null || variant.stockQuantity === undefined || variant.stockQuantity < 0 ? "Số lượng >= 0" : ""}>
+                          <Form.Item label={`Số lượng #${index + 1}`} required validateStatus={variant.stockQuantity === null || variant.stockQuantity === undefined || variant.stockQuantity < 0 ? "error" : ""} help={variant.stockQuantity === null || variant.stockQuantity === undefined || variant.stockQuantity < 0 ? "SL >= 0" : ""}>
                             <InputNumber min={0} value={variant.stockQuantity} onChange={(value) => handleVariantChange(variant.key, "stockQuantity", value)} style={{ width: "100%" }} />
                           </Form.Item>
                         </Col>
@@ -479,12 +505,12 @@ const EditProduct = ({ product, setModalChild, handleRefresh }) => {
                         </Col>
                       </Row>
                     </Col>
-                    {/* Cột con chứa ảnh xem trước */}
+                    {/* Cột con cho xem trước ảnh */}
                     <Col xs={24} sm={10}>
-                      <Form.Item label={`Ảnh xem trước #${index + 1}`}>
-                        <div style={{ display: "flex", justifyContent: "center", alignItems: "center", height: "120px", border: "1px dashed #ccc", borderRadius: "4px" }}>
+                      <Form.Item label={`Xem trước #${index + 1}`}>
+                        <div style={{ display: "flex", justifyContent: "center", alignItems: "center", height: "120px", border: "1px dashed #ccc", borderRadius: "4px", overflow: "hidden" }}>
                           {/* Hiển thị ảnh hoặc chữ placeholder */}
-                          {variant.imageUrl ? ( <Image height={110} src={variant.imageUrl} style={{ objectFit: "contain" }} fallback="/placeholder-image.png"/> ) : ( <span style={{ color: "#bfbfbf" }}>Chưa có ảnh</span> )}
+                          {variant.imageUrl ? ( <Image height={118} src={variant.imageUrl} style={{ objectFit: "contain" }} fallback="/placeholder-image.png"/> ) : ( <span style={{ color: "#bfbfbf" }}>Chưa có ảnh</span> )}
                         </div>
                       </Form.Item>
                     </Col>
@@ -492,10 +518,10 @@ const EditProduct = ({ product, setModalChild, handleRefresh }) => {
                 </div>
               ))}
             </div>
-            {/* Nút thêm biến thể */}
+            {/* Nút Thêm Biến Thể */}
             <Button type="dashed" onClick={addVariant} icon={<PlusOutlined />} style={{ width: "100%", marginTop: 16 }}> Thêm Biến Thể Khác </Button>
           </Col> {/* Kết thúc Cột 2 */}
-        </Row> {/* Kết thúc Row chính */}
+        </Row> {/* Kết thúc Hàng chính */}
         <Divider style={{ margin: '24px 0' }} /> {/* Đường kẻ ngang phân cách */}
 
         {/* Hàng chứa các nút action */}

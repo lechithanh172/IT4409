@@ -1,4 +1,3 @@
-// EditBrand.jsx
 import React, { useState, useEffect } from 'react';
 import { Button, Form, Input, Row, Col, message, Image } from 'antd';
 import apiService from '../../../services/api'; // Đảm bảo đường dẫn đúng
@@ -12,7 +11,7 @@ const EditBrand = ({ brand, setModalChild, handleRefresh }) => {
         // Cập nhật ảnh xem trước và giá trị form khi prop 'brand' thay đổi
         setBrandImage(brand?.logoUrl || null);
         form.setFieldsValue({
-            brandName: brand?.name || '', // Sử dụng brand.name
+            brandName: brand?.brandName || '', // Sử dụng brand.name
             logoUrl: brand?.logoUrl || '', // Sử dụng brand.logoUrl
             // Không có description cho Brand theo API
         });
@@ -41,7 +40,7 @@ const EditBrand = ({ brand, setModalChild, handleRefresh }) => {
         console.log('Sending update data to API:', data);
 
         // Kiểm tra thay đổi (so sánh với prop 'brand')
-        if (data.brandName === brand.name &&
+        if (data.brandName === brand.brandName &&
             data.logoUrl === brand.logoUrl) {
             message.info('Không có thay đổi nào để cập nhật.');
             setModalChild(null);
@@ -87,7 +86,7 @@ const EditBrand = ({ brand, setModalChild, handleRefresh }) => {
                 layout="vertical"
                 // Đặt giá trị ban đầu khớp với brand prop
                 initialValues={{
-                    brandName: brand.name,
+                    brandName: brand.brandName,
                     logoUrl: brand.logoUrl,
                 }}
                 onFinish={onFinish}

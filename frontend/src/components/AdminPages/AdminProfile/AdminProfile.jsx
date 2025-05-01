@@ -1,39 +1,28 @@
 // AdminProfile.jsx
 import React, { useEffect, useState, useCallback } from 'react';
-// --- Import các component từ Ant Design ---
 import {
-    Button, Modal, Input, message, Spin, Card, Form, Space, Typography, Tag,
-    Avatar, Row, Col, Divider, Tooltip // Thêm Avatar, Row, Col, Divider, Tooltip
+    Button, Modal, Input, notification, Spin, Card, Form, Space, Typography, Tag, // <--- Thay message bằng notification
+    Avatar, Row, Col, Divider, Tooltip
 } from 'antd';
-// --- Import các icon ---
-import { UserOutlined, EditOutlined, SaveOutlined, CloseOutlined, LockOutlined } from '@ant-design/icons'; // Thêm các icon cần thiết
-import apiService from '../../../services/api'; // Đảm bảo đường dẫn đúng
+import { UserOutlined, EditOutlined, SaveOutlined, CloseOutlined, LockOutlined } from '@ant-design/icons';
+// --- Đảm bảo đường dẫn này chính xác trong dự án của bạn ---
+import apiService from '../../../services/api';
 
-const { Text, Title, Paragraph } = Typography; // Thêm Title, Paragraph
+const { Text, Title } = Typography;
 
-// --- Dữ liệu cứng (Hardcoded Data) chính xác ---
-const hardcodedAdmin = {
-    "userId": 3, "username": "ductran", "password": "$2a$10$...", "email": "tranduct1k29@gmail.com", "firstName": "Rô", "lastName": "Nan Đô", "phoneNumber": "0911919191", "address": "Cầu Giấy", "role": "ADMIN", /* ... các trường khác nếu có ... */
-};
-// --------------------------
-
-// --- Component con để hiển thị chi tiết Profile (tái sử dụng) ---
-// Component này nhận các props để hiển thị label, value và quyết định hiển thị text hay input (cho chế độ sửa)
-const ProfileDetailItem = ({ label, value, isEditing, name, rules, inputType = 'input', form }) => (
-     <Row gutter={[8, 8]} align="middle" style={{ marginBottom: 12 }}> {/* Row chứa label và value */}
-        <Col xs={24} sm={6} style={{ textAlign: 'right', paddingRight: '10px' }}> {/* Cột cho label, căn phải */}
-            <Text strong type="secondary">{label}:</Text> {/* Nhãn, màu xám nhẹ */}
+// --- Component con để hiển thị chi tiết Profile ---
+const ProfileDetailItem = ({ label, value, isEditing, name, rules, inputType = 'input' }) => (
+    <Row key={name || label} gutter={[8, 8]} align="middle" style={{ marginBottom: 12 }}>
+        <Col xs={24} sm={6} style={{ textAlign: 'right', paddingRight: '10px' }}>
+            <Text strong type="secondary">{label}:</Text>
         </Col>
-        <Col xs={24} sm={18}> {/* Cột cho giá trị hoặc input */}
-            {isEditing ? ( // Nếu đang ở chế độ sửa
-                // Hiển thị Form.Item để nhập liệu
+        <Col xs={24} sm={18}>
+            {isEditing ? (
                 <Form.Item name={name} rules={rules} noStyle style={{ marginBottom: 0 }}>
-                    {/* Chọn loại input: TextArea cho địa chỉ, Input thường cho các trường khác */}
                     {inputType === 'textarea' ? <Input.TextArea autoSize={{ minRows: 2, maxRows: 4 }} /> : <Input />}
                 </Form.Item>
-            ) : ( // Nếu không ở chế độ sửa
-                // Hiển thị Text thông thường
-                <Text style={{ fontSize: '16px' }}>{value || 'N/A'}</Text> // Hiển thị 'N/A' nếu giá trị rỗng
+            ) : (
+                <Text style={{ fontSize: '16px' }}>{value || 'N/A'}</Text>
             )}
         </Col>
     </Row>
@@ -41,296 +30,486 @@ const ProfileDetailItem = ({ label, value, isEditing, name, rules, inputType = '
 
 // --- Component Chính AdminProfile ---
 const AdminProfile = () => {
-    // --- Khai báo State ---
-    const [admin, setAdmin] = useState(hardcodedAdmin); // State lưu thông tin admin, khởi tạo với dữ liệu cứng
-    const [isEditing, setIsEditing] = useState(false); // State quản lý chế độ sửa inline
-    const [loading, setLoading] = useState(false); // State loading chung (nếu cần fetch dữ liệu ban đầu)
-    const [loadingUpdate, setLoadingUpdate] = useState(false); // State loading khi cập nhật thông tin profile
-    const [loadingPassword, setLoadingPassword] = useState(false); // State loading khi đổi mật khẩu
-    const [loadingForgotEmail, setLoadingForgotEmail] = useState(false); // State loading cho bước 1 quên mật khẩu
-    const [loadingResetPassword, setLoadingResetPassword] = useState(false); // State loading cho bước 2 quên mật khẩu
+    // --- State ---
+    const [admin, setAdmin] = useState(null);
+    const [isEditing, setIsEditing] = useState(false);
+    const [loading, setLoading] = useState(true);
+    const [loadingUpdate, setLoadingUpdate] = useState(false);
+    const [loadingPassword, setLoadingPassword] = useState(false);
+    const [loadingForgotEmail, setLoadingForgotEmail] = useState(false);
+    const [loadingResetPassword, setLoadingResetPassword] = useState(false);
+    const [isPasswordModalVisible, setIsPasswordModalVisible] = useState(false);
+    const [isForgotPasswordModalVisible, setIsForgotPasswordModalVisible] = useState(false);
+    const [forgotPasswordStep, setForgotPasswordStep] = useState('email');
+    const [forgotPasswordEmail, setForgotPasswordEmail] = useState('');
 
-    // State quản lý hiển thị các Modal
-    // const [isUpdateModalVisible, setIsUpdateModalVisible] = useState(false); // Không cần modal riêng cho cập nhật info nữa
-    const [isPasswordModalVisible, setIsPasswordModalVisible] = useState(false); // Hiển thị modal đổi mật khẩu
-    const [isForgotPasswordModalVisible, setIsForgotPasswordModalVisible] = useState(false); // Hiển thị modal quên mật khẩu
+    // --- Forms ---
+    const [profileForm] = Form.useForm();
+    const [passwordForm] = Form.useForm();
+    const [forgotPasswordForm] = Form.useForm();
+    const [resetPasswordForm] = Form.useForm();
 
-    // State cho quy trình Quên Mật Khẩu
-    const [forgotPasswordStep, setForgotPasswordStep] = useState('email'); // Bước hiện tại ('email' hoặc 'reset')
-    const [forgotPasswordEmail, setForgotPasswordEmail] = useState(''); // Lưu email đã nhập ở bước 1
+    // --- Hàm Helper cho Notification ---
+    const showErrorNotification = (error, defaultMessage = 'Đã xảy ra lỗi. Vui lòng thử lại.') => {
+        let errorTitle = "Lỗi";
+        let errorDescription = defaultMessage;
 
-    // Khởi tạo các Form Instance của Ant Design
-    const [profileForm] = Form.useForm(); // Form cho sửa thông tin inline
-    const [passwordForm] = Form.useForm(); // Form đổi mật khẩu
-    const [forgotPasswordForm] = Form.useForm(); // Form bước 1 quên mật khẩu
-    const [resetPasswordForm] = Form.useForm(); // Form bước 2 quên mật khẩu
+        if (error.response) {
+            errorDescription = error.response.data?.message
+                            || error.response.data?.error
+                            || error.response.data?.detail
+                            || `Lỗi ${error.response.status}: ${error.response.statusText}`;
 
-    // --- useEffect để đồng bộ Form với State khi bật chế độ Edit ---
-    useEffect(() => {
-        // Chỉ chạy khi isEditing là true và có dữ liệu admin
-        if (isEditing && admin) {
-             // Đặt giá trị cho các trường trong form dựa trên state admin hiện tại
-             profileForm.setFieldsValue({
-                 firstName: admin.firstName,
-                 lastName: admin.lastName,
-                 phoneNumber: admin.phoneNumber,
-                 address: admin.address,
-             });
+            // Xử lý các mã lỗi hoặc message cụ thể
+            if (error.response.status === 401) errorTitle = "Lỗi xác thực";
+            if (error.response.data?.message?.toLowerCase().includes('email not found')) errorDescription = "Email không tồn tại trong hệ thống.";
+            if (error.response.data?.message?.toLowerCase().includes('password incorrect')) errorDescription = "Mật khẩu hiện tại không đúng.";
+            if (error.response.data?.message?.toLowerCase().includes('otp')) errorDescription = "Mã OTP không hợp lệ hoặc đã hết hạn.";
+            // Thêm các trường hợp khác nếu cần
+
+        } else if (error.request) {
+            errorTitle = "Lỗi mạng";
+            errorDescription = 'Không thể kết nối đến máy chủ. Vui lòng kiểm tra lại mạng.';
+        } else {
+            // Nếu lỗi không có response hay request, thường là lỗi logic client hoặc lỗi setup
+            errorTitle = "Lỗi hệ thống";
+            errorDescription = error.message || defaultMessage; // Hiển thị message của đối tượng Error nếu có
         }
-    }, [isEditing, admin, profileForm]); // Dependency: chạy lại khi isEditing, admin, hoặc profileForm thay đổi
 
-    // --- Hàm bật/tắt chế độ Sửa Inline ---
-    const toggleEdit = () => {
-        if (isEditing) { // Nếu đang tắt chế độ sửa
-            profileForm.resetFields(); // Reset các thay đổi chưa lưu trong form
-        }
-        setIsEditing(!isEditing); // Đảo ngược trạng thái isEditing
+        notification.error({
+            message: errorTitle,
+            description: errorDescription,
+            placement: 'topRight'
+        });
+        // console.error("Chi tiết lỗi:", error); // Có thể bật lại để debug
     };
 
-    // --- Hàm xử lý Submit Form Cập nhật Profile (Inline) ---
-     const handleProfileUpdateFinish = async (values) => {
-        console.log('Đang cập nhật profile với giá trị inline:', values);
-        setLoadingUpdate(true); // Bật loading
+    const showSuccessNotification = (description, title = "Thành công") => {
+        notification.success({
+            message: title,
+            description: description,
+            placement: 'topRight'
+        });
+    };
+    // --- Kết thúc Hàm Helper ---
+
+    // --- Hàm Fetch dữ liệu Admin ---
+    const fetchAdminData = useCallback(async () => {
+        setLoading(true);
+        const targetUsername = 'tranducthpt1';
         try {
-            // Chuẩn bị dữ liệu gửi đi theo yêu cầu API (firstName, lastName, phoneNumber, address)
-            const updatePayload = { ...values };
-            console.log("Payload để cập nhật:", updatePayload);
-
-            // --- Phần gọi API thật (Đang comment) ---
-            // await apiService.updateUserInfo(updatePayload);
-            // Giả lập độ trễ mạng
-            await new Promise(resolve => setTimeout(resolve, 500));
-
-            // Cập nhật state cục bộ sau khi gọi API thành công (hoặc giả lập thành công)
-            const updatedData = { ...admin, ...values }; // Merge dữ liệu mới vào state admin
-            setAdmin(updatedData);
-            message.success('Thông tin cá nhân đã được cập nhật!'); // Thông báo thành công
-            setIsEditing(false); // Tắt chế độ sửa sau khi thành công
-
-        } catch (error) { // Xử lý lỗi
-            console.error("Lỗi cập nhật profile:", error);
-            message.error(error.response?.data?.message || 'Cập nhật thông tin thất bại!'); // Hiển thị lỗi
+            const response = await apiService.getUserInfo(targetUsername);
+            if (response && response.data) {
+                setAdmin(response.data);
+            } else {
+                throw new Error("API trả về dữ liệu không hợp lệ.");
+            }
+        } catch (error) {
+            // Sử dụng notification thay vì message
+            showErrorNotification(error, 'Không thể tải thông tin cá nhân.');
+            setAdmin(null);
         } finally {
-            setLoadingUpdate(false); // Tắt loading
+            setLoading(false);
+        }
+    }, []);
+
+    // --- useEffect: Fetch dữ liệu khi component mount ---
+    useEffect(() => {
+        fetchAdminData();
+    }, [fetchAdminData]);
+
+    // --- useEffect: Đồng bộ dữ liệu vào Form khi sửa ---
+    useEffect(() => {
+        if (isEditing && admin) {
+            profileForm.setFieldsValue({
+                firstName: admin.firstName,
+                lastName: admin.lastName,
+                phoneNumber: admin.phoneNumber,
+                address: admin.address,
+            });
+        }
+        if (!isEditing) {
+            profileForm.resetFields();
+        }
+    }, [isEditing, admin, profileForm]);
+
+    // --- Hàm bật/tắt chế độ Sửa ---
+    const toggleEdit = () => {
+        if (!admin) return;
+        setIsEditing(!isEditing);
+    };
+
+    // --- Hàm xử lý Submit Form Cập nhật Profile ---
+    const handleProfileUpdateFinish = async (values) => {
+        if (!admin) return;
+        setLoadingUpdate(true);
+        try {
+            const updatePayload = { /* ... */ };
+            await apiService.updateUserInfo(updatePayload);
+            const updatedData = { ...admin, ...values };
+            setAdmin(updatedData);
+            // Sử dụng notification thay vì message
+            showSuccessNotification('Thông tin cá nhân đã được cập nhật thành công!');
+            setIsEditing(false);
+        } catch (error) {
+             // Sử dụng notification thay vì message
+            showErrorNotification(error, 'Cập nhật thông tin thất bại!');
+        } finally {
+            setLoadingUpdate(false);
         }
     };
 
-    // --- Hàm xử lý Đổi Mật Khẩu (Giữ nguyên logic) ---
+    // --- Hàm xử lý Đổi Mật Khẩu ---
     const handlePasswordChange = async (values) => {
-        console.log('Đang đổi mật khẩu với giá trị:', values);
-        if (values.newPassword !== values.confirmPassword) { message.error('Mật khẩu mới và xác nhận không khớp!'); return; }
+        if (!admin || !admin.email) {
+            // Sử dụng notification thay vì message
+            notification.error({ message: 'Lỗi', description: 'Email người dùng không tồn tại.' });
+            return;
+        }
+        // Form validation xử lý khớp mật khẩu, không cần message ở đây
+
         setLoadingPassword(true);
         try {
-            const payload = { email: admin.email, oldPassword: values.currentPassword, newPassword: values.newPassword };
-            console.log("Payload đổi mật khẩu:", payload);
-            // --- Gọi API Thật (Đang comment) ---
-            // await apiService.changePassword(payload);
-            await new Promise(resolve => setTimeout(resolve, 500)); // Giả lập
-            message.success('Đổi mật khẩu thành công!');
+            const payload = {
+                email: admin.email,
+                oldPassword: values.currentPassword,
+                newPassword: values.newPassword
+            };
+            await apiService.changePassword(payload);
+            // Sử dụng notification thay vì message
+            showSuccessNotification('Đổi mật khẩu thành công!');
             setIsPasswordModalVisible(false);
-            passwordForm.resetFields();
-        } catch (error) { console.error("Lỗi đổi mật khẩu:", error); message.error(error.response?.data?.message || 'Đổi mật khẩu thất bại!');
-        } finally { setLoadingPassword(false); }
+        } catch (error) {
+             // Sử dụng notification thay vì message
+            showErrorNotification(error, 'Đổi mật khẩu thất bại!'); // Hàm helper đã xử lý lỗi mật khẩu sai
+        } finally {
+            setLoadingPassword(false);
+        }
     };
 
-    // --- Hàm xử lý Quên Mật Khẩu - Bước 1: Gửi Email (Giữ nguyên logic) ---
+    // --- Hàm xử lý Quên Mật Khẩu - Bước 1: Gửi Email ---
     const handleForgotPasswordEmailSubmit = async (values) => {
         const email = values.forgotEmail;
-        console.log('Yêu cầu quên mật khẩu cho email:', email);
         setLoadingForgotEmail(true);
         try {
-            // --- Gọi API Thật (Đang comment) ---
-            // await apiService.forgetPassword(email);
-            await new Promise(resolve => setTimeout(resolve, 500)); // Giả lập
-            setForgotPasswordEmail(email); // Lưu email
-            setForgotPasswordStep('reset'); // Chuyển sang bước reset
-            forgotPasswordForm.resetFields(); // Xóa form email
-            message.success(`Yêu cầu đặt lại mật khẩu đã được gửi tới ${email}. Vui lòng kiểm tra email hoặc nhập mật khẩu mới bên dưới.`);
-        } catch (error) { console.error("Lỗi quên mật khẩu (bước 1):", error); message.error(error.response?.data?.message || 'Gửi yêu cầu thất bại. Vui lòng thử lại.');
-        } finally { setLoadingForgotEmail(false); }
+            await apiService.forgetPassword(email);
+            setForgotPasswordEmail(email);
+            setForgotPasswordStep('reset');
+             // Sử dụng notification thay vì message
+            showSuccessNotification(`Yêu cầu đặt lại mật khẩu đã được gửi tới ${email}. Vui lòng kiểm tra email.`);
+        } catch (error) {
+            // Sử dụng notification thay vì message
+            // Logic phân tích lỗi đã được chuyển vào showErrorNotification
+            showErrorNotification(error, 'Gửi yêu cầu thất bại. Vui lòng thử lại.');
+        } finally {
+            setLoadingForgotEmail(false);
+        }
     };
 
-    // --- Hàm xử lý Quên Mật Khẩu - Bước 2: Đặt lại Mật khẩu (Giữ nguyên logic) ---
+    // --- Hàm xử lý Quên Mật Khẩu - Bước 2: Reset Password ---
     const handleResetPasswordSubmit = async (values) => {
-         console.log('Đang đặt lại mật khẩu cho email:', forgotPasswordEmail);
-         console.log('Giá trị mật khẩu mới:', values);
-        if (values.newPassword !== values.confirmPassword) { message.error('Mật khẩu mới và xác nhận không khớp!'); return; }
+        if (!forgotPasswordEmail) {
+             // Sử dụng notification thay vì message
+             notification.error({ message: 'Lỗi', description: 'Không xác định được email để đặt lại mật khẩu.' });
+             return;
+        }
+        // Form validation xử lý khớp mật khẩu, không cần message ở đây
+
         setLoadingResetPassword(true);
         try {
-            // **** QUAN TRỌNG: Kiểm tra API của bạn có cần 'token' không ****
-            const payload = { /* token: values.token, */ email: forgotPasswordEmail, newPassword: values.newPassword };
-             console.log("Payload đặt lại mật khẩu:", payload);
-            // --- Gọi API Thật (Đang comment) ---
-            // await apiService.resetPassword(payload);
-             await new Promise(resolve => setTimeout(resolve, 500)); // Giả lập
-            message.success('Đặt lại mật khẩu thành công!');
-            handleCancelForgotPassword(); // Đóng modal và reset
-        } catch (error) { console.error("Lỗi đặt lại mật khẩu (bước 2):", error); message.error(error.response?.data?.message || 'Đặt lại mật khẩu thất bại.');
-        } finally { setLoadingResetPassword(false); }
+            const payload = {
+                email: forgotPasswordEmail,
+                otp: values.otp,
+                newPassword: values.newPassword
+            };
+            await apiService.resetPassword(payload);
+            // Sử dụng notification thay vì message
+            showSuccessNotification('Đặt lại mật khẩu thành công!');
+            handleCancelForgotPassword();
+        } catch (error) {
+             // Sử dụng notification thay vì message
+             showErrorNotification(error, 'Đặt lại mật khẩu thất bại!'); // Hàm helper đã xử lý lỗi OTP
+        } finally {
+            setLoadingResetPassword(false);
+        }
     };
 
 
     // --- Hàm Mở/Đóng Modals ---
-    const showPasswordModal = () => setIsPasswordModalVisible(true);
+    const showPasswordModal = () => {
+        if (admin) {
+            setIsPasswordModalVisible(true);
+        } else {
+             // Sử dụng notification thay vì message
+            notification.warning({
+                message: 'Thông tin chưa sẵn sàng',
+                description: 'Không thể mở đổi mật khẩu khi chưa tải được thông tin người dùng.'
+            });
+        }
+    };
+    const handleCancelPassword = () => {
+        setIsPasswordModalVisible(false);
+    };
+
     const showForgotPasswordModal = () => {
-        // Reset trạng thái của quy trình quên mật khẩu trước khi mở
         setForgotPasswordStep('email');
         setForgotPasswordEmail('');
-        forgotPasswordForm.resetFields();
-        resetPasswordForm.resetFields();
         setIsForgotPasswordModalVisible(true);
     };
-    // const handleCancelUpdate = () => setIsUpdateModalVisible(false); // Không cần nữa
-    const handleCancelPassword = () => { // Xử lý đóng modal đổi mật khẩu
-        setIsPasswordModalVisible(false);
-        passwordForm.resetFields(); // Reset form khi đóng
-    };
-    const handleCancelForgotPassword = () => { // Xử lý đóng modal quên mật khẩu (ở cả 2 bước)
+    const handleCancelForgotPassword = () => {
         setIsForgotPasswordModalVisible(false);
-        // Reset lại state của quy trình quên mật khẩu
-        setForgotPasswordStep('email');
-        setForgotPasswordEmail('');
-        forgotPasswordForm.resetFields();
-        resetPasswordForm.resetFields();
     };
 
 
     // --- Phần Render Giao Diện ---
-    if (loading) { /* ... hiển thị spinner loading ... */ } // Nếu đang fetch dữ liệu ban đầu
-    if (!admin) { /* ... hiển thị thông báo lỗi ... */ } // Nếu không có dữ liệu admin
 
+// 1. Loading ban đầu
+if (loading) {
     return (
-        // Container chính của trang profile
-        <div style={{ padding: '24px', background: '#f0f2f5', minHeight: 'calc(100vh - 160px)' }}>
-            {/* Card chứa thông tin và các nút hành động */}
-            <Card
-                 bordered={false} // Không có viền
-                 style={{ width: '100%', maxWidth: '900px', margin: 'auto' }} // Giới hạn chiều rộng, căn giữa
-                 // --- Phần Header của Card ---
-                 title={ // Hiển thị Avatar, Tên và Role
-                     <Space align="center"> {/* Căn các item theo chiều dọc */}
-                         <Avatar size={64} icon={<UserOutlined />} style={{ backgroundColor: '#1890ff' }} /> {/* Avatar người dùng */}
-                         <div style={{ marginLeft: '15px', marginBottom: 10 }}>
-                             {/* Tên Admin (Họ + Tên hoặc Username) */}
-                             <Title level={4} style={{ marginBottom: 0 }}>{`${admin.firstName || ''} ${admin.lastName || ''}`.trim() || admin.username}</Title>
-                             {/* Role Admin */}
-                             <Text type="secondary">{admin.role ? <Tag color="volcano">{admin.role}</Tag> : 'N/A'}</Text>
-                         </div>
-                     </Space>
-                 }
-                 extra={ // Các nút hành động ở góc trên phải Card
-                     <Space>
-                        {isEditing ? ( // Nếu đang ở chế độ sửa
-                            <>
-                                {/* Nút Hủy bỏ thay đổi */}
-                                <Tooltip title="Hủy bỏ thay đổi">
-                                     <Button icon={<CloseOutlined />} onClick={toggleEdit} shape="circle" disabled={loadingUpdate}/>
-                                </Tooltip>
-                                 {/* Nút Lưu thay đổi */}
-                                 <Tooltip title="Lưu thay đổi">
-                                     <Button type="primary" icon={<SaveOutlined />} onClick={() => profileForm.submit()} loading={loadingUpdate} shape="circle"/>
-                                 </Tooltip>
-                            </>
-                        ) : ( // Nếu đang ở chế độ xem
-                             /* Nút bật chế độ Sửa */
-                             <Tooltip title="Chỉnh sửa thông tin">
-                                 <Button icon={<EditOutlined />} onClick={toggleEdit} shape="circle"/>
-                             </Tooltip>
-                        )}
-                        {/* Nút mở Modal Đổi mật khẩu */}
-                        <Tooltip title="Đổi mật khẩu">
-                             <Button icon={<LockOutlined />} onClick={showPasswordModal} shape="circle" type="dashed"/>
-                        </Tooltip>
-                     </Space>
-                 }
-            >
-                {/* --- Form cho phép Sửa Inline --- */}
-                {/* Form này luôn tồn tại nhưng các Input chỉ hiện khi isEditing=true */}
-                <Form form={profileForm} layout="vertical" onFinish={handleProfileUpdateFinish} disabled={loadingUpdate}>
-                     {/* --- Phần Thông tin cơ bản --- */}
-                     <Title level={5}>Thông tin cơ bản</Title>
-                     <Divider style={{ marginTop: 0, marginBottom: 20 }}/>
-                     <Row gutter={24}> {/* Chia layout thành 2 cột */}
-                        <Col xs={24} md={12}> {/* Cột trái */}
-                            {/* Username và Email thường không cho sửa */}
-                            <ProfileDetailItem label="Username" value={admin.username} isEditing={false}/>
-                            <ProfileDetailItem label="Email" value={admin.email} isEditing={false} />
-                        </Col>
-                        <Col xs={24} md={12}> {/* Cột phải */}
-                             {/* Họ - hiển thị Input khi isEditing=true */}
-                             <ProfileDetailItem label="Họ" value={admin.firstName} isEditing={isEditing} name="firstName" rules={[{ required: true, message: 'Vui lòng nhập họ!' }]} form={profileForm} />
-                             {/* Tên - hiển thị Input khi isEditing=true */}
-                             <ProfileDetailItem label="Tên" value={admin.lastName} isEditing={isEditing} name="lastName" rules={[{ required: true, message: 'Vui lòng nhập tên!' }]} form={profileForm} />
-                        </Col>
-                     </Row>
+        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: 'calc(100vh - 160px)' }}>
+            <Spin size="large" tip="Đang tải thông tin cá nhân..." />
+        </div>
+    );
+}
 
-                     {/* --- Phần Thông tin liên hệ --- */}
-                     <Title level={5} style={{ marginTop: 20}}>Thông tin liên hệ</Title>
-                     <Divider style={{ marginTop: 0, marginBottom: 20 }}/>
-                     <Row gutter={24}>
-                        <Col xs={24} md={12}>
-                             {/* Số điện thoại - hiển thị Input khi isEditing=true */}
-                             <ProfileDetailItem label="Số điện thoại" value={admin.phoneNumber} isEditing={isEditing} name="phoneNumber" rules={[{ required: true, message: 'Vui lòng nhập SĐT!' }]} form={profileForm} />
-                        </Col>
-                         <Col xs={24} md={12}>
-                             {/* Địa chỉ - hiển thị TextArea khi isEditing=true */}
-                             <ProfileDetailItem label="Địa chỉ" value={admin.address} isEditing={isEditing} name="address" rules={[{ required: true, message: 'Vui lòng nhập địa chỉ!' }]} inputType="textarea" form={profileForm} />
-                        </Col>
-                     </Row>
-                     {/* Nút Submit ẩn, Form được submit bằng nút SaveOutlined ở header */}
-                     <Form.Item style={{ display: 'none' }}> <Button type="primary" htmlType="submit">Submit</Button> </Form.Item>
-                </Form>
-
-                {/* --- Liên kết Quên mật khẩu --- */}
-                <div style={{ marginTop: '30px', textAlign:'center' }}>
-                     <Button type="link" onClick={showForgotPasswordModal}>Quên mật khẩu?</Button>
-                </div>
+// 2. Lỗi không tải được dữ liệu ban đầu
+if (!admin) {
+    return (
+        <div style={{ padding: '24px', textAlign: 'center' }}>
+            <Card>
+                <Title level={4} type="danger">Không thể tải thông tin người dùng.</Title>
+                <Text type="secondary" style={{ display: 'block', marginBottom: 16 }}>Vui lòng kiểm tra lại kết nối hoặc liên hệ quản trị viên.</Text>
+                <Button type="primary" onClick={fetchAdminData} loading={loading}>Thử lại</Button>
             </Card>
+        </div>
+    );
+}
 
-            {/* --- Modal Đổi mật khẩu (Giữ nguyên cấu trúc) --- */}
-            <Modal title="Đổi mật khẩu" open={isPasswordModalVisible} onCancel={handleCancelPassword} footer={null} destroyOnClose centered>
-                 <Spin spinning={loadingPassword}>
-                    <Form form={passwordForm} layout="vertical" onFinish={handlePasswordChange}>
-                         {/* Các trường nhập mật khẩu */}
-                         <Form.Item label="Mật khẩu hiện tại" name="currentPassword" rules={[{ required: true, message: 'Vui lòng nhập mật khẩu hiện tại!' }]}><Input.Password /></Form.Item>
-                         <Form.Item label="Mật khẩu mới" name="newPassword" rules={[{ required: true, message: 'Vui lòng nhập mật khẩu mới!' },{ min: 6, message: 'Mật khẩu cần ít nhất 6 ký tự!' }]} hasFeedback><Input.Password /></Form.Item>
-                         <Form.Item label="Xác nhận mật khẩu mới" name="confirmPassword" dependencies={['newPassword']} hasFeedback rules={[{ required: true, message: 'Vui lòng xác nhận mật khẩu mới!' },({ getFieldValue }) => ({ validator(_, value) { if (!value || getFieldValue('newPassword') === value) { return Promise.resolve(); } return Promise.reject(new Error('Mật khẩu xác nhận không khớp!')); },})]}><Input.Password /></Form.Item>
-                         {/* Nút Hủy và Đổi mật khẩu */}
-                         <Form.Item style={{ textAlign: 'right' }}>
-                             <Space> <Button onClick={handleCancelPassword}>Hủy</Button> <Button type="primary" htmlType="submit" loading={loadingPassword}>Đổi mật khẩu</Button> </Space>
+// 3. Giao diện chính
+return (
+    <div style={{ padding: '24px', background: '#f0f2f5', minHeight: 'calc(100vh - 160px)' }}>
+        <Card
+             bordered={false}
+             style={{ width: '100%', maxWidth: '900px', margin: 'auto' }}
+             title={
+                 <Space align="center">
+                     <Avatar size={64} icon={<UserOutlined />} style={{ backgroundColor: '#1890ff' }} src={admin.avatarUrl /* Nếu có trường avatar */} />
+                     <div style={{ marginLeft: '15px' }}>
+                         <Title level={4} style={{ marginBottom: 4 }}>{`${admin.firstName || ''} ${admin.lastName || ''}`.trim() || admin.username}</Title>
+                         {admin.role && <Tag color={admin.role === 'ADMIN' ? 'volcano' : 'geekblue'}>{admin.role}</Tag>}
+                     </div>
+                 </Space>
+             }
+             extra={
+                <Space>
+                   {isEditing ? (
+                       <>
+                           <Tooltip title="Hủy bỏ">
+                               <Button icon={<CloseOutlined />} onClick={toggleEdit} shape="circle" disabled={loadingUpdate}/>
+                           </Tooltip>
+                           <Tooltip title="Lưu">
+                               {/* Trigger form submit */}
+                               <Button type="primary" icon={<SaveOutlined />} onClick={() => profileForm.submit()} loading={loadingUpdate} shape="circle"/>
+                           </Tooltip>
+                       </>
+                   ) : (
+                        <Tooltip title="Chỉnh sửa thông tin">
+                            <Button icon={<EditOutlined />} onClick={toggleEdit} shape="circle" />
+                        </Tooltip>
+                   )}
+                   <Tooltip title="Đổi mật khẩu">
+                        <Button icon={<LockOutlined />} onClick={showPasswordModal} shape="circle" type="dashed" />
+                   </Tooltip>
+                </Space>
+            }
+        >
+            {/* Form sửa inline */}
+            <Form form={profileForm} layout="vertical" onFinish={handleProfileUpdateFinish} disabled={loadingUpdate || !isEditing /* Disable cả form khi không edit */}>
+                 <Title level={5}>Thông tin cơ bản</Title>
+                 <Divider style={{ marginTop: 0, marginBottom: 20 }}/>
+                 <Row gutter={24}>
+                    {/* Username và Email không cho sửa */}
+                    <Col xs={24} md={12}>
+                        <ProfileDetailItem label="Username" value={admin.username} isEditing={false}/>
+                        <ProfileDetailItem label="Email" value={admin.email} isEditing={false} />
+                    </Col>
+                    {/* Họ và Tên cho sửa */}
+                    <Col xs={24} md={12}>
+                         <ProfileDetailItem label="Họ" value={admin.firstName} isEditing={isEditing} name="firstName" rules={[{ required: true, message: 'Vui lòng nhập họ!' }]} />
+                         <ProfileDetailItem label="Tên" value={admin.lastName} isEditing={isEditing} name="lastName" rules={[{ required: true, message: 'Vui lòng nhập tên!' }]} />
+                    </Col>
+                 </Row>
+
+                 <Title level={5} style={{ marginTop: 20}}>Thông tin liên hệ</Title>
+                 <Divider style={{ marginTop: 0, marginBottom: 20 }}/>
+                 <Row gutter={24}>
+                    <Col xs={24} md={12}>
+                         <ProfileDetailItem label="Số điện thoại" value={admin.phoneNumber} isEditing={isEditing} name="phoneNumber" rules={[{ required: true, message: 'Vui lòng nhập SĐT!' }]} />
+                    </Col>
+                     <Col xs={24} md={12}>
+                         <ProfileDetailItem label="Địa chỉ" value={admin.address} isEditing={isEditing} name="address" rules={[{ required: true, message: 'Vui lòng nhập địa chỉ!' }]} inputType="textarea" />
+                    </Col>
+                 </Row>
+                 {/* Nút submit ẩn của form inline, được trigger bởi nút Save ở header */}
+                 {/* Không cần nút ẩn này vì đã trigger bằng profileForm.submit() */}
+                 {/* <Form.Item style={{ display: 'none' }}> <Button type="primary" htmlType="submit">Submit</Button> </Form.Item> */}
+            </Form>
+
+            {/* Link Quên mật khẩu */}
+            <div style={{ marginTop: '30px', textAlign:'center' }}>
+                 <Button type="link" onClick={showForgotPasswordModal}>
+                     Quên mật khẩu?
+                 </Button>
+            </div>
+        </Card>
+
+        {/* --- Modal Đổi mật khẩu --- */}
+        <Modal
+            title="Đổi mật khẩu"
+            open={isPasswordModalVisible}
+            onCancel={handleCancelPassword}
+            footer={null} // Tự custom footer trong Form.Item
+            destroyOnClose // Quan trọng: Reset form state khi đóng
+            centered
+            maskClosable={!loadingPassword} // Không cho đóng khi đang loading
+            keyboard={!loadingPassword}
+        >
+             <Spin spinning={loadingPassword} tip="Đang xử lý...">
+                <Form form={passwordForm} layout="vertical" onFinish={handlePasswordChange} style={{marginTop: 20}}>
+                     <Form.Item label="Mật khẩu hiện tại" name="currentPassword" rules={[{ required: true, message: 'Vui lòng nhập mật khẩu hiện tại!' }]}>
+                        <Input.Password visibilityToggle/>
+                     </Form.Item>
+                     <Form.Item
+                        label="Mật khẩu mới"
+                        name="newPassword"
+                        rules={[
+                            { required: true, message: 'Vui lòng nhập mật khẩu mới!' },
+                            { min: 6, message: 'Mật khẩu cần ít nhất 6 ký tự!' }
+                        ]}
+                        hasFeedback // Hiển thị icon valid/invalid
+                     >
+                        <Input.Password visibilityToggle/>
+                     </Form.Item>
+                     <Form.Item
+                        label="Xác nhận mật khẩu mới"
+                        name="confirmPassword"
+                        dependencies={['newPassword']} // Phụ thuộc field 'newPassword'
+                        hasFeedback
+                        rules={[
+                            { required: true, message: 'Vui lòng xác nhận mật khẩu mới!' },
+                            // Custom validator function
+                            ({ getFieldValue }) => ({
+                                validator(_, value) {
+                                    if (!value || getFieldValue('newPassword') === value) {
+                                        return Promise.resolve(); // Hợp lệ
+                                    }
+                                    return Promise.reject(new Error('Mật khẩu xác nhận không khớp!')); // Báo lỗi
+                                },
+                            })
+                        ]}
+                     >
+                        <Input.Password visibilityToggle/>
+                     </Form.Item>
+                     <Form.Item style={{ textAlign: 'right', marginTop: 24 }}>
+                        <Space>
+                            <Button onClick={handleCancelPassword} disabled={loadingPassword}>Hủy</Button>
+                            <Button type="primary" htmlType="submit" loading={loadingPassword}>Đổi mật khẩu</Button>
+                        </Space>
+                     </Form.Item>
+                </Form>
+             </Spin>
+        </Modal>
+
+         {/* --- Modal Quên mật khẩu (2 bước) --- */}
+        <Modal
+            title={forgotPasswordStep === 'email' ? "Quên mật khẩu" : "Đặt lại mật khẩu"}
+            open={isForgotPasswordModalVisible}
+            onCancel={handleCancelForgotPassword}
+            footer={null} // Tự custom footer
+            destroyOnClose // Quan trọng: Reset form state khi đóng
+            centered
+            maskClosable={!(loadingForgotEmail || loadingResetPassword)} // Không cho đóng khi đang loading
+            keyboard={!(loadingForgotEmail || loadingResetPassword)}
+        >
+            {/* --- Nội dung Bước 1: Nhập Email --- */}
+            {forgotPasswordStep === 'email' && (
+                 <Spin spinning={loadingForgotEmail} tip="Đang gửi yêu cầu...">
+                     <p style={{ marginBottom: 16, marginTop: 8 }}>Nhập địa chỉ email của bạn để nhận hướng dẫn đặt lại mật khẩu.</p>
+                    <Form form={forgotPasswordForm} layout="vertical" onFinish={handleForgotPasswordEmailSubmit}>
+                          <Form.Item
+                            label="Email"
+                            name="forgotEmail"
+                            rules={[
+                                { required: true, message: 'Vui lòng nhập email!' },
+                                { type: 'email', message: 'Định dạng email không hợp lệ!' }
+                            ]}
+                          >
+                            <Input placeholder="Nhập email đã đăng ký" />
+                          </Form.Item>
+                         <Form.Item style={{ textAlign: 'right', marginTop: 24 }}>
+                            <Space>
+                                <Button onClick={handleCancelForgotPassword} disabled={loadingForgotEmail}>Hủy</Button>
+                                <Button type="primary" htmlType="submit" loading={loadingForgotEmail}>Gửi yêu cầu</Button>
+                            </Space>
                          </Form.Item>
                     </Form>
                  </Spin>
-            </Modal>
+            )}
 
-             {/* --- Modal Quên mật khẩu (2 bước - Giữ nguyên cấu trúc) --- */}
-            <Modal title={forgotPasswordStep === 'email' ? "Quên mật khẩu" : "Đặt lại mật khẩu"} open={isForgotPasswordModalVisible} onCancel={handleCancelForgotPassword} footer={null} destroyOnClose centered>
-                {/* --- Bước 1: Nhập Email --- */}
-                {forgotPasswordStep === 'email' && (
-                     <Spin spinning={loadingForgotEmail}>
-                         <p>Nhập địa chỉ email của bạn để nhận hướng dẫn đặt lại mật khẩu.</p>
-                        <Form form={forgotPasswordForm} layout="vertical" onFinish={handleForgotPasswordEmailSubmit}>
-                              <Form.Item label="Email" name="forgotEmail" rules={[{ required: true, message: 'Vui lòng nhập email!' },{ type: 'email', message: 'Email không hợp lệ!'}]}><Input placeholder="Nhập email đã đăng ký" /></Form.Item>
-                             <Form.Item style={{ textAlign: 'right' }}> <Space> <Button onClick={handleCancelForgotPassword}>Hủy</Button> <Button type="primary" htmlType="submit" loading={loadingForgotEmail}>Gửi yêu cầu</Button> </Space> </Form.Item>
-                        </Form>
-                     </Spin>
-                )}
-                {/* --- Bước 2: Nhập Mật khẩu mới --- */}
-                {forgotPasswordStep === 'reset' && (
-                     <Spin spinning={loadingResetPassword}>
-                        <p>Nhập mật khẩu mới cho tài khoản: <strong>{forgotPasswordEmail}</strong></p>
-                        {/* --- Tùy chọn: Trường nhập Token --- */}
-                        {/* <Form.Item label="Mã xác nhận (từ Email)" name="token" rules={[{ required: true, message: 'Vui lòng nhập mã xác nhận!' }]}><Input /></Form.Item> */}
-                        <Form form={resetPasswordForm} layout="vertical" onFinish={handleResetPasswordSubmit}>
-                            <Form.Item label="Mật khẩu mới" name="newPassword" rules={[{ required: true, message: 'Vui lòng nhập mật khẩu mới!' },{ min: 6, message: 'Mật khẩu ít nhất 6 ký tự!' }]} hasFeedback><Input.Password /></Form.Item>
-                            <Form.Item label="Xác nhận mật khẩu mới" name="confirmPassword" dependencies={['newPassword']} hasFeedback rules={[{ required: true, message: 'Vui lòng xác nhận mật khẩu mới!' },({ getFieldValue }) => ({ validator(_, value) { if (!value || getFieldValue('newPassword') === value) { return Promise.resolve(); } return Promise.reject(new Error('Mật khẩu xác nhận không khớp!')); },})]}><Input.Password /></Form.Item>
-                             <Form.Item style={{ textAlign: 'right' }}> <Space> <Button onClick={handleCancelForgotPassword}>Hủy</Button> <Button type="primary" htmlType="submit" loading={loadingResetPassword}>Đặt lại mật khẩu</Button> </Space> </Form.Item>
-                        </Form>
-                     </Spin>
-                )}
-            </Modal>
-        </div>
-    );
+            {/* --- Nội dung Bước 2: Nhập OTP và Mật khẩu mới --- */}
+            {forgotPasswordStep === 'reset' && (
+                 <Spin spinning={loadingResetPassword} tip="Đang đặt lại mật khẩu...">
+                    <p style={{ marginBottom: 16, marginTop: 8 }}>Một mã OTP đã được gửi đến email <strong>{forgotPasswordEmail}</strong>. Vui lòng nhập mã OTP và mật khẩu mới.</p>
+                    <Form form={resetPasswordForm} layout="vertical" onFinish={handleResetPasswordSubmit}>
+                        <Form.Item
+                            label="Mã OTP (6 chữ số)"
+                            name="otp"
+                            rules={[{ required: true, message: 'Vui lòng nhập mã OTP!' }]}
+                        >
+                            <Input placeholder="Nhập mã OTP bạn nhận được" maxLength={6}/>
+                        </Form.Item>
+                        <Form.Item
+                            label="Mật khẩu mới"
+                            name="newPassword"
+                            rules={[
+                                { required: true, message: 'Vui lòng nhập mật khẩu mới!' },
+                                { min: 6, message: 'Mật khẩu ít nhất 6 ký tự!' }
+                            ]}
+                            hasFeedback
+                        >
+                            <Input.Password visibilityToggle/>
+                        </Form.Item>
+                        <Form.Item
+                            label="Xác nhận mật khẩu mới"
+                            name="confirmPassword"
+                            dependencies={['newPassword']}
+                            hasFeedback
+                            rules={[
+                                { required: true, message: 'Vui lòng xác nhận mật khẩu mới!' },
+                                ({ getFieldValue }) => ({
+                                    validator(_, value) {
+                                        if (!value || getFieldValue('newPassword') === value) {
+                                            return Promise.resolve();
+                                        }
+                                        return Promise.reject(new Error('Mật khẩu xác nhận không khớp!'));
+                                    },
+                                })
+                            ]}
+                        >
+                            <Input.Password visibilityToggle/>
+                        </Form.Item>
+                        <Form.Item style={{ textAlign: 'right', marginTop: 24 }}>
+                            <Space>
+                                <Button onClick={handleCancelForgotPassword} disabled={loadingResetPassword}>Hủy</Button>
+                                <Button type="primary" htmlType="submit" loading={loadingResetPassword}> Đặt lại mật khẩu </Button>
+                            </Space>
+                        </Form.Item>
+                    </Form>
+                 </Spin>
+             )}
+         </Modal>
+    </div>
+);
 };
 
 export default AdminProfile;

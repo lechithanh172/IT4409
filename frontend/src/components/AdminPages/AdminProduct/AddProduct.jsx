@@ -1,4 +1,3 @@
-// AddProduct.jsx
 import React, { useState, useEffect } from 'react';
 import { Button, Form, Input, InputNumber, Space, Row, Col, message, Image, Select, Divider, Checkbox } from 'antd'; // Thêm Checkbox
 import { PlusOutlined, MinusCircleOutlined } from '@ant-design/icons';

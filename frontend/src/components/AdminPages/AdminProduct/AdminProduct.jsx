@@ -8,57 +8,277 @@ import EditProduct from './EditProduct'; // Component sửa sản phẩm
 import apiService from '../../../services/api'; // Service gọi API (giả định)
 const { confirm } = Modal; // Lấy hàm confirm từ Modal Antd
 
-// --- Dữ liệu cứng Category (Nên fetch từ API) ---
+// --- Dữ liệu cứng Category ---
 const allCategory = [
-    { "categoryId": 1, "name": "Laptop" }, { "categoryId": 2, "name": "Tablet" }, { "categoryId": 3, "name": "Smartphone" },
-    { "categoryId": 4, "name": "Accessory" }, { "categoryId": 5, "name": "Monitor" }, { "categoryId": 6, "name": "Printer" },
-    { "categoryId": 7, "name": "Router" }, { "categoryId": 8, "name": "Speaker" }, { "categoryId": 9, "name": "Camera" },
-    { "categoryId": 10, "name": "Smartwatch" }, { "categoryId": 13, "name": "bàn phím" }, { "categoryId": 14, "name": "chuột" }, { "categoryId": 16, "name": "tv" },
-];
-
-// --- Dữ liệu cứng Brand (Nên fetch từ API) ---
-const allBrand = [
-    { "brandId": 1, "name": "Apple", "logoUrl": "..." }, { "brandId": 2, "name": "Samsung", "logoUrl": "..." },
-    { "brandId": 3, "name": "Dell", "logoUrl": "..." }, { "brandId": 4, "name": "HP", "logoUrl": "..." },
-    { "brandId": 5, "name": "Lenovo", "logoUrl": "..." }, { "brandId": 6, "name": "Asus", "logoUrl": "..." },
-    { "brandId": 7, "name": "MSI", "logoUrl": "..." }, { "brandId": 8, "name": "Acer", "logoUrl": "..." },
-    { "brandId": 9, "name": "Xiaomi", "logoUrl": "..." }, { "brandId": 10, "name": "Sony", "logoUrl": "..." },
-    { "brandId": 11, "name": "Tecno", "logoUrl": "..." }, { "brandId": 12, "name": "Macbook", "logoUrl": "..." },
-    //... các brand khác
-];
-
-// --- Dữ liệu sản phẩm cứng (Nên fetch từ API) ---
-// Thêm trường `specifications` và `supportRushOrder` vào dữ liệu mẫu
-const productDataHardcoded = [
+    { "categoryId": 1, "name": "Laptop", "description": "Portable personal computers", "image": "https://hanoicomputercdn.com/media/product/89677_laptop_lenovo_ideapad_slim_5_14irh10_83k0000avn_i5_13420h_24gb_ram_512gb_ssd_14_wuxga_win11_xam_0005_layer_2.jpg" },
+    { "categoryId": 2, "name": "Tablet", "description": "Touchscreen mobile devices", "image": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRtSLFI5VEetrtdyPEDnn55_2OTomtzGFwzSQ&s" },
+    { "categoryId": 3, "name": "Smartphone", "description": "Mobile phones", "image": "https://cdn2.cellphones.com.vn/insecure/rs:fill:358:358/q:90/plain/https://cellphones.com.vn/media/catalog/product/i/p/iphone-15-pro-256gb.png" },
+    { "categoryId": 4, "name": "Accessory", "description": "Computer accessories", "image": "https://i5.walmartimages.com/seo/Wireless-Charger-Magnetic-Fast-Charging-Stand-Compatible-iPhone-16-15-14-13-12-11-Pro-Max-Plus-XS-XR-X-8-Apple-Watch-9-8-7-6-5-4-3-2-SE-AirPods-3-2-P_66f5dc9c-ca3c-4097-8e8b-39ccfa66b6a0.b5cb13def4077c44bc9e6ffa883a35ee.jpeg?odnHeight=320&odnWidth=320&odnBg=FFFFFF" },
+    { "categoryId": 5, "name": "Monitor", "description": "Display devices", "image": "https://www.lg.com/content/dam/channel/wcms/vn/images/man-hinh-may-tinh/24mr400-b_atvq_eavh_vn_c/gallery/small03.jpg" },
+    { "categoryId": 6, "name": "Printer", "description": "Printing machines", "image": "https://cdn2.cellphones.com.vn/x/media/catalog/product/t//t_i_xu_ng_52__1_4.png" },
+    { "categoryId": 7, "name": "Router", "description": "Network routers", "image": "https://owlgaming.vn/wp-content/uploads/2024/06/Thiet-bi-phat-Wifi-6-Router-ASUS-TUF-Gaming-AX6000-1.jpg" },
+    { "categoryId": 8, "name": "Speaker", "description": "Audio output devices", "image": "https://product.hstatic.net/1000187560/product/loa-bluetooth-havit-sk832bt_2__459d04d6a66e4ff38bfa4f528e3cb2d5_large.png" },
+    { "categoryId": 9, "name": "Camera", "description": "Photography and video", "image": "https://www.bachkhoashop.com/wp-content/uploads/2022/12/gth788_1.webp" },
+    { "categoryId": 10, "name": "Smartwatch", "description": "Wearable smart devices", "image": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQx-zhXJ2eJ5OxH7xxs0MnPpu5eNikP79VGbYQG_AEqHw57ezRC8BNLqqokP4n0KhtWCPo&usqp=CAU" }
+    ]
+    // --- Dữ liệu cứng Brand ---
+    const allBrand = [
+    { "brandId": 1, "name": "Apple", "logoUrl": "https://cdn2.cellphones.com.vn/insecure/rs:fill:0:50/q:30/plain/https://cellphones.com.vn/media/tmp/catalog/product/f/r/frame_59.png" },
+    { "brandId": 2, "name": "Samsung", "logoUrl": "https://cdn2.cellphones.com.vn/insecure/rs:fill:0:50/q:30/plain/https://cellphones.com.vn/media/tmp/catalog/product/f/r/frame_60.png" },
+    { "brandId": 3, "name": "Dell", "logoUrl": "https://cdn2.cellphones.com.vn/insecure/rs:fill:0:50/q:30/plain/https://cellphones.com.vn/media/wysiwyg/Icon/brand_logo/Dell.png" },
+    { "brandId": 4, "name": "HP", "logoUrl": "https://cdn2.cellphones.com.vn/insecure/rs:fill:0:50/q:30/plain/https://cellphones.com.vn/media/wysiwyg/Icon/brand_logo/HP.png" },
+    { "brandId": 5, "name": "Lenovo", "logoUrl": "https://cdn2.cellphones.com.vn/insecure/rs:fill:0:50/q:30/plain/https://cellphones.com.vn/media/wysiwyg/Icon/brand_logo/Lenovo.png" },
+    { "brandId": 6, "name": "Asus", "logoUrl": "https://cdn2.cellphones.com.vn/insecure/rs:fill:0:50/q:30/plain/https://cellphones.com.vn/media/wysiwyg/Icon/brand_logo/Asus.png" },
+    { "brandId": 7, "name": "MSI", "logoUrl": "https://cdn2.cellphones.com.vn/insecure/rs:fill:0:50/q:30/plain/https://cellphones.com.vn/media/wysiwyg/Icon/brand_logo/MSI.png" },
+    { "brandId": 8, "name": "Acer", "logoUrl": "https://cdn2.cellphones.com.vn/insecure/rs:fill:0:50/q:30/plain/https://cellphones.com.vn/media/wysiwyg/Icon/brand_logo/acer.png" },
+    { "brandId": 9, "name": "Xiaomi", "logoUrl": "https://cdn2.cellphones.com.vn/insecure/rs:fill:0:50/q:30/plain/https://cellphones.com.vn/media/tmp/catalog/product/f/r/frame_61.png" },
+    { "brandId": 10, "name": "Sony", "logoUrl": "https://cdn2.cellphones.com.vn/insecure/rs:fill:0:50/q:30/plain/https://cellphones.com.vn/media/catalog/product/f/r/frame_87.png" },
+    { "brandId": 11, "name": "Tecno", "logoUrl": "https://cdn2.cellphones.com.vn/insecure/rs:fill:0:50/q:30/plain/https://cellphones.com.vn/media/tmp/catalog/product/f/r/frame_69_1_.png" },
+    { "brandId": 12, "name": "Macbook", "logoUrl": "https://cdn2.cellphones.com.vn/insecure/rs:fill:0:50/q:30/plain/https://cellphones.com.vn/media/wysiwyg/Icon/brand_logo/macbook.png" },
+    { "brandId": 13, "name": "AirPods", "logoUrl": "https://cdn2.cellphones.com.vn/insecure/rs:fill:0:50/q:30/plain/https://cellphones.com.vn/media/catalog/product/b/r/brand-icon-airpods.png" },
+    { "brandId": 14, "name": "Bose", "logoUrl": "https://cdn2.cellphones.com.vn/insecure/rs:fill:0:50/q:30/plain/https://cellphones.com.vn/media/catalog/product/b/r/brand-icon-bose.png" },
+    { "brandId": 15, "name": "Logitech", "logoUrl": "https://cellphones.com.vn/media/icons/brands/brand-248.svg" },
+    { "brandId": 16, "name": "SanDisk", "logoUrl": "https://cdn2.cellphones.com.vn/insecure/rs:fill:0:50/q:30/plain/https://cellphones.com.vn/media/tmp/catalog/product/a/b/abcde_24_.png" },
+    { "brandId": 17, "name": "LG", "logoUrl": "https://cdn2.cellphones.com.vn/insecure/rs:fill:0:50/q:30/plain/https://cellphones.com.vn/media/tmp/catalog/product/f/r/frame_84_1_.png" },
+    { "brandId": 18, "name": "TCL", "logoUrl": "https://cdn2.cellphones.com.vn/insecure/rs:fill:0:50/q:30/plain/https://cellphones.com.vn/media/tmp/catalog/product/t/i/tivi-logo-cate.png" }
+    ]
+    // --- Dữ liệu sản phẩm cứng ---
+    const productDataHardcoded = [
     {
-      "productId": 1, "productName": "iPhone 16e 128GB | Chính hãng VN/A", "description": "...", "weight": 1, "price": 16990000,
-      "supportRushOrder": true, // Thêm trường này
-      "brandId": 1, "categoryId": 3,
-      "specifications": [ // Thêm trường này
-          { "group": "Màn hình", "title": "Kích thước", "content": "6.1 inch" },
-          { "group": "Hiệu năng", "title": "Chip", "content": "Apple A18" }
-      ],
-      "variants": [ {"color": "Trắng", "imageUrl": "...", "stockQuantity": 10, "discount": 10 }, {"color": "Đen", "imageUrl": "...", "stockQuantity": 29, "discount": 8 } ]
+    "productId": 1,
+    "productName": "iPhone 16e 128GB | Chính hãng VN/A",
+    "description": "iPhone 16e được trang bị chip xử lý Apple A18 mạnh mẽ, mang đến khả năng xử lý mượt mà mọi tác vụ hàng ngày, từ công việc đến giải trí.",
+    "weight": 1,
+    "price": 16990000,
+    "supportRushOrder": true,
+    "brandId": 1,
+    "categoryId": 3,
+    "variants": [
+    {
+    "color": "Trắng",
+    "imageUrl": "https://cdn2.cellphones.com.vn/358x/media/catalog/product/i/p/iphone-16e-128gb_1__1.png",
+    "stockQuantity": 10,
+    "discount": 10
     },
     {
-      "productId": 2, "productName": "iPhone 15 Pro Max 512GB | Chính hãng VN/A", "description": "...", "weight": 1, "price": 40990000,
-      "supportRushOrder": true,
-      "brandId": 1, "categoryId": 3,
-      "specifications": [
-          { "group": "Thiết kế", "title": "Chất liệu", "content": "Titan chuẩn hàng không" },
-          { "group": "Màn hình", "title": "Tần số quét", "content": "120Hz ProMotion" }
-      ],
-      "variants": [ {"color": "Titan Tự Nhiên", "imageUrl": "...", "stockQuantity": 20, "discount": 8 }, {"color": "Titan Đen", "imageUrl": "...", "stockQuantity": 13, "discount": 9 }, {"color": "Titan Xanh", "imageUrl": "...", "stockQuantity": 30, "discount": 10 } ]
+    "color": "Đen",
+    "imageUrl": "https://cdn2.cellphones.com.vn/358x/media/catalog/product/i/p/iphone-16e-128gb_1_1.png",
+    "stockQuantity": 29,
+    "discount": 8
+    }
+    ]
     },
     {
-        "productId": 3, "productName": "Samsung Galaxy Z Flip6 12GB 256GB", "description": "...", "weight": 1, "price": 28990000,
-        "supportRushOrder": false, // Ví dụ sản phẩm không hỗ trợ
-        "brandId": 2, "categoryId": 3,
-        "specifications": [], // Có thể rỗng
-        "variants": [ {"color": "Đen", "imageUrl": "...", "stockQuantity": 10, "discount": 10 }, {"color": "Xám", "imageUrl": "...", "stockQuantity": 15, "discount": 8 }, {"color": "Vàng", "imageUrl": "...", "stockQuantity": 30, "discount": 12 }, {"color": "Xanh dương", "imageUrl": "...", "stockQuantity": 20, "discount": 13 } ]
+    "productId": 2,
+    "productName": "iPhone 15 Pro Max 512GB | Chính hãng VN/A",
+    "description": "Thiết kế khung viền từ titan chuẩn hàng không vũ trụ - Cực nhẹ, bền cùng viền cạnh mỏng cầm nắm thoải mái",
+    "weight": 1,
+    "price": 40990000,
+    "supportRushOrder": true,
+    "brandId": 1,
+    "categoryId": 3,
+    "variants": [
+    {
+    "color": "Titan Tự Nhiên",
+    "imageUrl": "https://cdn2.cellphones.com.vn/358x/media/catalog/product/i/p/iphone15-pro-max-512gb-titan-nau.jpg",
+    "stockQuantity": 20,
+    "discount": 8
     },
-    // Thêm các sản phẩm khác với `supportRushOrder` và `specifications`
-];
+    {
+    "color": "Titan Đen",
+    "imageUrl": "https://cdn2.cellphones.com.vn/358x/media/catalog/product/i/p/iphone15-pro-max-512gb-titan-den.jpg",
+    "stockQuantity": 13,
+    "discount": 9
+    },
+    {
+    "color": "Titan Xanh",
+    "imageUrl": "https://cdn2.cellphones.com.vn/358x/media/catalog/product/i/p/iphone15-pro-max-512gb-titan-xanh.jpg",
+    "stockQuantity": 30,
+    "discount": 10
+    }
+    ]
+    },
+    {
+    "productId": 3,
+    "productName": "Samsung Galaxy Z Flip6 12GB 256GB",
+    "description": "Chip Snapdragon 8 Gen 3 8 nhân mang đến hiệu năng mạnh mẽ, cho phép bạn xử lý các tác vụ hàng ngày một cách mượt mà.",
+    "weight": 1,
+    "price": 28990000,
+    "supportRushOrder": true,
+    "brandId": 2,
+    "categoryId": 3,
+    "variants": [
+    {
+    "color": "Đen",
+    "imageUrl": "https://cdn2.cellphones.com.vn/358x/media/catalog/product/f/l/fliip-6-den_4__1.png",
+    "stockQuantity": 10,
+    "discount": 10
+    },
+    {
+    "color": "Xám",
+    "imageUrl": "https://cdn2.cellphones.com.vn/358x/media/catalog/product/f/l/flip-den.jpg",
+    "stockQuantity": 15,
+    "discount": 8
+    },
+    {
+    "color": "Vàng",
+    "imageUrl": "https://cdn2.cellphones.com.vn/358x/media/catalog/product/f/l/flip-vang.jpg",
+    "stockQuantity": 30,
+    "discount": 12
+    },
+    {
+    "color": "Xanh dương",
+    "imageUrl": "https://cdn2.cellphones.com.vn/358x/media/catalog/product/f/l/flip-xanh.jpg",
+    "stockQuantity": 20,
+    "discount": 13
+    }
+    ]
+    },
+    {
+    "productId": 4,
+    "productName": "Samsung Galaxy S25 Ultra 12GB 256GB",
+    "description": "Chuẩn IP68 trên Samsung S25 Ultra 5G – Chống nước, chống bụi, thiết kế cao cấp, sang trọng.",
+    "weight": 1,
+    "price": 39990000,
+    "supportRushOrder": true,
+    "brandId": 2,
+    "categoryId": 3,
+    "variants": [
+    {
+    "color": "Trắng",
+    "imageUrl": "https://cdn2.cellphones.com.vn/358x/media/catalog/product/d/i/dien-thoai-samsung-galaxy-s25-ultra_5.png",
+    "stockQuantity": 22,
+    "discount": 12
+    },
+    {
+    "color": "Xanh dương",
+    "imageUrl": "https://cdn2.cellphones.com.vn/358x/media/catalog/product/d/i/dien-thoai-samsung-galaxy-s25-ultra_2__6.png",
+    "stockQuantity": 12,
+    "discount": 10
+    },
+    {
+    "color": "Đen",
+    "imageUrl": "https://cdn2.cellphones.com.vn/358x/media/catalog/product/d/i/dien-thoai-samsung-galaxy-s25-ultra_3__6.png",
+    "stockQuantity": 26,
+    "discount": 14
+    },
+    {
+    "color": "Xám",
+    "imageUrl": "https://cdn2.cellphones.com.vn/358x/media/catalog/product/d/i/dien-thoai-samsung-galaxy-s25-ultra_1__6.png",
+    "stockQuantity": 22,
+    "discount": 15
+    }
+    ]
+    },
+    {
+    "productId": 5,
+    "productName": "Xiaomi Redmi Note 14 6GB 128GB",
+    "description": "Redmi Note 14 5G sở hữu camera AI 108MP kết hợp với zoom trong cảm biến 3x, cho ra những bức ảnh sắc nét, chi tiết dù chụp chủ thể ở xa hay cận cảnh phức tạp.",
+    "weight": 1,
+    "price": 4990000,
+    "supportRushOrder": true,
+    "brandId": 9,
+    "categoryId": 3,
+    "variants": [
+    {
+    "color": "Xanh lá",
+    "imageUrl": "https://cdn2.cellphones.com.vn/358x/media/catalog/product/d/i/dien-thoai-xiaomi-redmi-note-14_1__2.png",
+    "stockQuantity": 34,
+    "discount": 12
+    },
+    {
+    "color": "Đen",
+    "imageUrl": "https://cdn2.cellphones.com.vn/358x/media/catalog/product/d/i/dien-thoai-xiaomi-redmi-note-14_1.png",
+    "stockQuantity": 26,
+    "discount": 10
+    },
+    {
+    "color": "Tím",
+    "imageUrl": "https://cdn2.cellphones.com.vn/358x/media/catalog/product/d/i/dien-thoai-xiaomi-redmi-note-14.1.png",
+    "stockQuantity": 30,
+    "discount": 15
+    }
+    ]
+    },
+    {
+    "productId": 6,
+    "productName": "Xiaomi 14 12GB 256GB",
+    "description": "Mạnh mẽ cân mọi tác vụ, đa nhiệm cực đỉnh - Chip Snapdragon 8 Gen 3 (4nm) mượt mà đi kèm RAM 12GB",
+    "weight": 1,
+    "price": 22990000,
+    "supportRushOrder": true,
+    "brandId": 9,
+    "categoryId": 3,
+    "variants": [
+    {
+    "color": "Xanh",
+    "imageUrl": "https://cdn2.cellphones.com.vn/358x/media/catalog/product/x/i/xiaomi-14-pre-xanh-la_1.png",
+    "stockQuantity": 36,
+    "discount": 9
+    },
+    {
+    "color": "Trắng",
+    "imageUrl": "https://cdn2.cellphones.com.vn/358x/media/catalog/product/x/i/xiaomi-14-pre-trang_1.png",
+    "stockQuantity": 32,
+    "discount": 10
+    },
+    {
+    "color": "Đen",
+    "imageUrl": "https://cdn2.cellphones.com.vn/358x/media/catalog/product/x/i/xiaomi-14-pre-den_1.png",
+    "stockQuantity": 25,
+    "discount": 9
+    }
+    ]
+    },
+    {
+    "productId": 7,
+    "productName": "TECNO SPARK 30 Pro 8GB 256GB Transformer",
+    "description": "Với chip MediaTek Helio G100, Tecno Spark 30 Pro được thiết kế để mang lại hiệu năng vượt trội, đáp ứng mọi nhu cầu sử dụng hàng ngày của bạn.",
+    "weight": 1,
+    "price": 5290000,
+    "supportRushOrder": true,
+    "brandId": 11,
+    "categoryId": 3,
+    "variants": [
+    {
+    "color": "Đen",
+    "imageUrl": "https://cdn2.cellphones.com.vn/358x/media/catalog/product/p/h/photo_2025-01-10_08-54-30.jpg",
+    "stockQuantity": 10,
+    "discount": 6
+    },
+    {
+    "color": "Đỏ",
+    "imageUrl": "https://cdn2.cellphones.com.vn/358x/media/catalog/product/p/h/photo_2025-01-10_08-54-33.jpg",
+    "stockQuantity": 5,
+    "discount": 4
+    }
+    ]
+    },
+    {
+    "productId": 8,
+    "productName": "Tecno Pova 6 8GB 256GB",
+    "description": "Màn hình 6.78 inch cho không gian rộng rãi để xem phim, chơi game và đọc sách.",
+    "weight": 1,
+    "price": 6490000,
+    "supportRushOrder": true,
+    "brandId": 11,
+    "categoryId": 3,
+    "variants": [
+    {
+    "color": "Xám",
+    "imageUrl": "https://cdn2.cellphones.com.vn/358x/media/catalog/product/p/h/photo_2024-07-25_11-39-16.jpg",
+    "stockQuantity": 15,
+    "discount": 10
+    },
+    {
+    "color": "Xanh lá",
+    "imageUrl": "https://cdn2.cellphones.com.vn/358x/media/catalog/product/p/h/photo_2024-07-25_11-40-46.jpg",
+    "stockQuantity": 15,
+    "discount": 12
+    }
+    ]
+    }
+    ]
 
 // --- Tạo lookup maps để dễ dàng lấy tên Category và Brand từ ID ---
 const categoryMap = allCategory.reduce((map, category) => { map[category.categoryId] = category.name; return map; }, {});

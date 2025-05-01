@@ -462,7 +462,7 @@ const AdminOrder = () => {
                 dataSource={displayedOrders} // Dữ liệu hiển thị (đã lọc)
                 rowKey="key" // Key duy nhất cho mỗi hàng
                 loading={loading || !!loadingAction} // Hiển thị loading khi tải dữ liệu hoặc thực hiện hành động
-                pagination={{ pageSize: 10, showSizeChanger: true, pageSizeOptions: ['10', '20', '50'], showTotal: (total, range) => `${range[0]}-${range[1]} of ${total} items` }} // Cấu hình phân trang
+                pagination={{ pageSize: 10, showSizeChanger: true, pageSizeOptions: ['10', '20', '50'], size: 'large', showTotal: (total, range) => `${range[0]}-${range[1]} of ${total} items` }} // Cấu hình phân trang
                 scroll={{ x: 1150 }} // Cho phép cuộn ngang nếu bảng quá rộng
                 bordered // Hiển thị viền bảng
                 size="middle" // Kích thước bảng

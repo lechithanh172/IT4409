@@ -229,6 +229,7 @@ const AdminCategories = () => {
                     pageSizeOptions: ['5', '10', '15'], // Tùy chọn số item/trang
                     showSizeChanger: true, // Hiển thị dropdown chọn kích thước trang
                     defaultPageSize: 5, // Kích thước trang mặc định
+                    size: 'large',
                     style: { marginTop: '24px' } // Khoảng cách trên
                  }}
                 size="middle" // Kích thước bảng

@@ -313,6 +313,7 @@ const AdminUser = () => {
                     showSizeChanger: true,
                     defaultPageSize: 10,
                     style: { marginTop: '24px' },
+                    size: 'large',
                 }}
                 bordered
                 size="middle"

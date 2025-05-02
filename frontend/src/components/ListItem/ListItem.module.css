@@ -79,6 +79,7 @@
   transform: translateY(-50%);
   border-radius: 100px 0 0 100px;
   padding-left: 10px;
+  border: none;
 }
 
 .swiperButtonPrev svg,

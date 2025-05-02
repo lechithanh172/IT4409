@@ -1,280 +1,178 @@
 import React, { useEffect, useRef, useState } from "react";
 import styles from "./ListItem.module.css";
-import ProductCard from "../../Components/ProductCard/ProductCard.jsx";
+import ProductCard from "../../Components/ProductCard/ProductCard.jsx"; // Assuming path is correct
 import { Link } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faChevronLeft,
   faChevronRight,
 } from "@fortawesome/free-solid-svg-icons";
-import apiService from "../../services/api.js";
+import apiService from "../../services/api.js"; // Import your api service
 
-const data = [
-  {
-    productId: 1,
-    productName: "iPhone 16e 128GB | Chính hãng VN/A",
-    description:
-      "Máy mới 100% , chính hãng Apple Việt Nam.\nCellphoneS hiện là đại lý bán lẻ uỷ quyền iPhone chính hãng VN/A của Apple Việt Nam\niPhone 16e 128GB sử dụng iOS 18\nCáp Sạc USB-C (1m)\n1 ĐỔI 1 trong 30 ngày nếu có lỗi phần cứng nhà sản xuất. Bảo hành 12 tháng tại trung tâm bảo hành chính hãng Apple: CareS.vn(xem chi tiết)\nGiá sản phẩm đã bao gồm VAT",
-    price: 16990000,
-    imageUrl:
-      "https://cdn2.cellphones.com.vn/358x/media/catalog/product/i/p/iphone-16e-128gb_1__1.png",
-    stockQuantity: 10,
-    categoryId: 3,
-    brandId: 1,
-  },
-  {
-    productId: 2,
-    productName: "iPhone 15 Pro Max 512GB | Chính hãng VN/A",
-    description:
-      "Máy mới 100% , chính hãng Apple Việt Nam.\nCellphoneS hiện là đại lý bán lẻ uỷ quyền iPhone chính hãng VN/A của Apple Việt Nam\nHộp, Sách hướng dẫn, Cây lấy sim, Cáp Type C\n1 ĐỔI 1 trong 30 ngày nếu có lỗi phần cứng nhà sản xuất. Bảo hành 12 tháng tại trung tâm bảo hành chính hãng Apple: CareS.vn(xem chi tiết)\nXem thông tin kích hoạt bảo hành các sản phẩm Apple (tại đây)\nGiá sản phẩm đã bao gồm VAT",
-    price: 40990000,
-    imageUrl:
-      "https://cdn2.cellphones.com.vn/358x/media/catalog/product/i/p/iphone15-pro-max-512gb-titan-nau.jpg",
-    stockQuantity: 13,
-    categoryId: 3,
-    brandId: 1,
-  },
-  {
-    productId: 3,
-    productName: "Samsung Galaxy Z Flip6 12GB 256GB",
-    description:
-      "Mới, đầy đủ phụ kiện từ nhà sản xuất\nBảo hành 12 tháng tại trung tâm bảo hành Chính hãng. 1 đổi 1 trong 30 ngày nếu có lỗi phần cứng từ nhà sản xuất. (xem chi tiết)\nGiá sản phẩm đã bao gồm VAT",
-    price: 28990000,
-    imageUrl:
-      "https://cdn2.cellphones.com.vn/358x/media/catalog/product/f/l/fliip-6-den_4__1.png",
-    stockQuantity: 10,
-    categoryId: 3,
-    brandId: 2,
-  },
-  {
-    productId: 4,
-    productName: "Samsung Galaxy S25 Ultra 12GB 256GB",
-    description:
-      "Mới, đầy đủ phụ kiện từ nhà sản xuất\nĐiện thoại Samsung Galaxy S25 Ultra 5G 12GB 256GB\nBảo hành 12 tháng tại trung tâm bảo hành Chính hãng. 1 đổi 1 trong 30 ngày nếu có lỗi phần cứng từ nhà sản xuất. (xem chi tiết)\nGiá sản phẩm đã bao gồm VAT",
-    price: 39990000,
-    imageUrl:
-      "https://cdn2.cellphones.com.vn/358x/media/catalog/product/d/i/dien-thoai-samsung-galaxy-s25-ultra_5.png",
-    stockQuantity: 22,
-    categoryId: 3,
-    brandId: 2,
-  },
-  {
-    productId: 5,
-    productName: "Xiaomi Redmi Note 14 6GB 128GB",
-    description:
-      "Mới, đầy đủ phụ kiện từ nhà sản xuất\nRedmi Note 14, Cáp USB Type C, Củ sạc 33W, Dụng cụ lấy SIM, Sách hướng dẫn,...\nBảo hành 18 tháng tại trung tâm bảo hành Chính hãng. 1 đổi 1 trong 30 ngày nếu có lỗi phần cứng từ nhà sản xuất. (xem chi tiết)\nGiá sản phẩm đã bao gồm VAT",
-    price: 4990000,
-    imageUrl:
-      "https://cdn2.cellphones.com.vn/358x/media/catalog/product/d/i/dien-thoai-xiaomi-redmi-note-14_1__2.png",
-    stockQuantity: 34,
-    categoryId: 3,
-    brandId: 9,
-  },
-  {
-    productId: 6,
-    productName: "Xiaomi 14 12GB 256GB",
-    description:
-      "Mới, đầy đủ phụ kiện từ nhà sản xuất\nMáy, sạc, Cáp USB Type-C, Dụng cụ lấy SIM, Ốp, Hướng dẫn sử dụng nhanh\nBảo hành 24 tháng tại trung tâm bảo hành Chính hãng. 1 đổi 1 trong 30 ngày nếu có lỗi phần cứng từ nhà sản xuất. (xem chi tiết)\nGiá sản phẩm đã bao gồm VAT",
-    price: 22990000,
-    imageUrl:
-      "https://cdn2.cellphones.com.vn/358x/media/catalog/product/x/i/xiaomi-14-pre-xanh-la_1.png",
-    stockQuantity: 36,
-    categoryId: 3,
-    brandId: 9,
-  },
-  {
-    productId: 7,
-    productName: "TECNO SPARK 30 Pro 8GB 256GB Transformer",
-    description:
-      "Mới, đầy đủ phụ kiện từ nhà sản xuất\nMáy, Củ cáp, Cáp sạc, Ốp lưng\nBảo hành 13 tháng tại trung tâm bảo hành Chính hãng. 1 đổi 1 trong 30 ngày nếu có lỗi phần cứng từ nhà sản xuất. (xem chi tiết)\nGiá sản phẩm đã bao gồm VAT",
-    price: 5290000,
-    imageUrl:
-      "https://cdn2.cellphones.com.vn/358x/media/catalog/product/p/h/photo_2025-01-10_08-54-30.jpg",
-    stockQuantity: 10,
-    categoryId: 3,
-    brandId: 10,
-  },
-  {
-    productId: 8,
-    productName: "Tecno Pova 6 8GB 256GB",
-    description:
-      "Mới, đầy đủ phụ kiện từ nhà sản xuất\nBảo hành 13 tháng tại trung tâm bảo hành Chính hãng. 1 đổi 1 trong 30 ngày nếu có lỗi phần cứng từ nhà sản xuất. (xem chi tiết)\nGiá sản phẩm đã bao gồm VAT",
-    price: 6490000,
-    imageUrl:
-      "https://cdn2.cellphones.com.vn/358x/media/catalog/product/p/h/photo_2024-07-25_11-39-16.jpg",
-    stockQuantity: 15,
-    categoryId: 3,
-    brandId: 10,
-  },
-  {
-    productId: 9,
-    productName: "Apple MacBook Air M2 2024 8CPU 8GPU 16GB 256GB",
-    description:
-      "Máy mới 100%, đầy đủ phụ kiện từ nhà sản xuất. Sản phẩm có mã SA/A (được Apple Việt Nam phân phối chính thức).\nMáy, Sách HDSD, Cáp sạc USB-C (2 m), Cốc sạc USB-C 30W\n1 ĐỔI 1 trong 30 ngày nếu có lỗi phần cứng nhà sản xuất. Bảo hành 12 tháng tại trung tâm bảo hành chính hãng Apple: CareS.vn(xem chi tiết)\nXem thông tin kích hoạt bảo hành các sản phẩm Apple (tại đây)\nGiá sản phẩm đã bao gồm VAT",
-    price: 24990000,
-    imageUrl:
-      "https://cdn2.cellphones.com.vn/358x/media/catalog/product/m/a/macbook_air_m2_2_1_1_7.png",
-    stockQuantity: 42,
-    categoryId: 1,
-    brandId: 1,
-  },
-  {
-    productId: 10,
-    productName: "Apple MacBook Air M2 2024 8CPU 8GPU 16GB 256GB",
-    description:
-      "Máy mới 100%, đầy đủ phụ kiện từ nhà sản xuất. Sản phẩm có mã SA/A (được Apple Việt Nam phân phối chính thức).\nMáy, Sách HDSD, Cáp sạc USB-C (2 m), Cốc sạc USB-C 30W\n1 ĐỔI 1 trong 30 ngày nếu có lỗi phần cứng nhà sản xuất. Bảo hành 12 tháng tại trung tâm bảo hành chính hãng Apple: CareS.vn(xem chi tiết)\nXem thông tin kích hoạt bảo hành các sản phẩm Apple (tại đây)\nGiá sản phẩm đã bao gồm VAT",
-    price: 24990000,
-    imageUrl:
-      "https://cdn2.cellphones.com.vn/358x/media/catalog/product/m/a/macbook_air_m2_2_1_1_7.png",
-    stockQuantity: 42,
-    categoryId: 1,
-    brandId: 1,
-  },
-];
+// Removed the hardcoded 'data' array
 
 function ListItem({ category }) {
-  const [popularProducts, setPopularProducts] = useState([]);
-  const [categoryId, setCategoryId] = useState();
+  const [popularProducts, setPopularProducts] = useState([]); // State to hold products from API
   const [title, setTitle] = useState("");
-  const [index, setIndex] = useState(0);
-  const [offset, setOffset] = useState(0);
-  const [width, setWidth] = useState(0);
-  const [maxIndex, setMaxIndex] = useState(0);
-  const elementRef = useRef(null);
+  const [loading, setLoading] = useState(true); // Added loading state
+  const [error, setError] = useState(null); // Added error state
+  const [index, setIndex] = useState(0); // Your original state
+  const [offset, setOffset] = useState(0); // Your original state
+  const [width, setWidth] = useState(0); // Your original state
+  const [maxIndex, setMaxIndex] = useState(0); // Your original state, will be calculated dynamically
+  const elementRef = useRef(null); // Your original ref
 
+  // Effect to fetch data and set title
   useEffect(() => {
-    const fetchData = () => {
-      try {
-        // const products = apiService.getProductsByCategory(category)
-        const products = data;
-        let id;
-        switch (category) {
-          case "Smartphone":
-            id = 3;
-            break;
-          case "Laptop":
-            id = 1;
-            break;
-          case "Tablet":
-            id = 2;
-            break;
-          case "Accessory":
-            id = 4;
-            break;
-          case "Monitor":
-            id = 5;
-            break;
-          case "Printer":
-            id = 6;
-            break;
-          case "Router":
-            id = 7;
-            break;
-          case "Speaker":
-            id = 8;
-            break;
-          case "Camera":
-            id = 9;
-            break;
-          case "Smartwatch":
-            id = 10;
-            break;
-          default:
-            alert("404 Not Found");
-            return;
-        }
-        setCategoryId(id);
-        const filteredProducts = products.filter(
-          (product) => product.categoryId === id
-        );
-        setPopularProducts(filteredProducts);
+    const fetchData = async () => {
+      setLoading(true);
+      setError(null);
+      setPopularProducts([]); // Clear previous products
+      setIndex(0); // Reset index when category changes
+      setOffset(0); // Reset offset
 
-        switch (id) {
-          case 1:
-            setTitle("LAPTOP");
-            break;
-          case 2:
-            setTitle("MÁY TÍNH BẢNG");
-            break;
-          case 3:
-            setTitle("ĐIỆN THOẠI");
-            break;
-          case 4:
-            setTitle("PHỤ KIỆN MÁY TÍNH");
-            break;
-          case 5:
-            setTitle("MÀN HÌNH");
-            break;
-          case 6:
-            setTitle("MÁY IN");
-            break;
-          case 7:
-            setTitle("THIẾT BỊ MẠNG");
-            break;
-          case 8:
-            setTitle("LOA ÂM THANH");
-            break;
-          case 9:
-            setTitle("MÁY ẢNH & CAMERA");
-            break;
-          case 10:
-            setTitle("ĐỒNG HỒ THÔNG MINH");
-            break;
-          default:
-            setTitle("TẤT CẢ SẢN PHẨM");
-            break;
+      if (!category) {
+        setError("Category prop is missing.");
+        setTitle("LỖI");
+        setLoading(false);
+        return;
+      }
+
+      // --- Set Title based on category (same logic as before) ---
+      let displayTitle = category.toUpperCase() + " NỔI BẬT";
+      switch (category) {
+         case "Laptop": displayTitle = "LAPTOP NỔI BẬT"; break;
+         case "Tablet": displayTitle = "MÁY TÍNH BẢNG NỔI BẬT"; break;
+         case "Smartphone": displayTitle = "ĐIỆN THOẠI NỔI BẬT"; break;
+         case "Accessory": displayTitle = "PHỤ KIỆN MÁY TÍNH NỔI BẬT"; break;
+         case "Monitor": displayTitle = "MÀN HÌNH NỔI BẬT"; break;
+         case "Printer": displayTitle = "MÁY IN NỔI BẬT"; break;
+         case "Router": displayTitle = "THIẾT BỊ MẠNG NỔI BẬT"; break;
+         case "Speaker": displayTitle = "LOA ÂM THANH NỔI BẬT"; break;
+         case "Camera": displayTitle = "MÁY ẢNH & CAMERA NỔI BẬT"; break;
+         case "Smartwatch": displayTitle = "ĐỒNG HỒ THÔNG MINH NỔI BẬT"; break;
+         default: break;
+      }
+      setTitle(displayTitle);
+      // --- End Title Setting ---
+
+      // --- API Call ---
+      try {
+        const response = await apiService.getProductsByCategory(category);
+        if (response && Array.isArray(response.data)) {
+           setPopularProducts(response.data);
+        } else if (response && Array.isArray(response)) {
+           setPopularProducts(response);
+        } else {
+           console.warn(`No products found or unexpected data format for category: ${category}`, response);
+           setPopularProducts([]);
         }
       } catch (error) {
-        console.error("Error fetching data:", error);
+        console.error(`Error fetching data for category ${category}:`, error);
+        setError(`Could not load products. ${error.message}`);
+        setPopularProducts([]);
+      } finally {
+        setLoading(false);
       }
     };
 
     fetchData();
   }, [category]);
 
+  // Effect for slider calculations - **Using your original logic structure**
   useEffect(() => {
     const handleOffset = () => {
       const element = elementRef.current;
       let containerWidth;
+      let calculatedMaxIndex = 0; // Initialize calculated max index for this scope
+
+      // --- Your original offset and maxIndex calculation logic ---
       if (window.innerWidth > 1200) {
-        setOffset(index * 305);
-        setMaxIndex(popularProducts.length - 4);
+        setOffset(index * 305); // Your formula
+        // Calculate maxIndex based on API data length and 4 visible items
+        calculatedMaxIndex = popularProducts.length > 4 ? popularProducts.length - 4 : 0;
       } else if (window.innerWidth > 990) {
-        setOffset(index * (width / 3));
-        setMaxIndex(popularProducts.length - 4);
+        setOffset(index * (width / 3)); // Your formula
+         // Calculate maxIndex based on API data length and 4 visible items
+        calculatedMaxIndex = popularProducts.length > 4 ? popularProducts.length - 4 : 0;
       } else if (window.innerWidth > 717) {
-        setOffset(index * (width / 3 + 3.33333));
-        setMaxIndex(popularProducts.length - 3);
+        setOffset(index * (width / 3 + 3.33333)); // Your formula
+         // Calculate maxIndex based on API data length and 3 visible items
+        calculatedMaxIndex = popularProducts.length > 3 ? popularProducts.length - 3 : 0;
       } else {
-        setOffset(index * (width / 2 + 5));
-        setMaxIndex(popularProducts.length - 2);
+        setOffset(index * (width / 2 + 5)); // Your formula
+         // Calculate maxIndex based on API data length and 2 visible items
+        calculatedMaxIndex = popularProducts.length > 2 ? popularProducts.length - 2 : 0;
       }
+      // --- End of your original logic block ---
+
+      setMaxIndex(calculatedMaxIndex); // Update the state with the dynamically calculated maxIndex
 
       if (element) {
         containerWidth = element.offsetWidth;
-        setWidth(containerWidth);
+        setWidth(containerWidth); // Keep updating width as before
       }
     };
 
-    handleOffset();
+    // Run calculation only if products have loaded to avoid issues with popularProducts.length
+    if (!loading) {
+       handleOffset();
+    }
+
     window.addEventListener("resize", handleOffset);
-
     return () => window.removeEventListener("resize", handleOffset);
-  }, [index, width, popularProducts.length]);
+    // Depend on index, width, popularProducts.length, and loading status
+    // Using popularProducts.length ensures recalculation when data changes
+  }, [index, width, popularProducts.length, loading]); // Keep original dependencies + popularProducts.length + loading
 
+  // Effect for index correction - **Using your exact original logic**
   useEffect(() => {
+    // Your original index correction logic:
     if (index < -maxIndex && index !== 0) {
       setIndex(0);
     }
-  }, [maxIndex, index]);
+    // Add a check to prevent index from going positive (based on your original prev/next handlers)
+    if (index > 0) {
+        setIndex(0);
+    }
+  }, [maxIndex, index]); // Keep original dependencies
 
+  // --- Conditional Rendering for Loading/Error ---
+  if (loading) {
+    return (
+      <div className={styles.popular}>
+        <div className={styles.popularTitle}>
+          <Link to={`/product/category=${category}`} className={styles.title}>
+            <h2>{title || `${category.toUpperCase()} NỔI BẬT`}</h2>
+          </Link>
+        </div>
+        <p>Loading products...</p>
+      </div>
+    );
+  }
+
+  if (error) {
+     return (
+      <div className={styles.popular}>
+        <div className={styles.popularTitle}>
+          <Link to={`/product/category=${category}`} className={styles.title}>
+             <h2>{title}</h2>
+          </Link>
+        </div>
+        <p style={{ color: "red" }}>Error: {error}</p>
+      </div>
+    );
+  }
+
+  // --- Original Render Logic (when products are available) ---
   return (
     <>
+      {/* Render container only if there are products */}
       {popularProducts.length > 0 && (
         <div className={styles.popular}>
           <div className={styles.popularTitle}>
             <Link to={`/product/category=${category}`} className={styles.title}>
-              <h2>{title} NỔI BẬT</h2>
+              <h2>{title}</h2>
             </Link>
           </div>
           <div className={styles.productList}>
@@ -284,34 +182,35 @@ function ListItem({ category }) {
                   className={styles.productList}
                   ref={elementRef}
                   style={{
-                    transform: `translateX(${offset}px)`,
-                    transitionDuration: "300ms",
+                    transform: `translateX(${offset}px)`, // Uses offset calculated by your logic
+                    transitionDuration: "300ms", // Your original transition
+                    // Ensure display: flex or similar is handled by your CSS for styles.productList
                   }}
                 >
-                  {popularProducts.length > 0 ? (
-                    popularProducts.map((product) => (
-                      <div className={styles.listItem}>
-                        <ProductCard
-                          key={product.productId}
-                          product={product}
-                        />
-                      </div>
-                    ))
-                  ) : (
-                    <p>Chưa có sản phẩm nổi bật.</p>
-                  )}
+                  {/* Map over fetched popularProducts */}
+                  {popularProducts.map((product) => (
+                    <div className={styles.listItem} key={product.productId}>
+                      <ProductCard
+                        product={product} // Pass the product object from API
+                      />
+                    </div>
+                  ))}
                 </div>
+                {/* Prev Button - Your original logic/style/handler */}
                 <div
-                  onClick={() => setIndex((prev) => prev + 1)}
+                  onClick={() => setIndex((prev) => prev + 1)} // Your original handler
                   className={styles.swiperButtonPrev}
-                  style={index === 0 ? { display: "none" } : {}}
+                  style={index === 0 ? { display: "none" } : {}} // Your original style condition
                 >
                   <FontAwesomeIcon icon={faChevronLeft} />
                 </div>
+                {/* Next Button - Your original logic/style/handler */}
                 <div
-                  onClick={() => setIndex((prev) => prev - 1)}
+                  onClick={() => setIndex((prev) => prev - 1)} // Your original handler
                   className={styles.swiperButtonNext}
-                  style={index <= -maxIndex ? { display: "none" } : {}}
+                  // Your original style condition using dynamically calculated maxIndex
+                  style={maxIndex === 0 || index <= -maxIndex ? { display: "none" } : {}}
+                  // Added maxIndex === 0 check to hide if no scrolling is possible
                 >
                   <FontAwesomeIcon icon={faChevronRight} />
                 </div>
@@ -319,6 +218,17 @@ function ListItem({ category }) {
             </div>
           </div>
         </div>
+      )}
+      {/* Render message if not loading, no error, but no products */}
+      {!loading && !error && popularProducts.length === 0 && (
+         <div className={styles.popular}>
+            <div className={styles.popularTitle}>
+              <Link to={`/product/category=${category}`} className={styles.title}>
+                 <h2>{title}</h2>
+              </Link>
+            </div>
+            <p>Chưa có sản phẩm nổi bật nào cho danh mục này.</p>
+         </div>
       )}
     </>
   );

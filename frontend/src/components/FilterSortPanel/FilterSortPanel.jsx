@@ -64,12 +64,22 @@ const FilterSortPanel = ({ currentFilters, onFilterChange, availableBrands = [],
 
   // Hàm gọi callback KHI NGƯỜI DÙNG THẢ CHUỘT khỏi slider giá
   const handlePriceChangeFinal = (values) => {
-     console.log("Final Price Change:", values);
-     // Chỉ gọi onFilterChange nếu giá trị thực sự thay đổi
-     if (values[0] !== (parseInt(price_gte, 10) || minPrice) || values[1] !== (parseInt(price_lte, 10) || maxPrice)) {
-         onFilterChange({ price_gte: values[0], price_lte: values[1] });
-     }
-  };
+    // *** THÊM LOG ***
+    console.log("[FilterSortPanel] onFinalChange - values:", values);
+    console.log("[FilterSortPanel] currentFilters (before change):", { price_gte, price_lte });
+    console.log("[FilterSortPanel] Default min/max:", { minPrice, maxPrice });
+
+    const currentGte = parseInt(price_gte, 10) || minPrice;
+    const currentLte = parseInt(price_lte, 10) || maxPrice;
+
+    // Chỉ gọi onFilterChange nếu giá trị thực sự thay đổi
+    if (values[0] !== currentGte || values[1] !== currentLte) {
+        console.log("[FilterSortPanel] Price changed! Calling onFilterChange with:", { price_gte: values[0], price_lte: values[1] });
+        onFilterChange({ price_gte: values[0], price_lte: values[1] });
+    } else {
+        console.log("[FilterSortPanel] Price did not change. Not calling onFilterChange.");
+    }
+ };
 
   // Hàm toggle section
   const toggleSection = (setter) => setter(prev => !prev);

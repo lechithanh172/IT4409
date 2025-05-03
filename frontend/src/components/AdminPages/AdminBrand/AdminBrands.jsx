@@ -6,24 +6,18 @@ import AddBrand from './AddBrand';
 import EditBrand from './EditBrand';
 import apiService from '../../../services/api';
 
-// *** Bỏ dòng này đi vì không dùng Modal.confirm nữa ***
-// const { confirm } = Modal;
-
 const AdminBrands = () => {
     const [refresh, setRefresh] = useState(false);
     const [brands, setBrands] = useState([]);
-    const [modalChild, setModalChild] = useState(null); // State cho modal Add/Edit
+    const [modalChild, setModalChild] = useState(null);
     const [loading, setLoading] = useState(false);
     const [searchText, setSearchText] = useState('');
     const [searchedColumn, setSearchedColumn] = useState('');
     const searchInput = useRef(null);
 
-    // *** State mới cho modal xác nhận xóa ***
     const [isConfirmDeleteModalVisible, setIsConfirmDeleteModalVisible] = useState(false);
     const [brandToDelete, setBrandToDelete] = useState(null);
-    // ****************************************
 
-    // ... (useEffect, onRefresh, handleSearch, handleReset, getColumnSearchProps giữ nguyên) ...
     useEffect(() => {
         const fetchData = async () => {
             setLoading(true);
@@ -141,7 +135,6 @@ const AdminBrands = () => {
         setBrandToDelete(brand); // Lưu lại brand cần xóa
         setIsConfirmDeleteModalVisible(true); // Mở modal xác nhận
     };
-    // ******************************************************
 
     // *** Hàm xử lý khi nhấn OK trên modal xác nhận xóa ***
     const handleConfirmDelete = async () => {
@@ -152,7 +145,6 @@ const AdminBrands = () => {
         setIsConfirmDeleteModalVisible(false); // Đóng modal
         setBrandToDelete(null); // Reset state
     };
-    // ******************************************************
 
     // *** Hàm xử lý khi nhấn Cancel hoặc đóng modal xác nhận xóa ***
     const handleCancelDelete = () => {
@@ -160,7 +152,6 @@ const AdminBrands = () => {
         setIsConfirmDeleteModalVisible(false); // Đóng modal
         setBrandToDelete(null); // Reset state
     };
-    // ***********************************************************
 
     const columns = [
         {

@@ -40,11 +40,6 @@ const AddBrand = ({ setModalChild, handleRefresh }) => {
 
     return (
         <div style={{ width: 650, margin: 'auto' }}>
-            {/* Sửa tiêu đề */}
-            <h2 style={{ marginTop: 0, marginBottom: 20, textAlign: 'center', fontSize: '24px' }}>
-                Thêm Thương Hiệu
-            </h2>
-
             <Form
                 form={form}
                 name="themThuongHieu"

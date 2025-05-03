@@ -86,43 +86,17 @@ const apiService = {
   getOrderHistory: (username) => apiInstance.get(`/order/history/${username}`), // 22. API Xem lịch sử đơn hàng (Hiện có)
   getOrderById: (orderId) => apiInstance.get(`/order/view/${orderId}`), // 23. API Xem đơn hàng cụ thể (Hiện có)
   getOrdersByStatus: (status) => apiInstance.get(`/order/status/${status}`), // 24. API Lọc đơn theo trạng thái (Hiện có)
-  approveOrder: (orderId) => apiInstance.post(`/order/approve/${orderId}`), // 25. API Duyệt đơn hàng (Hiện có)
-
+  getAllOrders: () => apiInstance.get('/order/view/all'),
+  updateOrderStatus: (data) => apiInstance.post('/order/apply-status', data),
   // USER APIs
-/**
-   * 26. API Lấy thông tin người dùng theo username (Không dùng cho bảng chính, giữ lại nếu cần)
-   * GET /user/info/{username}
-   */
+
 getUserInfo: (username) => apiInstance.get(`/user/info/${username}`),
-
-/**
- * API Lấy thông tin người dùng theo role (Dùng cho các Tab trong AdminUser)
- * GET /user/{role}
- * role: CUSTOMER, PRODUCT_MANAGER, ADMIN (viết hoa/thường đều được - backend xử lý)
- */
 getUsersByRole: (role) => apiInstance.get(`/user/${role}`),
-
-/**
- * API Cập nhật thông tin người dùng (Dùng trong EditUser)
- * PUT /user/update
- * Body: { firstName, lastName, phoneNumber, address }
- */
 updateUserInfo: (data) => apiInstance.put("/user/update", data), // data nên là object chứa các trường cần cập nhật
-
-/**
- * API Xóa người dùng (Dùng trong AdminUser)
- * DELETE /user/delete?userId={userId}
- */
 deleteUser: (userId) =>
   apiInstance.delete("/user/delete", {
     params: { userId }, // Gửi userId như một query parameter
   }),
-
-/**
-* API Set Role cho người dùng (Có thể thêm vào EditUser hoặc action riêng)
-* POST /user/set-role
-* Body: { userId: number, role: string }
-*/
 setUserRole: (data) => apiInstance.post('/user/set-role', data), // data = { userId, role }
 
 forgetPassword: (email) =>

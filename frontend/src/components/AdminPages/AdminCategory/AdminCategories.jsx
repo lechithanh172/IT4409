@@ -5,30 +5,25 @@ import {
   DeleteFilled,
   ExclamationCircleFilled,
   SearchOutlined,
-  EditOutlined, // *** ĐÃ THÊM ICON SỬA ***
+  EditOutlined,
 } from "@ant-design/icons";
 import Highlighter from "react-highlight-words";
 import AddCategory from "./AddCategory";
 import EditCategory from "./EditCategory";
 import apiService from "../../../services/api";
 
-// Không dùng Modal.confirm nữa
-// const { confirm } = Modal;
-
 const AdminCategories = () => {
   const [refresh, setRefresh] = useState(false);
   const [categories, setCategories] = useState([]);
-  const [modalChild, setModalChild] = useState(null); // State cho modal Add/Edit
+  const [modalChild, setModalChild] = useState(null);
   const [loading, setLoading] = useState(false);
   const [searchText, setSearchText] = useState("");
   const [searchedColumn, setSearchedColumn] = useState("");
   const searchInput = useRef(null);
 
-  // State cho modal xác nhận xóa (giữ nguyên từ lần sửa trước)
   const [isConfirmDeleteModalVisible, setIsConfirmDeleteModalVisible] = useState(false);
   const [categoryToDelete, setCategoryToDelete] = useState(null);
 
-  // --- useEffect, onRefresh, Search Logic (giữ nguyên) ---
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
@@ -121,7 +116,6 @@ const AdminCategories = () => {
               text
           ),
   });
-  // --- Logic Xóa và Modal Xác nhận Xóa (giữ nguyên từ lần sửa trước) ---
   const deleteCategory = async (categoryToDelete) => {
     if (!categoryToDelete || !categoryToDelete.categoryId) {
       message.error("Không tìm thấy ID danh mục để xóa.");
@@ -210,26 +204,23 @@ const AdminCategories = () => {
     {
       title: "Hành động",
       key: "action",
-      width: 120, // *** TĂNG CHIỀU RỘNG ĐỂ CHỨA 2 NÚT ***
+      width: 120, 
       align: "center",
       fixed: "right",
       render: (_, record) => (
         <Space size="middle">
-          {/* *** NÚT SỬA ĐÃ THÊM *** */}
           <Button
-              type="text" // Hoặc "primary" tùy ý
+              type="text"
               icon={<EditOutlined />}
               onClick={(e) => {
-                  e.stopPropagation(); // Luôn cần để an toàn
+                  e.stopPropagation();
                   console.log("Edit button clicked for:", record);
-                  // Mở modal EditCategory khi click nút sửa
                   setModalChild(
                       <EditCategory category={record} setModalChild={setModalChild} handleRefresh={onRefresh} />
                   );
               }}
               aria-label={`Sửa danh mục ${record.categoryName}`}
           />
-          {/* *** NÚT XÓA (Giữ nguyên logic gọi modal state) *** */}
           <Button
             type="text"
             danger
@@ -237,7 +228,7 @@ const AdminCategories = () => {
             onClick={(e) => {
               e.stopPropagation();
               console.log("Delete button clicked for:", record);
-              showDeleteConfirmModal(record); // Gọi hàm mở modal xác nhận state
+              showDeleteConfirmModal(record);
             }}
             aria-label={`Xóa danh mục ${record.categoryName}`}
           />
@@ -265,7 +256,6 @@ const AdminCategories = () => {
         </Button>
       </Space>
 
-      {/* Modal dùng chung cho Add/Edit */}
       <Modal
         title={modalChild?.type === AddCategory ? 'Thêm Danh Mục Mới' : modalChild?.type === EditCategory ? 'Chỉnh Sửa Danh Mục' : false}
         centered
@@ -280,7 +270,6 @@ const AdminCategories = () => {
         {modalChild}
       </Modal>
 
-      {/* Modal xác nhận xóa (giữ nguyên) */}
       <Modal
           title="Xác nhận xóa danh mục"
           open={isConfirmDeleteModalVisible}
@@ -300,7 +289,6 @@ const AdminCategories = () => {
 
       <Table
         bordered
-        // *** ĐÃ XÓA PROP onRow ***
         columns={columns}
         dataSource={categories}
         rowKey="categoryId"

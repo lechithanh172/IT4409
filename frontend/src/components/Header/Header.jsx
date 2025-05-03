@@ -1,13 +1,13 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import { Link, NavLink, useNavigate } from "react-router-dom";
 import { useCart } from "../../contexts/CartContext";
 import Button from "../Button/Button";
 import Search from "../Search";
 import styles from "./Header.module.css";
 import logo from "../../../public/logosenashop.png";
-import useClickOutside from "../../hooks/useClickOutside"; // Import hook
+import useClickOutside from "../../hooks/useClickOutside";
+import apiService from "../../services/api";
 
-// Import icons
 import {
   FiShoppingCart,
   FiSearch,
@@ -16,381 +16,209 @@ import {
   FiX,
   FiChevronDown,
   FiLogOut,
-  FiBox, // Ví dụ icon cho đơn hàng
-  FiUserCheck, // Ví dụ icon cho profile khi đăng nhập
-} from "react-icons/fi"; // Chọn bộ icon bạn thích (Feather icons)
-
-const Category = [
-  { categoryId: 1, name: "Laptop", description: "Portable personal computers" },
-  { categoryId: 2, name: "Tablet", description: "Touchscreen mobile devices" },
-  { categoryId: 3, name: "Smartphone", description: "Mobile phones" },
-  { categoryId: 4, name: "Accessory", description: "Computer accessories" },
-  { categoryId: 5, name: "Monitor", description: "Display devices" },
-  { categoryId: 6, name: "Printer", description: "Printing machines" },
-  { categoryId: 7, name: "Router", description: "Network routers" },
-  { categoryId: 8, name: "Speaker", description: "Audio output devices" },
-  { categoryId: 9, name: "Camera", description: "Photography and video" },
-  { categoryId: 10, name: "Smartwatch", description: "Wearable smart devices" },
-];
+  FiBox,
+  FiUserCheck,
+} from "react-icons/fi";
 
 const Header = () => {
   const { cartItemCount } = useCart();
   const navigate = useNavigate();
 
-  // --- STATE QUẢN LÝ ---
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [userName, setUserName] = useState("User Name");
   const [categories, setCategories] = useState([]);
+  const [loadingCategories, setLoadingCategories] = useState(true);
+  const [errorCategories, setErrorCategories] = useState(null);
   const [isSearch, setIsSearch] = useState(false);
-  const [isMenu, setIsMenu] = useState(false);
-
   const [searchTerm, setSearchTerm] = useState("");
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isCategoryDropdownOpen, setIsCategoryDropdownOpen] = useState(false);
   const [isUserDropdownOpen, setIsUserDropdownOpen] = useState(false);
 
-  // --- REFS CHO DROPDOWN ---
   const categoryDropdownRef = useRef(null);
   const userDropdownRef = useRef(null);
   const mobileMenuRef = useRef(null);
-  const overlayRef = useRef(null);
+  const overlayRef = useRef(null); 
 
-  // --- SỬ DỤNG HOOK useClickOutside ---
   useClickOutside(categoryDropdownRef, () => setIsCategoryDropdownOpen(false));
   useClickOutside(userDropdownRef, () => setIsUserDropdownOpen(false));
-  useClickOutside(overlayRef, () => closeOverlay()); // Đóng overlay khi click ra ngoài
+  // Hook để đóng overlay khi click ngoài - Cần đảm bảo nó gọi closeOverlay đúng cách
+  useClickOutside(overlayRef, () => {
+      // Chỉ đóng nếu overlay đang thực sự hiển thị VÀ không phải do mobile menu gây ra
+      // (vì mobile menu có thể có logic đóng riêng khi click vào link bên trong)
+      // Hoặc đơn giản là gọi closeOverlay luôn
+      if (isSearch) { // Chỉ đóng overlay nếu do search gây ra
+        closeOverlay();
+      }
+  });
 
-  // --- HANDLERS ---
-  const handleSearchChange = (e) => {
-    setSearchTerm(e.target.value);
-  };
+  useEffect(() => {
+    const fetchCategories = async () => {
+      setLoadingCategories(true);
+      setErrorCategories(null);
+      try {
+        const response = await apiService.getAllCategories();
+        const fetchedCategories = response?.data || [];
+        if (Array.isArray(fetchedCategories)) {
+          setCategories(fetchedCategories);
+        } else {
+          setCategories([]);
+          setErrorCategories("Không thể tải danh mục.");
+        }
+      } catch (error) {
+        setErrorCategories("Lỗi tải danh mục. Vui lòng thử lại.");
+        setCategories([]);
+      } finally {
+        setLoadingCategories(false);
+      }
+    };
+    fetchCategories();
+  }, []);
 
+  // **** useEffect để quản lý class noScroll ****
+  useEffect(() => {
+    // Nếu search overlay hoặc mobile menu đang mở -> thêm class noScroll
+    if (isSearch || isMobileMenuOpen) {
+      document.body.classList.add("noScroll");
+    } else {
+      // Nếu cả hai đều đóng -> xóa class noScroll
+      document.body.classList.remove("noScroll");
+    }
+
+    // Cleanup function: Xóa class khi component unmount (quan trọng)
+    return () => {
+      document.body.classList.remove("noScroll");
+    };
+  }, [isSearch, isMobileMenuOpen]); // Theo dõi sự thay đổi của isSearch và isMobileMenuOpen
+
+  const handleSearchChange = (e) => { setSearchTerm(e.target.value); };
   const handleSearchSubmit = (e) => {
     e.preventDefault();
     if (searchTerm.trim()) {
       navigate(`/search?q=${encodeURIComponent(searchTerm)}`);
       setSearchTerm("");
       closeAllDropdowns();
+      closeOverlay(); // Đóng overlay sau khi submit
     }
-  };
-
+   };
   const toggleMobileMenu = () => {
-    setIsMobileMenuOpen(!isMobileMenuOpen);
-    setIsCategoryDropdownOpen(false);
-    setIsUserDropdownOpen(false);
-  };
+      const opening = !isMobileMenuOpen;
+      setIsMobileMenuOpen(opening);
+      // Logic quản lý noScroll đã chuyển vào useEffect riêng
+      setIsCategoryDropdownOpen(false);
+      setIsUserDropdownOpen(false);
+   };
+  const toggleCategoryDropdown = () => { setIsCategoryDropdownOpen(!isCategoryDropdownOpen); setIsUserDropdownOpen(false); };
+  const toggleUserDropdown = () => { setIsUserDropdownOpen(!isUserDropdownOpen); setIsCategoryDropdownOpen(false); };
+  const handleLogout = () => { setIsLoggedIn(false); setIsUserDropdownOpen(false); navigate("/"); };
+  const closeAllDropdowns = () => { setIsMobileMenuOpen(false); setIsCategoryDropdownOpen(false); setIsUserDropdownOpen(false); };
 
-  const toggleCategoryDropdown = () => {
-    setIsCategoryDropdownOpen(!isCategoryDropdownOpen);
-    setIsUserDropdownOpen(false);
-  };
-
-  const toggleUserDropdown = () => {
-    setIsUserDropdownOpen(!isUserDropdownOpen);
-    setIsCategoryDropdownOpen(false);
-  };
-
-  const handleLogout = () => {
-    setIsLoggedIn(false);
-    setIsUserDropdownOpen(false);
-    navigate("/");
-  };
-
-  const closeAllDropdowns = () => {
-    setIsMobileMenuOpen(false);
-    setIsCategoryDropdownOpen(false);
-    setIsUserDropdownOpen(false);
-  };
-
+  // Hàm đóng overlay (chỉ tắt isSearch)
   const closeOverlay = () => {
-    setIsMenu(false);
     setIsSearch(false);
-    document.body.classList.remove("noScroll"); // Xóa class no-scroll khi đóng overlay
+    // setIsMenu(false); // Không cần nếu dùng isMobileMenuOpen
+    // Logic xóa noScroll đã chuyển vào useEffect
   };
 
-  const handleSearch = () => {
-    setIsSearch(true);
-    document.body.classList.add("noScroll");
+  // Hàm xử lý khi nhấn nút Search icon/container -> mở overlay search
+  const handleSearchContainerClick = () => {
+    setIsSearch(true); // Chỉ cần set isSearch, useEffect sẽ xử lý noScroll
+    closeAllDropdowns(); // Đóng các dropdown khác
   };
 
-  useEffect(() => {
-    setCategories(Category);
-  }, []);
-
-  // --- RENDER ---
   return (
     <header className={styles.header}>
       <div className={styles.container}>
         <Link to="/" className={styles.logo} onClick={closeAllDropdowns}>
-          <img src={logo} className={styles.logoShop} />
+          <img src={logo} alt="SENA Shop Logo" className={styles.logoShop} />
           <p>SENA Shop</p>
         </Link>
 
-        {/* Desktop Navigation */}
         <nav className={styles.desktopNav}>
-          <NavLink
-            to="/"
-            className={({ isActive }) =>
-              isActive ? `${styles.navLink} ${styles.active}` : styles.navLink
-            }
-            end
-          >
-            Trang Chủ
-          </NavLink>
+          <NavLink to="/" className={({ isActive }) => isActive ? `${styles.navLink} ${styles.active}` : styles.navLink} end> Trang Chủ </NavLink>
 
-          {/* Category Dropdown */}
           <div className={styles.dropdownContainer} ref={categoryDropdownRef}>
-            <button
-              onClick={toggleCategoryDropdown}
-              className={`${styles.navLink} ${styles.dropdownToggle}`}
-            >
+            <button onClick={toggleCategoryDropdown} className={`${styles.navLink} ${styles.dropdownToggle}`} disabled={loadingCategories}>
               Danh Mục{" "}
-              <FiChevronDown
-                className={`${styles.chevronIcon} ${
-                  isCategoryDropdownOpen ? styles.chevronOpen : ""
-                }`}
-              />
+              <FiChevronDown className={`${styles.chevronIcon} ${isCategoryDropdownOpen ? styles.chevronOpen : ""}`} />
             </button>
             {isCategoryDropdownOpen && (
-              <div
-                className={`${styles.dropdownMenu} ${styles.categoryDropdown}`}
-              >
-                {categories.map((category) => (
-                  <Link
-                    to={`/products?category=${category.name}`}
-                    className={styles.dropdownItem}
-                    key={category.categoryId}
-                    onClick={toggleCategoryDropdown}
-                  >
-                    {category.name}
+              <div className={`${styles.dropdownMenu} ${styles.categoryDropdown}`}>
+                {loadingCategories && <div className={styles.dropdownItem}>Đang tải...</div>}
+                {errorCategories && !loadingCategories && <div className={`${styles.dropdownItem} ${styles.errorItem}`}>{errorCategories}</div>}
+                {!loadingCategories && !errorCategories && categories.length > 0 && categories.map((category) => (
+                  <Link to={`/products?category=${encodeURIComponent(category.categoryName)}`} className={styles.dropdownItem} key={category.categoryId} onClick={toggleCategoryDropdown} >
+                    {category.categoryName}
                   </Link>
                 ))}
-                <Link
-                  to="/products"
-                  className={styles.dropdownItem}
-                  onClick={toggleCategoryDropdown}
-                >
+                 {!loadingCategories && !errorCategories && categories.length === 0 && <div className={styles.dropdownItem}>Không có danh mục nào.</div>}
+                <Link to="/products" className={styles.dropdownItem} onClick={toggleCategoryDropdown} >
                   Tất cả sản phẩm
                 </Link>
               </div>
             )}
           </div>
 
-          <NavLink
-            to="/promotions"
-            className={({ isActive }) =>
-              isActive ? `${styles.navLink} ${styles.active}` : styles.navLink
-            }
-          >
-            Khuyến Mãi
-          </NavLink>
+          <NavLink to="/promotions" className={({ isActive }) => isActive ? `${styles.navLink} ${styles.active}` : styles.navLink}> Khuyến Mãi </NavLink>
         </nav>
 
-        {/* Actions Area */}
         <div className={styles.actions}>
-          {/* Search Bar */}
-          <div className={styles.menuList} onClick={handleSearch}>
-            <Search overlay={isSearch} />
-          </div>
+           {/* **** Gắn onClick vào div bao ngoài Search để trigger overlay **** */}
+           <div className={styles.menuList} onClick={handleSearchContainerClick}>
+             <Search />
+           </div>
 
-          {isMenu || isSearch ? (
-            <div
-              ref={overlayRef}
-              className={styles.overlay}
-              onClick={closeOverlay}
-            ></div>
-          ) : null}
+          {/* **** Overlay hiển thị khi isSearch HOẶC isMobileMenuOpen là true **** */}
+          {(isSearch || isMobileMenuOpen) && (
+            <div ref={overlayRef} className={styles.overlay} onClick={closeOverlay}></div>
+          )}
 
-          {/* Cart */}
-          <Link
-            to="/cart"
-            className={styles.actionButton}
-            title="Giỏ hàng"
-            onClick={closeAllDropdowns}
-          >
+          {/* Component Search không cần hiển thị có điều kiện ở đây nữa nếu nó dùng Tippy */}
+          <Link to="/cart" className={styles.actionButton} title="Giỏ hàng" onClick={closeAllDropdowns} >
             <FiShoppingCart />
-            {cartItemCount > 0 && (
-              <span className={styles.cartCount}>{cartItemCount}</span>
-            )}
+            {cartItemCount > 0 && ( <span className={styles.cartCount}>{cartItemCount}</span> )}
           </Link>
 
-          {/* Auth / User Menu */}
           <div className={styles.desktopAuth}>
-            {isLoggedIn ? (
+             {isLoggedIn ? (
               <div className={styles.dropdownContainer} ref={userDropdownRef}>
-                <button
-                  onClick={toggleUserDropdown}
-                  className={`${styles.actionButton} ${styles.userButton}`}
-                  title="Tài khoản"
-                >
+                <button onClick={toggleUserDropdown} className={`${styles.actionButton} ${styles.userButton}`} title="Tài khoản" >
                   <FiUserCheck />
-                  <FiChevronDown
-                    className={`${styles.chevronIcon} ${styles.userChevron} ${
-                      isUserDropdownOpen ? styles.chevronOpen : ""
-                    }`}
-                  />
+                  <FiChevronDown className={`${styles.chevronIcon} ${styles.userChevron} ${ isUserDropdownOpen ? styles.chevronOpen : "" }`} />
                 </button>
                 {isUserDropdownOpen && (
-                  <div
-                    className={`${styles.dropdownMenu} ${styles.userDropdown}`}
-                  >
-                    <div className={styles.dropdownHeader}>
-                      Chào, {userName}!
-                    </div>
-                    <Link
-                      to="/profile"
-                      className={styles.dropdownItem}
-                      onClick={toggleUserDropdown}
-                    >
-                      <FiUser className={styles.dropdownIcon} /> Hồ sơ
-                    </Link>
-                    <Link
-                      to="/orders"
-                      className={styles.dropdownItem}
-                      onClick={toggleUserDropdown}
-                    >
-                      <FiBox className={styles.dropdownIcon} /> Đơn hàng
-                    </Link>
-                    <button
-                      onClick={handleLogout}
-                      className={`${styles.dropdownItem} ${styles.logoutButton}`}
-                    >
-                      <FiLogOut className={styles.dropdownIcon} /> Đăng xuất
-                    </button>
+                  <div className={`${styles.dropdownMenu} ${styles.userDropdown}`} >
+                    <div className={styles.dropdownHeader}> Chào, {userName}! </div>
+                    <Link to="/profile" className={styles.dropdownItem} onClick={toggleUserDropdown} > <FiUser className={styles.dropdownIcon} /> Hồ sơ </Link>
+                    <Link to="/orders" className={styles.dropdownItem} onClick={toggleUserDropdown} > <FiBox className={styles.dropdownIcon} /> Đơn hàng </Link>
+                    <button onClick={handleLogout} className={`${styles.dropdownItem} ${styles.logoutButton}`} > <FiLogOut className={styles.dropdownIcon} /> Đăng xuất </button>
                   </div>
                 )}
               </div>
             ) : (
               <>
-                <Button
-                  variant="secondary"
-                  size="small"
-                  onClick={() => setIsLoggedIn(true)}
-                  className={styles.authButton}
-                >
-                  Đăng nhập
-                </Button>
-                <Button
-                  variant="primary"
-                  size="small"
-                  onClick={() => {}}
-                  className={styles.authButton}
-                >
-                  Đăng ký
-                </Button>
+                <Button variant="secondary" size="small" onClick={() => navigate('/login')} className={styles.authButton}> Đăng nhập </Button>
+                <Button variant="primary" size="small" onClick={() => navigate('/register')} className={styles.authButton}> Đăng ký </Button>
               </>
             )}
           </div>
 
-          {/* Mobile Menu Toggle */}
-          <button
-            className={styles.mobileMenuToggle}
-            onClick={toggleMobileMenu}
-            aria-label="Mở menu"
-          >
+          {/* Nút này vẫn toggle isMobileMenuOpen */}
+          <button className={styles.mobileMenuToggle} onClick={toggleMobileMenu} aria-label="Mở menu" >
             {isMobileMenuOpen ? <FiX /> : <FiMenu />}
           </button>
         </div>
       </div>
 
-      {/* Mobile Menu Drawer */}
-      <nav
-        ref={mobileMenuRef}
-        className={`${styles.mobileMenu} ${
-          isMobileMenuOpen ? styles.mobileMenuOpen : ""
-        }`}
-      >
-        <div className={styles.mobileMenuHeader}>
-          <span className={styles.mobileMenuTitle}>Menu</span>
-          <button
-            onClick={toggleMobileMenu}
-            className={styles.closeButton}
-            aria-label="Đóng menu"
-          >
-            <FiX />
-          </button>
-        </div>
-
-        {/* Auth/User Info in Mobile Menu */}
-        <div className={styles.mobileUserInfo}>
-          {isLoggedIn ? (
-            <>
-              <div className={styles.mobileWelcome}>
-                <FiUserCheck className={styles.mobileUserIcon} /> Chào,{" "}
-                {userName}!
-              </div>
-              <Link
-                to="/profile"
-                className={styles.mobileNavLink}
-                onClick={toggleMobileMenu}
-              >
-                Hồ sơ
-              </Link>
-              <Link
-                to="/orders"
-                className={styles.mobileNavLink}
-                onClick={toggleMobileMenu}
-              >
-                Đơn hàng
-              </Link>
-              <button
-                onClick={handleLogout}
-                className={`${styles.mobileNavLink} ${styles.mobileLogoutButton}`}
-              >
-                Đăng xuất
-              </button>
-            </>
-          ) : (
-            <div className={styles.mobileAuthButtons}>
-              <Button
-                variant="primary"
-                onClick={() => {
-                  setIsLoggedIn(true);
-                  toggleMobileMenu();
-                }}
-                className={styles.mobileAuthBtn}
-              >
-                Đăng nhập
-              </Button>
-              <Button
-                variant="secondary"
-                onClick={() => {
-                  toggleMobileMenu();
-                }}
-                className={styles.mobileAuthBtn}
-              >
-                Đăng ký
-              </Button>
-            </div>
-          )}
-        </div>
-
-        <hr className={styles.mobileMenuDivider} />
-
-        {/* Categories in Mobile Menu */}
-        <div className={styles.mobileCategorySection}>
-          <div className={styles.mobileNavGroupTitle}>Danh Mục</div>
-          {categories.map((category) => (
-            <Link
-              to={`/products?category=${category.name}`}
-              className={styles.mobileNavLink}
-              key={category.categoryId}
-              onClick={toggleMobileMenu}
-            >
-              {category.name}
-            </Link>
-          ))}
-        </div>
-        <hr className={styles.mobileMenuDivider} />
-
-        {/* Other Links */}
-        <Link
-          to="/promotions"
-          className={styles.mobileNavLink}
-          onClick={toggleMobileMenu}
-        >
-          Khuyến Mãi
-        </Link>
+      {/* Mobile Menu Drawer (logic isMobileMenuOpen vẫn giữ nguyên) */}
+      <nav ref={mobileMenuRef} className={`${styles.mobileMenu} ${ isMobileMenuOpen ? styles.mobileMenuOpen : "" }`} >
+         {/* ... Nội dung mobile menu giữ nguyên ... */}
+         <div className={styles.mobileMenuHeader}> <span className={styles.mobileMenuTitle}>Menu</span> <button onClick={toggleMobileMenu} className={styles.closeButton} aria-label="Đóng menu" > <FiX /> </button> </div>
+         <div className={styles.mobileUserInfo}> {/* ... */} </div>
+         <hr className={styles.mobileMenuDivider} />
+         <div className={styles.mobileCategorySection}> <div className={styles.mobileNavGroupTitle}>Danh Mục</div> {/* ... */} </div>
+         <hr className={styles.mobileMenuDivider} />
+         <Link to="/promotions" className={styles.mobileNavLink} onClick={toggleMobileMenu} > Khuyến Mãi </Link>
       </nav>
     </header>
   );

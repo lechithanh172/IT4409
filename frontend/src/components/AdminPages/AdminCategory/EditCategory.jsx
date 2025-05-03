@@ -66,10 +66,6 @@ const EditCategory = ({ category, setModalChild, handleRefresh }) => {
 
     return (
         <div style={{ width: 650, margin: 'auto' }}>
-            <h2 style={{ marginTop: 0, marginBottom: 20, textAlign: 'center', fontSize: '24px' }}>
-                Chỉnh Sửa Danh Mục
-            </h2>
-
             <Form
                 form={form}
                 name="suaDanhMuc"

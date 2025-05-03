@@ -17,11 +17,8 @@ import { PlusOutlined, MinusCircleOutlined } from "@ant-design/icons";
 import apiService from "../../../services/api"; // Đảm bảo đường dẫn này chính xác
 
 
-// Component EditProduct nhận props: product (dữ liệu sản phẩm cần sửa), setModalChild (để đóng modal), handleRefresh (để refresh list), categoriesList, brandsList
 const EditProduct = ({ product, setModalChild, handleRefresh, categoriesList = [], brandsList = [] }) => {
   const [form] = Form.useForm(); // Hook để quản lý Form Antd
-
-  // State để lưu danh sách các biến thể (variants) của sản phẩm
   // Khởi tạo từ prop product.variants
   const initialVariants = useMemo(() => (product?.variants || []).map((variant, index) => ({
     key: variant.variantId || `existing_${index}`, // Dùng variantId làm key nếu có, nếu không thì tạo key tạm
@@ -29,7 +26,7 @@ const EditProduct = ({ product, setModalChild, handleRefresh, categoriesList = [
     color: variant.color || "",
     imageUrl: variant.imageUrl || "",
     stockQuantity: variant.stockQuantity ?? 0,
-    discount: variant.discount ?? 0,
+    discountPercentage: variant.discountPercentage ?? 0,
   })), [product?.variants]); // Tính toán lại chỉ khi product.variants thay đổi
 
 
@@ -86,7 +83,6 @@ const EditProduct = ({ product, setModalChild, handleRefresh, categoriesList = [
              content: spec?.content || ''
          }));
       }
-      // *******************************************
 
       // Đặt giá trị ban đầu cho các trường Form
       form.setFieldsValue({
@@ -114,7 +110,7 @@ const EditProduct = ({ product, setModalChild, handleRefresh, categoriesList = [
          color: variant.color || "",
          imageUrl: variant.imageUrl || "",
          stockQuantity: variant.stockQuantity ?? 0,
-         discount: variant.discount ?? 0,
+         discountPercentage: variant.discountPercentage ?? 0,
        })));
     }
     // Mảng dependency: Chạy lại effect khi product, form, brandOptions hoặc categoryOptions thay đổi
@@ -153,11 +149,11 @@ const EditProduct = ({ product, setModalChild, handleRefresh, categoriesList = [
       ...variants,
       {
         key: `new_${Date.now()}_${variants.length}`, // Tạo key mới, duy nhất
-        variantId: undefined, // Biến thể mới chưa có ID từ DB
+        variantId: undefined, // Mẫu mới chưa có ID từ DB
         color: "",
         imageUrl: "",
         stockQuantity: 0,
-        discount: 0,
+        discountPercentage: 0,
       },
     ]);
   };
@@ -219,7 +215,6 @@ const EditProduct = ({ product, setModalChild, handleRefresh, categoriesList = [
     try {
       // *** CHUYỂN ĐỔI MẢNG SPECIFICATIONS THÀNH CHUỖI JSON TRƯỚC KHI GỬI ***
       const specificationsString = JSON.stringify(values.specifications || []);
-      // *****************************************************
 
       // Chuẩn bị dữ liệu để gửi lên API
       const data = {
@@ -240,7 +235,7 @@ const EditProduct = ({ product, setModalChild, handleRefresh, categoriesList = [
           color: variant.color,
           imageUrl: variant.imageUrl || "",
           stockQuantity: variant.stockQuantity ?? 0,
-          discount: variant.discount ?? 0,
+          discountPercentage: variant.discountPercentage ?? 0,
         })),
       };
 
@@ -263,7 +258,6 @@ const EditProduct = ({ product, setModalChild, handleRefresh, categoriesList = [
     }
   };
 
-  // Hiển thị trạng thái đang tải nếu chưa có dữ liệu `product`
   if (!product) {
     return <div>Đang tải dữ liệu sản phẩm...</div>;
   }
@@ -278,7 +272,6 @@ const EditProduct = ({ product, setModalChild, handleRefresh, categoriesList = [
         margin: "auto", // Căn giữa
       }}
     >
-      {/* Component Form của Ant Design */}
       <Form
         form={form} // Liên kết form instance
         name="chinhSuaSanPham"
@@ -286,13 +279,9 @@ const EditProduct = ({ product, setModalChild, handleRefresh, categoriesList = [
         onFinish={onFinish} // Hàm xử lý khi submit thành công
         onFinishFailed={onFinishFailed} // Hàm xử lý khi submit thất bại
         autoComplete="off"
-        // Không cần initialValues ở đây vì dùng form.setFieldsValue trong useEffect
       >
-        {/* Layout chia thành 2 cột */}
         <Row gutter={24}>
-          {/* === Cột 1: Thông tin chung & Thông số kỹ thuật === */}
           <Col xs={24} md={12}>
-            {/* Tên Sản Phẩm */}
             <Form.Item
               label="Tên Sản Phẩm"
               name="productName"
@@ -467,15 +456,15 @@ const EditProduct = ({ product, setModalChild, handleRefresh, categoriesList = [
 
           </Col> {/* Kết thúc Cột 1 */}
 
-          {/* === Cột 2: Biến thể Sản phẩm === */}
+          {/* === Cột 2: Mẫu Sản phẩm === */}
           <Col xs={24} md={12}>
-            <h3 style={{ marginBottom: 16, textAlign: "center" }}>Biến thể Sản Phẩm</h3>
+            <h3 style={{ marginBottom: 16, textAlign: "center" }}>Mẫu Sản Phẩm</h3>
             {/* Container cho danh sách biến thể */}
             <div style={{ maxHeight: "65vh", overflowY: "auto", paddingRight: "10px" }}>
               {/* Render từng biến thể từ state `variants` */}
               {variants.map((variant, index) => (
                 <div key={variant.key} style={{ marginBottom: 16, padding: "16px", border: "1px solid #e8e8e8", borderRadius: "8px", position: "relative" }}>
-                  {/* Nút Xóa Biến Thể */}
+                  {/* Nút Xóa Mẫu */}
                   {variants.length > 1 && (
                     <Button icon={<MinusCircleOutlined />} onClick={() => removeVariant(variant.key)} type="text" danger style={{ position: "absolute", top: 5, right: 5, padding: 5, zIndex: 10, lineHeight: 0, cursor: "pointer" }} title="Xóa biến thể này" />
                   )}
@@ -489,7 +478,7 @@ const EditProduct = ({ product, setModalChild, handleRefresh, categoriesList = [
                       </Form.Item>
                       {/* URL Ảnh */}
                       <Form.Item label={`Url ảnh #${index + 1}`}>
-                        <Input placeholder="https://example.com/anh-bien-the.jpg" value={variant.imageUrl} onChange={(e) => handleVariantChange(variant.key, "imageUrl", e.target.value)} />
+                        <Input placeholder="https://example.com/anh-mau-san-pham.jpg" value={variant.imageUrl} onChange={(e) => handleVariantChange(variant.key, "imageUrl", e.target.value)} />
                       </Form.Item>
                       {/* Hàng con cho Số lượng và Giảm giá */}
                       <Row gutter={8}>
@@ -499,8 +488,8 @@ const EditProduct = ({ product, setModalChild, handleRefresh, categoriesList = [
                           </Form.Item>
                         </Col>
                         <Col span={12}>
-                          <Form.Item label={`Giảm giá (%) #${index + 1}`} validateStatus={variant.discount < 0 || variant.discount > 100 ? "error" : ""} help={variant.discount < 0 || variant.discount > 100 ? "Từ 0 đến 100" : ""}>
-                            <InputNumber min={0} max={100} value={variant.discount} onChange={(value) => handleVariantChange(variant.key, "discount", value)} style={{ width: "100%" }} />
+                          <Form.Item label={`Giảm giá (%) #${index + 1}`} validateStatus={variant.discountPercentage < 0 || variant.discountPercentage > 100 ? "error" : ""} help={variant.discountPercentage < 0 || variant.discountPercentage > 100 ? "Từ 0 đến 100" : ""}>
+                            <InputNumber min={0} max={100} value={variant.discountPercentage} onChange={(value) => handleVariantChange(variant.key, "discountPercentage", value)} style={{ width: "100%" }} />
                           </Form.Item>
                         </Col>
                       </Row>
@@ -518,8 +507,8 @@ const EditProduct = ({ product, setModalChild, handleRefresh, categoriesList = [
                 </div>
               ))}
             </div>
-            {/* Nút Thêm Biến Thể */}
-            <Button type="dashed" onClick={addVariant} icon={<PlusOutlined />} style={{ width: "100%", marginTop: 16 }}> Thêm Biến Thể Khác </Button>
+            {/* Nút Thêm Mẫu */}
+            <Button type="dashed" onClick={addVariant} icon={<PlusOutlined />} style={{ width: "100%", marginTop: 16 }}> Thêm Mẫu Khác </Button>
           </Col> {/* Kết thúc Cột 2 */}
         </Row> {/* Kết thúc Hàng chính */}
         <Divider style={{ margin: '24px 0' }} /> {/* Đường kẻ ngang phân cách */}

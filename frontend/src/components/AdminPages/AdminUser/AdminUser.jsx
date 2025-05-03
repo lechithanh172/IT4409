@@ -178,7 +178,7 @@ const AdminUser = () => {
         { title: 'Họ Tên', key: 'fullName', width: '15%', ellipsis: true, render: (_, record) => `${record.firstName || ''} ${record.lastName || ''}`.trim(), sorter: (a, b) => `${a.firstName} ${a.lastName}`.localeCompare(`${b.firstName} ${b.lastName}`), },
         { title: 'SĐT', dataIndex: 'phoneNumber', key: 'phoneNumber', width: '12%', ellipsis: true, ...getColumnSearchProps('phoneNumber'), },
         { title: 'Địa chỉ', dataIndex: 'address', key: 'address', ellipsis: true, ...getColumnSearchProps('address'), },
-        { title: 'Role', dataIndex: 'role', key: 'role', width: '10%', align: 'center', render: (role) => { let color = 'default'; if (role === 'ADMIN') color = 'volcano'; else if (role === 'PRODUCT_MANAGER') color = 'geekblue'; else if (role === 'CUSTOMER') color = 'green'; return <Tag color={color}>{role}</Tag>; }, },
+        { title: 'Role', dataIndex: 'role', key: 'role', width: '12%', align: 'center', render: (role) => { let color = 'default'; if (role === 'ADMIN') color = 'volcano'; else if (role === 'PRODUCT_MANAGER') color = 'geekblue'; else if (role === 'CUSTOMER') color = 'green'; return <Tag color={color}>{role}</Tag>; }, },
         {
             title: 'Hành động',
             key: 'actions',

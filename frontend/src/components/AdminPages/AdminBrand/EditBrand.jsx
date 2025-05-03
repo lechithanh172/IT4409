@@ -73,12 +73,7 @@ const EditBrand = ({ brand, setModalChild, handleRefresh }) => {
     }
 
     return (
-        <div style={{ width: 650, margin: 'auto' }}>
-            {/* Sửa tiêu đề */}
-            <h2 style={{ marginTop: 0, marginBottom: 20, textAlign: 'center', fontSize: '24px' }}>
-                Chỉnh Sửa Thương Hiệu
-            </h2>
-
+        <div style={{ width: 630, margin: 'auto' }}>
             <Form
                 form={form}
                 // Sửa tên form

@@ -1,4 +1,4 @@
-// src/services/apiService.js
+// src/services/api.js
 import axios from "axios";
 
 // --- Cấu hình cơ bản ---
@@ -95,7 +95,7 @@ const apiService = {
   getCartItems: () => apiInstance.get("/cart-item/"),
   addToCart: (data) => apiInstance.post("/cart-item/add", data),
   updateCartItem: (data) => apiInstance.put("/cart-item/update", data),
-  removeCartItem: (cartItemId) => apiInstance.delete(`/cart-item/remove/${cartItemId}`),
+  removeCartItem: (data) => apiInstance.post(`/cart-item/remove`, data),
   clearCart: () => apiInstance.delete("/cart-item/clear"),
 
   // ORDER

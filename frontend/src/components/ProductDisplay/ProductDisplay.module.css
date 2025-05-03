@@ -414,3 +414,63 @@
     text-align: center;
     padding: 20px;
 }
+
+/* --- Phần Thông số Kỹ thuật --- */
+.specificationsSection {
+  margin-top: 25px; /* Khoảng cách với phần chọn màu/thông báo */
+  margin-bottom: 25px; /* Khoảng cách với nút actions */
+  padding-top: 20px;
+  border-top: 1px solid #e5e7eb; /* Phân cách nhẹ */
+}
+
+/* Style chung cho các tiêu đề section */
+.sectionTitle {
+  font-size: 1.2rem; /* Cỡ chữ tiêu đề */
+  font-weight: 600; /* Độ đậm */
+  color: #374151; /* Màu chữ */
+  margin-bottom: 15px; /* Khoảng cách dưới */
+}
+
+/* --- Badge Container (Để các badge nằm cùng hàng nếu cần) --- */
+.badgeContainer {
+    display: flex;
+    flex-wrap: wrap; /* Cho phép xuống dòng nếu nhiều badge */
+    gap: 8px; /* Khoảng cách giữa các badge */
+    margin-top: 10px; /* Khoảng cách với phần đánh giá */
+    margin-bottom: 10px; /* Khoảng cách với đường kẻ */
+}
+
+/* Style chung cho badge (Có thể dùng lại từ nơi khác nếu có) */
+.badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    font-weight: 500;
+    border: 1px solid; /* Thêm border để rõ ràng hơn */
+    white-space: nowrap; /* Ngăn badge xuống dòng */
+}
+
+/* Style riêng cho từng loại badge (Ví dụ) */
+.badgeInfo {
+    background-color: #e6f7ff;
+    color: #1890ff;
+    border-color: #91d5ff;
+}
+.badgeSuccess {
+    background-color: #f0fdf4;
+    color: #16a34a;
+    border-color: #bbf7d0;
+}
+
+/* ... các style khác của bạn giữ nguyên ... */
+
+/* Có thể thêm style để giới hạn chiều cao bảng thông số nếu cần */
+/* Điều chỉnh selector nếu SpecificationTable render cấu trúc khác */
+.specificationsSection > div > div:first-child { /* Target div chứa các group spec */
+    /* max-height: 450px; */ /* Ví dụ giới hạn chiều cao */
+    /* overflow-y: auto; */   /* Cho phép cuộn dọc */
+    /* padding-right: 10px; */ /* Chừa chỗ cho thanh cuộn */
+}

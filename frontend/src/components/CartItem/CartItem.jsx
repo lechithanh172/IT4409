@@ -1,117 +1,116 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import styles from './CartItem.module.css';
-import { FaTrashAlt, FaPlus, FaMinus } from 'react-icons/fa';
+import { FaTrashAlt, FaPlus, FaMinus, FaExclamationCircle } from 'react-icons/fa';
 
-// Hàm định dạng tiền tệ
 const formatCurrency = (amount) => {
-  if (typeof amount !== 'number' || isNaN(amount)) return '';
-  return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(amount);
+    if (typeof amount !== 'number' || isNaN(amount) || amount === 0) return 'N/A';
+    return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(amount);
 };
 
-const CartItem = ({ item, onRemove, onQuantityChange, onToggleSelect }) => {
+const DEFAULT_IMAGE_URL = '/images/placeholder-image.png';
 
-   // Cập nhật trực tiếp khi bấm nút +/-
-   const handleIncreaseQuantity = () => {
-        // Sử dụng key duy nhất (ví dụ: kết hợp ID) để xác định item cần cập nhật
-        onQuantityChange(item.uniqueId || `${item.productId}-${item.variantId}`, item.quantity + 1);
-   };
+const CartItem = ({ item, onRemove, onQuantityChange, onToggleSelect, isUpdating }) => {
+    const itemKey = item.uniqueId;
 
-   const handleDecreaseQuantity = () => {
-        if (item.quantity > 1) {
-            onQuantityChange(item.uniqueId || `${item.productId}-${item.variantId}`, item.quantity - 1);
+    // Khi bấm nút TĂNG: Thông báo cho cha cần thay đổi +1
+    const handleIncreaseQuantity = () => {
+        if (item.quantity >= item.stockQuantity) {
+            alert(`Số lượng tồn kho của "${item.name} - ${item.color}" chỉ còn ${item.stockQuantity}.`);
+            return;
         }
-   };
+        // *** THAY ĐỔI QUAN TRỌNG: Gửi +1 ***
+        onQuantityChange(itemKey, 1); // Gửi số lượng cần THAY ĐỔI, không phải số lượng mới
+    };
 
-  // Xử lý ảnh lỗi
-  const handleImageError = (e) => {
-    e.target.onerror = null;
-    e.target.src = '/images/placeholder-image.png'; // Ảnh dự phòng
-  };
+    // Khi bấm nút GIẢM: Thông báo cho cha cần thay đổi -1
+    const handleDecreaseQuantity = () => {
+        if (item.quantity > 1) {
+            // *** THAY ĐỔI QUAN TRỌNG: Gửi -1 ***
+            onQuantityChange(itemKey, -1); // Gửi số lượng cần THAY ĐỔI
+        }
+    };
 
-  // Tạo key duy nhất nếu chưa có
-  const itemKey = item.uniqueId || `${item.productId}-${item.variantId}`;
+    const handleImageError = (e) => {
+        if (e.target.src !== DEFAULT_IMAGE_URL) {
+            e.target.onerror = null;
+            e.target.src = DEFAULT_IMAGE_URL;
+        }
+    };
 
-  return (
-    <tr className={styles.cartItemRow}>
-      {/* Cột Checkbox */}
-      <td className={styles.columnSelect}>
-        <input
-          type="checkbox"
-          className={styles.itemSelectCheckbox}
-          checked={item.is_selected ?? true} // Mặc định là true nếu chưa có
-          onChange={() => onToggleSelect(itemKey)}
-          aria-label={`Chọn sản phẩm ${item.name}`}
-        />
-      </td>
+    const isDisabled = isUpdating || !!item.error;
 
-      {/* Cột Tên sản phẩm & Hình ảnh */}
-      <td className={styles.columnProduct}>
-        <div className={styles.productInfo}>
-          {/* Link đến trang chi tiết sản phẩm */}
-          <Link to={`/products/${item.productId}`} className={styles.productImageLink}>
-            <img
-              src={item.image || '/images/placeholder-image.png'}
-              alt={item.name}
-              className={styles.productImage}
-              onError={handleImageError}
-              loading="lazy"
-            />
-          </Link>
-          <div className={styles.productDetails}>
-            {/* Tên sản phẩm */}
-            <Link to={`/products/${item.productId}`} className={styles.productName}>
-              {item.name}
-            </Link>
-            {/* Thông tin biến thể */}
-            {item.variantName && (
-              <p className={styles.variantName}>{item.variantName}</p>
-            )}
-          </div>
-        </div>
-      </td>
-
-      {/* Cột Số lượng */}
-      <td className={styles.columnQuantity}>
-        <div className={styles.quantityControl}>
-          <button
-            onClick={handleDecreaseQuantity}
-            className={styles.quantityButton}
-            disabled={item.quantity <= 1}
-            aria-label="Giảm số lượng"
-          >
-            <FaMinus />
-          </button>
-          <span className={styles.quantityDisplay}>{item.quantity}</span>
-          <button
-            onClick={handleIncreaseQuantity}
-            className={styles.quantityButton}
-            aria-label="Tăng số lượng"
-          >
-            <FaPlus />
-          </button>
-        </div>
-      </td>
-
-      {/* Cột Đơn giá */}
-      <td className={`${styles.columnPrice} ${styles.alignRight}`}>{formatCurrency(item.price)}</td>
-
-       {/* Cột Thành tiền */}
-       <td className={`${styles.columnTotal} ${styles.alignRight}`}>{formatCurrency(item.price * item.quantity)}</td>
-
-      {/* Cột Thao tác */}
-      <td className={styles.columnActions}>
-        <button
-          onClick={() => onRemove(itemKey)}
-          className={styles.removeButton}
-          title="Xóa sản phẩm"
-          aria-label="Xóa sản phẩm"
-        >
-          <FaTrashAlt />
-        </button>
-      </td>
-    </tr>
-  );
+    return (
+        <tr className={`${styles.cartItemRow} ${item.error ? styles.itemWithError : ''}`}>
+            {/* Checkbox */}
+            <td className={styles.columnSelect}>
+                <input
+                    type="checkbox"
+                    className={styles.itemSelectCheckbox}
+                    checked={item.is_selected ?? true}
+                    onChange={() => onToggleSelect(itemKey)}
+                    disabled={isDisabled}
+                    aria-label={`Chọn sản phẩm ${item.name} - ${item.color}`}
+                />
+            </td>
+            {/* Sản phẩm */}
+            <td className={styles.columnProduct}>
+                <div className={styles.productInfo}>
+                    <Link to={`/product/${item.productId}`} className={styles.productImageLink}>
+                        <img
+                            src={item.imageUrl || DEFAULT_IMAGE_URL}
+                            alt={`${item.name} - ${item.color}`}
+                            className={styles.productImage}
+                            onError={handleImageError}
+                            loading="lazy"
+                        />
+                    </Link>
+                    <div className={styles.productDetails}>
+                        <Link to={`/product/${item.productId}`} className={styles.productName}>
+                            {item.name || 'Sản phẩm lỗi'}
+                        </Link>
+                        {item.color && (<p className={styles.variantName}>Màu: {item.color}</p>)}
+                        {item.error && (<p className={styles.itemErrorMessage}><FaExclamationCircle /> {item.error}</p>)}
+                    </div>
+                </div>
+            </td>
+            {/* Số lượng */}
+            <td className={styles.columnQuantity}>
+                <div className={styles.quantityControl}>
+                    <button
+                        onClick={handleDecreaseQuantity} // Gọi hàm giảm (gửi -1)
+                        className={styles.quantityButton}
+                        disabled={isDisabled || item.quantity <= 1}
+                        aria-label="Giảm số lượng"
+                    > <FaMinus /> </button>
+                    <span className={styles.quantityDisplay}>{item.quantity}</span>
+                    <button
+                        onClick={handleIncreaseQuantity} // Gọi hàm tăng (gửi +1)
+                        className={styles.quantityButton}
+                        disabled={isDisabled || item.quantity >= item.stockQuantity}
+                        aria-label="Tăng số lượng"
+                    > <FaPlus /> </button>
+                </div>
+                {item.quantity >= item.stockQuantity && !item.error && !isUpdating && (
+                     <span className={styles.maxQuantityNote}>Tối đa</span>
+                )}
+            </td>
+            {/* Đơn giá */}
+            <td className={`${styles.columnPrice} ${styles.alignRight}`}> {formatCurrency(item.price)} </td>
+            {/* Thành tiền */}
+            <td className={`${styles.columnTotal} ${styles.alignRight}`}> {formatCurrency(item.price * item.quantity)} </td>
+            {/* Xóa */}
+            <td className={styles.columnActions}>
+                <button
+                    onClick={() => onRemove(itemKey)} // Vẫn thông báo cho cha như cũ
+                    className={styles.removeButton}
+                    title={`Xóa ${item.name} - ${item.color}`}
+                    aria-label={`Xóa ${item.name} - ${item.color}`}
+                    disabled={isUpdating}
+                > <FaTrashAlt /> </button>
+            </td>
+        </tr>
+    );
 };
 
 export default CartItem;

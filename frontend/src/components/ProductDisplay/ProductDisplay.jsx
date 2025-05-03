@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useCart } from '../../contexts/CartContext'; // Import Cart Context (nếu dùng để update UI)
+// import { useCart } from '../../contexts/CartContext'; // Import Cart Context (nếu dùng để update UI)
 import { useAuth } from '../../contexts/AuthContext';   // Import Auth Context
 import apiService from '../../services/api';   // Import apiService
 import Button from '../Button/Button';               // Import Button component
@@ -11,7 +11,8 @@ import {
   FaStar, FaRegStar, FaStarHalfAlt, FaCartPlus, FaCheck, FaBolt, FaExclamationCircle, FaTag
 } from 'react-icons/fa';
 // Import các icon Feather (Fi...) từ /fi
-import { FiLogIn } from 'react-icons/fi'; 
+import { FiLogIn } from 'react-icons/fi';
+
 // --- Hàm tiện ích ---
 const formatCurrency = (amount) => {
   if (typeof amount !== 'number' || isNaN(amount)) return 'Liên hệ'; // Xử lý cả NaN
@@ -49,7 +50,7 @@ const RatingStars = ({ rating = 0, reviewCount = 0 }) => {
 const ProductDisplay = ({ product }) => {
   // Hooks
   // const { addItemToCart } = useCart(); // Có thể inject hàm này từ Context nếu cần update state global
-  const { isAuthenticated } = useAuth(); // Lấy trạng thái đăng nhập từ Auth Context
+  const { isAuthenticated, user } = useAuth(); // Lấy trạng thái đăng nhập và user data từ Auth Context
   const navigate = useNavigate();         // Hook để điều hướng
 
   // State
@@ -88,9 +89,14 @@ const ProductDisplay = ({ product }) => {
     // 1. Kiểm tra đăng nhập
     if (!isAuthenticated) {
         toast.warn('Vui lòng đăng nhập để thêm sản phẩm!', { position: "bottom-right" });
-        // Tùy chọn: Điều hướng đến trang đăng nhập
-        // navigate('/login');
         return; // Dừng thực thi
+    }
+
+    // 1.5 Kiểm tra xem có thông tin User ID không
+    if (!user?.userId) {
+      console.error("Add to cart failed: User ID not found in AuthContext.");
+      toast.error("Lỗi: Không thể xác định người dùng. Vui lòng thử đăng nhập lại.", { position: "bottom-right" });
+      return; // Dừng thực thi
     }
 
     // 2. Kiểm tra xem variant có hợp lệ, còn hàng và không đang trong quá trình thêm khác không
@@ -107,13 +113,15 @@ const ProductDisplay = ({ product }) => {
     setAddToCartError('');
 
     try {
-        // 4. Chuẩn bị dữ liệu gửi lên API
+        // 4. Chuẩn bị dữ liệu gửi lên API (THEO ĐÚNG DOCUMENTATION)
         const cartItemData = {
+            userId: user.userId,                // Lấy từ AuthContext
             productId: product.productId,       // ID sản phẩm chính
             variantId: selectedVariant.variantId, // ID của variant (màu sắc) được chọn
-            quantity: 1                       // Mặc định thêm 1 sản phẩm
+            quantity: 1,                      // Mặc định thêm 1 sản phẩm
+            isSelected: true                  // Mặc định là true khi thêm vào giỏ
         };
-        console.log("Attempting to add to cart:", cartItemData);
+        console.log("Attempting to add to cart with data:", cartItemData); // Log dữ liệu gửi đi
 
         // 5. Gọi API để thêm sản phẩm vào giỏ hàng
         const response = await apiService.addToCart(cartItemData);
@@ -130,8 +138,23 @@ const ProductDisplay = ({ product }) => {
 
     } catch (err) { // 8. Xử lý lỗi
         console.error("Lỗi khi thêm vào giỏ hàng:", err);
-        const errorMessage = err.response?.data?.message || err.message || "Thêm vào giỏ hàng thất bại.";
-        setAddToCartError(errorMessage); // Lưu lỗi để có thể hiển thị gần nút
+        // Cố gắng lấy message lỗi cụ thể từ response của API
+        let errorMessage = "Thêm vào giỏ hàng thất bại.";
+        if (err.response) {
+          // Lỗi có response từ server (4xx, 5xx)
+          errorMessage = err.response.data?.message || err.response.data || `Lỗi ${err.response.status}`;
+          console.error("API Error Response:", err.response.data);
+        } else if (err.request) {
+          // Lỗi request được gửi nhưng không nhận được response
+          errorMessage = "Không nhận được phản hồi từ máy chủ.";
+          console.error("API No Response:", err.request);
+        } else {
+          // Lỗi xảy ra trong quá trình thiết lập request
+          errorMessage = err.message;
+          console.error("API Request Setup Error:", err.message);
+        }
+
+        setAddToCartError(errorMessage); // Lưu lỗi để có thể hiển thị gần nút (nếu cần)
         // Hiển thị toast báo lỗi
         toast.error(errorMessage, { position: "bottom-right" });
     } finally {
@@ -148,8 +171,20 @@ const ProductDisplay = ({ product }) => {
         return;
      }
 
+     // 1.5 Kiểm tra xem có thông tin User ID không
+     if (!user?.userId) {
+       console.error("Order now failed: User ID not found in AuthContext.");
+       toast.error("Lỗi: Không thể xác định người dùng. Vui lòng thử đăng nhập lại.", { position: "bottom-right" });
+       return; // Dừng thực thi
+     }
+
      // 2. Kiểm tra variant, tồn kho, loading
-    if (!selectedVariant || selectedVariant.stockQuantity <= 0 || isAddingToCart) return;
+    if (!selectedVariant || selectedVariant.stockQuantity <= 0 || isAddingToCart) {
+        if (selectedVariant && selectedVariant.stockQuantity <= 0) {
+            toast.error('Sản phẩm đã hết hàng, không thể đặt ngay!', { position: "bottom-right" });
+        }
+        return;
+    }
 
     // 3. Bắt đầu loading (có thể dùng chung state isAddingToCart)
     setIsAddingToCart(true);
@@ -157,23 +192,39 @@ const ProductDisplay = ({ product }) => {
 
     try {
         // 4. Thêm sản phẩm vào giỏ hàng trước khi chuyển trang
+        //    (Payload giống hệt như handleAddToCart)
          const cartItemData = {
+            userId: user.userId,
             productId: product.productId,
             variantId: selectedVariant.variantId,
-            quantity: 1
+            quantity: 1,
+            isSelected: true // Item mới thêm thường được chọn sẵn trong giỏ
         };
+        console.log("Adding item to cart before navigating (Order Now):", cartItemData);
         await apiService.addToCart(cartItemData); // Gọi API thêm vào giỏ
-        console.log("Item added to cart before navigating to /cart");
+        console.log("Item added to cart successfully, navigating to /cart");
 
         // 5. Chuyển hướng đến trang giỏ hàng
         navigate('/cart');
-        // Không cần tắt loading ở đây nếu navigate thành công
+        // Không cần tắt loading ở đây nếu navigate thành công, vì component sẽ unmount
 
     } catch(err) { // 6. Xử lý lỗi nếu thêm vào giỏ thất bại
          console.error("Lỗi khi thêm vào giỏ (trong Đặt hàng):", err);
-         const errorMessage = err.response?.data?.message || err.message || "Không thể xử lý đặt hàng.";
+         // Xử lý lỗi tương tự như handleAddToCart
+         let errorMessage = "Không thể xử lý đặt hàng.";
+         if (err.response) {
+            errorMessage = err.response.data?.message || err.response.data || `Lỗi ${err.response.status}`;
+            console.error("API Error Response (Order Now):", err.response.data);
+          } else if (err.request) {
+            errorMessage = "Không nhận được phản hồi từ máy chủ.";
+            console.error("API No Response (Order Now):", err.request);
+          } else {
+            errorMessage = err.message;
+            console.error("API Request Setup Error (Order Now):", err.message);
+          }
+
          setAddToCartError(errorMessage);
-         toast.error(errorMessage, { position: "bottom-right" });
+         toast.error(`Đặt hàng thất bại: ${errorMessage}`, { position: "bottom-right" });
          setIsAddingToCart(false); // Quan trọng: Tắt loading nếu lỗi ở bước này
     }
     // Nếu không có lỗi ở try, isAddingToCart sẽ tự reset khi component unmount hoặc navigate
@@ -183,13 +234,13 @@ const ProductDisplay = ({ product }) => {
   // Kiểm tra dữ liệu đầu vào cơ bản
   if (!product || !product.variants || product.variants.length === 0) {
     // Có thể hiển thị một thông báo lỗi cụ thể hơn ở đây
-    return <p className={styles.errorMessage}>Không tìm thấy thông tin sản phẩm hoặc sản phẩm không có biến thể.</p>;
+    return <div className={styles.productDisplayContainer}><p className={styles.errorMessage}>Không tìm thấy thông tin sản phẩm hoặc sản phẩm không có biến thể.</p></div>;
   }
   // Đảm bảo luôn có một `currentVariant` để tránh lỗi (dù đã có useEffect xử lý)
   const currentVariant = selectedVariant || product.variants[0];
   // Kiểm tra lại xem currentVariant có thực sự tồn tại không (trường hợp cực hiếm)
   if (!currentVariant) {
-      return <p className={styles.errorMessage}>Lỗi hiển thị biến thể sản phẩm.</p>;
+      return <div className={styles.productDisplayContainer}><p className={styles.errorMessage}>Lỗi hiển thị biến thể sản phẩm.</p></div>;
   }
 
   // --- JSX Output ---
@@ -200,7 +251,7 @@ const ProductDisplay = ({ product }) => {
       <div className={styles.leftColumn}>
           <div className={styles.imageWrapper}>
               <img
-                  src={currentVariant.imageUrl} // Ảnh của variant đang chọn
+                  src={currentVariant.imageUrl || "/images/placeholder-image.png"} // Ảnh của variant đang chọn, có fallback
                   alt={`${product.productName} - ${currentVariant.color}`} // Text mô tả ảnh
                   className={styles.mainImage}
                   key={currentVariant.variantId} // Key giúp React nhận biết và cập nhật ảnh khi variant đổi
@@ -217,7 +268,6 @@ const ProductDisplay = ({ product }) => {
                   </div>
               )}
           </div>
-          {/* Phần specs tóm tắt đã bị xóa theo yêu cầu trước */}
       </div>
 
       {/* === CỘT PHẢI: THÔNG TIN & ACTIONS === */}
@@ -248,7 +298,7 @@ const ProductDisplay = ({ product }) => {
               {/* Giá bán hiện tại (đã tính discount) */}
               <span className={styles.currentPrice}>{formatCurrency(currentVariant.finalPrice)}</span>
               {/* Giá gốc (chỉ hiển thị nếu có discount) */}
-              {currentVariant.discount > 0 && currentVariant.basePrice && (
+              {currentVariant.discount > 0 && currentVariant.basePrice && currentVariant.basePrice > currentVariant.finalPrice && (
                   <span className={styles.oldPrice}>{formatCurrency(currentVariant.basePrice)}</span>
               )}
           </div>
@@ -269,10 +319,11 @@ const ProductDisplay = ({ product }) => {
                   onClick={() => handleSelectVariant(index)} // Gọi hàm xử lý khi click
                   // Tooltip hiển thị thông tin chi tiết khi hover
                   title={`${variant.color}\nGiá: ${formatCurrency(variant.finalPrice)}\n${variant.stockQuantity > 0 ? `Kho: ${variant.stockQuantity}` : 'Tạm hết hàng'}`}
+                  disabled={variant.stockQuantity <= 0} // Disable button nếu hết hàng
                 >
                   {/* Ảnh thumbnail của variant */}
                   <img
-                    src={variant.imageUrl} // Nên dùng ảnh thumbnail nếu API cung cấp
+                    src={variant.imageUrl || "/images/placeholder-image.png"} // Nên dùng ảnh thumbnail nếu API cung cấp, có fallback
                     alt={variant.color}
                     className={styles.variantThumb}
                     loading="lazy"
@@ -283,8 +334,8 @@ const ProductDisplay = ({ product }) => {
                       <span className={styles.variantColorName}>{variant.color}</span>
                       <span className={styles.variantPriceTag}>{formatCurrency(variant.finalPrice)}</span>
                   </div>
-                  {/* Icon check nếu variant này được chọn và còn hàng */}
-                  {index === selectedVariantIndex && variant.stockQuantity > 0 && (
+                  {/* Icon check nếu variant này được chọn */}
+                  {index === selectedVariantIndex && (
                      <FaCheck className={styles.checkmarkIcon} />
                   )}
                   {/* Lớp phủ hiển thị "Hết hàng" */}
@@ -303,7 +354,7 @@ const ProductDisplay = ({ product }) => {
                </p>
            )}
            {/* Thông báo lỗi khi thêm vào giỏ (nếu có) */}
-           {addToCartError && (
+           {addToCartError && !isAddingToCart && ( // Chỉ hiển thị lỗi khi không đang loading
                <p className={`${styles.variantOutOfStockMsg} ${styles.addToCartError}`}>
                    <FaExclamationCircle /> {addToCartError}
                </p>
@@ -317,12 +368,11 @@ const ProductDisplay = ({ product }) => {
                       className={styles.orderNowButton}
                       onClick={handleOrderNow} // Gọi hàm xử lý đặt hàng
                       // Disable nút nếu hết hàng hoặc đang xử lý thêm vào giỏ
-                      disabled={currentVariant.stockQuantity <= 0 || isAddingToCart}
+                      disabled={currentVariant.stockQuantity <= 0 || isAddingToCart || !isAuthenticated} // Disable nếu chưa đăng nhập
                   >
                        {/* Hiển thị spinner nếu đang xử lý */}
-                      {isAddingToCart && <Spinner size="small" color="#fff"/> }
-                      <strong>ĐẶT HÀNG</strong>
-                      <span>Giao hàng tận nơi</span>
+                      {isAddingToCart ? <Spinner size="small" color="#fff"/> : <strong>ĐẶT HÀNG</strong> }
+                      {!isAddingToCart && <span>Giao hàng tận nơi</span>}
                   </Button>
 
                   {/* Nút Thêm vào giỏ hàng */}
@@ -330,13 +380,23 @@ const ProductDisplay = ({ product }) => {
                       variant="outline" // Sử dụng variant outline (hoặc secondary)
                       className={styles.addToCartButton}
                       onClick={handleAddToCart} // Gọi hàm xử lý thêm vào giỏ
-                      disabled={currentVariant.stockQuantity <= 0 || isAddingToCart} // Disable khi hết hàng hoặc đang loading
+                      disabled={currentVariant.stockQuantity <= 0 || isAddingToCart || !isAuthenticated} // Disable khi hết hàng, đang loading hoặc chưa đăng nhập
                   >
                       {/* Hiển thị spinner hoặc icon tùy trạng thái loading */}
                       {isAddingToCart ? <Spinner size="small" /> : <FaCartPlus />}
-                      <span>{isAddingToCart ? 'Đang thêm...' : 'Thêm vào giỏ'}</span>
+                      <span>{isAddingToCart ? 'Đang xử lý...' : 'Thêm vào giỏ'}</span>
                   </Button>
            </div>
+            {/* Nút đăng nhập nếu chưa đăng nhập */}
+            {!isAuthenticated && (
+                 <Button
+                    variant="secondary"
+                    onClick={() => navigate('/login')}
+                    className={styles.loginPromptButton}
+                  >
+                      <FiLogIn /> Đăng nhập để mua hàng
+                 </Button>
+            )}
       </div>
     </div>
   );

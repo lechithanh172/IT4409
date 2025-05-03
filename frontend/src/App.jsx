@@ -17,6 +17,7 @@ import SignupPage from './pages/AuthPage/signupPage';
 import ChangePassword from './pages/AuthPage/changePasswordPage';
 import OtpPage from './pages/AuthPage/otpPage';
 import ProductListPage from './components/ProductListPage/ProductListPage';
+import PlaceOrder from './pages/PlaceOrder/PlaceOrder';
 // Admin Pages (ví dụ)
 // import AdminDashboardPage from './pages/Admin/AdminDashboardPage';
 
@@ -41,10 +42,18 @@ function App() {
         <Route path="login" element={<LoginPage />} />
         <Route path="email" element={<EmailInputPage />} />
         <Route path="signup" element={<SignupPage />} />
+        
         <Route path="change-password" element={<ChangePassword />} />
         <Route path="otp" element={<OtpPage />} />
-
         {/* Protected Routes (Cần đăng nhập) */}
+        <Route
+          path="place-order"
+          element={
+            <ProtectedRoute> {/* Chỉ yêu cầu đăng nhập */}
+              <PlaceOrder />
+            </ProtectedRoute>
+          }
+        />
         <Route
           path="cart"
           element={

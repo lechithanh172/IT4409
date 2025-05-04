@@ -33,7 +33,7 @@ public class CartController {
     @PutMapping("/update")
     public ResponseEntity<?> updateCartItem(@RequestBody CartItem cartItem) {
         if(cartService.updateCartItem(cartItem)) {
-            return ResponseEntity.status(200).body(new StatusResponse("Updated cart item"));
+            return ResponseEntity.status(200).body(cartService.getCartItem(cartItem.getUserId(), cartItem.getProductId(), cartItem.getVariantId()).get());
         }
         return ResponseEntity.status(404).body(new StatusResponse("Not found cart item"));
     }

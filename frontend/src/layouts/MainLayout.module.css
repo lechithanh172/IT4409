@@ -1,0 +1,95 @@
+/* src/layouts/MainLayout.module.css */
+
+.layoutContainer {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background-color: #f4f4f4;
+  position: relative; /* Đảm bảo container có position để con absolute/fixed tham chiếu (dù không chắc có tác dụng với Toastify) */
+}
+
+.mainContent {
+  flex-grow: 1;
+  width: 100%;
+}
+
+/* --- STYLE CHO TOAST CONTAINER (Thử nghiệm) --- */
+
+/* Nhắm mục tiêu container bằng class bạn đã thêm */
+/* Lưu ý: Việc ghi đè position, top, right có thể bị CSS của react-toastify ghi đè lại! */
+.customToastContainer {
+  /* Thử đặt vị trí - CÓ THỂ KHÔNG HOẠT ĐỘNG NHƯ MONG ĐỢI */
+  /* position: fixed !important;  Thử !important nếu cần */
+  top: 1rem !important;
+  /* right: 1rem !important; */
+  /* left: unset !important; */
+  bottom: unset !important; 
+  width: auto !important; 
+  /* Các style khác bạn có thể tùy chỉnh (thường hoạt động tốt hơn) */
+  /* Ví dụ: thay đổi độ rộng tối đa */
+  /* max-width: 400px; */
+}
+
+/* Style cho từng toast (nếu dùng toastClassName) */
+/* Ghi đè class mặc định của react-toastify hoặc dùng class tùy chỉnh */
+/* Ví dụ ghi đè */
+:global(.Toastify__toast) { /* Dùng :global để nhắm class bên ngoài module */
+  border-radius: 8px !important; /* Bo góc nhiều hơn */
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
+  font-family: inherit !important; /* Dùng font của trang */
+  /* background-color: #your-color !important; */
+}
+
+/* Ví dụ dùng class tùy chỉnh */
+.customToast {
+  background-color: #fff;
+  color: #333;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  font-family: inherit;
+  padding: 12px 18px !important; /* Tăng padding */
+}
+.customToastBody {
+  font-size: 0.95rem; /* Cỡ chữ nội dung */
+  line-height: 1.5;
+}
+/* Style cho các loại toast khác nhau (nếu dùng class tùy chỉnh) */
+.customToast.Toastify__toast--success { /* Ghép class tùy chỉnh với class mặc định */
+  background-color: #e6f7f1;
+  color: #0b825a;
+  border-left: 5px solid #10b981; /* Thêm viền trái màu */
+}
+.customToast.Toastify__toast--error {
+  background-color: #fff5f5;
+  color: #c53030;
+   border-left: 5px solid #e53e3e;
+}
+.customToast.Toastify__toast--warning {
+   background-color: #fffbeb;
+   color: #b45309;
+   border-left: 5px solid #f59e0b;
+}
+.customToast.Toastify__toast--info {
+   background-color: #e0f2fe;
+   color: #0284c7;
+    border-left: 5px solid #3b82f6;
+}
+
+
+/* Style thanh progress (nếu dùng progressClassName) */
+.customProgressBar {
+  background: linear-gradient(to right, #6366f1, #8b5cf6) !important; /* Gradient cho thanh progress */
+  height: 4px !important;
+}
+
+/* Ghi đè style nút đóng (ví dụ) */
+:global(.Toastify__close-button) {
+  color: #6b7280 !important;
+  opacity: 0.8 !important;
+}
+:global(.Toastify__close-button:hover) {
+  color: #1f2937 !important;
+  opacity: 1 !important;
+}
+
+/* --- KẾT THÚC STYLE TOAST --- */

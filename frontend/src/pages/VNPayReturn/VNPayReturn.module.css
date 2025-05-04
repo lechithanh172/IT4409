@@ -1,0 +1,103 @@
+/* src/pages/VNPayReturn/VNPayReturn.module.css */
+.vnPayReturnPage {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 70vh;
+    padding: 40px 20px;
+    text-align: center;
+}
+
+.loadingContainer,
+.resultContainer {
+    max-width: 600px;
+    width: 100%;
+    padding: 30px;
+    border-radius: 8px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    background-color: #fff;
+}
+
+.loadingContainer p {
+    margin-top: 15px;
+    font-size: 1.1em;
+    color: #555;
+}
+
+.resultContainer h2 {
+    margin-bottom: 15px;
+    font-size: 1.8em;
+}
+
+.resultContainer.success h2 {
+    color: #28a745; /* Green */
+}
+
+.resultContainer.failed h2 {
+    color: #dc3545; /* Red */
+}
+
+.resultContainer .icon {
+    margin-bottom: 20px;
+}
+
+.resultContainer.success .icon {
+    color: #28a745;
+}
+
+.resultContainer.failed .icon {
+    color: #dc3545;
+}
+
+.transactionDetails {
+    margin-top: 25px;
+    padding-top: 20px;
+    border-top: 1px solid #eee;
+    text-align: left;
+    font-size: 0.95em;
+    color: #333;
+}
+
+.transactionDetails h4 {
+    text-align: center;
+    margin-bottom: 15px;
+    color: #444;
+    font-weight: 600;
+}
+
+
+.transactionDetails p {
+    margin-bottom: 8px;
+    line-height: 1.5;
+}
+
+.transactionDetails strong {
+    color: #000;
+    margin-left: 5px; /* Add some space */
+    word-break: break-all; /* Prevent long strings from breaking layout */
+}
+
+
+.errorMessage {
+    color: #721c24; /* Darker red for error text */
+    background-color: #f8d7da;
+    border: 1px solid #f5c6cb;
+    padding: 10px 15px;
+    border-radius: 4px;
+    margin-top: 15px;
+    margin-bottom: 20px;
+}
+
+.actions {
+    margin-top: 30px;
+    display: flex;
+    justify-content: center;
+    gap: 15px; /* Spacing between buttons */
+}
+
+/* Optional: Adjust button styles if needed */
+.actions button {
+   padding: 10px 20px;
+   font-size: 1em;
+}

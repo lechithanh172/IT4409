@@ -1,0 +1,207 @@
+/* src/components/FilterSortPanel/FilterSortPanel.module.css */
+
+.filterPanel {
+    background-color: #fff;
+    padding: 20px 25px;
+    border-radius: 10px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.07);
+    border: 1px solid #e5e7eb;
+    width: 100%;
+    box-sizing: border-box;
+  }
+  
+  .panelTitle {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #1a3b5d;
+    margin: 0 0 25px 0;
+    padding-bottom: 15px;
+    border-bottom: 1px solid #e5e7eb;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .panelTitle svg {
+      color: #6366f1;
+      font-size: 1.3rem;
+  }
+  
+  .filterGroup {
+    margin-bottom: 15px;
+    border-bottom: 1px solid #f3f4f6;
+    padding-bottom: 15px;
+  }
+  .filterGroup:last-child {
+      margin-bottom: 0;
+      border-bottom: none;
+      padding-bottom: 0;
+  }
+  
+  .groupHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    background: none;
+    border: none;
+    padding: 5px 0;
+    cursor: pointer;
+    text-align: left;
+  }
+  .groupHeader span {
+      font-weight: 600;
+      color: #374151;
+      font-size: 1rem;
+  }
+  .groupHeader svg {
+      color: #9ca3af;
+      transition: transform 0.2s ease;
+      font-size: 1.1rem;
+  }
+  
+  .groupContent {
+      padding-top: 15px;
+      overflow: hidden;
+      max-height: 500px;
+      transition: max-height 0.3s ease-out, padding-top 0.3s ease-out, opacity 0.2s linear 0.1s;
+      opacity: 1;
+  }
+ 
+  .sortSelect {
+    width: 100%;
+    padding: 10px 14px;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    background-color: #fff;
+    cursor: pointer;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+    background-position: right 0.8rem center;
+    background-repeat: no-repeat;
+    background-size: 1.1em 1.1em;
+  }
+  .sortSelect:focus {
+    outline: none;
+    border-color: #6366f1;
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+  }
+  
+  .priceRangeValues {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.9rem;
+      color: #4b5563;
+      margin-bottom: 20px;
+      font-weight: 500;
+  }
+  .priceRangeValues span:last-child {
+      font-weight: 600;
+      color: #1f2937;
+  }
+  .priceError { 
+      font-size: 0.9rem;
+      color: #ef4444;
+      font-style: italic;
+  }
+  
+  .rangeSliderWrapper {
+      padding: 15px 10px 5px 10px; 
+  }
+  
+  .rangeTrackContainer {
+      height: 36px;
+      display: flex;
+      width: 100%;
+  }
+  
+  .rangeTrack {
+      height: 5px;
+      width: 100%;
+      border-radius: 3px;
+      background: #e5e7eb;
+      align-self: center;
+  }
+  
+  .rangeThumb {
+      height: 16px; 
+      width: 16px;
+      border-radius: 50%;
+      background-color: #6366f1;
+      border: 3px solid #fff; 
+      box-shadow: 0px 1px 4px rgba(0,0,0,0.3); 
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      cursor: grab;
+      outline: none;
+  }
+  .rangeThumb:active { cursor: grabbing; }
+  .rangeThumb:focus-visible { box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.3); }
+  
+  .brandList {
+      max-height: 280px;
+      overflow-y: auto;
+      padding-right: 8px;
+      margin-right: -8px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+  }
+  .brandList::-webkit-scrollbar { width: 5px; }
+  .brandList::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 10px; }
+  .brandList::-webkit-scrollbar-thumb { background: #ccc; border-radius: 10px; }
+  .brandList::-webkit-scrollbar-thumb:hover { background: #aaa; }
+  
+  .brandLabel {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px;
+      cursor: pointer;
+      border-radius: 6px;
+      transition: background-color 0.2s ease;
+  }
+  .brandLabel:hover { background-color: #f4f4f5; }
+  
+  .radioInput {
+      width: 16px;
+      height: 16px;
+      cursor: pointer;
+      accent-color: #6366f1;
+      flex-shrink: 0;
+      margin-top: 1px;
+  }
+  
+  .brandName {
+      font-size: 0.95rem;
+      color: #374151;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      transition: color 0.2s ease, font-weight 0.2s ease;
+  }
+  .brandLabel input[type="radio"]:checked + .brandName {
+      font-weight: 600;
+      color: #4f46e5;
+  }
+  .noOptions { 
+      font-size: 0.9rem;
+      color: #9ca3af;
+      font-style: italic;
+      padding: 10px 5px;
+  }
+  
+  @media (max-width: 992px) {
+      .filterPanel {
+          box-shadow: none;
+          border: none;
+          padding: 10px;
+          padding-top: 0;
+      }
+       .panelTitle { display: none; } 
+        .filterGroup { margin-bottom: 15px; padding-bottom: 15px; }
+        .groupHeader span { font-size: 1rem; }
+        .brandList { max-height: none; }
+  }

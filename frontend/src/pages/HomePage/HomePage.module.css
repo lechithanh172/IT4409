@@ -1,0 +1,313 @@
+/* src/pages/HomePage/HomePage.module.css */
+
+/* --- General Page Styles --- */
+.homePage {
+  width: 100%;
+  overflow-x: hidden;
+}
+
+/* --- Hero Section --- */
+.heroSection {
+  position: relative;
+  height: 60vh;
+  min-height: 400px;
+  background-size: cover;
+  background-position: center center;
+  background-repeat: no-repeat;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  color: #fff;
+}
+
+.heroOverlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.55); /* Tăng độ đậm lớp phủ */
+  z-index: 1;
+}
+
+.heroContent {
+  position: relative;
+  z-index: 2;
+  max-width: 800px;
+  padding: 20px;
+  /* Animation cho nội dung */
+  animation: fadeInHero 1s ease-out forwards;
+  opacity: 0;
+}
+@keyframes fadeInHero {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.heroTitle {
+  font-size: 3rem; /* To hơn */
+  font-weight: 700;
+  margin-bottom: 15px;
+  line-height: 1.2;
+  text-shadow: 2px 2px 6px rgba(0, 0, 0, 0.6);
+}
+
+.heroSubtitle {
+  font-size: 1.3rem; /* To hơn */
+  margin-bottom: 35px; /* Khoảng cách lớn hơn */
+  font-weight: 300;
+  text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
+}
+
+.heroCtaButton {
+  padding: 14px 35px !important; /* Nút to hơn */
+  font-size: 1.1rem !important;
+  font-weight: 600 !important;
+  border-radius: 8px !important; /* Bo góc nút */
+  transition: transform 0.2s ease, box-shadow 0.2s ease !important;
+}
+.heroCtaButton:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0, 123, 255, 0.4);
+}
+
+/* --- General Section Styles --- */
+.section {
+  padding: 50px 20px; /* Giảm padding trên dưới chút */
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+/* --- Section Header (Title + View All Link) --- */
+.sectionHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px; /* Khoảng cách với slider/grid */
+    padding-bottom: 10px; /* Khoảng cách với đường kẻ dưới (nếu có) */
+    border-bottom: 1px solid #e5e7eb; /* Đường kẻ phân cách nhẹ */
+}
+
+.sectionTitle {
+  text-align: left; /* Căn trái */
+  font-size: 1.8rem; /* Giảm cỡ chữ */
+  font-weight: 600; /* Đậm vừa */
+  color: #1f2937;
+  margin: 0; /* Reset margin */
+  padding: 0; /* Reset padding */
+  border: none; /* Reset border */
+}
+.sectionTitle::after { /* Bỏ gạch chân mặc định */
+    display: none;
+}
+
+
+.viewAllLink {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    color: #007bff;
+    text-decoration: none;
+    font-weight: 500;
+    font-size: 0.95rem;
+    padding: 5px 0;
+    transition: color 0.2s ease;
+    white-space: nowrap;
+}
+.viewAllLink:hover {
+    color: #0056b3;
+    text-decoration: underline;
+}
+.viewAllLink svg {
+    transition: transform 0.2s ease;
+    margin-top: 2px; /* Căn icon với text */
+}
+.viewAllLink:hover svg {
+    transform: translateX(3px);
+}
+
+
+/* --- Loading & Error States --- */
+.loadingContainer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 200px;
+}
+.error, .noProducts {
+  color: #ef4444;
+  text-align: center;
+  margin-top: 30px; /* Tăng khoảng cách */
+  padding: 15px;
+  background-color: #fff5f5; /* Nền đỏ nhạt */
+  border: 1px solid #fecaca;
+  border-radius: 6px;
+  font-size: 1rem;
+  font-weight: 500;
+}
+.pageError {
+    margin: 20px; /* Lỗi chung thì có margin */
+}
+.noProducts {
+     color: #6b7280;
+     font-style: normal; /* Bỏ italic */
+     background-color: #f9fafb;
+     border-color: #e5e7eb;
+}
+
+/* --- Product List (Slider sẽ xử lý bên trong component của nó) --- */
+/* Bỏ style cũ của .productList */
+/* .productList { ... } */
+/* Bỏ style cũ của .viewAllContainer */
+/* .viewAllContainer { ... } */
+
+
+/* --- Brands Section --- */
+.brandsSectionBg {
+    background-color: #fff;
+    border-top: 1px solid #f0f0f0; /* Phân cách nhẹ với section trên */
+    border-bottom: 1px solid #f0f0f0;
+}
+.brandList {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); /* Tăng minmax */
+    gap: 20px;
+    justify-content: center;
+    padding: 10px 0; /* Padding nhỏ cho brand list */
+}
+.brandCard {
+    display: block;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    padding: 20px 15px; /* Tăng padding */
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    background-color: #fff;
+    text-decoration: none;
+}
+.brandCard:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.08);
+}
+.brandImageWrapper {
+    aspect-ratio: 16 / 9; /* Tỷ lệ cho logo */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.brandLogo {
+    max-width: 100%;
+    max-height: 45px; /* Giảm chiều cao logo chút */
+    height: auto;
+    object-fit: contain;
+    filter: grayscale(60%);
+    opacity: 0.9;
+    transition: filter 0.3s ease, opacity 0.3s ease;
+}
+.brandCard:hover .brandLogo {
+    filter: grayscale(0%);
+    opacity: 1;
+}
+
+/* --- Categories Section --- */
+.categoriesSectionBg {
+  background-color: #f8f9fa;
+}
+.categoryList {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); /* Giảm minmax */
+  gap: 20px; /* Giảm gap */
+  justify-content: center;
+}
+.categoryCard {
+  display: block;
+  position: relative;
+  border-radius: 10px;
+  overflow: hidden;
+  text-decoration: none;
+  color: #fff;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.1);
+}
+.categoryCard:hover {
+  transform: translateY(-6px); /* Ít hơn */
+  box-shadow: 0 10px 22px rgba(0, 0, 0, 0.13);
+}
+.categoryImageWrapper {
+    position: relative;
+    padding-top: 100%; /* Tỷ lệ 1:1 cho category */
+    overflow: hidden;
+    background-color: #e5e5e5;
+}
+.categoryImage {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+}
+.categoryCard:hover .categoryImage {
+  transform: scale(1.04);
+}
+.categoryOverlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.7) 0%, rgba(0, 0, 0, 0) 70%);
+    z-index: 1;
+    transition: background 0.3s ease;
+}
+.categoryCard:hover .categoryOverlay {
+     background: linear-gradient(to top, rgba(0, 0, 0, 0.8) 0%, rgba(0, 0, 0, 0.1) 75%);
+}
+.categoryName {
+  position: absolute;
+  bottom: 15px; /* Điều chỉnh vị trí */
+  left: 15px;
+  right: 15px;
+  font-size: 1.1rem; /* Giảm cỡ chữ */
+  font-weight: 600;
+  z-index: 2;
+  margin: 0;
+  text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.6);
+  line-height: 1.3;
+  text-align: center; /* Căn giữa tên category */
+}
+
+/* --- Responsive --- */
+@media (max-width: 992px) {
+    .heroTitle { font-size: 2.5rem; }
+    .heroSubtitle { font-size: 1.2rem; }
+    .brandList { grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); }
+    .categoryList { grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); }
+}
+
+@media (max-width: 768px) {
+  .heroSection { height: 55vh; min-height: 380px; }
+  .heroTitle { font-size: 2.2rem; }
+  .heroSubtitle { font-size: 1.1rem; }
+   .section { padding: 40px 15px; } /* Giảm padding section */
+   .sectionHeader { margin-bottom: 20px; }
+   .sectionTitle { font-size: 1.6rem; } /* Giảm cỡ chữ title */
+   .viewAllLink { font-size: 0.9rem; }
+   .categoryList { gap: 15px; }
+   .categoryName { font-size: 1rem; bottom: 12px; left: 10px; right: 10px; }
+   .brandList { grid-template-columns: repeat(auto-fit, minmax(80px, 1fr)); gap: 15px;}
+    .brandCard { padding: 15px 10px; }
+}
+
+@media (max-width: 576px) {
+    .heroTitle { font-size: 2rem; }
+    .heroSubtitle { font-size: 1rem; margin-bottom: 25px; }
+    .heroCtaButton { padding: 12px 30px !important; font-size: 1rem !important; }
+     .section { padding: 30px 10px; } /* Giảm padding nữa */
+     .sectionTitle { font-size: 1.5rem; }
+     .categoryList { grid-template-columns: repeat(2, 1fr); gap: 12px; } /* Luôn 2 cột category */
+     .brandList { grid-template-columns: repeat(3, 1fr); gap: 10px;} /* 3 cột logo */
+     .brandCard { padding: 10px 8px; }
+     .brandLogo { max-height: 35px; }
+}

@@ -1,0 +1,75 @@
+/* src/components/SpecificationTable/SpecificationTable.module.css */
+
+.specTable {
+    width: 100%;
+    border-collapse: collapse; /* Gộp đường viền */
+    font-size: 0.95rem; /* Cỡ chữ cơ bản */
+    margin-bottom: 15px; /* Khoảng cách giữa các bảng/nhóm */
+  }
+  
+  .specTable th,
+  .specTable td {
+    padding: 10px 12px; /* Tăng padding */
+    text-align: left;
+    border-bottom: 1px solid #f0f0f0; /* Đường kẻ ngang mờ */
+    vertical-align: top; /* Căn nội dung lên trên nếu dài */
+  }
+  
+  .specTable th {
+    font-weight: 500; /* Hơi đậm */
+    color: #555; /* Màu xám đậm */
+    background-color: #fafafa; /* Nền xám rất nhạt cho header */
+    width: 35%; /* Độ rộng cột label cố định hơn */
+  }
+  
+  .specTable td {
+    color: #333;
+    line-height: 1.5; /* Giãn dòng cho dễ đọc */
+  }
+  
+  /* Style riêng cho bảng tóm tắt */
+  .summaryTable {
+      /* Không cần style đặc biệt nhiều */
+  }
+  .summaryTable th {
+      width: 40%; /* Có thể điều chỉnh độ rộng cột */
+      background-color: transparent; /* Bỏ nền xám cho bảng tóm tắt */
+      font-weight: 400; /* Không quá đậm */
+       padding: 8px 0 8px 0; /* Padding chỉ trên dưới, không trái phải */
+  }
+  .summaryTable td {
+       font-weight: 500; /* Giá trị đậm hơn */
+       color: #1f1f1f;
+       padding: 8px 0 8px 10px; /* Padding chỉ trên dưới và trái */
+  }
+  .summaryTable tr:last-child th,
+  .summaryTable tr:last-child td {
+      border-bottom: none; /* Bỏ border dòng cuối */
+  }
+  
+  
+  /* Style cho bảng đầy đủ */
+  .fullSpecsContainer {
+      /* Container chung nếu cần */
+  }
+  
+  .specGroup {
+      margin-bottom: 25px; /* Khoảng cách giữa các nhóm thông số */
+  }
+  .specGroup:last-child {
+      margin-bottom: 0;
+  }
+  
+  .groupTitle {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: #0056b3; /* Màu xanh đậm */
+      margin-bottom: 15px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid #ddd;
+  }
+  
+  /* Style hover cho hàng (tùy chọn) */
+  .specTable tbody tr:hover {
+      background-color: #f8f8f8;
+  }

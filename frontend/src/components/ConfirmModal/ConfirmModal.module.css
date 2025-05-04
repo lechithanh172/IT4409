@@ -1,0 +1,67 @@
+.modalOverlay {
+    position: fixed; /* Che phủ toàn màn hình */
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.6); /* Nền đen mờ */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000; /* Đảm bảo nằm trên các thành phần khác */
+    opacity: 0; /* Bắt đầu ẩn */
+    animation: fadeIn 0.3s forwards; /* Hiệu ứng xuất hiện */
+  }
+  
+  .modalContent {
+    background-color: #fff;
+    padding: 30px 35px; /* Tăng padding */
+    border-radius: 10px; /* Bo góc */
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+    max-width: 450px; /* Giới hạn chiều rộng */
+    width: 90%; /* Chiếm 90% chiều rộng trên màn hình nhỏ */
+    text-align: center;
+    transform: scale(0.9); /* Bắt đầu nhỏ */
+    animation: scaleUp 0.3s 0.1s forwards; /* Hiệu ứng phóng to */
+  }
+  
+  .modalTitle {
+    font-size: 1.5rem; /* Cỡ chữ tiêu đề */
+    font-weight: 600;
+    color: #333;
+    margin-top: 0;
+    margin-bottom: 15px;
+  }
+  
+  .modalMessage {
+    font-size: 1rem;
+    color: #555;
+    margin-bottom: 30px; /* Khoảng cách với nút */
+    line-height: 1.6; /* Giãn dòng */
+  }
+  
+  .modalActions {
+    display: flex;
+    justify-content: center; /* Căn giữa các nút */
+    gap: 15px; /* Khoảng cách giữa các nút */
+  }
+  
+  /* Kế thừa style từ Button component hoặc định nghĩa riêng */
+  .cancelButton, .confirmButton {
+    padding: 10px 25px !important;
+    font-size: 0.95rem !important;
+    border-radius: 6px !important;
+  }
+  
+  /* Keyframes cho hiệu ứng */
+  @keyframes fadeIn {
+    to {
+      opacity: 1;
+    }
+  }
+  
+  @keyframes scaleUp {
+    to {
+      transform: scale(1);
+    }
+  }

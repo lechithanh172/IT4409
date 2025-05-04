@@ -1,0 +1,99 @@
+/* src/components/ProductSlider/ProductSlider.module.css */
+
+.sliderContainer {
+    margin-bottom: 30px; /* Khoảng cách dưới mỗi slider */
+}
+
+.sliderTitle { /* Style cho tiêu đề slider (nếu dùng) */
+    font-size: 1.6rem;
+    font-weight: 600;
+    color: #222;
+    margin-bottom: 20px;
+    /* Thêm border hoặc style khác nếu muốn */
+}
+
+.swiperWrapper {
+    position: relative; /* Cho phép định vị nút tuyệt đối */
+    padding: 0 5px; /* Padding nhỏ để nút không bị che khuất hoàn toàn ở cạnh */
+}
+
+.mySwiper {
+    width: 100%;
+    padding-top: 10px; /* Khoảng cách trên để không bị che bởi title */
+    padding-bottom: 15px; /* Khoảng cách dưới để không bị che */
+}
+
+.swiperSlide {
+    width: auto; /* Để slidesPerView: 'auto' hoạt động đúng */
+    height: auto; /* Chiều cao tự động theo ProductCard */
+    box-sizing: border-box;
+    display: flex; /* Đảm bảo ProductCard chiếm hết slide */
+}
+
+/* --- Nút điều hướng tùy chỉnh --- */
+.navButton {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%); /* Căn giữa theo chiều dọc */
+    z-index: 10; /* Nằm trên các slide */
+    width: 40px; /* Kích thước nút */
+    height: 40px;
+    background-color: rgba(255, 255, 255, 0.9); /* Nền trắng mờ */
+    color: #333; /* Màu icon */
+    border: 1px solid #e5e7eb; /* Viền nhẹ */
+    border-radius: 50%; /* Nút tròn */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1); /* Đổ bóng nhẹ */
+    transition: background-color 0.2s ease, color 0.2s ease, opacity 0.3s ease, transform 0.2s ease;
+    opacity: 0; /* Ẩn ban đầu */
+}
+
+.swiperWrapper:hover .navButton {
+    opacity: 1; /* Hiện nút khi hover vào khu vực slider */
+}
+
+.navButton:hover {
+    background-color: #007bff; /* Màu nền khi hover */
+    color: #fff; /* Màu icon khi hover */
+    transform: translateY(-50%) scale(1.05); /* Phóng to nhẹ */
+}
+
+.prevButton {
+    left: -15px; /* Đặt nút ra ngoài lề trái một chút */
+}
+
+.nextButton {
+    right: -15px; /* Đặt nút ra ngoài lề phải một chút */
+}
+
+/* Style khi nút bị vô hiệu hóa (khi ở đầu/cuối slider hoặc không đủ slide) */
+/* Swiper tự động thêm class swiper-button-disabled */
+.navButton.swiper-button-disabled {
+    opacity: 0.3 !important; /* Làm mờ đi (dùng !important để ghi đè opacity hover) */
+    cursor: not-allowed;
+    transform: translateY(-50%); /* Reset transform */
+    background-color: rgba(229, 231, 235, 0.8); /* Màu xám nhạt hơn */
+    color: #9ca3af;
+    box-shadow: none;
+}
+
+/* Responsive cho nút */
+@media (max-width: 768px) {
+    .navButton {
+        width: 35px;
+        height: 35px;
+        font-size: 1.1rem; /* Icon nhỏ hơn */
+    }
+    .prevButton { left: -10px; }
+    .nextButton { right: -10px; }
+}
+
+@media (max-width: 480px) {
+    /* Có thể ẩn nút hoàn toàn trên mobile nếu muốn */
+    /* .navButton { display: none; } */
+    .prevButton { left: -5px; }
+    .nextButton { right: -5px; }
+}

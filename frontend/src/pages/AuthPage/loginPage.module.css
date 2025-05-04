@@ -1,0 +1,336 @@
+/* src/pages/AuthPage/loginPage.module.css */
+
+/* --- Container bao ngoài trang --- */
+.pageContainer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh; /* Luôn full chiều cao */
+    padding: 1.5rem;
+    /* Gradient nền đẹp mắt */
+    background-image: linear-gradient(135deg, #f6d365 0%, #fda085 100%);
+    /* Hoặc một ảnh nền chất lượng cao */
+    /* background-image: url('https://images.unsplash.com/photo-1501785888041-af3ef285b470?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=MnwyMDg4MDd8MHwxfHNlYXJjaHwxfHx0cmF2ZWx8ZW58MHx8fHwxNjE3OTMxMzYx&ixlib=rb-1.2.1&q=80&w=1920'); */
+    /* background-size: cover; */
+    /* background-position: center; */
+    box-sizing: border-box;
+    overflow: hidden; /* Tránh scroll không mong muốn */
+}
+
+/* --- Card đăng nhập --- */
+.loginCard {
+    display: flex; /* Sử dụng flex để chia 2 cột */
+    width: 100%;
+    max-width: 900px; /* Tăng max-width để chứa 2 cột */
+    background-color: #ffffff;
+    border-radius: 20px; /* Bo góc nhiều hơn */
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.15); /* Shadow mềm mại, rõ hơn */
+    overflow: hidden; /* Đảm bảo nội dung không tràn ra ngoài bo góc */
+    /* Animation xuất hiện nhẹ nhàng */
+    animation: slideUp 0.6s ease-out forwards;
+    opacity: 0; /* Bắt đầu ẩn */
+}
+
+@keyframes slideUp {
+    from { transform: translateY(20px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}
+
+
+/* --- Cột trang trí bên trái --- */
+.decorativeSide {
+    flex-basis: 45%; /* Chiếm khoảng 45% */
+    background: linear-gradient(to bottom, #ff9a9e 0%, #fad0c4 99%, #fad0c4 100%); /* Gradient trang trí */
+    /* Hoặc ảnh nền */
+    /* background-image: url('/path/to/decorative-image.jpg'); */
+    /* background-size: cover; */
+    /* background-position: center; */
+    padding: 3rem 2rem;
+    color: #fff;
+    display: flex;
+    flex-direction: column;
+    justify-content: center; /* Căn giữa nội dung */
+    align-items: center; /* Căn giữa ngang */
+    text-align: center;
+    border-top-left-radius: 20px;
+    border-bottom-left-radius: 20px;
+}
+
+.decorativeSide .logoPlaceholder {
+    font-size: 2rem;
+    font-weight: bold;
+    margin-bottom: 1.5rem;
+    /* Thêm style khác cho logo nếu có */
+     opacity: 0.9;
+}
+
+.decorativeSide h3 {
+    font-size: 1.6rem;
+    margin-bottom: 1rem;
+    font-weight: 600;
+    text-shadow: 1px 1px 3px rgba(0,0,0,0.1);
+}
+
+.decorativeSide p {
+    font-size: 1rem;
+    line-height: 1.6;
+    opacity: 0.9;
+}
+
+
+/* --- Cột Form bên phải --- */
+.formSide {
+    flex-basis: 55%; /* Chiếm phần còn lại */
+    padding: 3rem 2.5rem; /* Padding lớn hơn */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+/* --- Form --- */
+.loginForm {
+    width: 100%;
+    max-width: 380px; /* Giới hạn chiều rộng form trong cột */
+    margin: 0 auto; /* Căn giữa form */
+    display: flex;
+    flex-direction: column;
+}
+
+/* --- Tiêu đề và phụ đề trong Form --- */
+.title {
+    text-align: left; /* Căn trái */
+    color: #1a3b5d;
+    margin: 0 0 0.5rem 0;
+    font-size: 1.7rem; /* Điều chỉnh lại */
+    font-weight: 700;
+}
+
+.subtitle {
+    text-align: left; /* Căn trái */
+    margin: 0 0 2rem 0;
+    color: #7f8c8d;
+    font-size: 0.95rem;
+}
+
+/* --- Input Group --- */
+.inputGroup {
+    margin-bottom: 1.2rem;
+    position: relative;
+}
+
+.label {
+    display: block;
+    margin-bottom: 0.4rem;
+    color: #4a5568; /* Xám đậm hơn */
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+.inputWrapper { /* Thêm wrapper để chứa icon và nút toggle dễ hơn */
+    position: relative;
+}
+
+.inputIcon {
+    position: absolute;
+    top: 50%;
+    left: 15px;
+    transform: translateY(-50%);
+    color: #cbd5e0; /* Nhạt hơn nữa */
+    font-size: 1.1rem;
+    pointer-events: none;
+    z-index: 1;
+}
+
+/* --- Input Fields --- */
+.input {
+    width: 100%;
+    padding: 0.9rem 0.9rem 0.9rem 3rem; /* Padding trái lớn hơn cho icon */
+    font-size: 1rem;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    box-sizing: border-box;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+    color: #2d3748;
+    background-color: #f7fafc; /* Nền input hơi xám */
+}
+/* Mật khẩu có padding phải cho nút toggle */
+.input[type="password"],
+.input[type="text"][name="password"] { /* Cả khi hiện text */
+    padding-right: 3.2rem;
+}
+
+
+.input::placeholder {
+    color: #a0aec0;
+}
+
+.input:focus {
+    outline: none;
+    border-color: #63b3ed; /* Xanh dương nhạt hơn */
+    background-color: #fff;
+    box-shadow: 0 0 0 3px rgba(99, 179, 237, 0.2);
+}
+
+/* --- Nút ẩn/hiện mật khẩu --- */
+.passwordToggle {
+    position: absolute;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    display: flex;
+    align-items: center;
+    padding: 0 0.9rem;
+    cursor: pointer;
+    color: #a0aec0;
+    font-size: 1.3rem;
+    background: none; /* Bỏ nền */
+    border: none; /* Bỏ viền */
+    outline: none;
+    transition: color 0.2s ease;
+}
+.passwordToggle:hover {
+    color: #718096;
+}
+.passwordToggle:focus-visible { /* Style focus cho accessibility */
+     box-shadow: 0 0 0 2px rgba(66, 153, 225, 0.5);
+     border-radius: 50%;
+}
+
+
+/* --- Error Message --- */
+.error {
+    color: #e53e3e; /* Đỏ đậm hơn */
+    background-color: #fed7d7; /* Nền đỏ rất nhạt */
+    border: 1px solid #feb2b2; /* Viền đỏ nhạt */
+    padding: 0.8rem 1rem;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    margin: 0 0 1rem 0; /* Chỉ margin dưới */
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    text-align: left;
+}
+.error svg {
+    flex-shrink: 0;
+    font-size: 1.1rem;
+}
+
+/* --- Forgot Password Link --- */
+.forgotPasswordLinkContainer {
+    text-align: right; /* Đẩy sang phải */
+    margin-bottom: 1.5rem; /* Khoảng cách với nút login */
+    margin-top: -0.5rem; /* Kéo lên chút */
+}
+
+
+/* --- Login Button --- */
+.loginButton { /* Ghi đè hoặc bổ sung style cho Button component */
+    width: 100%;
+    padding: 0.9rem 1rem !important; /* Quan trọng để ghi đè */
+    /* Gradient đẹp mắt hơn */
+    background-image: linear-gradient(to right, #667eea 0%, #764ba2 100%);
+    color: white !important;
+    border: none !important;
+    border-radius: 8px !important;
+    font-size: 1.05rem !important;
+    font-weight: 600 !important;
+    cursor: pointer;
+    /* Bỏ margin-top vì form đã dùng gap */
+    transition: all 0.3s ease !important;
+    display: inline-flex !important;
+    align-items: center;
+    justify-content: center;
+    gap: 0.6rem !important;
+    text-transform: uppercase; /* Viết hoa chữ */
+    letter-spacing: 0.5px; /* Giãn cách chữ */
+}
+
+.loginButton:hover:not(:disabled) {
+    background-image: linear-gradient(to right, #764ba2 0%, #667eea 100%); /* Đảo chiều gradient */
+    box-shadow: 0 7px 20px rgba(102, 126, 234, 0.4) !important; /* Shadow màu tím/xanh */
+    transform: translateY(-3px) !important; /* Nhấc cao hơn */
+}
+
+.loginButton:active:not(:disabled) {
+    transform: translateY(-1px) !important;
+    box-shadow: 0 4px 10px rgba(102, 126, 234, 0.3) !important;
+}
+
+/* Style khi nút bị disable */
+.loginButton:disabled {
+    background: #e2e8f0 !important; /* Xám nhạt hơn */
+    color: #a0aec0 !important;
+    cursor: not-allowed;
+    transform: none !important;
+    box-shadow: none !important;
+}
+.loginButton:disabled .spinner > div { /* Đổi màu spinner khi disable */
+    border-left-color: #a0aec0 !important;
+}
+
+
+/* --- Signup Link Container --- */
+.signupLinkContainer {
+    margin-top: 2rem; /* Khoảng cách lớn hơn */
+    text-align: center;
+    font-size: 0.9rem;
+    color: #718096;
+}
+
+.link { /* Style chung cho các link */
+    color: #4299e1; /* Xanh dương sáng */
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.2s ease;
+}
+.link:hover {
+    color: #2b6cb0; /* Xanh đậm hơn */
+    text-decoration: underline;
+}
+
+.signupLink { /* Style riêng cho link đăng ký */
+    font-weight: 600; /* Đậm hơn */
+    margin-left: 0.4rem;
+}
+
+.separator { /* Dùng border thay cho span | */
+    display: inline-block;
+    border-left: 1px solid #e2e8f0;
+    height: 0.8em;
+    margin: 0 0.7rem;
+    vertical-align: middle;
+}
+
+
+/* --- Responsive --- */
+@media (max-width: 850px) { /* Ẩn cột trang trí sớm hơn */
+    .decorativeSide {
+        display: none; /* Ẩn cột trái */
+    }
+    .formSide {
+        flex-basis: 100%; /* Form chiếm toàn bộ */
+        padding: 2.5rem 2rem; /* Điều chỉnh padding */
+    }
+     .loginCard {
+        max-width: 450px; /* Giảm max-width khi chỉ còn form */
+        flex-direction: column; /* Xếp chồng (dù chỉ còn 1 phần) */
+    }
+}
+
+@media (max-width: 480px) {
+    .pageContainer { padding: 1rem; }
+    .loginCard { padding: 0; border-radius: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.1);} /* Bỏ padding card, dùng padding formSide */
+    .formSide { padding: 2rem 1.2rem; } /* Giảm padding form */
+    .title { font-size: 1.6rem; }
+    .subtitle { font-size: 0.9rem; margin-bottom: 1.5rem; }
+    .input { font-size: 0.95rem; padding: 0.8rem 0.8rem 0.8rem 2.5rem; }
+     .inputGroup input:not([type="email"]):not([type="tel"]):not([name="username"]):not([name="address"]):not([type="password"]) { padding-left: 0.8rem; }
+    .inputIcon { left: 12px; font-size: 1rem; }
+     .passwordWrapper input { padding-right: 2.8rem; }
+     .passwordToggle { padding: 0 0.7rem; font-size: 1.2rem; }
+    .loginButton { padding: 0.8rem !important; font-size: 1rem !important; }
+    .error { font-size: 0.85rem; padding: 0.7rem 0.9rem; }
+    .signupLinkContainer, .forgotPasswordLinkContainer, .links { font-size: 0.85rem; }
+     .separator { margin: 0 0.5rem; }
+}

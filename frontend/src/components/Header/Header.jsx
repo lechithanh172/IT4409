@@ -174,7 +174,7 @@ const Header = () => {
                     <div className={` ${styles.dropdownMenu} ${styles.userDropdown} ${isUserDropdownOpen ? styles.show : ''} `} role="menu">
                         <div className={styles.dropdownHeader}>Chào, {displayName}!</div>
                         <Link to="/profile" className={styles.dropdownItem} onClick={closeAllDropdowns} role="menuitem"><FiUser className={styles.dropdownIcon}/> Hồ sơ</Link>
-                        <Link to="/orders" className={styles.dropdownItem} onClick={closeAllDropdowns} role="menuitem"><FiBox className={styles.dropdownIcon}/> Đơn hàng</Link>
+                        <Link to="/profile/orders" className={styles.dropdownItem} onClick={closeAllDropdowns} role="menuitem"><FiBox className={styles.dropdownIcon}/> Đơn hàng</Link>
                         {/* Thêm link Admin/PM vào dropdown user */}
                         {userRole === 'admin' && (
                            <Link to="/admin" className={styles.dropdownItem} onClick={closeAllDropdowns} role="menuitem">

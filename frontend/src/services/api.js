@@ -108,7 +108,8 @@ const apiService = {
   // ORDER
   // ... (giữ nguyên)
   createOrder: (data) => apiInstance.post("/order/create", data),
-  getOrderHistory: () => apiInstance.get(`/order/history`), // Giả sử backend tự biết user
+  getOrderItems: (orderId) => apiInstance.get(`/order/get-items/${orderId}`),
+  getOrderHistory: (username) => apiInstance.get(`/order/history/${username}`),
   getOrderById: (orderId) => apiInstance.get(`/order/view/${orderId}`),
   getOrdersByStatus: (status) => apiInstance.get(`/order/status/${status}`), // Cho admin
   approveOrder: (orderId) => apiInstance.post(`/order/approve/${orderId}`), // Cho admin

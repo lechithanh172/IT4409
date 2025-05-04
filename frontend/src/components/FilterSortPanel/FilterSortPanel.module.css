@@ -62,16 +62,11 @@
   .groupContent {
       padding-top: 15px;
       overflow: hidden;
-      /* Hiệu ứng đóng mở đơn giản bằng max-height */
-      max-height: 500px; /* Giá trị đủ lớn */
+      max-height: 500px;
       transition: max-height 0.3s ease-out, padding-top 0.3s ease-out, opacity 0.2s linear 0.1s;
       opacity: 1;
   }
-  /* Style khi đóng (nếu cần class .closed) */
-  /* .groupContent.closed { max-height: 0; padding-top: 0; opacity: 0; } */
-  
-  
-  /* Style cho Sort Select */
+ 
   .sortSelect {
     width: 100%;
     padding: 10px 14px;
@@ -93,27 +88,26 @@
     box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
   }
   
-  /* --- Style cho Price Range Filter --- */
   .priceRangeValues {
       display: flex;
       justify-content: space-between;
       font-size: 0.9rem;
       color: #4b5563;
-      margin-bottom: 20px; /* Tăng khoảng cách */
+      margin-bottom: 20px;
       font-weight: 500;
   }
   .priceRangeValues span:last-child {
       font-weight: 600;
       color: #1f2937;
   }
-  .priceError { /* Thông báo lỗi nếu min >= max */
+  .priceError { 
       font-size: 0.9rem;
       color: #ef4444;
       font-style: italic;
   }
   
   .rangeSliderWrapper {
-      padding: 15px 10px 5px 10px; /* Padding trên dưới và ngang */
+      padding: 15px 10px 5px 10px; 
   }
   
   .rangeTrackContainer {
@@ -123,20 +117,20 @@
   }
   
   .rangeTrack {
-      height: 5px; /* Thanh track mỏng hơn */
+      height: 5px;
       width: 100%;
       border-radius: 3px;
-      background: #e5e7eb; /* Màu nền mặc định track (sẽ bị ghi đè) */
+      background: #e5e7eb;
       align-self: center;
   }
   
   .rangeThumb {
-      height: 16px; /* Nút kéo nhỏ hơn */
+      height: 16px; 
       width: 16px;
       border-radius: 50%;
-      background-color: #6366f1; /* Màu nút kéo (tím) */
-      border: 3px solid #fff; /* Viền trắng dày hơn */
-      box-shadow: 0px 1px 4px rgba(0,0,0,0.3); /* Đổ bóng rõ hơn */
+      background-color: #6366f1;
+      border: 3px solid #fff; 
+      box-shadow: 0px 1px 4px rgba(0,0,0,0.3); 
       display: flex;
       justify-content: center;
       align-items: center;
@@ -146,8 +140,6 @@
   .rangeThumb:active { cursor: grabbing; }
   .rangeThumb:focus-visible { box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.3); }
   
-  
-  /* Style cho Brand List */
   .brandList {
       max-height: 280px;
       overflow-y: auto;
@@ -157,7 +149,6 @@
       flex-direction: column;
       gap: 6px;
   }
-  /* Custom scrollbar */
   .brandList::-webkit-scrollbar { width: 5px; }
   .brandList::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 10px; }
   .brandList::-webkit-scrollbar-thumb { background: #ccc; border-radius: 10px; }
@@ -175,10 +166,10 @@
   .brandLabel:hover { background-color: #f4f4f5; }
   
   .radioInput {
-      width: 16px; /* Kích thước radio */
+      width: 16px;
       height: 16px;
       cursor: pointer;
-      accent-color: #6366f1; /* Màu radio khi chọn */
+      accent-color: #6366f1;
       flex-shrink: 0;
       margin-top: 1px;
   }
@@ -195,14 +186,13 @@
       font-weight: 600;
       color: #4f46e5;
   }
-  .noOptions { /* Thông báo nếu không có brand */
+  .noOptions { 
       font-size: 0.9rem;
       color: #9ca3af;
       font-style: italic;
       padding: 10px 5px;
   }
   
-  /* Responsive cho Panel */
   @media (max-width: 992px) {
       .filterPanel {
           box-shadow: none;
@@ -210,7 +200,7 @@
           padding: 10px;
           padding-top: 0;
       }
-       .panelTitle { display: none; } /* Ẩn title chính khi là offcanvas */
+       .panelTitle { display: none; } 
         .filterGroup { margin-bottom: 15px; padding-bottom: 15px; }
         .groupHeader span { font-size: 1rem; }
         .brandList { max-height: none; }

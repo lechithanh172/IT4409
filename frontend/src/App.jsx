@@ -18,6 +18,7 @@ import ChangePassword from './pages/AuthPage/changePasswordPage';
 import OtpPage from './pages/AuthPage/otpPage';
 import ProductListPage from './components/ProductListPage/ProductListPage';
 import PlaceOrder from './pages/PlaceOrder/PlaceOrder';
+import VNPayReturn from './pages/VNPayReturn/VNPayReturn';
 // Admin Pages (ví dụ)
 // import AdminDashboardPage from './pages/Admin/AdminDashboardPage';
 
@@ -42,7 +43,7 @@ function App() {
         <Route path="login" element={<LoginPage />} />
         <Route path="email" element={<EmailInputPage />} />
         <Route path="signup" element={<SignupPage />} />
-        
+        <Route path="vnpay_jsp/vnpay_return.jsp" element={<VNPayReturn />} />
         <Route path="change-password" element={<ChangePassword />} />
         <Route path="otp" element={<OtpPage />} />
         {/* Protected Routes (Cần đăng nhập) */}

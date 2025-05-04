@@ -98,6 +98,13 @@ const apiService = {
   removeCartItem: (data) => apiInstance.post(`/cart-item/remove`, data),
   clearCart: () => apiInstance.delete("/cart-item/clear"),
 
+  // ADDRESS
+  getProvinces: () => apiInstance.get("/location/province"),
+  getDistricts: (provinceId) => apiInstance.get(`/location/district/${provinceId}`),
+  getWards: (districtId) => apiInstance.get(`/location/ward/${districtId}`),
+  calculateShippingFee: (data) => apiInstance.post("/order/shipping-fee", data),
+  vnPayCreate: (data) => apiInstance.post("/api/vnpay/create", data),
+  //
   // ORDER
   // ... (giữ nguyên)
   createOrder: (data) => apiInstance.post("/order/create", data),

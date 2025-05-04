@@ -3,8 +3,7 @@ package com.request;
 import lombok.Data;
 
 @Data
-public class Item {
+public class ProductQuantityCheckRequest {
     private Integer productId;
     private Integer variantId;
-    private int quantity;
 }

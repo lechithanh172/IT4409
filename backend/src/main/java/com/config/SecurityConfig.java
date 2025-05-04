@@ -14,34 +14,71 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+
+import java.util.List;
 
 @Configuration
 public class SecurityConfig {
-
     @Autowired
     JwtAuthenticationFilter jwtAuthenticationFilter;
+    @Autowired
+    CustomAccessDeniedHandler customAccessDeniedHandler;
+    @Autowired
+    CustomAuthenticationEntryPoint customAuthenticationEntryPoint;
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
+                .cors(cors -> cors.configurationSource(corsConfigurer()))
                 .csrf((AbstractHttpConfigurer::disable))
+                .exceptionHandling(ex -> ex
+                        .accessDeniedHandler(customAccessDeniedHandler)
+                        .authenticationEntryPoint(customAuthenticationEntryPoint)
+                )
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers("/auth/**").permitAll()
-                        .requestMatchers("/users/forget-password").permitAll()
-                        .requestMatchers("/users/reset-password").permitAll()
-                        .requestMatchers("/users/**").authenticated()
-                        .requestMatchers("/products/add").hasAnyRole("ADMIN", "PRODUCT_MANAGER")
-                        .requestMatchers("/products/delete").hasAnyRole("ADMIN", "PRODUCT_MANAGER")
-                        .requestMatchers("/products/update").hasAnyRole("ADMIN", "PRODUCT_MANAGER")
-                        .requestMatchers("/products/**").permitAll()
-                        .requestMatchers("/orders/status/").hasAnyRole("ADMIN", "PRODUCT_MANAGER")
-                        .requestMatchers("/orders/view/").authenticated()
-                        .requestMatchers("/orders/approve/").hasAnyRole("ADMIN", "PRODUCT_MANAGER")
-                        .requestMatchers("/orders/**").authenticated()
-                        .requestMatchers("/cart-items/**").hasAnyRole("ADMIN", "PRODUCT_MANAGER")
-                        .anyRequest().authenticated()
+                        .requestMatchers("/user/forget-password").permitAll()
+                        .requestMatchers("/user/reset-password").permitAll()
+                        .requestMatchers("/user/customers").hasAnyRole("ADMIN")
+                        .requestMatchers("/user/product_managers").hasAnyRole("ADMIN")
+                        .requestMatchers("/user/**").authenticated()
+                        .requestMatchers("/product/add").hasAnyRole("ADMIN", "PRODUCT_MANAGER")
+                        .requestMatchers("/product/delete").hasAnyRole("ADMIN", "PRODUCT_MANAGER")
+                        .requestMatchers("/product/update").hasAnyRole("ADMIN", "PRODUCT_MANAGER")
+                        .requestMatchers("/product/variant/delete").hasAnyRole("ADMIN", "PRODUCT_MANAGER")
+                        .requestMatchers("/product/**").permitAll()
+                        .requestMatchers("/category").permitAll()
+                        .requestMatchers("/category/").permitAll()
+                        .requestMatchers("/category/**").hasAnyRole("ADMIN", "PRODUCT_MANAGER")
+                        .requestMatchers("/brand/").permitAll()
+                        .requestMatchers("/brand").permitAll()
+                        .requestMatchers("/brand/**").hasAnyRole("ADMIN", "PRODUCT_MANAGER")
+                        .requestMatchers("/order/status/**").hasAnyRole("ADMIN")
+                        .requestMatchers("/order/approve/").hasAnyRole("ADMIN")
+                        .requestMatchers("/order/view/all").hasAnyRole("ADMIN")
+                        .requestMatchers("/order/**").authenticated()
+                        .requestMatchers("/cart-item/check").permitAll()
+                        .requestMatchers("/cart-item/**").authenticated()
+                        .requestMatchers("/api/vnpay/**").authenticated()
+                        .anyRequest().permitAll()
                 )
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
         return http.build();
+    }
+    @Bean
+    public CorsConfigurationSource corsConfigurer() {
+        CorsConfiguration configuration = new CorsConfiguration();
+        configuration.setAllowedOrigins(List.of("http://localhost:5173"));
+        configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        configuration.setAllowedHeaders(List.of("*"));
+        configuration.setAllowCredentials(true);
+
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", configuration);
+
+        return source;
     }
 
     @Bean

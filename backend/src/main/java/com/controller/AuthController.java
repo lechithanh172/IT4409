@@ -1,15 +1,20 @@
 package com.controller;
 
+import com.entity.User;
 import com.request.LoginRequest;
 import com.request.SignUpOTPRequest;
 import com.request.SignUpRequest;
 import com.response.StatusResponse;
-import com.service.*;
-import com.entity.User;
+import com.service.JwtService;
+import com.service.OtpService;
+import com.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.io.UnsupportedEncodingException;
 import java.util.Optional;
@@ -42,7 +47,7 @@ public class AuthController {
     public ResponseEntity<?> signUpOtp(@RequestBody SignUpOTPRequest request) {
         if (otpService.validateOtp(request.getEmail(), request.getOtp())) {
             userService.createUser(request);
-            return ResponseEntity.status(200).body(new StatusResponse("Account has been created successfully"));
+            return ResponseEntity.status(200).body(userService.findByUsername(request.getUsername()).get());
         } else {
             return ResponseEntity.status(400).body(new StatusResponse("Wrong OTP"));
         }

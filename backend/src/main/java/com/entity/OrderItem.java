@@ -10,20 +10,17 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
-@Table(name = "cart_items")
-@IdClass(CartItemId.class)
+@Table(name = "order_items")
+@IdClass(OrderItemId.class)
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
 @Setter
-public class CartItem {
+public class OrderItem {
 
     @Id
-    private Integer userId;
+    private Integer orderId;
     @Id
     private Integer productId;
-    @Id
-    private Integer variantId;
-    private boolean isSelected = true;
     private Integer quantity;
 }

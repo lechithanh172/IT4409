@@ -25,6 +25,8 @@ public class ProductRequest {
 
     private Boolean supportRushOrder;
 
+    private Boolean isActive;
+
     private List<ProductVariantRequest> variants;
 
 }

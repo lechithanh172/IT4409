@@ -12,7 +12,6 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
-
 @Service
 public class UserService {
     @Autowired
@@ -21,6 +20,7 @@ public class UserService {
     private PasswordEncoder passwordEncoder;
     @Autowired
     private JwtService jwtService;
+    public Optional<User> findById(Integer userId) {return userRepository.findById(userId);}
 
     public Optional<User> findByEmail(String email) {return userRepository.findByEmail(email);}
 

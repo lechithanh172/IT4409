@@ -2,14 +2,12 @@ package com.service;
 
 import com.entity.User;
 import com.repository.UserRepository;
-import com.request.ChangePasswordRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.io.UnsupportedEncodingException;
 import java.util.Optional;
-import java.util.Random;
 
 @Service
 public class PasswordService {

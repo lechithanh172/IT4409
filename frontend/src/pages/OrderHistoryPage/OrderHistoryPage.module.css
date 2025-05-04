@@ -173,7 +173,6 @@
 .colTotal { width: 160px; font-weight: bold; font-size: 1.05em; } /* Slightly larger total */
 .alignRight { text-align: right !important; }
 
-/* Status Pill Styles */
 .orderStatus { padding: 5px 12px; border-radius: 15px; font-size: 0.75em; font-weight: 700; color: #fff; white-space: nowrap; text-transform: uppercase; letter-spacing: 0.5px; }
 .statusPending { background-color: #ffc107; color: #333;}
 .statusProcessing { background-color: #17a2b8; }

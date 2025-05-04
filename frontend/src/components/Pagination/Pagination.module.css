@@ -1,0 +1,122 @@
+/* src/components/Pagination/Pagination.module.css */
+
+.paginationContainer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 45px; /* Tăng khoảng cách với nội dung trên */
+    padding: 20px 0;
+    user-select: none;
+  }
+  
+  .paginationList {
+    display: flex;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    gap: 10px; /* Tăng khoảng cách giữa các nút */
+    align-items: center;
+  }
+  
+  
+  /* --- Style chung cho các nút/link phân trang --- */
+  .pageLink {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 42px; /* Kích thước nút vuông/tròn */
+    height: 42px;
+    padding: 0; /* Bỏ padding ngang vì kích thước cố định */
+    font-size: 0.95rem;
+    font-weight: 600; /* Chữ đậm hơn */
+    line-height: 1;
+    color: #374151; /* Màu xám đậm */
+    background-color: #fff;
+    border: 1px solid #d1d5db; /* Viền xám nhạt hơn */
+    border-radius: 8px; /* Bo góc vừa phải */
+    cursor: pointer;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1); /* Hiệu ứng transition mượt hơn */
+    text-decoration: none;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05); /* Shadow rất nhẹ */
+  }
+  .pageLink svg {
+      font-size: 1.3rem; /* Icon to hơn */
+      stroke-width: 2; /* Nét icon mảnh hơn */
+  }
+  
+  /* --- Hiệu ứng Hover (cho các nút có thể click) --- */
+  .pageLink:not([disabled]):not(.ellipsis):not([aria-current="page"]):hover {
+    border-color: #a5b4fc; /* Viền màu tím nhạt */
+    background-color: #f0f5ff; /* Nền tím rất nhạt */
+    color: #4f46e5; /* Màu tím chính */
+    transform: translateY(-2px); /* Nhấc nút lên */
+    box-shadow: 0 4px 10px rgba(79, 70, 229, 0.15); /* Shadow tím mờ */
+  }
+  
+  /* --- Style cho nút trang hiện tại (.active) --- */
+  .pageItem.active .pageLink {
+    background-color: #4f46e5; /* Nền màu tím */
+    border-color: #4f46e5;
+    color: #fff;
+    font-weight: 700;
+    cursor: default;
+    box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3); /* Shadow rõ hơn cho nút active */
+    /* Thêm hiệu ứng nhẹ khi active (tùy chọn) */
+    /* transform: scale(1.05); */
+  }
+  
+  /* --- Style cho nút bị vô hiệu hóa (.disabled) --- */
+  .pageItem.disabled .pageLink {
+    color: #cbd5e0; /* Màu xám rất nhạt */
+    background-color: #f8fafc; /* Nền trắng hơi xám */
+    border-color: #e2e8f0;
+    cursor: not-allowed;
+    box-shadow: none; /* Bỏ shadow */
+  }
+  .pageItem.disabled .pageLink:hover { /* Bỏ hiệu ứng hover */
+      background-color: #f8fafc;
+      border-color: #e2e8f0;
+      transform: none;
+  }
+  
+  .ellipsis {
+    border: none;
+    background: none;
+    color: #9ca3af; /* Màu xám nhạt hơn */
+    padding: 0 5px;
+    cursor: default;
+    width: auto; /* Để không bị cố định width */
+    height: 42px; /* Giữ chiều cao */
+    box-shadow: none; /* Bỏ shadow */
+  }
+  .ellipsis:hover { transform: none; } /* Bỏ hiệu ứng hover */
+  
+  
+  /* --- Responsive --- */
+  @media (max-width: 600px) {
+      .pageLink {
+          width: 38px; /* Giảm kích thước nút */
+          height: 38px;
+          font-size: 0.9rem;
+      }
+      .pageLink svg { font-size: 1.2rem; }
+      .paginationList { gap: 6px; } /* Giảm khoảng cách */
+  }
+  
+  @media (max-width: 400px) {
+       /* Ẩn các số trang không phải active và ellipsis */
+      .pageItem:not(.active):not(.disabled):not(.ellipsisItem) {
+           display: none;
+      }
+      /* Hiển thị trang đầu và cuối nếu cần */
+      
+       /* Hoặc giảm kích thước hơn nữa */
+       .pageLink {
+           width: 34px;
+           height: 34px;
+           font-size: 0.85rem;
+       }
+       .pageLink svg { font-size: 1.1rem; }
+       .paginationList { gap: 4px; }
+       .ellipsis { display: none; } /* Ẩn hẳn dấu ... trên mobile siêu nhỏ */
+  }

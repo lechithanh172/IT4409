@@ -1,0 +1,120 @@
+.popular {
+  overflow: hidden;
+  position: relative;
+}
+
+.productList {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 25px;
+  width: 100%;
+  grid-auto-flow: column;
+}
+
+.swiper-container {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+  padding: 0 20px;
+}
+
+.swiperWrapperPopular {
+  display: flex;
+  overflow: hidden;
+  transition: transform 300ms ease;
+}
+
+.popular {
+  display: flex;
+  flex-direction: column;
+}
+
+.popularTitle {
+  text-align: center;
+}
+
+.productListSwipper {
+  padding-bottom: 1vh;
+}
+
+.productList {
+  display: flex;
+  gap: 22px;
+  width: 141%;
+}
+
+.productList .listItem {
+  width: 17.1rem;
+  padding: 0.3rem;
+}
+
+.swiperButtonPrev,
+.swiperButtonNext {
+  align-items: center;
+  background: #fff;
+  box-shadow: 0 0 4px 0 rgba(0, 0, 0, 0.2);
+  display: flex;
+  font-size: 1.8rem;
+  height: 60px;
+  justify-content: center;
+  opacity: 0.8;
+  outline: none;
+  position: absolute;
+  top: 50%;
+  transition: 0.3s;
+  width: 30px;
+  z-index: 10;
+  cursor: pointer;
+}
+
+.swiperButtonPrev {
+  left: 0px;
+  transform: translateY(-50%);
+  border-radius: 0 100px 100px 0;
+  padding-right: 10px;
+}
+
+.swiperButtonNext {
+  right: 0px;
+  transform: translateY(-50%);
+  border-radius: 100px 0 0 100px;
+  padding-left: 10px;
+}
+
+.swiperButtonPrev svg,
+.swiperButtonNext svg {
+  color: #3a3a3a;
+  font-size: 24px;
+  font-weight: 600;
+}
+
+.swiperButtonPrev:hover,
+.swiperButtonNext:hover {
+  opacity: 1;
+}
+
+.swiper-container {
+  position: relative;
+  overflow: hidden;
+  width: 100%;
+  padding: 0 20px;
+}
+
+@media (max-width: 992px) {
+  .productList {
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  }
+}
+
+@media (max-width: 768px) {
+  .productList {
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 15px;
+  }
+}
+
+@media (max-width: 576px) {
+  .productList {
+    grid-template-columns: 1fr;
+  }
+}

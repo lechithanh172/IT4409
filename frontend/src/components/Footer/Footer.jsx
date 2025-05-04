@@ -18,7 +18,7 @@ const Footer = () => {
           <div className={styles.footerColumn}>
             <h4 className={styles.columnTitle}>MyEshop</h4>
             <p className={styles.footerText}>
-              Cửa hàng công nghệ hàng đầu, cung cấp Smartphone và Laptop chính hãng.
+              Cửa hàng công nghệ hàng đầu, cung cấp sản phẩm công nghệ chính hãng.
             </p>
             <div className={styles.socialIcons}>
                <SocialIcon href="https://facebook.com">FB</SocialIcon>
@@ -46,10 +46,10 @@ const Footer = () => {
            <div className={styles.footerColumn}>
             <h4 className={styles.columnTitle}>Liên Hệ</h4>
             <p className={styles.footerText}>
-              Địa chỉ: 123 Đường ABC, Quận XYZ, Thành phố HCM
+              Địa chỉ: 123 Đường Trần Đại Nghĩa, Quận Hai Bà Trưng, Thành phố Hà Nội
             </p>
             <p className={styles.footerText}>
-              Email: support@myeshop.com
+              Email: lehaanhduc@id.vn
             </p>
              <p className={styles.footerText}>
               Điện thoại: (028) 1234 5678

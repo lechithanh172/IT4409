@@ -1,24 +1,32 @@
 /* src/pages/OrderHistoryPage/OrderHistoryPage.module.css */
+
+/* --- General Container --- */
 .container {
-    max-width: 900px;
-    margin: 30px auto;
-    padding: 20px;
-    font-family: sans-serif;
+    max-width: 1150px; /* Adjust as needed for your layout */
+    margin: 30px auto; /* Center the container with top/bottom margin */
+    padding: 25px 30px; /* Padding inside the main container */
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    background-color: #f9f9f9;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08); /* Subtle shadow for depth */
 }
 
 .container h1 {
     display: flex;
     align-items: center;
-    gap: 10px;
-    font-size: 1.8em;
-    margin-bottom: 25px;
-    color: #333;
-    border-bottom: 2px solid #eee;
-    padding-bottom: 10px;
+    gap: 12px;
+    font-size: 1.9em; /* Slightly larger title */
+    margin-bottom: 30px;
+    color: #2c3e50; /* Darker blue */
+    border-bottom: 2px solid #e0e0e0;
+    padding-bottom: 15px;
+    font-weight: 600; /* Slightly bolder */
 }
 
+/* --- Loading/Error/Empty States --- */
 .loadingContainer,
-.errorContainer {
+.errorContainer,
+.noResults {
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -26,77 +34,146 @@
     min-height: 40vh;
     text-align: center;
     color: #555;
-}
-
-.errorContainer h2 {
-    color: #dc3545;
-    margin-top: 15px;
-    margin-bottom: 10px;
-}
-
-.errorContainer p {
-    margin-bottom: 20px;
-}
-
-.orderList {
-    display: flex;
-    flex-direction: column;
-    gap: 20px; /* Space between order cards */
-}
-
-.orderCard {
-    border: 1px solid #e0e0e0;
-    border-radius: 8px;
+    padding: 30px;
     background-color: #fff;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
-    transition: box-shadow 0.2s ease-in-out;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    margin-top: 20px; /* Add margin if needed */
 }
+.errorContainer h2 { color: #e74c3c; margin-top: 15px; margin-bottom: 10px; }
+.errorContainer p { margin-bottom: 20px; font-size: 1.05em; line-height: 1.6; }
+.noResults p { font-size: 1.1em; margin-bottom: 25px; }
+.loadingContainer p { font-size: 1.1em; margin-top: 15px;}
+.noResults a button, .errorContainer button { margin-top: 10px; } /* Ensure buttons have margin */
 
-.orderCard:hover {
-   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-}
 
-.orderHeader {
+/* --- Search Bar --- */
+.searchContainer {
+    margin-bottom: 25px;
     display: flex;
-    justify-content: space-between;
+    justify-content: flex-end; /* Align search to the right */
+}
+
+.searchInputWrapper {
+    position: relative;
+    display: flex;
     align-items: center;
-    padding: 15px 20px;
+    width: 100%;
+    max-width: 380px; /* Adjust width as needed */
+}
+
+.searchIcon {
+    position: absolute;
+    left: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #aaa;
+    pointer-events: none;
+}
+
+.searchInput {
+    width: 100%;
+    padding: 10px 40px 10px 40px; /* Padding: top/bottom, right (for clear), left (for search icon) */
+    border: 1px solid #ccc;
+    border-radius: 25px;
+    font-size: 1em;
+    outline: none;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    background-color: #fff;
+    box-sizing: border-box; /* Include padding in width */
+}
+
+.searchInput:focus {
+    border-color: #3498db;
+    box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.15);
+}
+
+.clearSearchButton {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
     cursor: pointer;
-    background-color: #f8f9fa;
-    border-bottom: 1px solid #e0e0e0;
-    border-top-left-radius: 8px;
-    border-top-right-radius: 8px;
-    flex-wrap: wrap; /* Allow wrapping on smaller screens */
-    gap: 10px;
-}
-
-.headerInfo {
+    color: #aaa;
+    padding: 6px;
     display: flex;
     align-items: center;
-    gap: 15px; /* Space between ID, Date, Status */
-    flex-wrap: wrap;
-    font-size: 0.9em;
+    justify-content: center;
+    transition: color 0.2s ease;
+    line-height: 1; /* Prevent button height issues */
+}
+.clearSearchButton:hover {
     color: #555;
 }
 
-.orderId {
-    font-weight: bold;
-    color: #333;
+
+/* --- Order Table --- */
+.tableContainer {
+    width: 100%;
+    overflow-x: auto; /* Horizontal scroll on small screens */
+    background-color: #fff;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.06);
 }
 
-.orderDate {
-    color: #777;
+.orderTable {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 700px; /* Prevent excessive squashing on small screens before scroll */
 }
 
-.orderStatus {
-    padding: 3px 8px;
-    border-radius: 4px;
-    font-size: 0.85em;
+.orderTable th,
+.orderTable td {
+    padding: 14px 16px; /* Slightly more padding */
+    text-align: left;
+    vertical-align: middle;
+    border-bottom: 1px solid #eee;
+    white-space: nowrap; /* Prevent text wrapping in header/summary row */
+}
+
+.orderTable th {
+    background-color: #f8f9fa;
     font-weight: 600;
-    color: #fff;
-    white-space: nowrap;
+    font-size: 0.85em; /* Slightly smaller header font */
+    color: #495057;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
 }
 
+.orderTable tbody tr:last-child td {
+    /* Remove bottom border only if it's NOT an expanded row's content */
+    /* border-bottom: none; This might remove border needed before expanded row */
+}
+
+.orderRow {
+    cursor: pointer;
+    transition: background-color 0.15s ease-in-out;
+}
+
+.orderRow:hover {
+    background-color: #f1f3f5;
+}
+
+/* Style for the main row when its details are expanded */
+.expandedHeader {
+    background-color: #e9ecef !important;
+    border-bottom: 1px solid #dee2e6;
+}
+
+
+/* Column specific styles */
+.colExpand { width: 45px; text-align: center !important; padding: 14px 10px; } /* Centered expand icon */
+.colId { width: 110px; font-weight: 500; color: #333;}
+.colDate { width: 170px; font-size: 0.9em; color: #555; }
+.colStatus { width: 150px; text-align: center !important; }
+.colPayment { width: 130px; }
+.colTotal { width: 160px; font-weight: bold; font-size: 1.05em; } /* Slightly larger total */
+.alignRight { text-align: right !important; }
+
+.orderStatus { padding: 5px 12px; border-radius: 15px; font-size: 0.75em; font-weight: 700; color: #fff; white-space: nowrap; text-transform: uppercase; letter-spacing: 0.5px; }
 .statusPending { background-color: #ffc107; color: #333;}
 .statusProcessing { background-color: #17a2b8; }
 .statusShipped { background-color: #007bff; }
@@ -105,127 +182,69 @@
 .statusUnknown { background-color: #6c757d; }
 
 
-.headerTotal {
-    display: flex;
-    align-items: center;
-    gap: 15px;
-    font-weight: bold;
-    font-size: 1em;
-    color: #0056b3;
+.toggleIcon { color: #6c757d; transition: transform 0.2s ease; display: inline-block; vertical-align: middle; }
+
+.expandedRow td {
+    padding: 20 !important;
+    border-bottom: 1px solid #dee2e6 !important;
+    border-top: 1px solid #dee2e6 !important;
 }
 
-.toggleIcon {
-    color: #6c757d;
-    transition: transform 0.2s ease;
+.expandedContent {
+    background-color: #fdfdfd;
+    padding: 25px 35px; 
+    text-align: left;
+    white-space: normal;
 }
-
-/* Rotate chevron when expanded (handled by checking state in component) */
-
 
 .orderDetails {
-    padding: 20px;
-    border-top: 1px dashed #eee; /* Separator */
-    background-color: #fff; /* Ensure background */
-    border-bottom-left-radius: 8px;
-    border-bottom-right-radius: 8px;
+    width: 100%;
 }
 
 .orderMeta {
-    margin-bottom: 20px;
+    margin-bottom: 25px;
     font-size: 0.95em;
-    line-height: 1.6;
+    line-height: 1.7;
     color: #444;
+    border-bottom: 1px dashed #ddd;
+    padding-bottom: 20px; /* Space above the dividing line */
+    /* Optional: Add specific horizontal padding if needed,
+       but often the padding on .expandedContent is enough.
+       If it still looks too close, uncomment and adjust below: */
+    /* padding-left: 10px; */
+    /* padding-right: 10px; */
 }
-
 .orderMeta p {
-    margin-bottom: 8px;
+    margin-bottom: 10px; /* Space between lines */
+    display: flex; /* Use flexbox for better alignment */
+    gap: 8px; /* Space between label and value */
 }
-
 .orderMeta strong {
     color: #111;
-    margin-right: 5px;
+    flex-shrink: 0; /* Prevent label from shrinking */
+    /* Remove fixed min-width if using flex gap */
+    /* min-width: 150px; */
+    font-weight: 600; /* Make label slightly bolder */
 }
 
 .itemsTitle {
-    font-size: 1.1em;
+    font-size: 1.15em;
     font-weight: 600;
-    margin-bottom: 15px;
+    margin-top: 20px; /* Space above title */
+    margin-bottom: 18px;
     color: #333;
-    border-bottom: 1px solid #eee;
-    padding-bottom: 8px;
 }
+.itemsLoading, .itemsError { padding: 20px; text-align: center; color: #777; display: flex; align-items: center; justify-content: center; gap: 8px; font-style: italic; background-color: #f8f8f8; border-radius: 4px;}
+.itemsError { color: #dc3545; font-style: normal; background-color: #f8d7da; border: 1px solid #f5c6cb;}
 
-.itemsLoading,
-.itemsError {
-    padding: 15px;
-    text-align: center;
-    color: #777;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-}
-.itemsError {
-    color: #dc3545;
-}
+.itemsList { display: flex; flex-direction: column; gap: 18px; }
 
+.orderItem { display: flex; align-items: center; gap: 18px; padding-bottom: 12px; border-bottom: 1px solid #f0f0f0; }
+.orderItem:last-child { border-bottom: none; padding-bottom: 5px; }
 
-.itemsList {
-    display: flex;
-    flex-direction: column;
-    gap: 15px; /* Space between items */
-}
-
-.orderItem {
-    display: flex;
-    align-items: center;
-    gap: 15px;
-    padding-bottom: 15px;
-    border-bottom: 1px solid #f0f0f0;
-}
-.orderItem:last-child {
-    border-bottom: none;
-    padding-bottom: 0;
-}
-
-.itemImage {
-    width: 60px;
-    height: 60px;
-    object-fit: contain; /* Use contain to avoid stretching */
-    border-radius: 4px;
-    border: 1px solid #eee;
-    flex-shrink: 0;
-}
-
-.itemInfo {
-    flex-grow: 1;
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-}
-
-.itemName {
-    font-weight: 600;
-    color: #222;
-    font-size: 0.95em;
-}
-
-.itemColor {
-    font-size: 0.85em;
-    color: #666;
-}
-
-.itemQuantity {
-    font-size: 0.9em;
-    color: #555;
-    min-width: 40px; /* Ensure alignment */
-    text-align: center;
-}
-
-.itemPrice {
-    font-size: 0.95em;
-    font-weight: 500;
-    color: #333;
-    min-width: 100px; /* Ensure alignment */
-    text-align: right;
-}
+.itemImage { width: 60px; height: 60px; object-fit: contain; border-radius: 4px; border: 1px solid #eee; flex-shrink: 0; background-color: #fff;}
+.itemInfo { flex-grow: 1; display: flex; flex-direction: column; gap: 4px; }
+.itemName { font-weight: 500; color: #2c3e50; font-size: 1em; line-height: 1.3; } /* Slightly larger item name */
+.itemColor { font-size: 0.88em; color: #666; }
+.itemQuantity { font-size: 0.9em; color: #555; min-width: 50px; text-align: center; font-weight: 500;}
+.itemPrice { font-size: 0.95em; font-weight: 500; color: #333; min-width: 110px; text-align: right; white-space: nowrap;}

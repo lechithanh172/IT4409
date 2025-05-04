@@ -43,7 +43,6 @@ const calculateTotalFromItems = (items) => {
 
 const VNPayReturn = () => {
     const location = useLocation();
-    const navigate = useNavigate();
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState(null);
     const [paymentStatus, setPaymentStatus] = useState('PENDING'); // PENDING, PROCESSING_ORDER, SUCCESS, FAILED
@@ -144,6 +143,7 @@ const VNPayReturn = () => {
             const fullAddressForFinalOrder = `${savedData.detailedAddress}, ${savedData.wardFullName}, ${savedData.districtFullName}, ${savedData.provinceName}`;
             const finalOrderData = {
                 shippingAddress: fullAddressForFinalOrder, paymentMethod: "VNPAY", deliveryMethod: savedData.shippingMethod,
+                shippingFee: savedData.shippingFee,
                 note: savedData.notes || '', items: savedData.orderItems.map(item => ({ productId: item.productId, variantId: item.variantId, quantity: item.quantity })),
                 vnpTransactionNo: vnp_TransactionNo, vnpTxnRef: vnp_TxnRef, vnpPayDate: vnp_PayDate, vnpAmount: vnpAmountValue,
             };

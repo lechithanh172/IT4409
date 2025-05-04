@@ -167,11 +167,78 @@ const PlaceOrder = () => {
     // Calculate Grand Total
     const finalTotalAmount = useMemo(() => (orderTotal || 0) + (shippingFee || 0) + (vatAmount || 0), [orderTotal, shippingFee, vatAmount]);
 
-    // Handle COD Order
-    const handleConfirmOrderCOD = useCallback(async () => { /* ... (Keep existing implementation) ... */ }, [isShippingInfoSaved, isAuthenticated, user, navigate]);
-    // Handle VNPAY Payment
-    const handleVNPayPayment = useCallback(async () => { /* ... (Keep existing implementation) ... */ }, [isShippingInfoSaved, isAuthenticated, user, navigate]);
+    const handleConfirmOrderCOD = useCallback(async () => {
+        // (Keep existing implementation - unchanged)
+         setError(null);
+         if (!isShippingInfoSaved) { setError("Thông tin đơn hàng/phí chưa được lưu hoặc đã thay đổi. Vui lòng 'Lưu & Tính phí' lại."); return; }
+         if (!isAuthenticated || !user?.userId) { setError("Vui lòng đăng nhập để đặt hàng."); navigate('/login'); return; }
+         setIsProcessingPayment(true);
+         const savedDataString = sessionStorage.getItem('savedShippingInfo');
+         let savedData;
+         try {
+              savedData = JSON.parse(savedDataString || '{}');
+              if (!savedData || typeof savedData !== 'object' || !Array.isArray(savedData.orderItems) || savedData.orderItems.length === 0 || typeof savedData.shippingFee !== 'number' || !savedData.provinceName || !savedData.districtFullName || !savedData.wardFullName || !savedData.detailedAddress || !savedData.phone || !savedData.email || !savedData.shippingMethod) { throw new Error("Dữ liệu lưu trong session không hợp lệ."); }
+         } catch (e) {
+              console.error("Fatal Error validating saved data on COD confirm:", e);
+              setError("Lỗi đọc dữ liệu đơn hàng. Vui lòng 'Lưu & Tính phí' lại.");
+              setIsProcessingPayment(false); setIsShippingInfoSaved(false); setShippingFee(null);
+              sessionStorage.removeItem('savedShippingInfo'); return;
+         }
+         const savedSubtotal = calculateTotalFromItems(savedData.orderItems);
+         const savedVat = savedSubtotal * 0.10;
+         const finalTotalForAPI = savedSubtotal + savedData.shippingFee + savedVat;
+         const fullAddressForFinalOrder = `${savedData.detailedAddress}, ${savedData.wardFullName}, ${savedData.districtFullName}, ${savedData.provinceName}`;
+         const finalOrderDataPayload = { shippingAddress: fullAddressForFinalOrder, paymentMethod: "CASH", deliveryMethod: savedData.shippingMethod, note: savedData.notes || '', items: savedData.orderItems.map(item => ({ productId: item.productId, variantId: item.variantId, quantity: item.quantity })), /* Include other needed fields like userId, totalAmount etc. */ };
+         console.log("Attempting COD order creation with payload:", finalOrderDataPayload);
+         try {
+             const response = await apiService.createOrder(finalOrderDataPayload);
+             console.log("API Create Order Response (COD):", response);
+             sessionStorage.removeItem('pendingOrderData'); sessionStorage.removeItem('savedShippingInfo');
+             navigate('/order-success', { replace: true, state: { orderId: response.data?.orderId, orderCode: response.data?.orderCode, totalAmount: finalTotalForAPI } });
+         } catch (err) {
+             console.error("Lỗi khi xác nhận đặt hàng COD:", err.response?.data || err.message || err);
+             const message = err.response?.data?.message || err.message || "Đặt hàng COD không thành công."; setError(message);
+             setIsProcessingPayment(false);
+         }
+    }, [isShippingInfoSaved, isAuthenticated, user, navigate]);
 
+    // --- FUNCTION TO HANDLE VNPAY PAYMENT INITIATION ---
+    const handleVNPayPayment = useCallback(async () => {
+       // (Keep existing implementation - unchanged)
+       setError(null);
+       if (!isShippingInfoSaved) { setError("Thông tin đơn hàng/phí chưa được lưu hoặc đã thay đổi. Vui lòng 'Lưu & Tính phí' lại."); return; }
+       if (!isAuthenticated || !user?.userId) { setError("Vui lòng đăng nhập để thanh toán."); navigate('/login'); return; }
+       setIsProcessingPayment(true);
+       const savedDataString = sessionStorage.getItem('savedShippingInfo');
+       let savedData;
+       try {
+           savedData = JSON.parse(savedDataString || '{}');
+           if (!savedData || typeof savedData !== 'object' || !Array.isArray(savedData.orderItems) || savedData.orderItems.length === 0 || typeof savedData.shippingFee !== 'number' || !savedData.provinceName || !savedData.districtFullName || !savedData.wardFullName || !savedData.detailedAddress || !savedData.phone || !savedData.email || !savedData.shippingMethod) { throw new Error("Dữ liệu lưu trong session không hợp lệ."); }
+       } catch (e) {
+           console.error("Fatal Error validating saved data for VNPAY:", e);
+           setError("Lỗi đọc dữ liệu đơn hàng. Vui lòng 'Lưu & Tính phí' lại.");
+           setIsProcessingPayment(false); setIsShippingInfoSaved(false); setShippingFee(null);
+           sessionStorage.removeItem('savedShippingInfo'); return;
+       }
+       const savedSubtotal = calculateTotalFromItems(savedData.orderItems);
+       const savedVat = savedSubtotal * 0.10;
+       const finalTotalForPayment = savedSubtotal + savedData.shippingFee + savedVat;
+       const vnPayPayload = { amount: Math.round(finalTotalForPayment), bankCode: '', language: 'vn' };
+       try {
+           console.log("Calling VNPAY create payment API with payload:", vnPayPayload);
+           const response = await apiService.vnPayCreate(vnPayPayload);
+           console.log("VNPAY Create API Response Raw:", response);
+           if (response && response.data && response.data.code === '00') {
+               const paymentUrl = response.data.data;
+               if (paymentUrl && typeof paymentUrl === 'string' && paymentUrl.startsWith('http')) { window.location.href = paymentUrl; return; }
+               else { throw new Error("Không nhận được URL thanh toán hợp lệ từ VNPAY (dữ liệu không đúng)."); }
+           } else { throw new Error(response?.data?.message || "Giao dịch VNPAY không thành công hoặc phản hồi không hợp lệ."); }
+       } catch (err) {
+           console.error("Lỗi khi tạo thanh toán VNPAY:", err.response?.data || err.message || err);
+           const message = err.message || "Tạo thanh toán VNPAY thất bại."; setError(message);
+           setIsProcessingPayment(false);
+       }
+    }, [isShippingInfoSaved, isAuthenticated, user, navigate]);
     // --- Render Loading/Empty States ---
     if (!isInitialLoadComplete) { return ( <div className={styles.placeOrderContainer} style={{ minHeight: '60vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><Spinner size="large" /><p>Đang tải...</p></div> ); }
     if (!isDataLoadSuccessful) { return ( <div className={styles.placeOrderContainer} style={{ textAlign: 'center', padding: '40px 20px', minHeight: '60vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}><FaExclamationTriangle size={40} style={{ color: '#dc3545', marginBottom: '15px'}} /><h2>Không có thông tin đơn hàng</h2><p>Không thể tải dữ liệu sản phẩm. Vui lòng quay lại giỏ hàng.</p><Link to="/cart"><Button variant='secondary'>Quay lại giỏ hàng</Button></Link></div> ); }

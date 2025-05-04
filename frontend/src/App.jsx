@@ -61,9 +61,6 @@ function App() {
           <Route path="profile/orders" element={<OrderHistoryPage />} />
           {/* Add other protected routes here */}
         </Route>
-
-        {/* Add 404 Not Found Route within MainLayout if desired */}
-        {/* <Route path="*" element={<NotFoundPage />} /> */}
       </Route>
 
       {/* --- Routes Outside MainLayout (e.g., Admin, Fullscreen Auth) --- */}

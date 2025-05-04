@@ -15,8 +15,6 @@ import {
 const Header = () => {
   // Removed: const { cartItemCount } = useCart();
   const { user, isAuthenticated, logout } = useAuth();
-  const [cartItemCount, setCartItemCount] = useState(0); // Local state for cart count
-  const [isFetchingCartCount, setIsFetchingCartCount] = useState(false); // Loading state for count
 
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState('');
@@ -56,42 +54,7 @@ const Header = () => {
     fetchCategories();
   }, []); // Fetch categories only once on mount
 
-  // --- Fetch Cart Item Count (ONLY WHEN LOGGED IN) ---
-  const fetchCartCount = useCallback(async () => {
-    if (!isAuthenticated) {
-        setCartItemCount(0); // Ensure count is 0 when logged out
-        return;
-    }
-    console.log("User authenticated, fetching cart count...");
-    setIsFetchingCartCount(true);
-    try {
-        // *** IMPORTANT: Replace with your actual API call ***
-        // Example assuming an API endpoint exists:
-        const response = await apiService.getCartItemCount(); // You need to define this in api.js
-        // Adjust parsing based on your API response structure:
-        // e.g., if it returns { data: { count: 5 } } -> response.data.count
-        // e.g., if it returns { data: 5 } -> response.data
-        const count = parseInt(response?.data?.count || response?.data || 0, 10); // Example parsing
-        if (!isNaN(count) && count >= 0) {
-            setCartItemCount(count);
-            console.log("Cart count fetched:", count);
-        } else {
-             console.warn("Invalid cart count received:", response?.data);
-             setCartItemCount(0);
-        }
-    } catch (error) {
-        console.error("Error fetching cart count:", error);
-        setCartItemCount(0); // Reset count on error
-    } finally {
-        setIsFetchingCartCount(false);
-    }
-  }, [isAuthenticated]); // Dependency: Fetch when authentication status changes
-
-  // Trigger cart count fetch when user logs in or component mounts while logged in
-  useEffect(() => {
-    fetchCartCount();
-  }, [fetchCartCount]); // fetchCartCount is memoized by useCallback
-
+  
   // --- Event Handlers ---
   const handleSearchChange = (e) => setSearchTerm(e.target.value);
   const handleSearchSubmit = (e) => {
@@ -161,10 +124,6 @@ const Header = () => {
              {isAuthenticated && (
                 <Link to="/cart" className={styles.actionButton} title="Giỏ hàng" onClick={closeAllDropdowns}>
                     <FiShoppingCart />
-                    {!isFetchingCartCount && cartItemCount > 0 && (
-                        <span className={styles.cartCount}>{cartItemCount}</span>
-                    )}
-                    {isFetchingCartCount && <Spinner size="tinyInline" style={{ marginLeft: '5px' }}/>}
                 </Link>
              )}
              <div className={styles.desktopAuth}>

@@ -1,3 +1,4 @@
+// src/pages/CartPage/CartPage.js
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext'; // Import hook để lấy thông tin user
@@ -16,25 +17,19 @@ const formatCurrency = (amount) => {
 };
 
 // --- Hàm tiện ích: Lấy giá cuối cùng của Variant (ĐÃ SỬA THEO API MỚI) ---
-// Sử dụng giá gốc của sản phẩm và chiết khấu của variant
 const getVariantFinalPrice = (variantDetail, mainProductPrice) => {
-    console.log(`Calculating price for variant ${variantDetail?.variantId}. Main price: ${mainProductPrice}, Discount: ${variantDetail?.discount}%`);
-
-    // Validate main product price
+    // console.log(`Calculating price for variant ${variantDetail?.variantId}. Main price: ${mainProductPrice}, Discount: ${variantDetail?.discount}%`);
     if (typeof mainProductPrice !== 'number' || isNaN(mainProductPrice) || mainProductPrice <= 0) {
         console.error(`Invalid mainProductPrice (${mainProductPrice}) for variant ${variantDetail?.variantId}. Returning 0.`);
-        return 0; // Or handle as appropriate, maybe throw an error or return null
+        return 0;
     }
-
-    // Check if variant has a valid discount percentage
     if (variantDetail && typeof variantDetail.discount === 'number' && variantDetail.discount > 0 && variantDetail.discount < 100) {
         const discountMultiplier = 1 - (variantDetail.discount / 100);
         const finalPrice = mainProductPrice * discountMultiplier;
-        console.log(`Applied discount ${variantDetail.discount}%. Final price: ${finalPrice}`);
-        return Math.round(finalPrice); // Round to nearest integer (VND has no decimals often)
+        // console.log(`Applied discount ${variantDetail.discount}%. Final price: ${finalPrice}`);
+        return Math.round(finalPrice); // Rounding might be appropriate for display
     } else {
-        // If no valid discount, use the main product price
-        console.log(`No valid discount found or discount is 0. Using main product price: ${mainProductPrice}`);
+        // console.log(`No valid discount. Using main product price: ${mainProductPrice}`);
         return mainProductPrice;
     }
 };
@@ -45,7 +40,7 @@ const CartPage = () => {
   const [cartItems, setCartItems] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [isUpdating, setIsUpdating] = useState(false);
+  const [isUpdating, setIsUpdating] = useState(false); // For item-specific updates (qty, select, remove)
   const { user, isAuthenticated } = useAuth();
   const navigate = useNavigate();
 
@@ -55,28 +50,31 @@ const CartPage = () => {
 
   // --- Hàm Fetch và Làm Giàu Dữ liệu Giỏ Hàng ---
   const fetchAndEnrichCart = useCallback(async () => {
+    // Reset state for each fetch attempt
+    setCartItems([]);
+    setError(null);
+    setIsLoading(true); // Start loading
+
     if (!isAuthenticated) {
       console.log("User not authenticated. Skipping cart fetch.");
-      setIsLoading(false); setCartItems([]); return;
+      setIsLoading(false); return; // Stop loading, keep cart empty
     }
 
     console.log("Starting cart fetch process...");
-    setIsLoading(true); setError(null);
 
     try {
-      // 1. Fetch dữ liệu cơ bản từ API giỏ hàng
+      // 1. Fetch base cart items
       console.log("Fetching basic cart items...");
       const baseCartResponse = await apiService.getCartItems();
       console.log("API getCartItems Response:", baseCartResponse);
 
       if (!baseCartResponse || !Array.isArray(baseCartResponse.data)) {
         console.warn("API getCartItems did not return a valid array:", baseCartResponse?.data);
-        setCartItems([]);
-        // Keep loading true? Or set false and show error? Setting false for now.
+        // Keep cart empty, loading finished
         setIsLoading(false);
-        // Don't throw here, maybe the API returns empty array correctly later
-        // throw new Error("Dữ liệu giỏ hàng nhận được không hợp lệ.");
-        return; // Exit if data is invalid
+        // Optionally set an error if empty array isn't expected
+        // setError("Không thể tải dữ liệu giỏ hàng.");
+        return;
       }
 
       const baseCartData = baseCartResponse.data;
@@ -86,43 +84,53 @@ const CartPage = () => {
         setCartItems([]); setIsLoading(false); return;
       }
 
-      // 2. Lấy danh sách các productId duy nhất
+      // 2. Get unique product IDs
       const uniqueProductIds = [...new Set(baseCartData.map(item => item.productId))];
+      if (uniqueProductIds.length === 0) { // Handle case where cart has items but no valid productIds
+        console.warn("Cart data contains items but no valid product IDs.");
+        setCartItems([]); setIsLoading(false); return;
+      }
       console.log("Fetching details for product IDs:", uniqueProductIds);
 
-      // Gọi API lấy chi tiết từng sản phẩm song song
+      // 3. Fetch product details concurrently
       const productDetailPromises = uniqueProductIds.map(id =>
-        apiService.getProductById(id).catch(err => ({ error: err, productId: id }))
+        apiService.getProductById(id).catch(err => {
+            console.error(`Error fetching product ID ${id}:`, err); // Log individual fetch errors
+            return { error: err, productId: id }; // Return error object to identify failed fetches
+        })
       );
       const productDetailResults = await Promise.allSettled(productDetailPromises);
 
-      // 3. Tạo Map để lưu trữ chi tiết sản phẩm
+      // 4. Create product details map
       const productDetailsMap = new Map();
       productDetailResults.forEach(result => {
-        if (result.status === 'fulfilled' && result.value?.data?.productId) {
+        if (result.status === 'fulfilled' && result.value?.data?.productId && !result.value.error) {
           productDetailsMap.set(result.value.data.productId, result.value.data);
         } else {
-          const failedProductId = result.reason?.productId || result.value?.productId || result.reason?.config?.url?.split('/').pop() || 'unknown';
-          console.error(`Failed to fetch details for product ID ${failedProductId}:`, result.reason || result.value?.error);
-          // Optionally store error info or handle placeholder creation later
+          const failedProductId = result.reason?.productId || result.value?.productId || 'unknown';
+          console.error(`Failed to store/fetch details for product ID ${failedProductId}. Reason:`, result.reason || result.value?.error);
         }
       });
       console.log("Product details map created:", productDetailsMap);
 
-      // 4. Kết hợp dữ liệu giỏ hàng với chi tiết sản phẩm/variant
+      // 5. Enrich cart items
       const enrichedItems = baseCartData.map(cartItem => {
         const productDetail = productDetailsMap.get(cartItem.productId);
 
         // Handle case where product detail fetch failed
         if (!productDetail) {
-          console.warn(`Product details not found for productId: ${cartItem.productId}. Creating placeholder.`);
+          console.warn(`Product details missing for productId: ${cartItem.productId}. Creating placeholder.`);
           return {
-            ...cartItem,
-            uniqueId: cartItem.cartItemId || `${cartItem.productId}-${cartItem.variantId || 'unknown'}`,
-            name: `Sản phẩm ID ${cartItem.productId}`,
+            cartItemId: cartItem.cartItemId, // Use cartItemId from original data
+            productId: cartItem.productId,
+            variantId: cartItem.variantId,
+            userId: cartItem.userId,
+            uniqueId: cartItem.cartItemId || `${cartItem.productId}-${cartItem.variantId || 'err'}`, // Ensure uniqueId
+            name: `Sản phẩm ID ${cartItem.productId} (Lỗi)`,
             color: cartItem.variantId ? `Variant ID ${cartItem.variantId}` : 'N/A',
             imageUrl: '/images/placeholder-image.png',
-            price: 0, stockQuantity: 0,
+            price: 0, // Price unknown
+            stockQuantity: 0,
             is_selected: cartItem.selected ?? true,
             quantity: Math.max(1, parseInt(cartItem.quantity || 1, 10)),
             error: 'Lỗi tải thông tin sản phẩm'
@@ -138,12 +146,12 @@ const CartPage = () => {
         if (!variantDetail) {
           console.warn(`Variant details not found for productId: ${cartItem.productId}, variantId: ${cartItem.variantId}. Creating placeholder.`);
           return {
-            ...cartItem,
+            ...cartItem, // Keep original cartItem data like userId, cartItemId
             uniqueId: cartItem.cartItemId || `${cartItem.productId}-${cartItem.variantId}`,
-            name: `${productDetail.productName}`, // Use main product name
+            name: `${productDetail.productName} (Lỗi phiên bản)`,
             color: `Variant ID ${cartItem.variantId} (Lỗi)`,
-            imageUrl: productDetail.variants?.[0]?.imageUrl || '/images/placeholder-image.png', // Try first variant image or placeholder
-            price: productDetail.price || 0, // Fallback to main product price (no discount possible)
+            imageUrl: productDetail.variants?.[0]?.imageUrl || '/images/placeholder-image.png',
+            price: productDetail.price || 0, // Fallback price (no discount)
             stockQuantity: 0,
             is_selected: cartItem.selected ?? true,
             quantity: Math.max(1, parseInt(cartItem.quantity || 1, 10)),
@@ -151,44 +159,40 @@ const CartPage = () => {
           };
         }
 
-        // --- SUCCESS CASE: Create the fully enriched item ---
-        // *** CRITICAL: Pass variantDetail and productDetail.price to getVariantFinalPrice ***
+        // --- SUCCESS CASE ---
         const finalPrice = getVariantFinalPrice(variantDetail, productDetail.price);
 
         return {
-          ...cartItem,
-          uniqueId: cartItem.cartItemId || `${cartItem.productId}-${cartItem.variantId}`,
+          ...cartItem, // Keep original cartItem data like userId, cartItemId
+          uniqueId: cartItem.cartItemId || `${cartItem.productId}-${cartItem.variantId}`, // Unique key for React list
           productId: productDetail.productId,
           variantId: variantDetail.variantId,
           name: productDetail.productName,
           color: variantDetail.color,
           imageUrl: variantDetail.imageUrl || '/images/placeholder-image.png',
-          price: finalPrice, // Use the calculated final price
+          price: finalPrice, // Use calculated final price
           stockQuantity: parseInt(variantDetail.stockQuantity || 0, 10),
           is_selected: cartItem.selected ?? true,
           quantity: Math.max(1, parseInt(cartItem.quantity || 1, 10)),
-          error: null // No error for this item
+          error: null // No error
         };
-      });
+      }).filter(item => item); // Filter out potential nulls if placeholders aren't returned fully
 
-      console.log("Enriched cart items:", enrichedItems);
+      console.log("Final enriched cart items:", enrichedItems);
       setCartItems(enrichedItems);
 
     } catch (err) {
-      console.error("Error fetching or processing cart:", err);
-      // Set a general error message if the process failed
+      console.error("Critical error during fetchAndEnrichCart:", err);
       setError(err.message || "Không thể tải giỏ hàng. Vui lòng thử lại.");
-      setCartItems([]); // Clear items on major error
+      setCartItems([]);
     } finally {
-      setIsLoading(false); // Finish loading
+      setIsLoading(false);
       console.log("Cart fetch process finished.");
     }
-  }, [isAuthenticated]); // Re-fetch when auth state changes
+  }, [isAuthenticated]);
 
   // --- useEffect: Initial Fetch ---
-  useEffect(() => {
-    fetchAndEnrichCart();
-  }, [fetchAndEnrichCart]);
+  useEffect(() => { fetchAndEnrichCart(); }, [fetchAndEnrichCart]);
 
   // --- Action Handlers ---
 
@@ -210,12 +214,12 @@ const CartPage = () => {
     if (!isAuthenticated || !user?.userId) { alert("Vui lòng đăng nhập."); console.error("Remove item failed: User not auth."); return; }
 
     setIsUpdating(true);
-    const payload = { userId: user.userId, productId, variantId }; // Assuming API uses these for removal
+    const payload = { userId: user.userId, productId, variantId };
     console.log("Attempting remove with payload:", payload);
     try {
-      await apiService.removeCartItem(payload); // Ensure this API exists and works as expected
+      await apiService.removeCartItem(payload);
       console.log(`Successfully removed item ${uniqueId}`);
-      setCartItems(prevItems => prevItems.filter(item => item.uniqueId !== uniqueId)); // Update UI
+      setCartItems(prevItems => prevItems.filter(item => item.uniqueId !== uniqueId));
     } catch (err) {
       console.error(`Error removing item ${uniqueId}:`, err);
       alert(`Lỗi xóa "${name} - ${color}". Lỗi: ${err.response?.data?.message || err.message}`);
@@ -225,7 +229,7 @@ const CartPage = () => {
   };
 
   // 4. Handle Quantity Change
-   const handleQuantityChange = async (itemUniqueId, changeAmount) => {
+  const handleQuantityChange = async (itemUniqueId, changeAmount) => {
     console.log(`Quantity change for ${itemUniqueId}, amount: ${changeAmount}`);
     if (!isAuthenticated || !user?.userId) { alert("Vui lòng đăng nhập."); return; }
 
@@ -237,12 +241,7 @@ const CartPage = () => {
 
     const projectedNewQuantity = currentItem.quantity + changeAmount;
     if (projectedNewQuantity < 1) { console.warn("Qty < 1"); return; }
-    // Use stockQuantity from the enriched item state
-    if (projectedNewQuantity > currentItem.stockQuantity) {
-        alert(`Tồn kho tối đa cho "${currentItem.name} - ${currentItem.color}" là ${currentItem.stockQuantity}.`);
-        return;
-    }
-
+    if (projectedNewQuantity > currentItem.stockQuantity) { alert(`Tồn kho tối đa cho "${currentItem.name} - ${currentItem.color}" là ${currentItem.stockQuantity}.`); return; }
 
     const originalItems = [...cartItems];
     setCartItems(prevItems => {
@@ -262,7 +261,6 @@ const CartPage = () => {
     try {
         await apiService.updateCartItem(payload);
         console.log(`API qty update success for ${itemUniqueId}.`);
-        // No need to re-fetch if optimistic update is trusted
     } catch (err) {
         console.error(`Error updating quantity API for ${itemUniqueId}:`, err);
         alert(`Lỗi cập nhật số lượng "${currentItem.name}". Lỗi: ${err.response?.data?.message || err.message}`);
@@ -306,7 +304,6 @@ const CartPage = () => {
     try {
         await apiService.updateCartItem(payload);
         console.log(`API selection update success for ${itemUniqueId}.`);
-        // No re-fetch needed
     } catch (err) {
         console.error(`Error updating selection API for ${itemUniqueId}:`, err);
         alert(`Lỗi cập nhật lựa chọn "${itemToToggle.name}". Lỗi: ${err.response?.data?.message || err.message}`);
@@ -328,7 +325,7 @@ const CartPage = () => {
       try {
         console.log("Attempting to clear cart...");
         await apiService.clearCart(); // Assumes API uses user token implicitly
-        setCartItems([]); // Clear UI
+        setCartItems([]);
         console.log("Cart cleared successfully.");
       } catch (err) {
         console.error("Error clearing cart:", err);
@@ -339,63 +336,97 @@ const CartPage = () => {
     }
   };
 
-  // 7. Proceed to Place Order
+  // 7. Proceed to Place Order (WITH ADDED LOGGING)
   const handlePlaceOrder = () => {
-    if (!isAuthenticated || !user?.userId) { alert("Vui lòng đăng nhập."); return; }
+    console.log("[handlePlaceOrder] Initiated.");
 
-    const itemsToOrder = cartItems.filter(item => item.is_selected && !item.error);
-    if (itemsToOrder.length === 0) { alert("Vui lòng chọn ít nhất một sản phẩm hợp lệ."); return; }
+    if (!isAuthenticated || !user?.userId) {
+      alert("Vui lòng đăng nhập để đặt hàng.");
+      console.log("[handlePlaceOrder] Blocked: User not authenticated.");
+      return;
+    }
+    console.log("[handlePlaceOrder] User authenticated.");
 
-    // Re-calculate total based on the selected items *now*
-    const currentSelectedTotal = itemsToOrder.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+    const currentCartItems = cartItems; // Use current state
+    console.log("[handlePlaceOrder] Current cart items state:", currentCartItems);
 
-    // Check stock just before proceeding
-    const outOfStockItems = itemsToOrder.filter(item => item.quantity > item.stockQuantity);
+    const itemsToOrder = currentCartItems.filter(item => item.is_selected && !item.error);
+    console.log("[handlePlaceOrder] Filtered items to order:", itemsToOrder);
+
+    if (itemsToOrder.length === 0) {
+      alert("Vui lòng chọn ít nhất một sản phẩm hợp lệ để đặt hàng.");
+      console.log("[handlePlaceOrder] Blocked: No valid items selected.");
+      return;
+    }
+    console.log("[handlePlaceOrder] Items selected. Proceeding to stock check.");
+
+    // Stock Check
+    const outOfStockItems = itemsToOrder.filter(item => {
+        const stock = typeof item.stockQuantity === 'number' ? item.stockQuantity : 0;
+        const qty = typeof item.quantity === 'number' ? item.quantity : 0;
+        return qty > stock;
+    });
+    console.log("[handlePlaceOrder] Out of stock items:", outOfStockItems);
+
     if (outOfStockItems.length > 0) {
       const itemNames = outOfStockItems.map(item => `${item.name} - ${item.color} (Chỉ còn ${item.stockQuantity})`).join('\n - ');
       alert(`Một số sản phẩm không đủ số lượng:\n - ${itemNames}\nVui lòng điều chỉnh.`);
+      console.log("[handlePlaceOrder] Blocked: Stock check failed.");
       return;
     }
+    console.log("[handlePlaceOrder] Stock check passed.");
 
+    // Recalculate total strictly based on the items being ordered now
+    let currentSelectedTotal = 0;
     try {
-        // Prepare data with potentially complex objects, ensure serializability if needed
-        const orderData = {
-            items: itemsToOrder.map(item => ({ // Map to include necessary fields only
-                cartItemId: item.cartItemId, // Keep cartItemId if needed later
-                uniqueId: item.uniqueId,
-                productId: item.productId,
-                variantId: item.variantId,
-                name: item.name,
-                color: item.color,
-                imageUrl: item.imageUrl,
-                price: item.price, // The calculated final price
-                quantity: item.quantity,
-                // Add other fields if PlaceOrder page needs them
+        currentSelectedTotal = itemsToOrder.reduce((sum, item) => {
+            const price = typeof item.price === 'number' && !isNaN(item.price) ? item.price : 0;
+            const quantity = typeof item.quantity === 'number' && !isNaN(item.quantity) ? item.quantity : 0;
+             if (price <= 0 && quantity > 0) { console.warn(`[handlePlaceOrder] Item ${item.name} (${item.uniqueId}) has price ${price}, quantity ${quantity}.`); }
+            return sum + (price * quantity);
+        }, 0);
+        console.log("[handlePlaceOrder] Recalculated selected total:", currentSelectedTotal);
+
+        if (isNaN(currentSelectedTotal)) { throw new Error("Lỗi tính toán tổng tiền (NaN)."); }
+        if (currentSelectedTotal < 0) { throw new Error("Tổng tiền không hợp lệ (âm)."); }
+
+        // Prepare data for sessionStorage
+        const orderDataForSession = {
+            items: itemsToOrder.map(item => ({
+                uniqueId: item.uniqueId, productId: item.productId, variantId: item.variantId,
+                name: item.name, color: item.color, imageUrl: item.imageUrl,
+                price: item.price, quantity: item.quantity, // Pass the final price
             })),
-            total: currentSelectedTotal // Send the calculated total
+            total: currentSelectedTotal // Pass the calculated subtotal
         };
-        sessionStorage.setItem('pendingOrderData', JSON.stringify(orderData));
-        console.log("Order data saved to sessionStorage:", orderData);
-        navigate('/place-order'); // Navigate
+
+        const orderDataString = JSON.stringify(orderDataForSession);
+        console.log("[handlePlaceOrder] Serialized order data for session:", orderDataString);
+
+        sessionStorage.setItem('pendingOrderData', orderDataString);
+        console.log("[handlePlaceOrder] Order data saved to sessionStorage successfully.");
+
+        // Navigate
+        navigate('/place-order');
+        console.log("[handlePlaceOrder] Navigating to /place-order");
 
     } catch (error) {
-        console.error("Error saving order data to sessionStorage:", error);
-        alert("Lỗi khi chuẩn bị đặt hàng. Vui lòng thử lại.");
+        console.error("[handlePlaceOrder] Error during final preparation:", error);
+        alert(`Đã xảy ra lỗi khi chuẩn bị đặt hàng: ${error.message}. Vui lòng thử lại.`);
+        sessionStorage.removeItem('pendingOrderData'); // Clean up potentially bad data
     }
   };
 
   // --- Memoized Calculations ---
   const validCartItems = useMemo(() => cartItems.filter(item => !item.error), [cartItems]);
   const selectedItems = useMemo(() => validCartItems.filter(item => item.is_selected), [validCartItems]);
-  // ** Recalculate selectedTotal based on current selectedItems prices **
   const selectedTotal = useMemo(() =>
       selectedItems.reduce((sum, item) => {
-          // Ensure price and quantity are numbers before adding
-          const price = typeof item.price === 'number' ? item.price : 0;
-          const quantity = typeof item.quantity === 'number' ? item.quantity : 0;
+          const price = typeof item.price === 'number' && !isNaN(item.price) ? item.price : 0;
+          const quantity = typeof item.quantity === 'number' && !isNaN(item.quantity) ? item.quantity : 0;
           return sum + (price * quantity);
       }, 0),
-      [selectedItems] // Recalculate when selected items change
+      [selectedItems]
   );
   const cartItemCount = validCartItems.length;
   const isCartEmpty = cartItemCount === 0;
@@ -426,7 +457,7 @@ const CartPage = () => {
       </h1>
 
       {/* Minor Error Notification */}
-      {error && cartItems.length > 0 && ( <div className={styles.generalError}><FaInfoCircle /> {error}</div> )}
+      {error && cartItems.length > 0 && ( <div className={styles.generalError}><FaInfoCircle /> {error} - Một số thông tin sản phẩm có thể chưa được cập nhật.</div> )}
 
       {/* Content: Empty or Table */}
       {isCartEmpty && !isLoading ? (
@@ -459,7 +490,7 @@ const CartPage = () => {
                     onRemove={() => promptRemoveItem(item.uniqueId)}
                     onQuantityChange={handleQuantityChange}
                     onToggleSelect={handleToggleSelect}
-                    isUpdating={isUpdating && (itemToRemove?.uniqueId === item.uniqueId || item.uniqueId === 'updating-qty-or-select')} // Be more specific if needed
+                    isUpdating={isUpdating} // Apply global updating state for simplicity
                   />
                 ))}
               </tbody>
@@ -474,7 +505,6 @@ const CartPage = () => {
                  <div className={styles.summaryRow}><span>Đã chọn:</span><span>{selectedItems.length} / {cartItemCount}</span></div>
                  <div className={`${styles.summaryRow} ${styles.grandTotal}`}>
                     <span>Tạm tính:</span>
-                    {/* Display the correctly calculated selectedTotal */}
                     <span className={styles.totalAmountValue}>{formatCurrency(selectedTotal)}</span>
                  </div>
                  <p className={styles.vatNote}>(Giá đã bao gồm VAT nếu có)</p>

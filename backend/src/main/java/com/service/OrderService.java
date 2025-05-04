@@ -73,5 +73,16 @@ public class OrderService {
     public List<Order> getAllOrders() {
         return orderRepository.findAll();
     }
+    public Order applyOrderStatus(Integer orderId, OrderStatus status) {
+        Optional<Order> order = orderRepository.findOrderByOrderId(orderId);
+        if(order.isPresent()) {
+            order.get().setStatus(status);
+            orderRepository.save(order.get());
+            return order.get();
+        }
+        else {
+            return null;
+        }
+    }
 
 }

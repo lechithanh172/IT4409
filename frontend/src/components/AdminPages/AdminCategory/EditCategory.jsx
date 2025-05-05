@@ -15,9 +15,7 @@ const EditCategory = ({ category, setModalChild, handleRefresh }) => {
         });
     }, [category, form]);
 
-
     const onFinishFailed = (errorInfo) => {
-        console.log('Failed:', errorInfo);
         message.error('Vui lòng điền đầy đủ thông tin bắt buộc.');
     };
 
@@ -34,8 +32,6 @@ const EditCategory = ({ category, setModalChild, handleRefresh }) => {
             description: values.description || '',
         };
 
-        console.log('Sending update data to API:', data);
-
         if (data.categoryName === category.categoryName &&
             data.imageUrl === category.imageUrl &&
             data.description === category.description) {
@@ -50,9 +46,8 @@ const EditCategory = ({ category, setModalChild, handleRefresh }) => {
             handleRefresh();
             setModalChild(null);
         } catch (e) {
-             const errorMessage = e.response?.data?.message || e.message || 'Đã xảy ra lỗi khi cập nhật danh mục';
-             console.error("Update Category Error:", e.response || e);
-             message.error(errorMessage);
+            const errorMessage = e.response?.data?.message || e.message || 'Đã xảy ra lỗi khi cập nhật danh mục';
+            message.error(errorMessage);
         }
     };
 
@@ -84,26 +79,18 @@ const EditCategory = ({ category, setModalChild, handleRefresh }) => {
                         <Form.Item
                             label="Tên Danh Mục"
                             name="categoryName"
-                            rules={[
-                                {
-                                    required: true,
-                                    message: 'Hãy nhập tên danh mục!',
-                                },
-                            ]}
+                            rules={[{ required: true, message: 'Hãy nhập tên danh mục!' }]}
                         >
                             <Input />
                         </Form.Item>
 
-                        <Form.Item
-                            label="Url Ảnh Hiển Thị"
-                            name="imageUrl"
-                        >
+                        <Form.Item label="Url Ảnh Hiển Thị" name="imageUrl">
                             <Input onChange={handleImageUrlChange} placeholder="https://example.com/image.png" />
                         </Form.Item>
                     </Col>
 
                     <Col xs={24} sm={8}>
-                         <Form.Item label="Xem trước ảnh">
+                        <Form.Item label="Xem trước ảnh">
                             <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '10vw', height: '10vw', border: '1px dashed #d9d9d9', borderRadius: '8px', padding: '5px' }}>
                                 {categoryImage ? (
                                     <Image
@@ -114,15 +101,11 @@ const EditCategory = ({ category, setModalChild, handleRefresh }) => {
                                     <span style={{ color: '#bfbfbf' }}>Xem trước</span>
                                 )}
                             </div>
-                         </Form.Item>
+                        </Form.Item>
                     </Col>
                 </Row>
 
-                <Form.Item
-                    label="Mô Tả Danh Mục"
-                    name="description"
-                    rules={[{ required: true, message: 'Hãy nhập mô tả danh mục!' }]}
-                >
+                <Form.Item label="Mô Tả Danh Mục" name="description" rules={[{ required: true, message: 'Hãy nhập mô tả danh mục!' }]}>
                     <Input.TextArea rows={4} />
                 </Form.Item>
 

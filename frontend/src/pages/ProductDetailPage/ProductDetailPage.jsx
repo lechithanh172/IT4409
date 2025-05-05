@@ -10,7 +10,6 @@ const ProductDetailPage = () => {
   const { productId } = useParams(); // Lấy ID từ URL
   const { getProductById, loading, error } = useProducts(); // Lấy hàm và state từ context
 
-  // Tìm sản phẩm dựa trên ID
   const product = getProductById(productId);
 
   // --- Xử lý trạng thái Loading, Error, Not Found ---
@@ -44,24 +43,8 @@ const ProductDetailPage = () => {
     );
   }
 
-  // Nếu có sản phẩm, render ProductDisplay
   return (
-    <div className={styles.pageContainer}>
-       {/* Có thể thêm Breadcrumbs ở đây */}
-      {/* <div className={styles.breadcrumbs}>
-           <Link to="/">Trang chủ</Link> / <Link to="/products">Sản phẩm</Link> / <span>{product.name}</span>
-       </div> */}
-      <ProductDisplay product={product} />
-       {/* Có thể thêm section mô tả chi tiết, đánh giá ở dưới ProductDisplay */}
-       {/* <section className={styles.descriptionSection}>
-            <h2>Mô tả sản phẩm</h2>
-            <p>{product.description || 'Chưa có mô tả cho sản phẩm này.'}</p>
-       </section>
-       <section className={styles.reviewSection}>
-           <h2>Đánh giá sản phẩm</h2>
-            {/* Render component đánh giá ở đây */}
-       {/* </section> */}
-    </div>
+    <></>
   );
 };
 

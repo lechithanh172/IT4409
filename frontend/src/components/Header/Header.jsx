@@ -4,7 +4,7 @@ import { useCart } from "../../contexts/CartContext";
 import Button from "../Button/Button";
 import Search from "../Search";
 import styles from "./Header.module.css";
-import logo from "../../../public/logosenashop.png";
+import logo from "../../../src/assets/logosenashop.png";
 import useClickOutside from "../../hooks/useClickOutside";
 import apiService from "../../services/api";
 

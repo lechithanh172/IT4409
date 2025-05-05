@@ -5,6 +5,7 @@ import {
   Col,
   Divider,
   Dropdown,
+  Image,
   Menu,
   Modal,
   Row,
@@ -15,13 +16,11 @@ import {
   Spin,
   Alert,
 } from "antd";
-import { EditOutlined, ExclamationCircleFilled } from "@ant-design/icons";
-import apiService from "../../../services/api"; // Ensure correct path
+import { EditOutlined } from "@ant-design/icons";
+import apiService from "../../../services/api";
 
 const { Text, Paragraph, Title } = Typography;
-const { confirm } = Modal;
 
-// --- Helper Functions & Status Components (Giữ nguyên) ---
 const formatCurrency = (value) => {
   if (typeof value !== "number" || isNaN(value)) return "N/A";
   return new Intl.NumberFormat("vi-VN", {
@@ -29,6 +28,7 @@ const formatCurrency = (value) => {
     currency: "VND",
   }).format(value);
 };
+
 function formatDate(isoString) {
   if (!isoString) return "N/A";
   try {
@@ -44,18 +44,18 @@ function formatDate(isoString) {
       hour12: false,
     });
   } catch (error) {
-    console.error("Lỗi định dạng ngày:", isoString, error);
     return "Invalid Date";
   }
 }
+
 const STATUS_DETAILS = {
   PENDING: { label: "Chờ xử lý", color: "gold" },
   APPROVED: { label: "Đã duyệt", color: "lime" },
   REJECTED: { label: "Bị từ chối", color: "error" },
   SHIPPING: { label: "Đang giao", color: "processing" },
   DELIVERED: { label: "Đã giao", color: "success" },
-  // CANCELLED: { label: 'Đã hủy', color: 'red' },
 };
+
 const DeliveryStatusComponent = ({ deliveryStatus }) => {
   const statusUpper = deliveryStatus?.toUpperCase();
   const details = STATUS_DETAILS[statusUpper] || {
@@ -64,34 +64,7 @@ const DeliveryStatusComponent = ({ deliveryStatus }) => {
   };
   return <Tag color={details.color}>{details.label}</Tag>;
 };
-// Giả sử API getOrderById trả về paymentStatus
-const PaymentStatusComponent = ({ paymentStatus }) => {
-  let color;
-  let text = paymentStatus || "N/A";
-  switch (paymentStatus?.toUpperCase()) {
-    case "PENDING":
-      color = "warning";
-      text = "Chờ TT";
-      break;
-    case "COMPLETED":
-      color = "success";
-      text = "Đã TT";
-      break;
-    case "PAID":
-      color = "success";
-      text = "Đã TT";
-      break;
-    case "FAILED":
-      color = "error";
-      text = "Thất bại";
-      break;
-    default:
-      color = "default";
-  }
-  return <Tag color={color}>{text}</Tag>;
-};
 
-// --- Detail Row Component (Giữ nguyên) ---
 const DetailRow = ({
   label,
   value,
@@ -126,120 +99,126 @@ const VALID_STATUS_TRANSITIONS = {
   REJECTED: ["PENDING", "APPROVED"],
 };
 
+
 const OrderDetails = ({ orderId, handleRefreshParent }) => {
   const [orderData, setOrderData] = useState(null);
   const [customerInfo, setCustomerInfo] = useState(null);
+  const [orderItems, setOrderItems] = useState([]);
   const [loadingOrderDetails, setLoadingOrderDetails] = useState(true);
   const [loadingUserInfo, setLoadingUserInfo] = useState(false);
+  const [loadingItems, setLoadingItems] = useState(true);
   const [fetchError, setFetchError] = useState(null);
   const [currentOrderStatus, setCurrentOrderStatus] = useState(null);
   const [isStatusModalVisible, setIsStatusModalVisible] = useState(false);
   const [newStatusToConfirm, setNewStatusToConfirm] = useState(null);
   const [loadingStatusUpdate, setLoadingStatusUpdate] = useState(false);
 
+  const fetchUserInfo = async (userId) => {
+      setLoadingUserInfo(true);
+      setCustomerInfo(null);
+      try {
+        const customerResponse = await apiService.getUsersByRole("CUSTOMER");
+        const customerList = customerResponse?.data;
+        if (!Array.isArray(customerList)) {
+          setCustomerInfo({ username: "Lỗi dữ liệu user" });
+          setLoadingUserInfo(false);
+          return;
+        }
+        const foundUser = customerList.find((user) => user.userId === userId);
+        setCustomerInfo(foundUser || { username: `User ID ${userId} không tìm thấy` });
+      } catch (error) {
+        console.error("Lỗi tải thông tin user:", error);
+        setCustomerInfo({ username: "Lỗi tải user" });
+      } finally {
+        setLoadingUserInfo(false);
+      }
+    };
+
   useEffect(() => {
     if (!orderId) {
       setFetchError("ID đơn hàng không hợp lệ.");
       setLoadingOrderDetails(false);
+      setLoadingItems(false);
       return;
     }
 
-    const fetchOrder = async () => {
+    const fetchOrderAndItems = async () => {
       setLoadingOrderDetails(true);
+      setLoadingItems(true);
       setFetchError(null);
       setOrderData(null);
       setCustomerInfo(null);
       setCurrentOrderStatus(null);
+      setOrderItems([]);
 
       try {
-        const response = await apiService.getOrderById(orderId);
-        if (response && response.data) {
-          setOrderData(response.data);
-          setCurrentOrderStatus(response.data.status || "PENDING");
-          if (response.data.userId) {
-            fetchUserInfo(response.data.userId);
+        const [orderResponse, itemsResponse] = await Promise.all([
+          apiService.getOrderById(orderId),
+          apiService.getProductByOrderId(orderId)
+        ]);
+
+        if (orderResponse && orderResponse.data) {
+          const fetchedOrder = orderResponse.data;
+          setOrderData(fetchedOrder);
+          setCurrentOrderStatus(fetchedOrder.status?.toUpperCase() || "PENDING");
+          if (fetchedOrder.userId) {
+            fetchUserInfo(fetchedOrder.userId);
           } else {
-            setCustomerInfo({ username: "Không có ID user" });
+            setCustomerInfo({ username: "Khách vãng lai (không có ID)" });
+            setLoadingUserInfo(false);
           }
         } else {
           throw new Error("Không nhận được dữ liệu đơn hàng hợp lệ.");
         }
+
+        if (itemsResponse && Array.isArray(itemsResponse.data)) {
+            setOrderItems(itemsResponse.data);
+        } else {
+            console.warn("API sản phẩm không trả về mảng dữ liệu:", itemsResponse);
+            setOrderItems([]);
+        }
+
       } catch (error) {
-        console.error(`Lỗi khi tải chi tiết đơn hàng ${orderId}:`, error);
-        setFetchError(
-          error.response?.data?.message ||
-            error.message ||
-            "Không thể tải chi tiết đơn hàng."
-        );
+        console.error("Lỗi khi tải chi tiết đơn hàng hoặc sản phẩm:", error);
+        const errorMsg = error.response?.data?.message || error.message || "Không thể tải dữ liệu.";
+        setFetchError(errorMsg);
+        setOrderItems([]);
       } finally {
         setLoadingOrderDetails(false);
+        setLoadingItems(false);
       }
     };
 
-    const fetchUserInfo = async (userId) => {
-      setLoadingUserInfo(true);
-      setCustomerInfo(null); // Reset thông tin khách hàng cũ
-      try {
-        // Gọi API lấy tất cả khách hàng
-        const customerResponse = await apiService.getUsersByRole("CUSTOMER");
-        console.log("Response từ getUsersByRole: ", customerResponse); // Log toàn bộ response để kiểm tra
+    fetchOrderAndItems();
+  }, [orderId]);
 
-        // Kiểm tra xem có dữ liệu và có phải là mảng không
-        const customerList = customerResponse?.data;
-        if (!Array.isArray(customerList)) {
-          console.warn("Dữ liệu khách hàng trả về không phải là mảng.");
-          setCustomerInfo({ username: "Lỗi dữ liệu user" });
-          setLoadingUserInfo(false);
-          return; // Dừng lại nếu dữ liệu không đúng
-        }
-
-        console.log("Danh sách khách hàng đã fetch:", customerList);
-
-        // *** Tìm kiếm user trong mảng customerList ***
-        const foundUser = customerList.find((user) => user.userId === userId);
-
-        console.log(`Đang tìm userId: ${userId}. Tìm thấy:`, foundUser); // Log kết quả tìm kiếm
-
-        // Cập nhật state customerInfo dựa trên kết quả tìm kiếm
-        if (foundUser) {
-          setCustomerInfo(foundUser); // Tìm thấy -> set thông tin user
-        } else {
-          // Không tìm thấy user với userId này trong danh sách CUSTOMER
-          console.warn(
-            `Không tìm thấy thông tin cho người dùng ID: ${userId} trong danh sách CUSTOMER.`
-          );
-          setCustomerInfo({
-            username: `User ID ${userId} không tồn tại hoặc không phải CUSTOMER`,
-          }); // Set placeholder
-        }
-      } catch (error) {
-        // Xử lý lỗi nếu gọi API getUsersByRole thất bại
-        console.error(
-          `Lỗi khi tải danh sách CUSTOMER hoặc tìm user ID ${userId}:`,
-          error
-        );
-        setCustomerInfo({ username: "Lỗi tải user list" }); // Set placeholder lỗi
-      } finally {
-        setLoadingUserInfo(false); // Luôn tắt loading sau khi hoàn tất hoặc lỗi
-      }
-    };
-
-    fetchOrder();
-  }, [orderId]); // Chỉ fetch lại khi orderId thay đổi
-
-  // --- Items Table Columns ---
   const itemsColumns = [
     {
-      title: "Sản phẩm",
-      key: "productName", // Giả sử API trả về productName trong item
-      dataIndex: "productName", // Giả sử API trả về productName trong item
-      render: (text) => <Text>{text || "N/A"}</Text>,
+      title: "Ảnh",
+      dataIndex: "imageUrl",
+      key: "imageUrl",
+      width: 80,
+      align: 'center',
+      render: (url, record) => (
+          <Image
+              src={url || '/placeholder.png'}
+              alt={record.productName || "Sản phẩm"}
+              width={50}
+              style={{ objectFit: 'contain' }}
+              preview={!!url}
+           />
+      ),
     },
     {
-      title: "Phiên bản",
-      key: "variantInfo", // Giả sử API trả về variantInfo (ví dụ: màu sắc)
-      dataIndex: "variantInfo", // Giả sử API trả về variantInfo
-      render: (text) => <Text>{text || "N/A"}</Text>,
+      title: "Tên sản phẩm",
+      key: "productInfo",
+      render: (_, record) => (
+        <div>
+          <Text strong>{record.productName || "N/A"}</Text>
+          {record.color && <div style={{ fontSize: '12px', color: '#888' }}>Màu: {record.color}</div>}
+          {record.variantId && <div style={{ fontSize: '12px', color: '#888' }}>Variant ID: {record.variantId}</div>}
+        </div>
+      ),
     },
     {
       title: "SL",
@@ -250,16 +229,18 @@ const OrderDetails = ({ orderId, handleRefreshParent }) => {
       render: (qty) => <Text>{qty ?? 0}</Text>,
     },
     {
-      title: "Đơn giá", // Giá tại thời điểm đặt hàng
-      dataIndex: "price", // Giả sử API trả về price trong item
+      title: "Đơn giá",
+      dataIndex: "price",
       key: "price",
       align: "right",
+      width: 130,
       render: (price) => <Text>{formatCurrency(price)}</Text>,
     },
     {
       title: "Thành tiền",
-      key: "total",
+      key: "lineTotal",
       align: "right",
+      width: 140,
       render: (_, record) => {
         const lineTotal = (record.price ?? 0) * (record.quantity ?? 0);
         return <Text strong>{formatCurrency(lineTotal)}</Text>;
@@ -267,7 +248,7 @@ const OrderDetails = ({ orderId, handleRefreshParent }) => {
     },
   ];
 
-  const handleApplyStatusInModal = useCallback(
+   const handleApplyStatusInModal = useCallback(
     async (orderIdToUpdate, currentStatus, newStatus) => {
       const currentStatusUpper = currentStatus?.toUpperCase();
       const newStatusUpper = newStatus.toUpperCase();
@@ -275,7 +256,7 @@ const OrderDetails = ({ orderId, handleRefreshParent }) => {
         VALID_STATUS_TRANSITIONS[currentStatusUpper] || [];
       if (!validTransitions.includes(newStatusUpper)) {
         message.warning(
-          `Không thể chuyển từ trạng thái '${currentStatus}' sang '${newStatus}'.`
+          `Không thể chuyển từ trạng thái '${STATUS_DETAILS[currentStatusUpper]?.label || currentStatus}' sang '${STATUS_DETAILS[newStatusUpper]?.label || newStatus}'.`
         );
         return;
       }
@@ -290,28 +271,23 @@ const OrderDetails = ({ orderId, handleRefreshParent }) => {
         };
         await apiService.updateOrderStatus(payload);
 
-        // Cập nhật state cục bộ
-        setCurrentOrderStatus(newStatus); // Dùng newStatus (UPPERCASE từ menu) để cập nhật hiển thị
+        setCurrentOrderStatus(newStatusUpper);
+        setOrderData(prev => prev ? {...prev, status: newStatusUpper} : null);
+
         message.success(
           `Đơn hàng #${orderIdToUpdate} đã cập nhật trạng thái thành ${
             STATUS_DETAILS[newStatusUpper]?.label || newStatus
           }.`
         );
 
-        // Gọi hàm refresh của component cha
         if (handleRefreshParent) {
           handleRefreshParent();
         }
       } catch (error) {
-        console.error(
-          `Lỗi khi cập nhật trạng thái ${newStatus} cho đơn ${orderIdToUpdate}:`,
-          error
-        );
         message.error(
           error.response?.data?.message ||
             `Cập nhật trạng thái cho đơn hàng #${orderIdToUpdate} thất bại!`
         );
-        // Không cần revert vì cha sẽ refresh
       } finally {
         setLoadingStatusUpdate(false);
         setNewStatusToConfirm(null);
@@ -321,9 +297,10 @@ const OrderDetails = ({ orderId, handleRefreshParent }) => {
   );
 
   const showStatusConfirm = (status) => {
-    setNewStatusToConfirm(status); // status là UPPERCASE
+    setNewStatusToConfirm(status);
     setIsStatusModalVisible(true);
   };
+
   const handleStatusOk = () => {
     if (orderData && newStatusToConfirm) {
       handleApplyStatusInModal(
@@ -333,13 +310,13 @@ const OrderDetails = ({ orderId, handleRefreshParent }) => {
       );
     }
   };
+
   const handleStatusCancel = () => {
     setIsStatusModalVisible(false);
     setNewStatusToConfirm(null);
   };
 
-  // --- Render Logic ---
-  if (loadingOrderDetails) {
+  if (loadingOrderDetails || loadingItems) {
     return (
       <div style={{ padding: "50px", textAlign: "center" }}>
         <Spin size="large" tip="Đang tải chi tiết đơn hàng..." />
@@ -356,10 +333,18 @@ const OrderDetails = ({ orderId, handleRefreshParent }) => {
   if (!orderData) {
     return (
       <Card>
-        <Paragraph>Không có dữ liệu đơn hàng.</Paragraph>
+        <Paragraph>Không có dữ liệu đơn hàng hoặc sản phẩm.</Paragraph>
       </Card>
     );
   }
+
+  const itemsTotal = orderItems.reduce((sum, item) => {
+    const price = item.price ?? 0;
+    const quantity = item.quantity ?? 0;
+    return sum + (price * quantity);
+  }, 0);
+  const shippingFee = orderData.shippingFee ?? 0;
+  const calculatedGrandTotal = itemsTotal + shippingFee;
 
   const currentStatusUpperForCheck = currentOrderStatus?.toUpperCase();
   const possibleNextStatuses =
@@ -372,7 +357,7 @@ const OrderDetails = ({ orderId, handleRefreshParent }) => {
         <Menu.Item
           key={statusKey}
           danger={["REJECTED"].includes(statusKey)}
-          onClick={() => showStatusConfirm(statusKey)} // statusKey là UPPERCASE
+          onClick={() => showStatusConfirm(statusKey)}
         >
           Chuyển sang "{STATUS_DETAILS[statusKey]?.label || statusKey}"
         </Menu.Item>
@@ -384,146 +369,93 @@ const OrderDetails = ({ orderId, handleRefreshParent }) => {
     <>
       <Card title={false} bordered={false} style={{ padding: 0 }}>
         <Row gutter={[32, 24]}>
-          <Col xs={24} lg={12}>
-            <Title
-              level={5}
-              style={{
-                marginBottom: 15,
-                borderBottom: "1px solid #f0f0f0",
-                paddingBottom: 8,
-              }}
-            >
-              Thông tin đơn hàng
-            </Title>
-            <DetailRow label="Mã ĐH" value={orderData.orderId} />
-            <DetailRow
-              label="Ngày đặt"
-              value={formatDate(orderData.createdAt)}
-            />
-            <DetailRow label="Phương thức TT" value={orderData.paymentMethod} />
-            <DetailRow
-              label="Trạng thái ĐH"
-              value={
-                <DeliveryStatusComponent deliveryStatus={currentOrderStatus} />
-              }
-            />
-            <DetailRow
-              label="Phí vận chuyển"
-              value={formatCurrency(orderData.shippingFee)}
-            />
-            <DetailRow
-              label="Ghi chú KH"
-              value={orderData.note || "(Không có)"}
-            />
-
-            {canChangeStatusManually && (
-              <Row
-                gutter={[16, 8]}
-                style={{ marginTop: 10, alignItems: "center" }}
-              >
+           <Col xs={24} lg={12}>
+             <Title level={5} style={{ marginBottom: 15, borderBottom: "1px solid #f0f0f0", paddingBottom: 8 }}>
+               Thông tin đơn hàng
+             </Title>
+             <DetailRow label="Mã ĐH" value={orderData.orderId} />
+             <DetailRow label="Ngày đặt" value={formatDate(orderData.createdAt)} />
+             <DetailRow label="Phương thức TT" value={orderData.paymentMethod} />
+             <DetailRow label="Trạng thái ĐH" value={<DeliveryStatusComponent deliveryStatus={currentOrderStatus} />} />
+             <DetailRow label="Phí vận chuyển" value={formatCurrency(shippingFee)} />
+             <DetailRow label="Ghi chú KH" value={orderData.note || "(Không có)"} />
+             {canChangeStatusManually && (
+              <Row gutter={[16, 8]} style={{ marginTop: 10, alignItems: "center" }}>
                 <Col span={6} style={{ color: "#555", textAlign: "right" }}>
                   <Text strong>Hành động:</Text>
                 </Col>
                 <Col span={18}>
-                  <Dropdown
-                    overlay={statusMenu}
-                    trigger={["click"]}
-                    disabled={loadingStatusUpdate}
-                  >
-                    <Button
-                      size="small"
-                      icon={<EditOutlined />}
-                      loading={loadingStatusUpdate}
-                    >
+                  <Dropdown overlay={statusMenu} trigger={["click"]} disabled={loadingStatusUpdate}>
+                    <Button size="small" icon={<EditOutlined />} loading={loadingStatusUpdate}>
                       Đổi trạng thái
                     </Button>
                   </Dropdown>
                 </Col>
               </Row>
-            )}
-          </Col>
+             )}
+           </Col>
 
-          {/* Cột Thông tin khách hàng */}
-          <Col xs={24} lg={12}>
-            <Title
-              level={5}
-              style={{
-                marginBottom: 15,
-                borderBottom: "1px solid #f0f0f0",
-                paddingBottom: 8,
-              }}
-            >
-              Thông tin khách hàng
-            </Title>
-            {loadingUserInfo ? (
-              <Spin size="small" />
-            ) : customerInfo ? (
-              <>
-                <DetailRow label="Tên KH" value={customerInfo.username} />
-                <DetailRow label="Email" value={customerInfo.email || "N/A"} />
-                <DetailRow
-                  label="Điện thoại"
-                  value={customerInfo.phoneNumber || "N/A"}
-                />
-                <DetailRow
-                  label="Địa chỉ GH"
-                  value={
-                    orderData.shippingAddress ||
-                    customerInfo.address ||
-                    "(Không có)"
-                  }
-                />
-              </>
-            ) : (
-              <Paragraph type="secondary">
-                Không tải được thông tin người dùng.
-              </Paragraph>
-            )}
-          </Col>
-        </Row>{" "}
+           <Col xs={24} lg={12}>
+             <Title level={5} style={{ marginBottom: 15, borderBottom: "1px solid #f0f0f0", paddingBottom: 8 }}>
+               Thông tin khách hàng
+             </Title>
+             {loadingUserInfo ? ( <Spin size="small" /> )
+              : customerInfo ? (
+               <>
+                 <DetailRow label="Tên KH" value={customerInfo.username} />
+                 <DetailRow label="Email" value={customerInfo.email || "N/A"} />
+                 <DetailRow label="Điện thoại" value={customerInfo.phoneNumber || "N/A"} />
+                 <DetailRow label="Địa chỉ GH" value={orderData.shippingAddress || customerInfo.address || "(Không có)"} />
+               </>
+             ) : (
+               <Paragraph type="secondary">Không tải được thông tin người dùng.</Paragraph>
+             )}
+           </Col>
+        </Row>
+
         <Divider style={{ margin: "24px 0" }} />
-        {/* Phần bảng sản phẩm và các thành phần khác giữ nguyên */}
+
         <Title level={5} style={{ marginBottom: 15 }}>
-          Sản phẩm trong đơn
+          Sản phẩm trong đơn ({orderItems.length})
         </Title>
         <Table
-          dataSource={orderData.items || []}
-          columns={itemsColumns}
-          rowKey={(item, index) =>
-            `${item.productId || `p${index}`}-${item.variantId || `v${index}`}`
-          } // Key ví dụ
-          pagination={false}
-          bordered
-          size="middle"
-          scroll={{ x: "max-content" }}
-          summary={() => (
+            dataSource={orderItems}
+            columns={itemsColumns}
+            rowKey={(item) => `${item.productId}-${item.variantId}`}
+            pagination={false}
+            bordered
+            size="small"
+            scroll={{ x: "max-content" }}
+            summary={() => (
             <>
-              <Table.Summary.Row>
-                <Table.Summary.Cell index={0} colSpan={4} align="right">
-                  <Text strong style={{ fontSize: "15px" }}>
-                    Phí vận chuyển:
-                  </Text>
-                </Table.Summary.Cell>
-                <Table.Summary.Cell index={1} align="right">
-                  <Text strong style={{ fontSize: "15px" }}>
-                    {formatCurrency(orderData.shippingFee)}
-                  </Text>
-                </Table.Summary.Cell>
-              </Table.Summary.Row>
-              <Table.Summary.Row>
-                <Table.Summary.Cell index={0} colSpan={4} align="right">
-                  <Text strong style={{ fontSize: "16px" }}>
-                    Tổng cộng:
-                  </Text>
-                </Table.Summary.Cell>
-                <Table.Summary.Cell index={1} align="right">
-                  <Text strong style={{ fontSize: "16px", color: "#d32f2f" }}>
-                    {formatCurrency(orderData.totalAmount)}
-                  </Text>
-                </Table.Summary.Cell>
-              </Table.Summary.Row>
+                <Table.Summary.Row>
+                    <Table.Summary.Cell index={0} colSpan={4} align="right">
+                        <Text strong>Tổng tiền hàng:</Text>
+                    </Table.Summary.Cell>
+                    <Table.Summary.Cell index={1} align="right">
+                        <Text strong>{formatCurrency(itemsTotal)}</Text>
+                    </Table.Summary.Cell>
+                </Table.Summary.Row>
+                <Table.Summary.Row>
+                    <Table.Summary.Cell index={0} colSpan={4} align="right">
+                        <Text strong>Phí vận chuyển:</Text>
+                    </Table.Summary.Cell>
+                    <Table.Summary.Cell index={1} align="right">
+                        <Text strong>{formatCurrency(shippingFee)}</Text>
+                    </Table.Summary.Cell>
+                </Table.Summary.Row>
+                <Table.Summary.Row style={{ backgroundColor: '#fafafa' }}>
+                    <Table.Summary.Cell index={0} colSpan={4} align="right">
+                        <Text strong style={{ fontSize: '16px' }}>Tổng cộng:</Text>
+                    </Table.Summary.Cell>
+                    <Table.Summary.Cell index={1} align="right">
+                        <Text strong style={{ fontSize: '16px', color: '#d32f2f' }}>
+                            {formatCurrency(calculatedGrandTotal)}
+                        </Text>
+                    </Table.Summary.Cell>
+                </Table.Summary.Row>
             </>
-          )}
+            )}
         />
       </Card>
 
@@ -537,12 +469,11 @@ const OrderDetails = ({ orderId, handleRefreshParent }) => {
         cancelText="Hủy"
         destroyOnClose
       >
-        <Paragraph>
-          Bạn có chắc chắn muốn đổi trạng thái đơn hàng này thành "
-          {STATUS_DETAILS[newStatusToConfirm?.toUpperCase()]?.label ||
-            newStatusToConfirm}
-          "?
-        </Paragraph>
+        {newStatusToConfirm && (
+            <Paragraph>
+                Bạn có chắc chắn muốn đổi trạng thái đơn hàng <Text strong>#{orderData?.orderId}</Text> từ <DeliveryStatusComponent deliveryStatus={currentOrderStatus} /> thành <DeliveryStatusComponent deliveryStatus={newStatusToConfirm} /> không?
+            </Paragraph>
+        )}
       </Modal>
     </>
   );

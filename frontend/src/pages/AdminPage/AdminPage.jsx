@@ -5,38 +5,34 @@ import {
   InfoCircleOutlined,
   TruckOutlined,
   HddOutlined,
-  LogoutOutlined, // <-- Import Logout icon
-  MenuFoldOutlined, // <-- Icon for collapsed state
-  MenuUnfoldOutlined, // <-- Icon for expanded state
-  AppstoreOutlined, // Example icon for Products parent menu
+  LogoutOutlined,
+  MenuFoldOutlined,
+  MenuUnfoldOutlined,
+  AppstoreOutlined,
 } from "@ant-design/icons";
-import { Badge, Button, Menu, Layout, Space, Avatar, Dropdown, Typography } from "antd"; // <-- Added Layout, Space, Avatar, Dropdown, Typography
+import { Badge, Button, Menu, Layout, Space, Avatar, Dropdown, Typography } from "antd";
 import AdminUser from "../../Components/AdminPages/AdminUser/AdminUser";
 import AdminProduct from "../../components/AdminPages/AdminProduct/AdminProduct";
-import AdminOrder from "../../Components/AdminPages/AdminOrder/AdminOrder";
+import AdminOrder from "../../components/AdminPages/AdminOrder/AdminOrder";
 import AdminBrands from "../../components/AdminPages/AdminBrand/AdminBrands";
 import AdminCategories from "../../components/AdminPages/AdminCategory/AdminCategories";
 import AdminProfile from "../../components/AdminPages/AdminProfile/AdminProfile";
 import styles from "./AdminPage.module.css";
 
-const { Header, Sider, Content } = Layout; // Destructure Layout components
-const { Title } = Typography; // Use Typography for title
+const { Header, Sider, Content } = Layout;
+const { Title } = Typography;
 
-// Logout Function
 const logout = () => {
-  console.log("User logged out");
   localStorage.clear();
-  window.location.href = "/"; // Redirect to homepage or login page
+  window.location.href = "/";
 };
 
-// Menu Item Helper
 function getItem(label, key, icon, children, type) {
   return { key, icon, children, label, type };
 }
 
-// Define Menu Items
 const items = [
-  getItem("Quản lý Sản phẩm", "productSub", <AppstoreOutlined />, [ // Use a unique key for the submenu itself
+  getItem("Quản lý Sản phẩm", "productSub", <AppstoreOutlined />, [
     { key: "products", label: "Tất cả Sản phẩm" },
     { key: "categories", label: "Danh mục" },
     { key: "brands", label: "Thương hiệu" },
@@ -46,43 +42,33 @@ const items = [
   getItem("Thông tin Admin", "profile", <InfoCircleOutlined />),
 ];
 
-
 const Admin = () => {
-  // State variables
-  const [keySelected, setKeySelected] = useState("products"); // Default selection
-  const [collapsed, setCollapsed] = useState(false); // Sidebar collapse state
-  const [isTooltipVisible, setTooltipVisible] = useState(false); // Notification tooltip visibility
-  const [tooltipPosition, setTooltipPosition] = useState({ top: 0, left: 0 }); // Tooltip position
-  const [isRead, setIsRead] = useState(true); // Notification read status (set false for dot)
+  const [keySelected, setKeySelected] = useState("products");
+  const [collapsed, setCollapsed] = useState(false);
+  const [isTooltipVisible, setTooltipVisible] = useState(false);
+  const [tooltipPosition, setTooltipPosition] = useState({ top: 0, left: 0 });
+  const [isRead, setIsRead] = useState(true);
 
-  localStorage.setItem("accessToken", "eyJhbGciOiJIUzI1NiJ9.eyJyb2xlIjoiQURNSU4iLCJzdWIiOiJ0cmFuZHVjdGhwdDEiLCJpYXQiOjE3NDYyNzU0ODEsImV4cCI6MTc0NjI3OTA4MX0.PmTxYagBIqz1tuVqhBeovFBzC82SUCvZXThek7fpfRw")
+  // localStorage.setItem("accessToken", "eyJhbGciOiJIUzI1NiJ9.eyJyb2xlIjoiQURNSU4iLCJzdWIiOiJ0cmFuZHVjdGhwdDEiLCJpYXQiOjE3NDY0MDQxMTYsImV4cCI6MTc0NjQwNzcxNn0.AJ8iLWWX6cJMArDhrM3FwD8p1Xn0XzPBL-e9IP4fu6I");
 
-  // Toggle Sidebar Collapse
   const toggleCollapsed = () => {
     setCollapsed(!collapsed);
   };
 
-
-  // Handle Notification Bell Click
   const handleBellClick = (event) => {
     const rect = event.currentTarget.getBoundingClientRect();
     setTooltipPosition({
       top: rect.bottom + window.scrollY + 10,
-      left: rect.right + window.scrollX - 200, // Adjust positioning relative to bell
+      left: rect.right + window.scrollX - 200,
     });
     setTooltipVisible((prevVisible) => !prevVisible);
-    // Optionally mark as read when opened
-    // setIsRead(true);
   };
 
-  // Handle Menu Item Click
   const handleOnClick = ({ key }) => {
     setKeySelected(key);
-    // Close notification tooltip if open when navigating
     setTooltipVisible(false);
   };
 
-  // Render Content Based on Selected Key
   const renderPage = (key) => {
     switch (key) {
       case "users": return <AdminUser />;
@@ -91,19 +77,18 @@ const Admin = () => {
       case "brands": return <AdminBrands />;
       case "orders": return <AdminOrder />;
       case "profile": return <AdminProfile />;
-      default: return <AdminProduct />; // Default to products page
+      default: return <AdminProduct />;
     }
   };
 
-  // Define User Dropdown Menu Items
   const userMenuItems = [
     {
       key: 'profileLink',
       label: 'Xem hồ sơ',
       icon: <UserOutlined />,
       onClick: () => {
-          setKeySelected('profile'); // Navigate to profile page
-          setTooltipVisible(false); // Close tooltip if open
+          setKeySelected('profile');
+          setTooltipVisible(false);
       }
     },
     {
@@ -111,47 +96,34 @@ const Admin = () => {
       label: 'Đăng xuất',
       icon: <LogoutOutlined />,
       danger: true,
-      onClick: logout, // Call the logout function
+      onClick: logout,
     },
   ];
 
-
   return (
-    <Layout style={{ minHeight: '100vh' }}> {/* Main layout container */}
-      {/* Ant Design Header */}
+    <Layout style={{ minHeight: '100vh' }}>
       <Header className={styles.header}>
-        {/* Logo/Title Area */}
         <div className={styles.logoArea}>
-           {/* Optional: Replace with your actual logo */}
-           {/* <img src="/logo.png" alt="Logo" className={styles.logoImg} /> */}
            <Title level={3} className={styles.headerTitle}>Admin Dashboard</Title>
         </div>
 
-        {/* Right Aligned Header Items */}
         <div className={styles.headerRight}>
           <Space size="middle" align="center">
-            {/* Notification Bell */}
             <div style={{ position: "relative" }}>
-                <Badge dot={!isRead} offset={[-5, 5]} > {/* Adjust offset as needed */}
+                <Badge dot={!isRead} offset={[-5, 5]} >
                     <Button
-                        type="text" // Text button blends well with dark header
+                        type="text"
                         shape="circle"
                         icon={<BellOutlined className={styles.headerIcon}/>}
                         onClick={handleBellClick}
                     />
                 </Badge>
-                {/* Your Notification Tooltip/Popover Component */}
-                {/* {isTooltipVisible && <YourNotificationComponent position={tooltipPosition} onClose={() => setTooltipVisible(false)} />} */}
             </div>
 
-            {/* User Avatar and Dropdown Menu */}
             <Dropdown menu={{ items: userMenuItems }} placement="bottomRight" arrow trigger={['click']}>
-                {/* Clickable Avatar Area */}
                 <a onClick={(e) => e.preventDefault()} className={styles.avatarLink}>
                     <Space>
                         <Avatar size="default" icon={<UserOutlined />} className={styles.avatar}/>
-                        {/* Optional: Display Admin Username */}
-                        {/* <span className={styles.username}>Admin</span> */}
                     </Space>
                 </a>
             </Dropdown>
@@ -159,28 +131,23 @@ const Admin = () => {
         </div>
       </Header>
 
-      {/* Layout container for Sidebar and Content */}
       <Layout>
-        {/* Ant Design Sidebar */}
         <Sider
-           trigger={null} // Disable default trigger, use custom button
+           trigger={null}
            collapsible
            collapsed={collapsed}
-           width={220} // Width when expanded
+           width={220}
            className={styles.sidebar}
            theme="dark"
         >
-           {/* Navigation Menu */}
            <Menu
               mode="inline"
               theme="dark"
               selectedKeys={[keySelected]}
-              // openKeys can be managed with state if needed for submenus
-              style={{ height: 'calc(100% - 48px)', borderRight: 0, overflowY: 'auto', overflowX: 'hidden' }} // Fill sidebar height minus button, allow scroll
+              style={{ height: 'calc(100% - 48px)', borderRight: 0, overflowY: 'auto', overflowX: 'hidden' }}
               items={items}
               onClick={handleOnClick}
            />
-           {/* Custom Collapse Button at the bottom */}
            <Button
              type="text"
              icon={collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
@@ -189,10 +156,8 @@ const Admin = () => {
            />
         </Sider>
 
-        {/* Main Content Area Layout */}
         <Layout className={styles.contentLayout}>
             <Content className={styles.contentWrapper}>
-                {/* Render the selected page component */}
                 {renderPage(keySelected)}
             </Content>
         </Layout>

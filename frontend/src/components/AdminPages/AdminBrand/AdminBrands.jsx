@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Button, Modal, Space, Table, message, Input, Image } from 'antd';
-import { PlusCircleFilled, DeleteFilled, ExclamationCircleFilled, SearchOutlined, EditOutlined } from '@ant-design/icons';
+import { PlusCircleFilled, DeleteFilled, EditOutlined, SearchOutlined } from '@ant-design/icons';
 import Highlighter from 'react-highlight-words';
 import AddBrand from './AddBrand';
 import EditBrand from './EditBrand';
@@ -27,12 +27,10 @@ const AdminBrands = () => {
                 if (Array.isArray(rawData)) {
                     setBrands(rawData);
                 } else {
-                    console.error('Dữ liệu trả về không phải mảng:', rawData);
                     message.error('Dữ liệu thương hiệu không hợp lệ.');
                     setBrands([]);
                 }
             } catch (error) {
-                console.error('Error fetching brands:', error);
                 message.error('Không thể lấy dữ liệu thương hiệu.');
                 setBrands([]);
             } finally {
@@ -58,7 +56,7 @@ const AdminBrands = () => {
         setSearchText('');
     };
 
-     const getColumnSearchProps = (dataIndex) => ({
+    const getColumnSearchProps = (dataIndex) => ({
         filterDropdown: ({ setSelectedKeys, selectedKeys, confirm, clearFilters, close }) => (
             <div style={{ padding: 8 }} onKeyDown={(e) => e.stopPropagation()}>
                 <Input
@@ -113,15 +111,13 @@ const AdminBrands = () => {
             ),
     });
 
-    // Hàm thực hiện việc xóa (giữ nguyên)
-    const deleteBrand = async (brandId) => { // Nhận brandId thay vì cả object
+    const deleteBrand = async (brandId) => {
         setLoading(true);
         try {
             await apiService.deleteBrand(brandId);
-            onRefresh(); // Lấy lại dữ liệu mới nhất
-            message.success(`Đã xóa thương hiệu.`); // Thông báo chung chung hơn
+            onRefresh();
+            message.success(`Đã xóa thương hiệu.`);
         } catch (error) {
-            console.error('Lỗi khi xóa thương hiệu:', error);
             const errorMessage = error.response?.data?.message || error.message || `Xóa thương hiệu thất bại.`;
             message.error(errorMessage);
         } finally {
@@ -129,28 +125,22 @@ const AdminBrands = () => {
         }
     };
 
-    // *** Sửa hàm này: Chỉ cập nhật state để hiển thị modal ***
     const showDeleteConfirmModal = (brand) => {
-        console.log("Setting brand to delete and showing confirm modal:", brand);
-        setBrandToDelete(brand); // Lưu lại brand cần xóa
-        setIsConfirmDeleteModalVisible(true); // Mở modal xác nhận
+        setBrandToDelete(brand);
+        setIsConfirmDeleteModalVisible(true);
     };
 
-    // *** Hàm xử lý khi nhấn OK trên modal xác nhận xóa ***
     const handleConfirmDelete = async () => {
         if (brandToDelete) {
-            console.log("Confirming delete for:", brandToDelete);
-            await deleteBrand(brandToDelete.brandId); // Gọi hàm xóa với ID
+            await deleteBrand(brandToDelete.brandId);
         }
-        setIsConfirmDeleteModalVisible(false); // Đóng modal
-        setBrandToDelete(null); // Reset state
+        setIsConfirmDeleteModalVisible(false);
+        setBrandToDelete(null);
     };
 
-    // *** Hàm xử lý khi nhấn Cancel hoặc đóng modal xác nhận xóa ***
     const handleCancelDelete = () => {
-        console.log("Cancelled delete");
-        setIsConfirmDeleteModalVisible(false); // Đóng modal
-        setBrandToDelete(null); // Reset state
+        setIsConfirmDeleteModalVisible(false);
+        setBrandToDelete(null);
     };
 
     const columns = [
@@ -204,9 +194,7 @@ const AdminBrands = () => {
                         icon={<DeleteFilled />}
                         onClick={(e) => {
                             e.stopPropagation();
-                            // *** Gọi hàm mới để mở modal xác nhận ***
                             showDeleteConfirmModal(record);
-                            // ****************************************
                         }}
                         aria-label={`Xóa thương hiệu ${record.brandName}`}
                     />
@@ -229,7 +217,6 @@ const AdminBrands = () => {
                 </Button>
             </Space>
 
-            {/* Modal cho Thêm/Sửa Thương Hiệu */}
             <Modal
                 title={modalChild?.type === AddBrand ? 'Thêm Thương Hiệu' : modalChild?.type === EditBrand ? 'Sửa Thương Hiệu' : false}
                 centered
@@ -244,32 +231,29 @@ const AdminBrands = () => {
                 {modalChild}
             </Modal>
 
-            {/* *** Modal xác nhận xóa *** */}
             <Modal
                 title="Xác nhận xóa"
-                open={isConfirmDeleteModalVisible} // Hiển thị dựa trên state
-                onOk={handleConfirmDelete} // Hàm xử lý khi nhấn OK
-                onCancel={handleCancelDelete} // Hàm xử lý khi nhấn Cancel
+                open={isConfirmDeleteModalVisible}
+                onOk={handleConfirmDelete}
+                onCancel={handleCancelDelete}
                 okText="Xóa"
                 cancelText="Hủy"
-                okType="danger" // Màu đỏ cho nút OK
-                confirmLoading={loading} // Hiển thị loading trên nút OK khi đang xóa
-                maskClosable={false} // Không cho đóng khi click bên ngoài
-                centered // Hiển thị giữa màn hình
+                okType="danger"
+                confirmLoading={loading}
+                maskClosable={false}
+                centered
             >
-                {/* Nội dung của modal */}
                 {brandToDelete && (
                     <p>Bạn có chắc chắn muốn xóa thương hiệu <strong>{brandToDelete.brandName}</strong> (Mã: {brandToDelete.brandId}) không?</p>
                 )}
             </Modal>
-            {/* ************************* */}
 
             <Table
                 bordered
                 columns={columns}
                 dataSource={brands}
                 rowKey="brandId"
-                loading={loading && !isConfirmDeleteModalVisible} // Chỉ loading table khi không phải loading của modal xóa
+                loading={loading && !isConfirmDeleteModalVisible}
                 pagination={{
                     pageSizeOptions: ['5', '10', '15', '20'],
                     showSizeChanger: true,
@@ -283,4 +267,5 @@ const AdminBrands = () => {
         </div>
     );
 };
+
 export default AdminBrands;

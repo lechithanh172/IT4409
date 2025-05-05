@@ -12,7 +12,7 @@ import {
 import Highlighter from "react-highlight-words";
 import AddProduct from "./AddProduct";
 import EditProduct from "./EditProduct";
-import apiService from "../../../services/api"; // Đảm bảo service có đủ hàm API
+import apiService from "../../../services/api";
 
 const AdminProduct = () => {
   const [refresh, setRefresh] = useState(false);
@@ -33,7 +33,6 @@ const AdminProduct = () => {
     const fetchData = async () => {
       setLoading(true);
       try {
-        // *** Gọi đồng thời 3 API ***
         const [productResponse, categoryResponse, brandResponse] =
           await Promise.all([
             apiService.getAllProducts(),
@@ -42,64 +41,43 @@ const AdminProduct = () => {
           ]);
 
         const rawProducts = productResponse.data || [];
-        console.log("All Products: ", rawProducts);
-
         const rawCategories = categoryResponse.data || [];
         const rawBrands = brandResponse.data || [];
 
         if (Array.isArray(rawCategories)) {
-          console.log("Fetched Categories:", rawCategories);
           setCategoriesList(rawCategories);
         } else {
-          console.error(
-            "Dữ liệu categories từ API không hợp lệ:",
-            rawCategories
-          );
           message.error("Không thể tải danh sách danh mục.");
           setCategoriesList([]);
         }
         if (Array.isArray(rawBrands)) {
-          console.log("Fetched Brands:", rawBrands);
           setBrandsList(rawBrands);
         } else {
-          console.error("Dữ liệu brands từ API không hợp lệ:", rawBrands);
           message.error("Không thể tải danh sách thương hiệu.");
           setBrandsList([]);
         }
 
-        // Tạo Map từ dữ liệu API (thực hiện sau khi fetch)
         const categoryMap = Array.isArray(rawCategories)
           ? rawCategories.reduce((map, category) => {
-              map[category.categoryId] =
-                category.categoryName || `Cat ${category.categoryId}`;
+              map[category.categoryId] = category.categoryName;
               return map;
             }, {})
           : {};
 
         const brandMap = Array.isArray(rawBrands)
           ? rawBrands.reduce((map, brand) => {
-              map[brand.brandId] = {
-                name: brand.brandName || `Brand ${brand.brandId}`,
-                logoUrl: brand.logoUrl,
-              };
+              map[brand.brandId] = { name: brand.brandName, logoUrl: brand.logoUrl };
               return map;
             }, {})
           : {};
 
-          if (Array.isArray(rawProducts)) {
+        if (Array.isArray(rawProducts)) {
           const processedProducts = rawProducts.map((product) => {
             let parsedSpecs = [];
-            if (
-              product.specifications &&
-              typeof product.specifications === "string"
-            ) {
+            if (product.specifications && typeof product.specifications === "string") {
               try {
                 parsedSpecs = JSON.parse(product.specifications);
-                if (
-                  !Array.isArray(parsedSpecs) ||
-                  !parsedSpecs.every((s) => typeof s === "object" && s !== null)
-                )
-                  parsedSpecs = [];
+                if (!Array.isArray(parsedSpecs)) parsedSpecs = [];
               } catch (e) {
                 parsedSpecs = [];
               }
@@ -109,10 +87,8 @@ const AdminProduct = () => {
 
             return {
               ...product,
-              categoryName:
-                categoryMap[product.categoryId] || `ID: ${product.categoryId}`,
-              brandName:
-                brandMap[product.brandId]?.name || `ID: ${product.brandId}`,
+              categoryName: categoryMap[product.categoryId] || `ID: ${product.categoryId}`,
+              brandName: brandMap[product.brandId]?.name || `ID: ${product.brandId}`,
               totalStock: (product.variants || []).reduce(
                 (sum, v) => sum + (v.stockQuantity || 0),
                 0
@@ -123,12 +99,10 @@ const AdminProduct = () => {
           });
           setProducts(processedProducts);
         } else {
-          console.error("Dữ liệu sản phẩm không phải mảng:", rawProducts);
           setProducts([]);
           message.error("Dữ liệu sản phẩm không hợp lệ.");
         }
       } catch (error) {
-        console.error("Lỗi khi fetch dữ liệu:", error);
         message.error("Không thể tải dữ liệu. Vui lòng thử lại.");
         setProducts([]);
         setCategoriesList([]);
@@ -141,17 +115,20 @@ const AdminProduct = () => {
   }, [refresh]);
 
   const onRefresh = () => setRefresh((prev) => !prev);
+
   const handleSearch = (selectedKeys, confirm, dataIndex) => {
     confirm();
     setSearchText(selectedKeys[0]);
     setSearchedColumn(dataIndex);
   };
+
   const handleReset = (clearFilters, confirm) => {
     clearFilters && clearFilters();
     setSearchText("");
     confirm();
     setSearchedColumn("");
   };
+
   const getColumnSearchProps = (dataIndex, title) => ({
     filterDropdown: ({
       setSelectedKeys,
@@ -161,19 +138,15 @@ const AdminProduct = () => {
       close,
     }) => (
       <div style={{ padding: 8 }} onKeyDown={(e) => e.stopPropagation()}>
-        {" "}
         <Input
           ref={searchInput}
           placeholder={`Tìm ${title}`}
           value={selectedKeys[0]}
-          onChange={(e) =>
-            setSelectedKeys(e.target.value ? [e.target.value] : [])
-          }
+          onChange={(e) => setSelectedKeys(e.target.value ? [e.target.value] : [])}
           onPressEnter={() => handleSearch(selectedKeys, confirm, dataIndex)}
           style={{ marginBottom: 8, display: "block" }}
-        />{" "}
+        />
         <Space>
-          {" "}
           <Button
             type="primary"
             onClick={() => handleSearch(selectedKeys, confirm, dataIndex)}
@@ -182,30 +155,19 @@ const AdminProduct = () => {
             style={{ width: 90 }}
           >
             Tìm
-          </Button>{" "}
-          <Button
-            onClick={() => clearFilters && handleReset(clearFilters, confirm)}
-            size="small"
-            style={{ width: 90 }}
-          >
+          </Button>
+          <Button onClick={() => clearFilters && handleReset(clearFilters, confirm)} size="small" style={{ width: 90 }}>
             Reset
-          </Button>{" "}
+          </Button>
           <Button type="link" size="small" onClick={() => close()}>
             Đóng
-          </Button>{" "}
-        </Space>{" "}
+          </Button>
+        </Space>
       </div>
     ),
-    filterIcon: (filtered) => (
-      <SearchOutlined style={{ color: filtered ? "#1677ff" : undefined }} />
-    ),
+    filterIcon: (filtered) => <SearchOutlined style={{ color: filtered ? "#1677ff" : undefined }} />,
     onFilter: (value, record) =>
-      record[dataIndex]
-        ? record[dataIndex]
-            .toString()
-            .toLowerCase()
-            .includes(value.toLowerCase())
-        : "",
+      record[dataIndex] ? record[dataIndex].toString().toLowerCase().includes(value.toLowerCase()) : "",
     onFilterDropdownOpenChange: (visible) => {
       if (visible) {
         setTimeout(() => searchInput.current?.select(), 100);
@@ -213,18 +175,12 @@ const AdminProduct = () => {
     },
     render: (text) =>
       searchedColumn === dataIndex ? (
-        <Highlighter
-          highlightStyle={{ backgroundColor: "#ffc069", padding: 0 }}
-          searchWords={[searchText]}
-          autoEscape
-          textToHighlight={text ? text.toString() : ""}
-        />
+        <Highlighter highlightStyle={{ backgroundColor: "#ffc069", padding: 0 }} searchWords={[searchText]} autoEscape textToHighlight={text ? text.toString() : ""} />
       ) : (
         text
       ),
   });
 
-  // Logic Xóa và Modal Xác nhận Xóa (Giữ nguyên)
   const deleteProduct = async (productToDelete) => {
     if (!productToDelete || !productToDelete.productId) {
       message.error("ID sản phẩm không hợp lệ.");
@@ -236,18 +192,16 @@ const AdminProduct = () => {
       message.success(`Đã xóa: ${productToDelete.productName}`);
       onRefresh();
     } catch (error) {
-      console.error("Lỗi xóa:", error);
-      message.error(
-        error.response?.data?.message ||
-          `Xóa thất bại: ${productToDelete.productName}`
-      );
+      message.error(error.response?.data?.message || `Xóa thất bại: ${productToDelete.productName}`);
       setLoading(false);
     }
   };
+
   const showDeleteConfirmModal = (product) => {
     setProductToDelete(product);
     setIsConfirmDeleteModalVisible(true);
   };
+
   const handleConfirmDelete = async () => {
     if (productToDelete) {
       await deleteProduct(productToDelete);
@@ -255,6 +209,7 @@ const AdminProduct = () => {
     setIsConfirmDeleteModalVisible(false);
     setProductToDelete(null);
   };
+
   const handleCancelDelete = () => {
     setIsConfirmDeleteModalVisible(false);
     setProductToDelete(null);
@@ -278,13 +233,7 @@ const AdminProduct = () => {
       render: (_, record) => {
         const img = record.variants?.[0]?.imageUrl;
         return img ? (
-          <Image
-            width={40}
-            height={40}
-            src={img}
-            style={{ objectFit: "contain" }}
-            preview={true}
-          />
+          <Image width={40} height={40} src={img} style={{ objectFit: "contain" }} preview={true} />
         ) : (
           "N/A"
         );
@@ -303,8 +252,7 @@ const AdminProduct = () => {
       dataIndex: "categoryName",
       key: "categoryName",
       width: 120,
-      sorter: (a, b) =>
-        (a.categoryName || "").localeCompare(b.categoryName || ""),
+      sorter: (a, b) => (a.categoryName || "").localeCompare(b.categoryName || ""),
       ...getColumnSearchProps("categoryName", "danh mục"),
       ellipsis: true,
     },
@@ -323,9 +271,7 @@ const AdminProduct = () => {
       key: "price",
       width: 120,
       render: (text) =>
-        text
-          ? text.toLocaleString("vi-VN", { style: "currency", currency: "VND" })
-          : "N/A",
+        text ? text.toLocaleString("vi-VN", { style: "currency", currency: "VND" }) : "N/A",
       sorter: (a, b) => a.price - b.price,
       align: "right",
     },
@@ -434,8 +380,7 @@ const AdminProduct = () => {
           }
           icon={<PlusCircleFilled />}
         >
-          {" "}
-          Thêm sản phẩm{" "}
+          Thêm sản phẩm
         </Button>
       </Space>
 
@@ -457,8 +402,7 @@ const AdminProduct = () => {
         style={{ top: 20 }}
         bodyStyle={{ maxHeight: "calc(100vh - 120px)", overflowY: "auto" }}
       >
-        {" "}
-        {modalChild}{" "}
+        {modalChild}
       </Modal>
 
       <Modal
@@ -473,14 +417,13 @@ const AdminProduct = () => {
         maskClosable={false}
         centered
       >
-        {" "}
         {productToDelete && (
           <p>
             Bạn có chắc chắn muốn xóa{" "}
             <strong>{productToDelete.productName}</strong> (Mã:{" "}
             {productToDelete.productId}) không?
           </p>
-        )}{" "}
+        )}
       </Modal>
 
       <Table

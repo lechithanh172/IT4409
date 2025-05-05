@@ -1,10 +1,6 @@
-/* AdminPage.module.css */
-
-/* --- Global Styles (Keep if they work) --- */
 html, body {
   height: 100%;
   margin: 0;
-  /* overflow: hidden; Consider removing if content needs to scroll window */
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
 }
 
@@ -14,20 +10,19 @@ html, body {
   flex-direction: column;
 }
 
-/* --- Header Styles (Using Ant Design Layout.Header) --- */
 .header {
   display: flex;
   justify-content: space-between;
   align-items: center;
   padding: 0 24px;
-  background-color: #001529; /* Ant Design dark theme color */
+  background-color: #001529;
   color: #fff;
   height: 64px;
-  position: sticky; /* Make header sticky */
+  position: sticky;
   top: 0;
   z-index: 100;
-  border-bottom: 1px solid #002140; /* Subtle separator */
-  flex-shrink: 0; /* Prevent header shrinking */
+  border-bottom: 1px solid #002140;
+  flex-shrink: 0;
 }
 
 .logoArea {
@@ -35,7 +30,7 @@ html, body {
   align-items: center;
 }
 
-.logoImg { /* Style if using an image logo */
+.logoImg {
   height: 32px;
   margin-right: 16px;
 }
@@ -48,13 +43,13 @@ html, body {
 }
 
 .headerRight {
-  /* Container for right-side elements */
 }
 
 .headerIcon {
   color: rgba(255, 255, 255, 0.85) !important;
   font-size: 18px;
 }
+
 .headerIcon:hover {
    color: #fff !important;
 }
@@ -62,51 +57,48 @@ html, body {
 .avatarLink {
   display: inline-block;
   cursor: pointer;
-  padding: 0 8px; /* Add some padding for easier clicking */
+  padding: 0 8px;
   border-radius: 4px;
   transition: background-color 0.3s;
 }
+
 .avatarLink:hover {
   background-color: rgba(255, 255, 255, 0.1);
 }
 
 .avatar {
   background-color: rgba(255, 255, 255, 0.25);
-  vertical-align: middle; /* Align avatar nicely with text/icons */
+  vertical-align: middle;
 }
 
-.username { /* Style for optional username */
+.username {
   color: rgba(255, 255, 255, 0.85);
   margin-left: 8px;
   vertical-align: middle;
 }
 
-
-/* --- Sidebar Styles (Using Ant Design Layout.Sider) --- */
 .sidebar {
-  height: calc(100vh - 64px); /* Full height minus header */
-  position: sticky !important; /* Make sidebar sticky */
-  top: 64px; /* Position below the header */
+  height: calc(100vh - 64px);
+  position: sticky !important;
+  top: 64px;
   left: 0;
-  overflow: hidden; /* Hide scrollbars, menu handles its own scroll */
-  background-color: #001529 !important; /* Ensure bg color */
-  display: flex; /* Use flex to position collapse button */
-  flex-direction: column; /* Stack menu and button */
+  overflow: hidden;
+  background-color: #001529 !important;
+  display: flex;
+  flex-direction: column;
 }
 
-/* --- Ant Design Menu Styles within Sidebar --- */
-/* Let Menu handle its own scrolling within the flex container */
 .sidebar .ant-menu {
-  flex-grow: 1; /* Allow menu to take up available space */
-  background: transparent !important; /* Inherit Sider background */
+  flex-grow: 1;
+  background: transparent !important;
   border-right: none !important;
 }
 
 .sidebar .ant-menu-item,
 .sidebar .ant-menu-submenu-title {
-  color: rgba(255, 255, 255, 0.65); /* Default menu item color */
-  margin: 4px 8px !important; /* Item margin */
-  width: calc(100% - 16px) !important; /* Item width accounting for margin */
+  color: rgba(255, 255, 255, 0.65);
+  margin: 4px 8px !important;
+  width: calc(100% - 16px) !important;
   border-radius: 4px;
 }
 
@@ -117,59 +109,57 @@ html, body {
 }
 
 .sidebar .ant-menu-item-selected {
-  background-color: #1677ff !important; /* Ant Design primary blue */
+  background-color: #1677ff !important;
   color: #fff !important;
   font-weight: 600;
 }
 
 .sidebar .ant-menu-item .anticon,
 .sidebar .ant-menu-submenu-title .anticon {
-  color: rgba(255, 255, 255, 0.65); /* Default icon color */
+  color: rgba(255, 255, 255, 0.65);
 }
+
 .sidebar .ant-menu-item:hover .anticon,
 .sidebar .ant-menu-submenu-title:hover .anticon,
 .sidebar .ant-menu-item-selected .anticon {
-  color: #fff; /* Icon color on hover/selected */
+  color: #fff;
 }
 
-/* --- Custom Collapse Button --- */
 .collapseButton {
-  height: 48px; /* Button height */
-  line-height: 48px; /* Center icon vertically */
+  height: 48px;
+  line-height: 48px;
   color: rgba(255, 255, 255, 0.65) !important;
-  background: #002140 !important; /* Slightly different background */
+  background: #002140 !important;
   border: none !important;
-  border-radius: 0 !important; /* Square edges */
-  width: 100% !important; /* Full width */
+  border-radius: 0 !important;
+  width: 100% !important;
   text-align: center;
   cursor: pointer;
   font-size: 16px;
-  flex-shrink: 0; /* Prevent button shrinking */
+  flex-shrink: 0;
   transition: color 0.3s;
 }
+
 .collapseButton:hover {
    color: #fff !important;
-   background: #002a52 !important; /* Darker hover */
+   background: #002a52 !important;
 }
 
-/* --- Content Area Styles --- */
 .contentLayout {
   padding: 24px;
-  background-color: #f0f2f5; /* Light grey background for the area outside content */
+  background-color: #f0f2f5;
   min-height: calc(100vh - 64px);
-  overflow-y: auto; /* Allow this layout part to scroll if needed */
+  overflow-y: auto;
 }
 
 .contentWrapper {
-  background-color: #fff; /* White background for the main content */
+  background-color: #fff;
   padding: 24px;
-  min-height: 100%; /* Fill the padded area */
+  min-height: 100%;
   border-radius: 8px;
   box-shadow: 0 1px 3px rgba(0,0,0,0.05);
 }
 
-
-/* --- Responsive Adjustments (Example) --- */
 @media (max-width: 768px) {
   .header {
     padding: 0 16px;
@@ -178,7 +168,7 @@ html, body {
     font-size: 18px;
   }
   .username {
-    display: none; /* Hide username on small screens */
+    display: none;
   }
   .contentLayout {
     padding: 16px;
@@ -186,23 +176,17 @@ html, body {
   .contentWrapper {
     padding: 16px;
   }
-  /* Consider auto-collapsing sidebar on small screens */
-  /* .sidebar { width: 80px !important; } */
 }
 
-/* Keep your specific component styles (Tooltip, Table etc.) */
 .tooltip {
-  /* ... your existing tooltip styles ... */
   position: fixed;
-  top: 65px; /* Position below header */
+  top: 65px;
   right: 20px;
   z-index: 9999;
   background-color: #fff;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
   padding: 10px;
   border-radius: 8px;
-  width: 250px; /* Adjust as needed */
-  color: #333; /* Ensure text is visible */
+  width: 250px;
+  color: #333;
 }
-
-/* ... other specific styles for tables, buttons inside content ... */

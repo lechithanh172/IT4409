@@ -11,7 +11,6 @@ const EditUser = ({ userData, setModalChild, handleRefresh }) => {
     const [form] = Form.useForm();
     const [submitting, setSubmitting] = useState(false);
 
-    // **** Sử dụng useWatch để theo dõi giá trị trường 'role' ****
     const selectedRole = Form.useWatch('role', form);
 
     useEffect(() => {
@@ -33,45 +32,48 @@ const EditUser = ({ userData, setModalChild, handleRefresh }) => {
         if (newRole && newRole !== originalRole) {
             setSubmitting(true);
             const roleData = { userId: userData.userId, role: newRole };
-            console.log('Dữ liệu gửi cho setUserRole:', roleData);
 
             try {
-                // **** Giả sử bạn có hàm này trong apiService ****
-                // await apiService.setUserRole(roleData);
-                // **** Thay thế bằng API thật ****
-                console.log("(Giả lập) Gọi API setUserRole thành công");
-                await new Promise(resolve => setTimeout(resolve, 500)); // Giả lập độ trễ mạng
+                await apiService.setUserRole(roleData);
+                await new Promise(resolve => setTimeout(resolve, 500));
 
                 message.success(`Đã cập nhật vai trò cho người dùng "${userData.username}" thành "${newRole}" thành công!`);
                 handleRefresh();
                 setModalChild(null);
             } catch (error) {
-                console.error("Lỗi khi cập nhật vai trò người dùng:", error);
                 const errorMessage = error.response?.data?.message || error.message || "Cập nhật vai trò thất bại.";
                 message.error(errorMessage);
             } finally {
                 setSubmitting(false);
             }
         } else {
-             message.info('Vai trò không thay đổi.');
-             setModalChild(null);
+            message.info('Vai trò không thay đổi.');
+            setModalChild(null);
         }
     };
 
     if (!userData) {
-        return ( <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '200px' }}> <Spin tip="Đang tải thông tin người dùng..." /> </div> );
+        return (
+            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '200px' }}>
+                <Spin tip="Đang tải thông tin người dùng..." />
+            </div>
+        );
     }
 
     return (
-        <Form form={form} layout="vertical" onFinish={onFinish} >
+        <Form form={form} layout="vertical" onFinish={onFinish}>
             <Title level={4} style={{ textAlign: 'center', marginBottom: 24 }}> Chỉnh sửa vai trò người dùng </Title>
             <Descriptions bordered size="small" column={1} style={{ marginBottom: 24 }}>
                  <Descriptions.Item label="ID Người dùng">{userData.userId}</Descriptions.Item>
                  <Descriptions.Item label="Username">{userData.username || 'N/A'}</Descriptions.Item>
                  <Descriptions.Item label="Email">{userData.email || 'N/A'}</Descriptions.Item>
-                 <Descriptions.Item label="Họ tên"> {`${userData.firstName || ''} ${userData.lastName || ''}`.trim() || 'N/A'} </Descriptions.Item>
+                 <Descriptions.Item label="Họ tên">{`${userData.firstName || ''} ${userData.lastName || ''}`.trim() || 'N/A'}</Descriptions.Item>
                  <Descriptions.Item label="Số điện thoại">{userData.phoneNumber || 'N/A'}</Descriptions.Item>
-                 <Descriptions.Item label="Vai trò hiện tại"> <Tag color={userData.role === 'ADMIN' ? 'red' : userData.role === 'PRODUCT_MANAGER' ? 'blue' : 'green'}> {userData.role || 'N/A'} </Tag> </Descriptions.Item>
+                 <Descriptions.Item label="Vai trò hiện tại">
+                     <Tag color={userData.role === 'ADMIN' ? 'red' : userData.role === 'PRODUCT_MANAGER' ? 'blue' : 'green'}>
+                         {userData.role || 'N/A'}
+                     </Tag>
+                 </Descriptions.Item>
             </Descriptions>
             <Divider>Thay đổi vai trò</Divider>
             <Form.Item
@@ -80,12 +82,11 @@ const EditUser = ({ userData, setModalChild, handleRefresh }) => {
                  rules={[{ required: true, message: 'Vui lòng chọn vai trò mới!' }]}
                  initialValue={userData.role}
             >
-                <Select placeholder="Chọn vai trò mới" loading={submitting} disabled={submitting} >
-                    {ROLES.map(role => ( <Option key={role} value={role}> {role} </Option> ))}
+                <Select placeholder="Chọn vai trò mới" loading={submitting} disabled={submitting}>
+                    {ROLES.map(role => (<Option key={role} value={role}>{role}</Option>))}
                 </Select>
             </Form.Item>
 
-            {/* **** Hiển thị Alert dựa trên selectedRole **** */}
             {selectedRole === 'ADMIN' && userData.role !== 'ADMIN' && (
                  <Alert
                     message="Cảnh báo"
@@ -99,7 +100,7 @@ const EditUser = ({ userData, setModalChild, handleRefresh }) => {
             <Form.Item style={{ textAlign: 'right', marginTop: 24, marginBottom: 0 }}>
                 <Space>
                     <Button onClick={() => setModalChild(null)} disabled={submitting}> Hủy </Button>
-                    <Button type="primary" htmlType="submit" loading={submitting} >
+                    <Button type="primary" htmlType="submit" loading={submitting}>
                         {submitting ? 'Đang cập nhật...' : 'Lưu thay đổi'}
                     </Button>
                 </Space>

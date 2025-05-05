@@ -1,9 +1,8 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Carousel, Button as AntButton } from 'antd'; // Import Ant Button
-import styles from './Banner.module.css'; // Use your specific CSS module
+import { Carousel, Button as AntButton } from 'antd';
+import styles from './Banner.module.css';
 
-// Define Banner Slides Data
 const bannerSlides = [
   {
     key: 'slide1',
@@ -74,7 +73,7 @@ const bannerSlides = [
 const Banner = () => (
   <Carousel autoplay autoplaySpeed={3000} effect="fade" className={styles.bannerCarousel}>
     {bannerSlides.map(slide => (
-      <div key={slide.key}> {/* Outer div for Carousel */}
+      <div key={slide.key}>
         <div
           className={styles.bannerItem}
           style={{ backgroundImage: `url(${slide.imageUrl})` }}

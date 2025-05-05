@@ -33,12 +33,10 @@ const AdminCategories = () => {
         if (Array.isArray(rawData)) {
           setCategories(rawData);
         } else {
-          console.error("Dữ liệu category không phải mảng:", rawData);
           message.error('Dữ liệu danh mục không hợp lệ.');
           setCategories([]);
         }
       } catch (error) {
-        console.error("Lỗi khi tải danh mục:", error);
         message.error('Không thể lấy dữ liệu danh mục.');
         setCategories([]);
       } finally {
@@ -64,58 +62,59 @@ const AdminCategories = () => {
   };
 
   const getColumnSearchProps = (dataIndex) => ({
-      filterDropdown: ({ setSelectedKeys, selectedKeys, confirm, clearFilters, close }) => (
-          <div style={{ padding: 8 }} onKeyDown={(e) => e.stopPropagation()}>
-              <Input
-                  ref={searchInput}
-                  placeholder={`Tìm ${dataIndex === 'categoryId' ? 'mã' : dataIndex === 'categoryName' ? 'tên' : dataIndex}`}
-                  value={selectedKeys[0]}
-                  onChange={(e) => setSelectedKeys(e.target.value ? [e.target.value] : [])}
-                  onPressEnter={() => handleSearch(selectedKeys, confirm, dataIndex)}
-                  style={{ marginBottom: 8, display: 'block' }}
-              />
-              <Space>
-                  <Button
-                      type="primary"
-                      onClick={() => handleSearch(selectedKeys, confirm, dataIndex)}
-                      icon={<SearchOutlined />}
-                      size="small"
-                      style={{ width: 90 }}
-                  >
-                      Tìm
-                  </Button>
-                  <Button
-                      onClick={() => clearFilters && handleReset(clearFilters, confirm, dataIndex)}
-                      size="small"
-                      style={{ width: 90 }}
-                  >
-                      Reset
-                  </Button>
-                  <Button type="link" size="small" onClick={() => close()}>
-                      Đóng
-                  </Button>
-              </Space>
-          </div>
+    filterDropdown: ({ setSelectedKeys, selectedKeys, confirm, clearFilters, close }) => (
+      <div style={{ padding: 8 }} onKeyDown={(e) => e.stopPropagation()}>
+        <Input
+          ref={searchInput}
+          placeholder={`Tìm ${dataIndex === 'categoryId' ? 'mã' : dataIndex === 'categoryName' ? 'tên' : dataIndex}`}
+          value={selectedKeys[0]}
+          onChange={(e) => setSelectedKeys(e.target.value ? [e.target.value] : [])}
+          onPressEnter={() => handleSearch(selectedKeys, confirm, dataIndex)}
+          style={{ marginBottom: 8, display: 'block' }}
+        />
+        <Space>
+          <Button
+            type="primary"
+            onClick={() => handleSearch(selectedKeys, confirm, dataIndex)}
+            icon={<SearchOutlined />}
+            size="small"
+            style={{ width: 90 }}
+          >
+            Tìm
+          </Button>
+          <Button
+            onClick={() => clearFilters && handleReset(clearFilters, confirm, dataIndex)}
+            size="small"
+            style={{ width: 90 }}
+          >
+            Reset
+          </Button>
+          <Button type="link" size="small" onClick={() => close()}>
+            Đóng
+          </Button>
+        </Space>
+      </div>
+    ),
+    filterIcon: (filtered) => <SearchOutlined style={{ color: filtered ? '#1677ff' : undefined }} />,
+    onFilter: (value, record) => record[dataIndex] ? record[dataIndex].toString().toLowerCase().includes(value.toLowerCase()) : '',
+    onFilterDropdownOpenChange: (visible) => {
+      if (visible) {
+        setTimeout(() => searchInput.current?.select(), 100);
+      }
+    },
+    render: (text) =>
+      searchedColumn === dataIndex ? (
+        <Highlighter
+          highlightStyle={{ backgroundColor: '#ffc069', padding: 0 }}
+          searchWords={[searchText]}
+          autoEscape
+          textToHighlight={text ? text.toString() : ''}
+        />
+      ) : (
+        text
       ),
-      filterIcon: (filtered) => <SearchOutlined style={{ color: filtered ? '#1677ff' : undefined }} />,
-      onFilter: (value, record) => record[dataIndex] ? record[dataIndex].toString().toLowerCase().includes(value.toLowerCase()) : '',
-      onFilterDropdownOpenChange: (visible) => {
-          if (visible) {
-              setTimeout(() => searchInput.current?.select(), 100);
-          }
-      },
-      render: (text) =>
-          searchedColumn === dataIndex ? (
-              <Highlighter
-                  highlightStyle={{ backgroundColor: '#ffc069', padding: 0 }}
-                  searchWords={[searchText]}
-                  autoEscape
-                  textToHighlight={text ? text.toString() : ''}
-              />
-          ) : (
-              text
-          ),
   });
+
   const deleteCategory = async (categoryToDelete) => {
     if (!categoryToDelete || !categoryToDelete.categoryId) {
       message.error("Không tìm thấy ID danh mục để xóa.");
@@ -127,12 +126,10 @@ const AdminCategories = () => {
       message.success(`Đã xóa danh mục: ${categoryToDelete.categoryName}`);
       onRefresh();
     } catch (error) {
-      console.error("Lỗi khi xóa danh mục:", error);
       const errorMessage = error.response?.data?.message || error.message || `Xóa danh mục thất bại: ${categoryToDelete.categoryName}`;
       message.error(errorMessage);
-      setLoading(false); // Tắt loading nếu lỗi
+      setLoading(false);
     }
-    // Không cần setLoading(false) nếu thành công vì onRefresh sẽ làm
   };
 
   const showDeleteConfirmModal = (category) => {
@@ -144,7 +141,6 @@ const AdminCategories = () => {
     if (categoryToDelete) {
       await deleteCategory(categoryToDelete);
     }
-    // Đóng modal sau khi xử lý xong (kể cả lỗi hay thành công)
     setIsConfirmDeleteModalVisible(false);
     setCategoryToDelete(null);
   };
@@ -154,7 +150,6 @@ const AdminCategories = () => {
     setCategoryToDelete(null);
   };
 
-  // --- Định nghĩa Cột cho Bảng (Đã sửa cột Hành động) ---
   const columns = [
     {
       title: "Mã",
@@ -199,27 +194,26 @@ const AdminCategories = () => {
       key: "description",
       ellipsis: true,
       width: 300,
-       ...getColumnSearchProps("description"),
+      ...getColumnSearchProps("description"),
     },
     {
       title: "Hành động",
       key: "action",
-      width: 120, 
+      width: 120,
       align: "center",
       fixed: "right",
       render: (_, record) => (
         <Space size="middle">
           <Button
-              type="text"
-              icon={<EditOutlined />}
-              onClick={(e) => {
-                  e.stopPropagation();
-                  console.log("Edit button clicked for:", record);
-                  setModalChild(
-                      <EditCategory category={record} setModalChild={setModalChild} handleRefresh={onRefresh} />
-                  );
-              }}
-              aria-label={`Sửa danh mục ${record.categoryName}`}
+            type="text"
+            icon={<EditOutlined />}
+            onClick={(e) => {
+              e.stopPropagation();
+              setModalChild(
+                <EditCategory category={record} setModalChild={setModalChild} handleRefresh={onRefresh} />
+              );
+            }}
+            aria-label={`Sửa danh mục ${record.categoryName}`}
           />
           <Button
             type="text"
@@ -227,7 +221,6 @@ const AdminCategories = () => {
             icon={<DeleteFilled />}
             onClick={(e) => {
               e.stopPropagation();
-              console.log("Delete button clicked for:", record);
               showDeleteConfirmModal(record);
             }}
             aria-label={`Xóa danh mục ${record.categoryName}`}
@@ -271,20 +264,20 @@ const AdminCategories = () => {
       </Modal>
 
       <Modal
-          title="Xác nhận xóa danh mục"
-          open={isConfirmDeleteModalVisible}
-          onOk={handleConfirmDelete}
-          onCancel={handleCancelDelete}
-          okText="Xóa"
-          cancelText="Hủy"
-          okType="danger"
-          confirmLoading={loading}
-          maskClosable={false}
-          centered
+        title="Xác nhận xóa danh mục"
+        open={isConfirmDeleteModalVisible}
+        onOk={handleConfirmDelete}
+        onCancel={handleCancelDelete}
+        okText="Xóa"
+        cancelText="Hủy"
+        okType="danger"
+        confirmLoading={loading}
+        maskClosable={false}
+        centered
       >
-          {categoryToDelete && (
-              <p>Bạn có chắc chắn muốn xóa danh mục <strong>{categoryToDelete.categoryName}</strong> (Mã: {categoryToDelete.categoryId}) không?</p>
-          )}
+        {categoryToDelete && (
+          <p>Bạn có chắc chắn muốn xóa danh mục <strong>{categoryToDelete.categoryName}</strong> (Mã: {categoryToDelete.categoryId}) không?</p>
+        )}
       </Modal>
 
       <Table
@@ -307,4 +300,5 @@ const AdminCategories = () => {
     </div>
   );
 };
+
 export default AdminCategories;

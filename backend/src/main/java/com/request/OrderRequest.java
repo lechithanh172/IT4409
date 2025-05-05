@@ -16,6 +16,8 @@ public class OrderRequest {
 
     private DeliveryMethod deliveryMethod;
 
+    private Integer shippingFee;
+
     private String note;
 
     private Item[] items;

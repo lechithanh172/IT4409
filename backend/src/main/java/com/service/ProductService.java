@@ -41,7 +41,6 @@ public class ProductService {
         dto.setWeight(product.getWeight());
         String category = categoryRepository.findByCategoryId(product.getCategoryId()).get().getCategoryName();
 
-//        System.out.println(category);
         String brand = brandRepository.findByBrandId(product.getBrandId()).get().getBrandName();
         dto.setCategoryName(category);
         dto.setBrandName(brand);
@@ -127,6 +126,9 @@ public class ProductService {
         product.setWeight(request.getWeight());
         product.setPrice(request.getPrice());
         product.setSupportRushOrder(request.getSupportRushOrder());
+        if(request.getIsActive() != null) {
+            product.setIsActive(request.getIsActive());
+        }
 
         Integer categoryId = categoryRepository.findByCategoryNameIgnoreCase(request.getCategoryName()).get().getCategoryId();
         Integer brandId = brandRepository.findByBrandNameIgnoreCase(request.getBrandName()).get().getBrandId();

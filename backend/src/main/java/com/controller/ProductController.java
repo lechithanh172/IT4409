@@ -81,4 +81,16 @@ public class ProductController {
         }
         else return ResponseEntity.status(200).body(products);
     }
+    @DeleteMapping("/variant/delete")
+    public ResponseEntity<?> deleteVariant(@RequestParam Integer variantId) {
+        if(productService.deleteVariant(variantId)) {
+            return ResponseEntity.status(200).body(new StatusResponse("Variant deleted successfully"));
+        }
+        else return ResponseEntity.status(404).body(new StatusResponse("Variant does not exist"));
+    }
+    @GetMapping("/all")
+    public ResponseEntity<?> getAllProducts() {
+        return ResponseEntity.status(200).body(productService.getAllProducts());
+    }
+
 }

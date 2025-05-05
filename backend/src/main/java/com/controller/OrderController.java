@@ -2,13 +2,16 @@ package com.controller;
 
 import com.entity.Order;
 import com.entity.User;
+import com.enums.DeliveryMethod;
 import com.enums.OrderStatus;
 import com.enums.Role;
 import com.request.ApplyStatusRequest;
 import com.request.OrderRequest;
+import com.request.ShippingRequest;
 import com.response.StatusResponse;
 import com.service.JwtService;
 import com.service.OrderService;
+import com.service.ShippingService;
 import com.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -27,20 +30,24 @@ public class OrderController {
     private UserService userService;
     @Autowired
     private JwtService jwtService;
+    @Autowired
+    private ShippingService shippingService;
 
     @PostMapping("/create")
     public ResponseEntity<?> createOrder(@RequestBody OrderRequest request, @RequestHeader("Authorization") String token) {
         Integer orderCodeReturn = orderService.createOrder(request, token);
         if(orderCodeReturn != -1) {
+            System.out.println(orderCodeReturn);
             return ResponseEntity.status(200).body(orderService.getOrderById(orderCodeReturn));
+
         }
-        else return ResponseEntity.status(400).body("Order creation failed");
+        else return ResponseEntity.status(400).body(new StatusResponse("Order creation failed"));
     }
     @GetMapping("/history/{username}")
     public ResponseEntity<?> viewOrderHistory(@PathVariable String username, @RequestHeader("Authorization") String token) {
         Optional<User> u = userService.getInfo(token);
         if(u.isPresent()) {
-            if(u.get().getUsername().equals(username) || jwtService.extractRole(token).equals("ADMIN")) {
+            if(u.get().getUsername().equals(username) || jwtService.extractRole(token).equals(Role.ADMIN)) {
                 return ResponseEntity.status(200).body(orderService.getOrderHistory(u.get().getUserId()));
             }
             else return ResponseEntity.status(403).body(new StatusResponse("Access Denied"));
@@ -77,12 +84,33 @@ public class OrderController {
     }
     @PostMapping("/apply-status")
     public ResponseEntity<?> approveOrder(@RequestBody ApplyStatusRequest request) {
-        OrderStatus orderStatus = OrderStatus.valueOf(request.getStatus().toUpperCase());
-        Order order = orderService.applyOrderStatus(request.getOrderId(), orderStatus);
-        if(order != null) {
-            return ResponseEntity.status(200).body(order);
+        try {
+            OrderStatus orderStatus = OrderStatus.valueOf(request.getStatus().toUpperCase());
+            Order order = orderService.applyOrderStatus(request.getOrderId(), orderStatus);
+            if(order != null) {
+                return ResponseEntity.status(200).body(order);
+            }
+            else return ResponseEntity.status(404).body(new StatusResponse("Order not found"));
         }
-        else return ResponseEntity.status(404).body(new StatusResponse("Order not found"));
+        catch (IllegalArgumentException e) {
+            return ResponseEntity.status(400).body(new StatusResponse("Invalid order status"));
+        }
+    }
+    @GetMapping("/get-items/{orderId}")
+    public ResponseEntity<?> getProductsByOrderId(@PathVariable Integer orderId) {
+        return ResponseEntity.status(200).body(orderService.getProductsByOrderId(orderId));
+    }
+    @PostMapping("/shipping-fee")
+    public ResponseEntity<?> shippingFeeCalculate(@RequestBody ShippingRequest request) {
+        try {
+            DeliveryMethod deliveryMethod = DeliveryMethod.valueOf(request.getDeliveryMethod().toUpperCase());
+            Double weight = shippingService.totalWeightCalculate(request.getItems());
+            if(weight == null) return ResponseEntity.status(404).body(new StatusResponse("Cannot find product(s)"));
+            return ResponseEntity.status(200).body(shippingService.calculateShippingFee(request.getShippingAddress(), weight, deliveryMethod));
+        }
+        catch (IllegalArgumentException e) {
+            return ResponseEntity.status(400).body(new StatusResponse("Invalid delivery method"));
+        }
     }
 
 }

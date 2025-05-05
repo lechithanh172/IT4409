@@ -20,7 +20,7 @@ import ProductListPage from './components/ProductListPage/ProductListPage'; // A
 import PlaceOrder from './pages/PlaceOrder/PlaceOrder';
 import VNPayReturn from './pages/VNPayReturn/VNPayReturn';
 import OrderHistoryPage from './pages/OrderHistoryPage/OrderHistoryPage'; // Import OrderHistoryPage
-
+import AdminPage from './pages/AdminPage/AdminPage';
 // Protected Route Component
 import ProtectedRoute from './components/Auth/ProtectedRoute';
 
@@ -62,7 +62,17 @@ function App() {
           {/* Add other protected routes here */}
         </Route>
       </Route>
-
+      <Route
+        path="/admin"
+        element={
+          <ProtectedRoute requiredRole="admin"> {/* Yêu cầu đăng nhập VÀ role 'admin' */}
+            {/* Nếu muốn có Admin Layout riêng thì thay AdminPage bằng AdminLayout */}
+            {/* <AdminLayout> */}
+              <AdminPage />
+            {/* </AdminLayout> */}
+          </ProtectedRoute>
+        }
+      > </Route>
       {/* --- Routes Outside MainLayout (e.g., Admin, Fullscreen Auth) --- */}
       {/* Example:
       <Route path="/admin" element={<AdminLayout />}>

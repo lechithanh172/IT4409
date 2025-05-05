@@ -1,315 +1,379 @@
-import React, { useState, useEffect } from 'react';
-import { Button, Form, Input, InputNumber, Space, Row, Col, Divider, message, Upload, Image } from 'antd';
-import { PlusOutlined, MinusCircleOutlined } from '@ant-design/icons';
-import apiService from '../../../services/api';
-import ProductDetails from './ProductDetails';
+import React, { useState, useEffect, useMemo } from "react";
+import {
+  Button,
+  Form,
+  Input,
+  InputNumber,
+  Space,
+  Row,
+  Col,
+  Divider,
+  message,
+  Image,
+  Select,
+  Checkbox,
+} from "antd";
+import { PlusOutlined, MinusCircleOutlined } from "@ant-design/icons";
+import apiService from "../../../services/api";
 
-const EditProduct = ({ product, setModalChild, handleRefresh }) => {
-    const initialVariants = (product.variants || []).map((variant) => ({
-        ...variant,
-        key: Date.now() + Math.random(), // tạo khóa key duy nhất
-    }));
-    const [variants, setVariants] = useState(initialVariants);
-    const [productImage, setProductImage] = useState(product.brand.image);
+const EditProduct = ({ product, setModalChild, handleRefresh, categoriesList = [], brandsList = [] }) => {
+  const [form] = Form.useForm();
+  const initialVariants = useMemo(() => (product?.variants || []).map((variant, index) => ({
+    key: variant.variantId || `existing_${index}`,
+    variantId: variant.variantId,
+    color: variant.color || "",
+    imageUrl: variant.imageUrl || "",
+    stockQuantity: variant.stockQuantity ?? 0,
+    discountPercentage: variant.discountPercentage ?? 0,
+  })), [product?.variants]);
 
-    const onFinishFailed = (errorInfo) => {
-        console.log('Failed:', errorInfo);
-    };
+  const categoryOptions = useMemo(() => (
+    categoriesList.map(cat => ({
+        value: cat.categoryName || `Danh mục ${cat.categoryId}`,
+        label: cat.categoryName || `Danh mục ${cat.categoryId}`
+    }))
+  ), [categoriesList]);
 
-    const addVariant = () => {
-        setVariants([...variants, { key: Date.now(), color: '', quantity: '', sale: '', image: '' }]);
-    };
+  const brandOptions = useMemo(() => (
+    brandsList.map(brand => ({
+        value: brand.brandName || `Thương hiệu ${brand.brandId}`,
+        label: brand.brandName || `Thương hiệu ${brand.brandId}`,
+        image: brand.logoUrl
+    }))
+  ), [brandsList]);
 
-    const removeVariant = (key) => {
-        setVariants(variants.filter((variant) => variant.key !== key));
-    };
+  const [variants, setVariants] = useState(initialVariants);
+  const [selectedBrandImage, setSelectedBrandImage] = useState(null);
 
-    const handleVariantChange = (key, field, value) => {
-        setVariants(variants.map((variant) => (variant.key === key ? { ...variant, [field]: value } : variant)));
-    };
-
-    const onFinish = async (values) => {
+  useEffect(() => {
+    if (product) {
+      let parsedSpecifications = [];
+      if (product.specifications && typeof product.specifications === 'string') {
         try {
-            console.log('Form Values:', values);
-            console.log('Variants:', variants);
-
-            if (!product._id) {
-                throw new Error('ID sản phẩm không tồn tại');
-            }
-
-            const data = {
-                name: values.name || '',
-                category: values.category || '',
-                brand: {
-                    name: values.brand?.name || '',
-                    image: values.brand?.image || '',
-                },
-                description: typeof values.description === 'string' ? values.description.split('\n') : [], // Kiểm tra kiểu dữ liệu trước khi split
-                specifications: typeof values.specifications === 'string' ? values.specifications.split('\n') : [],
-                price: values.price || 0,
-                variants: [],
-            };
-
-            console.log('Description:', data.variants);
-
-            variants.forEach((variant) => {
-                data.variants.push({
-                    color: variant.color || 'default',
-                    quantity: variant.quantity || 0,
-                    sale: variant.sale || 0,
-                    image: variant.image || '',
-                });
-            });
-            console.log(product);
-            // Kiểm tra xem có sự thay đổi nào không
-            const isProductChanged = JSON.stringify(data) !== JSON.stringify(product);
-            const areVariantsChanged = JSON.stringify(data.variants) !== JSON.stringify(product.variants);
-
-            if (!isProductChanged && !areVariantsChanged) {
-                console.log('not thing to change');
-                message.info('Không có thay đổi nào để cập nhật.');
-                return; // Không gửi đi nếu không có thay đổi
-            }
-
-            await apiService.updateProduct(product._id, data);
-            message.success('Sản phẩm được cập nhật thành công!');
-            handleRefresh();
-            setModalChild(null);
-        } catch (e) {
-            message.error(e.message);
+          parsedSpecifications = JSON.parse(product.specifications);
+          if (!Array.isArray(parsedSpecifications)) {
+            parsedSpecifications = [];
+          } else {
+            parsedSpecifications = parsedSpecifications.map(spec => ({
+              group: spec?.group || '',
+              title: spec?.title || '',
+              content: spec?.content || ''
+            }));
+          }
+        } catch (error) {
+          parsedSpecifications = [];
+          message.error("Lỗi định dạng dữ liệu thông số kỹ thuật nhận được.");
         }
-    };
+      } else if (Array.isArray(product.specifications)) {
+         parsedSpecifications = product.specifications.map(spec => ({
+             group: spec?.group || '',
+             title: spec?.title || '',
+             content: spec?.content || ''
+         }));
+      }
 
-    return (
-        <div style={{ width: 1200 }}>
-            <h2 style={{ marginTop: 0, marginBottom: 10, textAlign: 'center', fontSize: '24px' }}>
-                Chỉnh sửa Sản Phẩm
-            </h2>
+      form.setFieldsValue({
+        productName: product.productName,
+        description: product.description,
+        weight: product.weight,
+        price: product.price,
+        categoryName: product.categoryName,
+        brandName: product.brandName,
+        supportRushOrder: product.supportRushOrder || false,
+        specifications: parsedSpecifications,
+      });
 
-            <Form
-                name="chinhSuaSanPham"
-                labelCol={{ span: 4 }}
-                wrapperCol={{ span: 20 }}
-                initialValues={{
-                    ...product,
-                    description: product.description.join('\n'),
-                    specifications: product.specifications.join('\n'),
-                }}
-                onFinish={onFinish}
-                onFinishFailed={onFinishFailed}
-                autoComplete="off"
-            >
-                <Row gutter={16}>
-                    <Col span={12}>
-                        <Form.Item
-                            label="Tên"
-                            name="name"
-                            rules={[{ required: true, message: 'Hãy nhập tên sản phẩm!' }]}
-                        >
-                            <Input />
-                        </Form.Item>
-                        <Form.Item
-                            label="Loại"
-                            name="category"
-                            rules={[{ required: true, message: 'Hãy nhập loại hàng hóa!' }]}
-                        >
-                            <Input />
-                        </Form.Item>
-                        <Form.Item label="Nhà sản xuất">
-                            <Row justify="center">
-                                <Col span={16}>
-                                    <Form.Item
-                                        label="Tên"
-                                        name={['brand', 'name']}
-                                        required
-                                        rules={[
-                                            {
-                                                required: true,
-                                                message: 'Hãy nhập tên hãng sản xuất!',
-                                            },
-                                        ]}
-                                        labelCol={{ span: 5 }}
-                                        wrapperCol={{ span: 19 }}
-                                    >
-                                        <Input />
-                                    </Form.Item>
-                                    <Form.Item
-                                        label="Url ảnh"
-                                        name={['brand', 'image']}
-                                        labelCol={{ span: 5 }}
-                                        wrapperCol={{ span: 19 }}
-                                        style={{
-                                            marginBottom: 0,
-                                        }}
-                                    >
-                                        <Input
-                                            onChange={(e) => {
-                                                setProductImage(e.target.value);
-                                            }}
-                                        />
-                                    </Form.Item>
-                                </Col>
-                                <Col
-                                    span={8}
-                                    style={{
-                                        display: 'flex',
-                                        justifyContent: 'center',
-                                    }}
-                                >
-                                    {productImage && (
-                                        <Image
-                                            height={100}
-                                            width={100}
-                                            style={{
-                                                objectFit: 'contain',
-                                                borderRadius: '10px',
-                                                border: '1px solid #ccc',
-                                            }}
-                                            src={productImage}
-                                            fallback="data:image/png;base64,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"
-                                        />
-                                    )}
-                                </Col>
-                            </Row>
-                        </Form.Item>
-                        <Form.Item
-                            label="Thông tin"
-                            name="description"
-                            rules={[{ required: true, message: 'Hãy nhập thông tin sản phẩm!' }]}
-                        >
-                            <Input.TextArea rows={4} />
-                        </Form.Item>
-                        <Form.Item
-                            label="Thông số"
-                            name="specifications"
-                            rules={[{ required: true, message: 'Hãy nhập thông số sản phẩm!' }]}
-                        >
-                            <Input.TextArea rows={4} />
-                        </Form.Item>
-                        <Form.Item
-                            label="Giá"
-                            name="price"
-                            wrapperCol={{ span: 12 }}
-                            rules={[{ required: true, message: 'Hãy nhập giá sản phẩm!' }]}
-                        >
-                            <InputNumber
-                                min={0}
-                                addonAfter="₫"
-                                formatter={(value) => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
-                            />
-                        </Form.Item>
-                    </Col>
-                    <Col span={12} style={{ paddingLeft: 10 }}>
-                        <h3 style={{ margin: 0 }}>Biến thể</h3>
-                        {variants.map((variant) => (
-                            <div key={variant.key} style={{ marginBottom: 8 }}>
-                                <Divider style={{ margin: 10, borderTopColor: '#b0d169' }} dashed />
-                                <Row>
-                                    <Col span={17}>
-                                        <Form.Item
-                                            label="Màu sắc"
-                                            required
-                                            labelCol={{ span: 6 }}
-                                            wrapperCol={{ span: 17 }}
-                                        >
-                                            <Input
-                                                placeholder="Màu sắc"
-                                                value={variant.color}
-                                                onChange={(e) =>
-                                                    handleVariantChange(variant.key, 'color', e.target.value)
-                                                }
-                                            />
-                                        </Form.Item>
-                                        <Form.Item label="Url ảnh" labelCol={{ span: 6 }} wrapperCol={{ span: 17 }}>
-                                            <Input
-                                                value={variant.image}
-                                                onChange={(e) => {
-                                                    handleVariantChange(variant.key, 'image', e.target.value);
-                                                }}
-                                            />
-                                        </Form.Item>
-                                        <Form.Item
-                                            label="Số lượng"
-                                            labelCol={{ span: 6 }}
-                                            rules={[{ required: true, message: 'Hãy nhập số lượng!' }]}
-                                        >
-                                            <InputNumber
-                                                min={0}
-                                                value={variant.quantity}
-                                                onChange={(value) =>
-                                                    handleVariantChange(variant.key, 'quantity', value)
-                                                }
-                                            />
-                                        </Form.Item>
-                                        <Form.Item label="Giảm giá" labelCol={{ span: 6 }} style={{ marginBottom: 0 }}>
-                                            <InputNumber
-                                                min={0}
-                                                addonAfter="%"
-                                                value={variant.sale}
-                                                onChange={(value) => handleVariantChange(variant.key, 'sale', value)}
-                                            />
-                                        </Form.Item>
-                                    </Col>
-                                    <Col span={5}>
-                                        {variant.image && (
-                                            <Image
-                                                height={100}
-                                                width={100}
-                                                style={{
-                                                    objectFit: 'contain',
-                                                    borderRadius: '10px',
-                                                    border: '1px solid #ccc',
-                                                }}
-                                                src={variant.image}
-                                                fallback="data:image/png;base64,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"
-                                            />
-                                        )}
-                                    </Col>
-                                    <Col span={2} style={{ display: 'flex', alignItems: 'center' }}>
-                                        <Button
-                                            type="dashed"
-                                            onClick={() => removeVariant(variant.key)}
-                                            icon={<MinusCircleOutlined />}
-                                        />
-                                    </Col>
-                                </Row>
-                            </div>
-                        ))}
+      const initialBrandData = brandOptions.find(
+        (b) => b.value === product.brandName
+      );
+      setSelectedBrandImage(initialBrandData ? initialBrandData.image : null);
 
-                        <Button
-                            type="dashed"
-                            onClick={addVariant}
-                            icon={<PlusOutlined />}
-                            style={{ width: '100%', marginBottom: 20 }}
-                        >
-                            Thêm biến thể
-                        </Button>
-                    </Col>
-                </Row>
-                <Form.Item
-                    wrapperCol={{
-                        offset: 21,
-                        span: 3,
-                    }}
-                    style={{ marginBottom: 0 }}
-                >
-                    <Space>
-                        <Button type="primary" htmlType="submit">
-                            OK
-                        </Button>
-                        <Button
-                            type="default"
-                            onClick={() =>
-                                setModalChild(<ProductDetails product={product} setModalChild={setModalChild} />)
-                            }
-                        >
-                            Cancel
-                        </Button>
-                    </Space>
-                </Form.Item>
-            </Form>
-        </div>
+      setVariants((product?.variants || []).map((variant, index) => ({
+        key: variant.variantId || `existing_${index}`,
+        variantId: variant.variantId,
+        color: variant.color || "",
+        imageUrl: variant.imageUrl || "",
+        stockQuantity: variant.stockQuantity ?? 0,
+        discountPercentage: variant.discountPercentage ?? 0,
+      })));
+    }
+  }, [product, form, brandOptions, categoryOptions]);
+
+  const handleBrandChange = (value) => {
+    const selectedBrand = brandOptions.find((b) => b.value === value);
+    setSelectedBrandImage(selectedBrand ? selectedBrand.image : null);
+
+    if (value !== undefined) {
+        form.setFieldsValue({ brandName: value });
+    } else {
+        form.setFieldsValue({ brandName: undefined });
+        setSelectedBrandImage(null);
+    }
+  };
+
+  const onFinishFailed = (errorInfo) => {
+    message.error("Vui lòng kiểm tra lại các trường thông tin còn thiếu hoặc không hợp lệ.");
+  };
+
+  const addVariant = () => {
+    setVariants([
+      ...variants,
+      {
+        key: `new_${Date.now()}_${variants.length}`,
+        variantId: undefined,
+        color: "",
+        imageUrl: "",
+        stockQuantity: 0,
+        discountPercentage: 0,
+      },
+    ]);
+  };
+
+  const removeVariant = (keyToRemove) => {
+    if (variants.length <= 1) {
+      message.warning("Sản phẩm phải có ít nhất một biến thể.");
+      return;
+    }
+    setVariants(variants.filter((variant) => variant.key !== keyToRemove));
+  };
+
+  const handleVariantChange = (key, field, value) => {
+    setVariants(
+      variants.map((variant) =>
+        variant.key === key ? { ...variant, [field]: value } : variant
+      )
     );
+  };
+
+  const onFinish = async (values) => {
+    if (!product || !product.productId) {
+      message.error("ID sản phẩm không hợp lệ để cập nhật.");
+      return;
+    }
+
+    const invalidVariant = variants.some(
+      (v) => !v.color || v.stockQuantity === null || v.stockQuantity === undefined || v.stockQuantity < 0
+    );
+    if (invalidVariant) {
+      message.error(
+        "Vui lòng nhập đầy đủ thông tin hợp lệ (Màu sắc, Số lượng >= 0) cho tất cả các biến thể!"
+      );
+      return;
+    }
+
+    const invalidSpecification = (values.specifications || []).some(spec => !spec || !spec.group || !spec.title || !spec.content);
+    if (invalidSpecification) {
+        message.error('Vui lòng nhập đầy đủ thông tin (Nhóm, Tiêu đề, Nội dung) cho tất cả các thông số kỹ thuật!');
+        const firstInvalidSpecIndex = (values.specifications || []).findIndex(spec => !spec || !spec.group || !spec.title || !spec.content);
+        if (firstInvalidSpecIndex !== -1) {
+            const fieldName = ['specifications', firstInvalidSpecIndex, 'group'];
+             try {
+                 form.scrollToField(fieldName);
+             } catch(e){}
+        }
+        return;
+    }
+
+    try {
+      const specificationsString = JSON.stringify(values.specifications || []);
+
+      const data = {
+        productId: product.productId,
+        productName: values.productName || "",
+        description: values.description || "",
+        weight: values.weight ?? 0,
+        price: values.price ?? 0,
+        categoryName: values.categoryName || "",
+        brandName: values.brandName || "",
+        supportRushOrder: values.supportRushOrder || false,
+        specifications: specificationsString,
+        variants: variants.map((variant) => ({
+          ...(variant.variantId && { variantId: variant.variantId }),
+          color: variant.color,
+          imageUrl: variant.imageUrl || "",
+          stockQuantity: variant.stockQuantity ?? 0,
+          discountPercentage: variant.discountPercentage ?? 0,
+        })),
+      };
+
+      await apiService.updateProduct(data);
+      message.success(`Sản phẩm ${data.productName} đã được cập nhật thành công!`);
+      handleRefresh();
+      setModalChild(null);
+    } catch (e) {
+      const errorMessage =
+        e.response?.data?.message ||
+        e.message ||
+        "Đã xảy ra lỗi khi cập nhật sản phẩm";
+      message.error(errorMessage);
+    }
+  };
+
+  if (!product) {
+    return <div>Đang tải dữ liệu sản phẩm...</div>;
+  }
+
+  return (
+    <div style={{ width: "80vw", maxWidth: "1200px", minWidth: "700px", margin: "auto" }}>
+      <Form
+        form={form}
+        name="chinhSuaSanPham"
+        layout="vertical"
+        onFinish={onFinish}
+        onFinishFailed={onFinishFailed}
+        autoComplete="off"
+      >
+        <Row gutter={24}>
+          <Col xs={24} md={12}>
+            <Form.Item label="Tên Sản Phẩm" name="productName" rules={[{ required: true, message: "Vui lòng nhập tên sản phẩm!" }]}>
+              <Input />
+            </Form.Item>
+
+            <Form.Item label="Danh Mục" name="categoryName" rules={[{ required: true, message: "Vui lòng chọn danh mục!" }]}>
+              <Select
+                showSearch
+                placeholder="Chọn danh mục"
+                optionFilterProp="label"
+                filterOption={(input, option) => (option?.label ?? '').toLowerCase().includes(input.toLowerCase())}
+                options={categoryOptions}
+              />
+            </Form.Item>
+
+            <Form.Item label="Thương Hiệu" name="brandName" rules={[{ required: true, message: "Vui lòng chọn thương hiệu!" }]}>
+              <Row gutter={16} align="middle">
+                <Col flex="auto">
+                  <Select
+                    showSearch
+                    placeholder="Chọn thương hiệu"
+                    optionFilterProp="label"
+                    filterOption={(input, option) => (option?.label ?? '').toLowerCase().includes(input.toLowerCase())}
+                    options={brandOptions}
+                    onChange={handleBrandChange}
+                    style={{ width: "100%" }}
+                    allowClear
+                    onClear={() => handleBrandChange(undefined)}
+                  />
+                </Col>
+                <Col>
+                  {selectedBrandImage && (
+                    <div style={{ height: "32px", display: "flex", alignItems: "center", marginLeft: "8px" }}>
+                      <Image height={32} src={selectedBrandImage} preview={false} style={{ objectFit: "contain", border: "1px solid #d9d9d9", borderRadius: "4px", padding: "2px" }} />
+                    </div>
+                  )}
+                </Col>
+              </Row>
+            </Form.Item>
+
+            <Form.Item label="Mô tả sản phẩm" name="description" rules={[{ required: true, message: "Vui lòng nhập mô tả!" }]}>
+              <Input.TextArea rows={4} />
+            </Form.Item>
+
+            <Row gutter={16}>
+              <Col xs={24} sm={12}>
+                <Form.Item label="Giá Gốc (VNĐ)" name="price" rules={[{ required: true, message: "Vui lòng nhập giá sản phẩm!" }, { type: "number", min: 0, message: "Giá phải là số không âm!" }]}>
+                  <InputNumber min={0} formatter={(value) => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")} parser={(value) => value.replace(/\$\s?|(,*)/g, "")} style={{ width: "100%" }} />
+                </Form.Item>
+              </Col>
+              <Col xs={24} sm={12}>
+                <Form.Item label="Cân nặng (kg)" name="weight" rules={[{ required: true, message: "Vui lòng nhập cân nặng!" }, { type: "number", min: 0, message: "Cân nặng phải là số không âm!" }]}>
+                  <InputNumber min={0} step={0.1} style={{ width: "100%" }} />
+                </Form.Item>
+              </Col>
+            </Row>
+
+            <Form.Item name="supportRushOrder" valuePropName="checked">
+              <Checkbox>Hỗ trợ giao hàng nhanh</Checkbox>
+            </Form.Item>
+
+            <Divider>Thông số kỹ thuật</Divider>
+
+            <Form.List name="specifications">
+              {(fields, { add, remove }, { errors }) => (
+                <>
+                  {fields.map(({ key, name, ...restField }) => (
+                    <Space key={key} style={{ display: 'flex', marginBottom: 8, alignItems: 'baseline' }} align="baseline">
+                      <Form.Item {...restField} name={[name, 'group']} rules={[{ required: true, message: 'Nhập nhóm' }]}>
+                        <Input placeholder="Nhóm" />
+                      </Form.Item>
+                      <Form.Item {...restField} name={[name, 'title']} rules={[{ required: true, message: 'Nhập tiêu đề' }]}>
+                        <Input placeholder="Tiêu đề" />
+                      </Form.Item>
+                      <Form.Item {...restField} name={[name, 'content']} rules={[{ required: true, message: 'Nhập nội dung' }]}>
+                        <Input placeholder="Nội dung" />
+                      </Form.Item>
+                      <MinusCircleOutlined onClick={() => remove(name)} title="Xóa thông số này" />
+                    </Space>
+                  ))}
+                  <Form.Item>
+                    <Button type="dashed" onClick={() => add({ group: '', title: '', content: '' })} block icon={<PlusOutlined />}>
+                      Thêm thông số kỹ thuật
+                    </Button>
+                    <Form.ErrorList errors={errors} />
+                  </Form.Item>
+                </>
+              )}
+            </Form.List>
+          </Col>
+
+          <Col xs={24} md={12}>
+            <h3 style={{ marginBottom: 16, textAlign: "center" }}>Mẫu Sản Phẩm</h3>
+            <div style={{ maxHeight: "65vh", overflowY: "auto", paddingRight: "10px" }}>
+              {variants.map((variant, index) => (
+                <div key={variant.key} style={{ marginBottom: 16, padding: "16px", border: "1px solid #e8e8e8", borderRadius: "8px", position: "relative" }}>
+                  {variants.length > 1 && (
+                    <Button icon={<MinusCircleOutlined />} onClick={() => removeVariant(variant.key)} type="text" danger style={{ position: "absolute", top: 5, right: 5, padding: 5, zIndex: 10 }} title="Xóa biến thể này" />
+                  )}
+                  <Row gutter={16}>
+                    <Col xs={24} sm={14}>
+                      <Form.Item label={`Màu sắc #${index + 1}`} required validateStatus={!variant.color ? "error" : ""} help={!variant.color ? "Vui lòng nhập màu sắc" : ""}>
+                        <Input placeholder="VD: Xanh dương" value={variant.color} onChange={(e) => handleVariantChange(variant.key, "color", e.target.value)} />
+                      </Form.Item>
+                      <Form.Item label={`Url ảnh #${index + 1}`}>
+                        <Input placeholder="https://example.com/anh-mau-san-pham.jpg" value={variant.imageUrl} onChange={(e) => handleVariantChange(variant.key, "imageUrl", e.target.value)} />
+                      </Form.Item>
+                      <Row gutter={8}>
+                        <Col span={12}>
+                          <Form.Item label={`Số lượng #${index + 1}`} required validateStatus={variant.stockQuantity === null || variant.stockQuantity === undefined || variant.stockQuantity < 0 ? "error" : ""} help={variant.stockQuantity === null || variant.stockQuantity === undefined || variant.stockQuantity < 0 ? "SL >= 0" : ""}>
+                            <InputNumber min={0} value={variant.stockQuantity} onChange={(value) => handleVariantChange(variant.key, "stockQuantity", value)} style={{ width: "100%" }} />
+                          </Form.Item>
+                        </Col>
+                        <Col span={12}>
+                          <Form.Item label={`Giảm giá (%) #${index + 1}`} validateStatus={variant.discountPercentage < 0 || variant.discountPercentage > 100 ? "error" : ""} help={variant.discountPercentage < 0 || variant.discountPercentage > 100 ? "Từ 0 đến 100" : ""}>
+                            <InputNumber min={0} max={100} value={variant.discountPercentage} onChange={(value) => handleVariantChange(variant.key, "discountPercentage", value)} style={{ width: "100%" }} />
+                          </Form.Item>
+                        </Col>
+                      </Row>
+                    </Col>
+                    <Col xs={24} sm={10}>
+                      <Form.Item label={`Xem trước #${index + 1}`}>
+                        <div style={{ display: "flex", justifyContent: "center", alignItems: "center", height: "120px", border: "1px dashed #ccc", borderRadius: "4px", overflow: "hidden" }}>
+                          {variant.imageUrl ? (
+                            <Image height={118} src={variant.imageUrl} style={{ objectFit: "contain" }} fallback="/placeholder-image.png" />
+                          ) : (
+                            <span style={{ color: "#bfbfbf" }}>Chưa có ảnh</span>
+                          )}
+                        </div>
+                      </Form.Item>
+                    </Col>
+                  </Row>
+                </div>
+              ))}
+            </div>
+            <Button type="dashed" onClick={addVariant} icon={<PlusOutlined />} style={{ width: "100%", marginTop: 16 }}>Thêm Mẫu Khác</Button>
+          </Col>
+        </Row>
+
+        <Divider style={{ margin: '24px 0' }} />
+
+        <Form.Item style={{ textAlign: "right", marginBottom: 0 }}>
+          <Space>
+            <Button type="default" size="middle" onClick={() => setModalChild(null)}> Hủy Bỏ </Button>
+            <Button type="primary" size="middle" htmlType="submit"> Cập Nhật Sản Phẩm </Button>
+          </Space>
+        </Form.Item>
+      </Form>
+    </div>
+  );
 };
 
 export default EditProduct;

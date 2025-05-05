@@ -4,7 +4,7 @@ import axios from "axios";
 // --- Cấu hình cơ bản ---
 export const base_url = "http://ducable.id.vn:8080";
 const LOGIN_ENDPOINT = "/auth/login";
-const SIGNUP_ENDPOINT = "/auth/register"; // Giả sử
+const SIGNUP_ENDPOINT = "/auth/signup"; // Giả sử
 
 const apiInstance = axios.create({
   baseURL: base_url,
@@ -59,16 +59,21 @@ const apiService = {
   // AUTH
   loginUser: (credentials) => apiInstance.post(LOGIN_ENDPOINT, credentials),
   signupUser: (userData) => apiInstance.post(SIGNUP_ENDPOINT, userData),
-
+  signupWithOtp: (data) => apiInstance.post("/auth/signup-otp", data),
   // USER
   // Hàm này cần username
   getUserInfo: (username) => apiInstance.get(`/user/info/${username}`),
-  // ... (các API user khác giữ nguyên)
+  getUsersByRole: (role) => apiInstance.get(`/user/${role}`),
   updateUserInfo: (data) => apiInstance.put("/user/update", data),
+  deleteUser: (userId) =>
+    apiInstance.delete("/user/delete", {
+      params: { userId },
+    }),
+  setUserRole: (data) => apiInstance.post('/user/set-role', data),
+  // ... (các API user khác giữ nguyên)
   changePassword: (data) => apiInstance.put("/user/change-password", data),
   forgetPassword: (email) => apiInstance.post(`/user/forget-password?email=${encodeURIComponent(email)}`),
   resetPassword: (data) => apiInstance.post("/user/reset-password", data),
-  deleteUser: (userId) => apiInstance.delete(`/user/delete?userId=${userId}`), // Cho admin
 
   // CATEGORY
   // ... (giữ nguyên)
@@ -80,6 +85,14 @@ const apiService = {
   // BRAND
   // ... (giữ nguyên)
   getAllBrands: () => apiInstance.get("/brand/"),
+  getBrandByName: (brandName) =>
+    apiInstance.get("/brand", { params: { brand: brandName } }),
+  addBrand: (data) => apiInstance.post("/brand/add", data),
+  deleteBrand: (brandId) =>
+    apiInstance.delete("/brand/delete", {
+      params: { brandId },
+    }),
+  updateBrand: (data) => apiInstance.put("/brand/update", data),
 
   // PRODUCT
   // ... (giữ nguyên)
@@ -113,6 +126,7 @@ const apiService = {
   getOrderById: (orderId) => apiInstance.get(`/order/view/${orderId}`),
   getOrdersByStatus: (status) => apiInstance.get(`/order/status/${status}`), // Cho admin
   approveOrder: (orderId) => apiInstance.post(`/order/approve/${orderId}`), // Cho admin
+  getAllOrders: () => apiInstance.get('/order/view/all'),
 };
 
 export default apiService;

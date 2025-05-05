@@ -1,161 +1,168 @@
-import React, { useEffect, useState } from "react";
-import { UserOutlined, ProductOutlined, BellOutlined } from "@ant-design/icons";
-import { Badge, Button, Menu } from "antd";
+import React, { useState } from "react";
+import {
+  UserOutlined,
+  BellOutlined,
+  InfoCircleOutlined,
+  TruckOutlined,
+  HddOutlined,
+  LogoutOutlined,
+  MenuFoldOutlined,
+  MenuUnfoldOutlined,
+  AppstoreOutlined,
+} from "@ant-design/icons";
+import { Badge, Button, Menu, Layout, Space, Avatar, Dropdown, Typography } from "antd";
 import AdminUser from "../../Components/AdminPages/AdminUser/AdminUser";
-import AdminProduct from "../../Components/AdminPages/AdminProduct/AdminProduct";
-import boxImage from "./box.png";
-import AdminOrder from "../../Components/AdminPages/AdminOrder/AdminOrder";
-import AdminProfile from "../../Components/AdminPages/AdminProfile/AdminProfile";
+import AdminProduct from "../../components/AdminPages/AdminProduct/AdminProduct";
+import AdminOrder from "../../components/AdminPages/AdminOrder/AdminOrder";
+import AdminBrands from "../../components/AdminPages/AdminBrand/AdminBrands";
+import AdminCategories from "../../components/AdminPages/AdminCategory/AdminCategories";
+import AdminProfile from "../../components/AdminPages/AdminProfile/AdminProfile";
 import styles from "./AdminPage.module.css";
-import { InfoCircleOutlined } from "@ant-design/icons";
-import Tooltip from "./Tooltip ";
-import CustomModal from './CustomModal';
 
+const { Header, Sider, Content } = Layout;
+const { Title } = Typography;
 
 const logout = () => {
-  console.log("User logged out");
   localStorage.clear();
   window.location.href = "/";
 };
 
 function getItem(label, key, icon, children, type) {
-  return {
-    key,
-    icon,
-    children,
-    label,
-    type,
-  };
+  return { key, icon, children, label, type };
 }
 
 const items = [
-  getItem("Sản phẩm", "products", <ProductOutlined />),
+  getItem("Quản lý Sản phẩm", "productSub", <AppstoreOutlined />, [
+    { key: "products", label: "Tất cả Sản phẩm" },
+    { key: "categories", label: "Danh mục" },
+    { key: "brands", label: "Thương hiệu" },
+  ]),
   getItem("Người dùng", "users", <UserOutlined />),
-  getItem("Đơn hàng", "orders", <img src={boxImage} alt="Order" width={14} />),
-  getItem("Thông tin", "profile", <InfoCircleOutlined />),
+  getItem("Đơn hàng", "orders", <TruckOutlined />),
+  getItem("Thông tin Admin", "profile", <InfoCircleOutlined />),
 ];
 
 const Admin = () => {
-  const [users, setUsers] = useState([]);
-  const [selectedUser, setSelectedUser] = useState(null);
-  const [messages, setMessages] = useState([]);
-  const [isTooltipVisible, setTooltipVisible] = useState(false);
-  const [isRead, setIsRead] = useState(true);
   const [keySelected, setKeySelected] = useState("products");
+  const [collapsed, setCollapsed] = useState(false);
+  const [isTooltipVisible, setTooltipVisible] = useState(false);
   const [tooltipPosition, setTooltipPosition] = useState({ top: 0, left: 0 });
-  const [isChatModalVisible, setChatModalVisible] = useState(false);
+  const [isRead, setIsRead] = useState(true);
+
+  // localStorage.setItem("accessToken", "eyJhbGciOiJIUzI1NiJ9.eyJyb2xlIjoiQURNSU4iLCJzdWIiOiJ0cmFuZHVjdGhwdDEiLCJpYXQiOjE3NDY0MDQxMTYsImV4cCI6MTc0NjQwNzcxNn0.AJ8iLWWX6cJMArDhrM3FwD8p1Xn0XzPBL-e9IP4fu6I");
+
+  const toggleCollapsed = () => {
+    setCollapsed(!collapsed);
+  };
 
   const handleBellClick = (event) => {
-    const rect = event.target.getBoundingClientRect();
+    const rect = event.currentTarget.getBoundingClientRect();
     setTooltipPosition({
       top: rect.bottom + window.scrollY + 10,
-      left: rect.left + window.scrollX - 100,
+      left: rect.right + window.scrollX - 200,
     });
     setTooltipVisible((prevVisible) => !prevVisible);
   };
 
-  const handleUserClick = (user) => {
-    setSelectedUser(user);
-    setTooltipVisible(false); // Close tooltip when a user is selected
-    setChatModalVisible(true); // Open chat modal with the selected user
-  };
-
   const handleOnClick = ({ key }) => {
     setKeySelected(key);
+    setTooltipVisible(false);
   };
 
   const renderPage = (key) => {
     switch (key) {
-      case "users":
-        return <AdminUser />;
-      case "products":
-        return <AdminProduct />;
-      case "orders":
-        return <AdminOrder />;
-      case "profile":
-        return <AdminProfile />;
-      default:
-        return <></>;
+      case "users": return <AdminUser />;
+      case "products": return <AdminProduct />;
+      case "categories": return <AdminCategories />;
+      case "brands": return <AdminBrands />;
+      case "orders": return <AdminOrder />;
+      case "profile": return <AdminProfile />;
+      default: return <AdminProduct />;
     }
   };
 
-  return (
-    <>
-      <header className={styles.header}>
-        <h1 className={styles.headerTitle}>Admin</h1>
-        <div style={{ display: "flex", alignItems: "center" }}>
-          <div style={{ position: "relative" }}>
-            <Badge dot={!isRead} offset={[-10, 10]}>
-              <Button
-                ghost
-                shape="circle"
-                icon={<BellOutlined />}
-                onClick={handleBellClick}
-              />
-            </Badge>
+  const userMenuItems = [
+    {
+      key: 'profileLink',
+      label: 'Xem hồ sơ',
+      icon: <UserOutlined />,
+      onClick: () => {
+          setKeySelected('profile');
+          setTooltipVisible(false);
+      }
+    },
+    {
+      key: 'logout',
+      label: 'Đăng xuất',
+      icon: <LogoutOutlined />,
+      danger: true,
+      onClick: logout,
+    },
+  ];
 
-            <Tooltip
-              className="tooltip"
-              visible={isTooltipVisible}
-              position={tooltipPosition}
-              onClose={() => setTooltipVisible(false)}
-              content={
-                <div>
-                  <h4>Người dùng nhắn tin:</h4>
-                  <ul style={{ margin: 5, padding: 0, listStyle: "none" }}>
-                    {users.map((user) => (
-                      <li
-                        key={user.id}
-                        style={{
-                          padding: "8px",
-                          cursor: "pointer",
-                          background: "#f9f9f9",
-                          borderRadius: "4px",
-                          marginBottom: "5px",
-                        }}
-                        onClick={() => handleUserClick(user)}
-                      >
-                        <div style={{ fontWeight: "bold", marginBottom: "4px" }}>
-                          ID: {user.id}
-                        </div>
-                        <div style={{ color: "#333" }}>
-                          Tin nhắn: {user.mes}
-                        </div>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              }
-            />
-          </div>
-          <Button
-            ghost
-            onClick={logout}
-            style={{ marginLeft: 10, marginRight: 40 }}
-          >
-            Đăng xuất
-          </Button>
+  return (
+    <Layout style={{ minHeight: '100vh' }}>
+      <Header className={styles.header}>
+        <div className={styles.logoArea}>
+           <Title level={3} className={styles.headerTitle}>Admin Dashboard</Title>
         </div>
-      </header>
-      <div>
-        <div className={styles.menuContainer}>
-          <Menu
-            mode="inline"
-            selectedKeys={[keySelected]}
-            style={{ height: "100%" }}
-            items={items}
-            onClick={handleOnClick}
-          />
+
+        <div className={styles.headerRight}>
+          <Space size="middle" align="center">
+            <div style={{ position: "relative" }}>
+                <Badge dot={!isRead} offset={[-5, 5]} >
+                    <Button
+                        type="text"
+                        shape="circle"
+                        icon={<BellOutlined className={styles.headerIcon}/>}
+                        onClick={handleBellClick}
+                    />
+                </Badge>
+            </div>
+
+            <Dropdown menu={{ items: userMenuItems }} placement="bottomRight" arrow trigger={['click']}>
+                <a onClick={(e) => e.preventDefault()} className={styles.avatarLink}>
+                    <Space>
+                        <Avatar size="default" icon={<UserOutlined />} className={styles.avatar}/>
+                    </Space>
+                </a>
+            </Dropdown>
+          </Space>
         </div>
-        <div className={styles.content}>
-          <div
-            style={{ height: "calc(100vh - 120px - 40px)", overflowY: "auto" }}
-          >
-            {renderPage(keySelected)}
-          </div>
-        </div>
-      </div>
-    </>
+      </Header>
+
+      <Layout>
+        <Sider
+           trigger={null}
+           collapsible
+           collapsed={collapsed}
+           width={220}
+           className={styles.sidebar}
+           theme="dark"
+        >
+           <Menu
+              mode="inline"
+              theme="dark"
+              selectedKeys={[keySelected]}
+              style={{ height: 'calc(100% - 48px)', borderRight: 0, overflowY: 'auto', overflowX: 'hidden' }}
+              items={items}
+              onClick={handleOnClick}
+           />
+           <Button
+             type="text"
+             icon={collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
+             onClick={toggleCollapsed}
+             className={styles.collapseButton}
+           />
+        </Sider>
+
+        <Layout className={styles.contentLayout}>
+            <Content className={styles.contentWrapper}>
+                {renderPage(keySelected)}
+            </Content>
+        </Layout>
+      </Layout>
+    </Layout>
   );
 };
 

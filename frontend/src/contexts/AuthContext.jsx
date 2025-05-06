@@ -1,219 +1,233 @@
 import React, { createContext, useState, useContext, useEffect } from 'react';
-import Spinner from '../components/Spinner/Spinner'; // Import Spinner
-import { useNavigate, useLocation } from 'react-router-dom';
-
-// Dữ liệu người dùng giả lập (thay bằng logic thật)
-const fakeUsers = {
-  adminUser: { id: 'adm1', username: 'Admin', role: 'admin' },
-  pmUser: { id: 'pm1', username: 'ProductMgr', role: 'productmanager' },
-  normalUser: { id: 'usr1', username: 'Customer', role: 'user' }, // Role người dùng thường
-};
-const fakeAuth = {
-  token: 'fake-jwt-token', // Token xác thực giả
-  expiresIn: '1h' // Thời gian hết hạn 
-};
+import apiService from '../services/api';
+import Spinner from '../components/Spinner/Spinner';
 
 const AuthContext = createContext();
 
-export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(null); // null: chưa đăng nhập, object: đã đăng nhập
-  const [isLoading, setIsLoading] = useState(true); // Trạng thái kiểm tra đăng nhập ban đầu
-
-  // Giả lập kiểm tra trạng thái đăng nhập khi tải ứng dụng (ví dụ: kiểm tra token)
-  useEffect(() => {
-    setIsLoading(true);
-    // --- Logic kiểm tra thật sẽ ở đây ---
-    // Ví dụ: đọc token từ localStorage, gọi API /me để lấy user info
-    // --- Kết thúc logic thật ---
-
-    // --- Giả lập: Lấy user từ localStorage nếu có ---
-    const storedUserType = localStorage.getItem('loggedInUserType'); // Ví dụ: 'admin', 'pm', 'user'
-    if (storedUserType === 'admin') {
-      setUser(fakeUsers.adminUser);
-    } else if (storedUserType === 'pm') {
-      setUser(fakeUsers.pmUser);
-    } else if (storedUserType === 'user') {
-      setUser(fakeUsers.normalUser);
-    } else {
-      setUser(null);
-    }
-    // --- Kết thúc giả lập ---
-
-    // Giả lập độ trễ
-    const timer = setTimeout(() => {
-      setIsLoading(false);
-    }, 500); // Giảm thời gian chờ nếu cần
-
-    return () => clearTimeout(timer);
-  }, []);
-
-
-  const login = async (username, password) => {
-    setIsLoading(true);
-    try {
-      await new Promise(resolve => setTimeout(resolve, 500));
-      let loggedInUser = null;
-      if (username === 'admin' && password === 'admin123') {
-        loggedInUser = fakeUsers.adminUser;
-      } else if (username === 'pm' && password === 'pm123') {
-        loggedInUser = fakeUsers.pmUser;
-      } else if (username === 'user' && password === 'user123') {
-        loggedInUser = fakeUsers.normalUser;
-      } else {
-        throw new Error('Tên đăng nhập hoặc mật khẩu không đúng');
-      }
-
-      // Lưu vào localStorage
-      localStorage.setItem('authToken', token);
-      localStorage.setItem('loggedInUserType', user.role); // lưu 'admin', 'productManager', 'user'
-
-      // Cập nhật user context
-      setUser(loggedInUser);
-
-      return loggedInUser; // trả về user để phía UI có thể điều hướng theo role nếu muốn
-    } catch (error) {
-      console.error('Login error:', error);
-      throw error;
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-
-  // --- Hàm đăng xuất ---
-  const logout = () => {
-    setIsLoading(true);
-    setTimeout(() => {
-      setUser(null);
-      localStorage.removeItem('loggedInUserType');
-      localStorage.removeItem('authToken');
-      setIsLoading(false);
-    }, 200);
-  };
-
-  //-- Hàm đổi mật khẩu 
-  const changePassword = async (newPassword) => {
-    try {
-      await new Promise(resolve => setTimeout(resolve, 500));
-      alert('Đổi mật khẩu thành công!');
-      return true;
-    } catch (error) {
-      console.error('Lỗi khi đổi mật khẩu:', error);
-      alert('Lỗi khi đổi mật khẩu!');
-      throw error;
-    }
-  };
-
-
-  //hàm đăng ký
-  const signup = async (userData) => {
-    setIsLoading(true);
-    try {
-      await new Promise(resolve => setTimeout(resolve, 500));
-
-      // Giả lập tạo user mới
-      const newUser = {
-        id: `usr${Math.floor(Math.random() * 1000)}`,
-        username: userData.username,
-        role: 'user'
+// --- Hàm fetchUserInfo (Giả sử API trả về đầy đủ trừ username và role cần chuẩn hóa) ---
+const fetchUserInfo = async (username) => {
+  if (!username) throw new Error("Thiếu username để fetch info.");
+  try {
+    const response = await apiService.getUserInfo(username);
+    if (response?.data && typeof response.data === 'object' && response.data.role) {
+      return {
+        ...response.data,
+        username: username, // Thêm username
+        role: String(response.data.role).toLowerCase() // Chuẩn hóa role
       };
-
-      localStorage.setItem('authToken', fakeAuth.token);
-      localStorage.setItem('loggedInUserType', newUser.role);
-      setUser(newUser);
-
-      return true;
-    } catch (err) {
-      console.error('Signup error:', err);
-      throw err;
-    } finally {
-      setIsLoading(false);
+    } else {
+      throw new Error("Dữ liệu user info không hợp lệ từ API.");
     }
-  };
-  //hàm lấy otp
-  const useOtp = (onSuccessCallback) => {
-    const [otp, setOtp] = useState(new Array(6).fill(''));
-    const [secondsLeft, setSecondsLeft] = useState(300);
-
-    useEffect(() => {
-      if (secondsLeft === 0) return;
-      const timer = setInterval(() => setSecondsLeft((prev) => prev - 1), 1000);
-      return () => clearInterval(timer);
-    }, [secondsLeft]);
-
-    const formatTime = () => {
-      const minutes = Math.floor(secondsLeft / 60);
-      const seconds = secondsLeft % 60;
-      return `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
-    };
-
-    const handleChange = (element, index) => {
-      if (isNaN(element.value)) return;
-      let newOtp = [...otp];
-      newOtp[index] = element.value;
-      setOtp(newOtp);
-      if (element.nextSibling) element.nextSibling.focus();
-    };
-
-    const handleSubmit = (e) => {
-      e.preventDefault();
-      const otpCode = otp.join('');
-      if (otpCode === '123456') {
-        if (onSuccessCallback) onSuccessCallback();
-      } else {
-        alert('OTP không đúng!');
-      }
-    };
-    return {
-      otp,
-      secondsLeft,
-      formatTime,
-      handleChange,
-      handleSubmit,
-    };
+  } catch (error) {
+    console.error(`Lỗi fetch user info cho ${username}:`, error);
+    throw error; // Ném lỗi lên
   }
-  //hàm nhập email
-  const EmailInput = () => {
-    const [email, setEmail] = useState('');
-    const navigate = useNavigate();
-    const location = useLocation();
-
-    const searchParams = new URLSearchParams(location.search);
-    const type = searchParams.get('type');
-
-    const handleSubmit = (e) => {
-      e.preventDefault();
-
-      //thêm validate email ở đây
-
-      // encodeURIComponent để tránh lỗi URL khi có ký tự lạ
-      navigate(`/otp?type=${type}&email=${encodeURIComponent(email)}`);
-    };
-
-    return {
-      email,
-      setEmail,
-      handleSubmit,
-      type,
-    };
-  };
-
-  const value = {
-    user,
-    isAuthenticated: !!user, // True nếu user khác null
-    isLoading,
-    login,
-    logout,
-    changePassword,
-    signup,
-    useOtp,
-    EmailInput
-  };
-
-  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
 
-// Custom hook để sử dụng AuthContext
+export const AuthProvider = ({ children }) => {
+  const [user, setUser] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
+
+  const logout = (triggeredByError = false) => { // Thêm tham số để biết logout do lỗi hay do người dùng
+    if (!triggeredByError) console.log("[AuthContext] Logging out (user action)...");
+    else console.warn("[AuthContext] Logging out due to error or invalid state...");
+
+    localStorage.removeItem('accessToken');
+    localStorage.removeItem('refreshToken');
+    localStorage.removeItem('pendingUsername');
+    localStorage.removeItem('userData'); // Quan trọng: Xóa user data khi logout
+    setUser(null);
+  };
+
+  // Kiểm tra Auth khi tải ứng dụng
+  useEffect(() => {
+    const checkAuthStatus = async () => {
+      const token = localStorage.getItem('accessToken');
+      let usernameFromStorage = null;
+
+      // Ưu tiên lấy username từ userData đã lưu
+      const storedUserData = localStorage.getItem('userData');
+      if (storedUserData) {
+        try {
+          usernameFromStorage = JSON.parse(storedUserData)?.username;
+        } catch (e) {
+          console.error("Lỗi parse userData, sẽ xóa:", e);
+          localStorage.removeItem('userData'); // Xóa data lỗi
+        }
+      }
+
+      // Nếu không có username từ userData, thử lấy từ pending (ít xảy ra khi hoạt động đúng)
+      if (!usernameFromStorage) {
+        usernameFromStorage = localStorage.getItem('pendingUsername');
+      }
+
+      if (token && usernameFromStorage) {
+        console.log(`[AuthContext] Auth Check: Found token & username (${usernameFromStorage}). Validating...`);
+        try {
+          // Gọi API để xác thực token VÀ lấy thông tin user mới nhất
+          const currentUserInfo = await fetchUserInfo(usernameFromStorage);
+          if (currentUserInfo && currentUserInfo.role) {
+            setUser(currentUserInfo);
+            localStorage.setItem('userData', JSON.stringify(currentUserInfo)); // Cập nhật data mới nhất
+            localStorage.removeItem('pendingUsername'); // Dọn dẹp pending
+            console.log("[AuthContext] Auth Check: Valid session restored.", currentUserInfo);
+          } else {
+            // API trả về data không hợp lệ
+            console.warn("[AuthContext] Auth Check: Fetched user info is invalid.");
+            logout(true); // Logout do trạng thái không hợp lệ
+          }
+        } catch (error) {
+          // API fetchUserInfo lỗi (vd: 401 do token hết hạn)
+          console.error("[AuthContext] Auth Check: Error fetching user info.", error);
+          logout(true); // Logout do lỗi xác thực
+        }
+      } else {
+        // Không có token hoặc không có username -> không thể khôi phục session
+        console.log("[AuthContext] Auth Check: No valid token or username found.");
+        if (user !== null) setUser(null); // Đảm bảo user state là null nếu không có session
+        // Không cần gọi logout() ở đây nữa vì các giá trị đã là null/không tồn tại
+      }
+      setIsLoading(false); // Kết thúc kiểm tra
+    };
+
+    checkAuthStatus();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // Chỉ chạy 1 lần
+
+  // --- Hàm Đăng nhập ---
+  const login = async (username, password) => {
+    console.log(`[AuthContext] Attempting login: ${username}`);
+    localStorage.removeItem('pendingUsername'); // Xóa cái cũ
+    localStorage.removeItem('userData');      // Xóa data cũ
+
+    // Lưu username tạm thời để gọi API info sau khi có token
+    localStorage.setItem('pendingUsername', username);
+
+    try {
+      const loginResponse = await apiService.login({ username, password });
+      const token = loginResponse.data?.accessToken;
+      const refreshToken = loginResponse.data?.refreshToken;
+
+      if (!token) throw new Error('Không nhận được token xác thực.');
+
+      localStorage.setItem('accessToken', token);
+      if (refreshToken) localStorage.setItem('refreshToken', refreshToken);
+      console.log("[AuthContext] Login: Token received and stored.");
+
+      // Lấy thông tin user ngay sau khi có token
+      const userInfo = await fetchUserInfo(username); // Dùng username vừa nhập
+
+      if (userInfo && userInfo.role) {
+        setUser(userInfo);
+        localStorage.setItem('userData', JSON.stringify(userInfo)); // Lưu user data đầy đủ
+        localStorage.removeItem('pendingUsername'); // Xóa username tạm
+        console.log("[AuthContext] Login: User state updated:", userInfo);
+        return userInfo; // Trả về cho LoginPage
+      } else {
+        // Lỗi không mong muốn: Có token nhưng không lấy được info hợp lệ
+        throw new Error("Không thể lấy thông tin tài khoản.");
+      }
+    } catch (error) {
+      console.error("[AuthContext] Login failed:", error);
+      logout(true); // Dọn dẹp triệt để khi login lỗi
+      const message = error.response?.data?.message ||
+        (error.response?.status === 401 ? 'Sai tên đăng nhập hoặc mật khẩu' : null) ||
+        error.message ||
+        'Đăng nhập thất bại.';
+      throw new Error(message); // Ném lỗi cho LoginPage hiển thị
+    }
+  };
+  const preSignup = async (data) => {
+    console.log("[AuthContext] Attempting pre-signup with data:", data);
+    try {
+      const response = await apiService.requestSignup(data); // Bạn cần tạo hàm này trong apiService
+      console.log("[AuthContext] Pre-signup success:", response);
+      return response.data;
+    } catch (error) {
+      console.error("[AuthContext] Pre-signup error:", error);
+      const message = error.response?.data?.message || error.message || "Gửi email OTP không thành công.";
+      throw new Error(message);
+    }
+  };
+  // --- Hàm Đăng ký ---
+  const signup = async (signupData) => {
+    // Code hàm signup giữ nguyên
+    console.log("[AuthContext] Attempting signup with data:", signupData);
+    try {
+      const response = await apiService.signupWithOtp(signupData);
+      console.log("[AuthContext] API Signup Response:", response);
+      if (response.status === 200 || response.status === 201) {
+        console.log("[AuthContext] Signup successful");
+        return response.data;
+      } else {
+        console.error("[AuthContext] Signup API returned unexpected status:", response.status, response.data);
+        throw new Error("Đăng ký không thành công.");
+      }
+    } catch (error) {
+      console.error("[AuthContext] Context Signup Error:", error);
+      const message = error.response?.data?.message || error.message || "Đăng ký không thành công.";
+      throw new Error(message);
+    }
+  };
+  // --- Hàm Quên Mật Khẩu ---
+  const forgetPassword = async (email) => {
+    console.log("[AuthContext] Sending forget password request for:", email);
+    try {
+      const response = await apiService.forgetPassword(email);
+      console.log("[AuthContext] Forget password response:", response);
+      return response.data || "OTP đã được gửi đến email của bạn.";
+    } catch (error) {
+      console.error("[AuthContext] Forget password error:", error);
+      const message = error.response?.data?.message || error.message || "Không thể gửi OTP.";
+      throw new Error(message);
+    }
+  };
+
+  const resetPassword = async (data) => {
+    try {
+      const response = await apiService.resetPassword(data);
+      return response.data;
+    } catch (error) {
+      // Xử lý lỗi trả về từ server
+      const message = error.response?.data?.message || 'Đặt lại mật khẩu thất bại.';
+      throw new Error(message);
+    }
+  };
+  // đổi mật khẩu
+  const changePassword = async ({ currentPassword, newPassword }) => {
+    try {
+      const storedUser = JSON.parse(localStorage.getItem('userData'));
+      const email = storedUser?.email;
+
+      if (!email) throw new Error('Không tìm thấy email người dùng.');
+
+      const response = await apiService.changePassword({
+        email,
+        currentPassword,
+        newPassword
+      });
+
+      console.log('[AuthContext] Password changed:', response.data);
+      return response.data;
+    } catch (error) {
+      console.error('[AuthContext] Change password error:', error);
+      const message = error.response?.data?.message || error.message || 'Đổi mật khẩu thất bại.';
+      throw new Error(message);
+    }
+  };
+
+
+  // Giá trị context
+  const value = { user, isAuthenticated: !!user, isLoading, login, logout, preSignup, signup, forgetPassword, resetPassword, changePassword };
+
+  // Render children khi loading xong, hoặc luôn render và để ProtectedRoute xử lý
+  return <AuthContext.Provider value={value}>{!isLoading ? children : null}</AuthContext.Provider>;
+  // Hoặc nếu muốn hiện spinner toàn trang:
+  // if (isLoading) return <div style={{...}}><Spinner size="large" /></div>;
+  // return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
+};
+
+// Custom hook
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (context === undefined) {
@@ -221,3 +235,4 @@ export const useAuth = () => {
   }
   return context;
 };
+

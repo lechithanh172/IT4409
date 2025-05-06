@@ -1,0 +1,315 @@
+/* --- Container bao ngoài trang --- */
+.pageContainer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    padding: 1.5rem;
+    background-image: linear-gradient(135deg, #a1c4fd 0%, #c2e9fb 100%);
+    /* Gradient nhẹ nhàng, khác LoginPage */
+    box-sizing: border-box;
+    overflow: hidden;
+}
+
+/* --- Card đăng ký --- */
+.signupCard {
+    display: flex;
+    width: 100%;
+    max-width: 900px;
+    background-color: #ffffff;
+    border-radius: 20px;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.15);
+    overflow: hidden;
+    animation: slideUp 0.6s ease-out forwards;
+    opacity: 0;
+}
+
+@keyframes slideUp {
+    from {
+        transform: translateY(20px);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+/* --- Cột trang trí bên trái --- */
+.decorativeSide {
+    flex-basis: 45%;
+    background: linear-gradient(to bottom, #a1c4fd 0%, #c2e9fb 100%);
+    /* Gradient đồng bộ với pageContainer */
+    padding: 3rem 2rem;
+    color: #fff;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    border-top-left-radius: 20px;
+    border-bottom-left-radius: 20px;
+}
+
+.decorativeSide .logoPlaceholder {
+    font-size: 2rem;
+    font-weight: bold;
+    margin-bottom: 1.5rem;
+    opacity: 0.9;
+}
+
+.decorativeSide h3 {
+    font-size: 1.6rem;
+    margin-bottom: 1rem;
+    font-weight: 600;
+    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.decorativeSide p {
+    font-size: 1rem;
+    line-height: 1.6;
+    opacity: 0.9;
+}
+
+/* --- Cột Form bên phải --- */
+.formSide {
+    flex-basis: 55%;
+    padding: 3rem 2.5rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+/* --- Form --- */
+.signupForm {
+    width: 100%;
+    max-width: 380px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+}
+
+/* --- Tiêu đề và phụ đề trong Form --- */
+.title {
+    text-align: left;
+    color: #1a3b5d;
+    margin: 0 0 0.5rem 0;
+    font-size: 1.7rem;
+    font-weight: 700;
+}
+
+.subtitle {
+    text-align: left;
+    margin: 0 0 2rem 0;
+    color: #7f8c8d;
+    font-size: 0.95rem;
+}
+
+/* --- Input Group --- */
+.inputGroup {
+    margin-bottom: 1.2rem;
+    position: relative;
+}
+
+.label {
+    display: block;
+    margin-bottom: 0.4rem;
+    color: #4a5568;
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+.inputWrapper {
+    position: relative;
+}
+
+.inputIcon {
+    position: absolute;
+    top: 50%;
+    left: 15px;
+    transform: translateY(-50%);
+    color: #cbd5e0;
+    font-size: 1.1rem;
+    pointer-events: none;
+    z-index: 1;
+}
+
+/* --- Input Fields --- */
+.input {
+    width: 100%;
+    padding: 0.9rem 0.9rem 0.9rem 3rem;
+    font-size: 1rem;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    box-sizing: border-box;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+    color: #2d3748;
+    background-color: #f7fafc;
+}
+
+.input::placeholder {
+    color: #a0aec0;
+}
+
+.input:focus {
+    outline: none;
+    border-color: #63b3ed;
+    background-color: #fff;
+    box-shadow: 0 0 0 3px rgba(99, 179, 237, 0.2);
+}
+
+/* --- Error Message --- */
+.error {
+    color: #e53e3e;
+    background-color: #fed7d7;
+    border: 1px solid #feb2b2;
+    padding: 0.8rem 1rem;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    margin: 0 0 1rem 0;
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    text-align: left;
+}
+
+.error svg {
+    flex-shrink: 0;
+    font-size: 1.1rem;
+}
+
+/* --- Submit Button --- */
+.submitButton {
+    width: 100%;
+    padding: 0.9rem 1rem !important;
+    background-image: linear-gradient(to right, #48bb78 0%, #38a169 100%);
+    /* Gradient xanh lá */
+    color: white !important;
+    border: none !important;
+    border-radius: 8px !important;
+    font-size: 1.05rem !important;
+    font-weight: 600 !important;
+    cursor: pointer;
+    transition: all 0.3s ease !important;
+    display: inline-flex !important;
+    align-items: center;
+    justify-content: center;
+    gap: 0.6rem !important;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.submitButton:hover:not(:disabled) {
+    background-image: linear-gradient(to right, #38a169 0%, #48bb78 100%);
+    box-shadow: 0 7px 20px rgba(72, 187, 120, 0.4) !important;
+    transform: translateY(-3px) !important;
+}
+
+.submitButton:active:not(:disabled) {
+    transform: translateY(-1px) !important;
+    box-shadow: 0 4px 10px rgba(72, 187, 120, 0.3) !important;
+}
+
+.submitButton:disabled {
+    background: #e2e8f0 !important;
+    color: #a0aec0 !important;
+    cursor: not-allowed;
+    transform: none !important;
+    box-shadow: none !important;
+}
+
+.submitButton:disabled .spinner>div {
+    border-left-color: #a0aec0 !important;
+}
+
+/* --- Login Link Container --- */
+.loginLinkContainer {
+    margin-top: 2rem;
+    text-align: center;
+    font-size: 0.9rem;
+    color: #718096;
+}
+
+.link {
+    color: #4299e1;
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.2s ease;
+}
+
+.link:hover {
+    color: #2b6cb0;
+    text-decoration: underline;
+}
+
+.loginLink {
+    font-weight: 600;
+    margin-left: 0.4rem;
+}
+
+/* --- Responsive --- */
+@media (max-width: 850px) {
+    .decorativeSide {
+        display: none;
+    }
+
+    .formSide {
+        flex-basis: 100%;
+        padding: 2.5rem 2rem;
+    }
+
+    .signupCard {
+        max-width: 450px;
+        flex-direction: column;
+    }
+}
+
+@media (max-width: 480px) {
+    .pageContainer {
+        padding: 1rem;
+    }
+
+    .signupCard {
+        padding: 0;
+        border-radius: 15px;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    }
+
+    .formSide {
+        padding: 2rem 1.2rem;
+    }
+
+    .title {
+        font-size: 1.6rem;
+    }
+
+    .subtitle {
+        font-size: 0.9rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .input {
+        font-size: 0.95rem;
+        padding: 0.8rem 0.8rem 0.8rem 2.5rem;
+    }
+
+    .inputIcon {
+        left: 12px;
+        font-size: 1rem;
+    }
+
+    .submitButton {
+        padding: 0.8rem !important;
+        font-size: 1rem !important;
+    }
+
+    .error {
+        font-size: 0.85rem;
+        padding: 0.7rem 0.9rem;
+    }
+
+    .loginLinkContainer {
+        font-size: 0.85rem;
+    }
+}

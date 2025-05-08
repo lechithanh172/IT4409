@@ -234,6 +234,7 @@ public class ProductService {
         productVariantRepository.deleteById(variantId);
         return true;
     }
+    public List<ProductDTO> searchProductsByPriceRange(String brandName) {}
 
 
 

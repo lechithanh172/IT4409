@@ -58,4 +58,13 @@ public class CartController {
         }
         return ResponseEntity.status(404).body(new StatusResponse("Not found product variant"));
     }
+    @PostMapping("/remove-all")
+    public ResponseEntity<?> deleteAllCartItems(@RequestHeader("Authorization") String token) {
+        Optional<User> user = userService.getInfo(token);
+        if(user.isPresent()) {
+            cartService.deleteAllCartItems(user.get().getUserId());
+            return ResponseEntity.status(200).body(new StatusResponse("Deleted cart items successfully"));
+        }
+        else return ResponseEntity.status(404).body(new StatusResponse("Not found user"));
+    }
 }

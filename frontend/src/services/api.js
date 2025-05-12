@@ -70,20 +70,17 @@ const apiService = {
       params: { userId },
     }),
   setUserRole: (data) => apiInstance.post('/user/set-role', data),
-  // ... (các API user khác giữ nguyên)
   changePassword: (data) => apiInstance.put("/user/change-password", data),
   forgetPassword: (email) => apiInstance.post(`/user/forget-password?email=${encodeURIComponent(email)}`),
   resetPassword: (data) => apiInstance.post("/user/reset-password", data),
 
   // CATEGORY
-  // ... (giữ nguyên)
   updateCategory: (data) => apiInstance.put("/category/update", data),
   deleteCategory: (categoryId) => apiInstance.delete(`/category/delete?categoryId=${categoryId}`),
   getProductsByCategory: (categoryName) => apiInstance.get(`/product/category=${encodeURIComponent(categoryName)}`),
   getAllCategories: () => apiInstance.get("/category/"),
 
   // BRAND
-  // ... (giữ nguyên)
   getAllBrands: () => apiInstance.get("/brand/"),
   getBrandByName: (brandName) =>
     apiInstance.get("/brand", { params: { brand: brandName } }),
@@ -95,8 +92,7 @@ const apiService = {
   updateBrand: (data) => apiInstance.put("/brand/update", data),
 
   // PRODUCT
-  // ... (giữ nguyên)
-   addProduct: (data) => apiInstance.post("/product/add", data),
+  addProduct: (data) => apiInstance.post("/product/add", data),
   updateProduct: (data) => apiInstance.put("/product/update", data),
   deleteProduct: (productId) => apiInstance.delete(`/product/delete?productId=${productId}`),
   searchProducts: (keyword) => apiInstance.get(`/product/search=${encodeURIComponent(keyword)}`),
@@ -104,7 +100,6 @@ const apiService = {
   getAllProducts: () => apiInstance.get("/product/all"),
 
   // CART ITEM
-  // ... (giữ nguyên hoặc điều chỉnh endpoint/payload)
   getCartItems: () => apiInstance.get("/cart-item/"),
   addToCart: (data) => apiInstance.post("/cart-item/add", data),
   updateCartItem: (data) => apiInstance.put("/cart-item/update", data),
@@ -119,7 +114,6 @@ const apiService = {
   vnPayCreate: (data) => apiInstance.post("/api/vnpay/create", data),
   //
   // ORDER
-  // ... (giữ nguyên)
   createOrder: (data) => apiInstance.post("/order/create", data),
   getOrderItems: (orderId) => apiInstance.get(`/order/get-items/${orderId}`),
   getOrderHistory: (username) => apiInstance.get(`/order/history/${username}`),

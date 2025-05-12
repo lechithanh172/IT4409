@@ -260,7 +260,7 @@ const AdminProduct = () => {
       title: "Thương hiệu",
       dataIndex: "brandName",
       key: "brandName",
-      width: 120,
+      width: 150,
       sorter: (a, b) => (a.brandName || "").localeCompare(b.brandName || ""),
       ...getColumnSearchProps("brandName", "thương hiệu"),
       ellipsis: true,
@@ -371,8 +371,8 @@ const AdminProduct = () => {
           onClick={() =>
             setModalChild(
               <AddProduct
-                setModalChild={setModalChild}
-                handleRefresh={onRefresh}
+                closeModal={() => setModalChild(null)}
+                onProductAdded={onRefresh}
                 categoriesList={categoriesList}
                 brandsList={brandsList}
               />

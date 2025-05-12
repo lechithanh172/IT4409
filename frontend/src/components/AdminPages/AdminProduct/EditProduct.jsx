@@ -12,9 +12,13 @@ import {
   Image,
   Select,
   Checkbox,
+  Card,
+  Typography,
 } from "antd";
 import { PlusOutlined, MinusCircleOutlined } from "@ant-design/icons";
 import apiService from "../../../services/api";
+
+const { Text } = Typography;
 
 const EditProduct = ({ product, setModalChild, handleRefresh, categoriesList = [], brandsList = [] }) => {
   const [form] = Form.useForm();
@@ -53,24 +57,34 @@ const EditProduct = ({ product, setModalChild, handleRefresh, categoriesList = [
           parsedSpecifications = JSON.parse(product.specifications);
           if (!Array.isArray(parsedSpecifications)) {
             parsedSpecifications = [];
-          } else {
-            parsedSpecifications = parsedSpecifications.map(spec => ({
-              group: spec?.group || '',
-              title: spec?.title || '',
-              content: spec?.content || ''
-            }));
           }
         } catch (error) {
           parsedSpecifications = [];
           message.error("Lỗi định dạng dữ liệu thông số kỹ thuật nhận được.");
         }
       } else if (Array.isArray(product.specifications)) {
-         parsedSpecifications = product.specifications.map(spec => ({
-             group: spec?.group || '',
-             title: spec?.title || '',
-             content: spec?.content || ''
-         }));
+         parsedSpecifications = product.specifications;
       }
+
+      // Chuyển đổi dữ liệu specifications thành định dạng nhóm
+      const specificationGroups = [];
+      const groupMap = new Map();
+
+      parsedSpecifications.forEach(spec => {
+        if (spec.group && spec.title && spec.content) {
+          if (!groupMap.has(spec.group)) {
+            groupMap.set(spec.group, {
+              groupName: spec.group,
+              details: []
+            });
+            specificationGroups.push(groupMap.get(spec.group));
+          }
+          groupMap.get(spec.group).details.push({
+            title: spec.title,
+            content: spec.content
+          });
+        }
+      });
 
       form.setFieldsValue({
         productName: product.productName,
@@ -80,7 +94,7 @@ const EditProduct = ({ product, setModalChild, handleRefresh, categoriesList = [
         categoryName: product.categoryName,
         brandName: product.brandName,
         supportRushOrder: product.supportRushOrder || false,
-        specifications: parsedSpecifications,
+        specificationGroups: specificationGroups.length > 0 ? specificationGroups : [{ groupName: "", details: [{ title: "", content: "" }] }],
       });
 
       const initialBrandData = brandOptions.find(
@@ -161,21 +175,38 @@ const EditProduct = ({ product, setModalChild, handleRefresh, categoriesList = [
       return;
     }
 
-    const invalidSpecification = (values.specifications || []).some(spec => !spec || !spec.group || !spec.title || !spec.content);
-    if (invalidSpecification) {
-        message.error('Vui lòng nhập đầy đủ thông tin (Nhóm, Tiêu đề, Nội dung) cho tất cả các thông số kỹ thuật!');
-        const firstInvalidSpecIndex = (values.specifications || []).findIndex(spec => !spec || !spec.group || !spec.title || !spec.content);
-        if (firstInvalidSpecIndex !== -1) {
-            const fieldName = ['specifications', firstInvalidSpecIndex, 'group'];
-             try {
-                 form.scrollToField(fieldName);
-             } catch(e){}
+    const specificationsArray = [];
+    let hasSpecError = false;
+    if (values.specificationGroups && Array.isArray(values.specificationGroups)) {
+      values.specificationGroups.forEach(groupItem => {
+        if (groupItem && groupItem.groupName?.trim()) {
+          if (!groupItem.details || groupItem.details.length === 0 || groupItem.details.every(d => !d?.title?.trim() || !d?.content?.trim())) {
+            hasSpecError = true;
+          } else {
+            groupItem.details.forEach(detail => {
+              if (detail && detail.title?.trim() && detail.content?.trim()) {
+                specificationsArray.push({
+                  group: groupItem.groupName.trim(),
+                  title: detail.title.trim(),
+                  content: detail.content.trim(),
+                });
+              } else if (detail && (detail.title?.trim() || detail.content?.trim())) {
+                hasSpecError = true;
+              }
+            });
+          }
+        } else if (groupItem && groupItem.details && groupItem.details.some(d => d?.title?.trim() || d?.content?.trim())) {
+            hasSpecError = true;
         }
+      });
+    }
+     if (hasSpecError) {
+        message.error("Vui lòng hoàn thành tất cả các trường cho thông số kỹ thuật đã thêm, bao gồm Tên Nhóm, Tiêu đề và Nội dung cho mỗi chi tiết.");
         return;
     }
 
     try {
-      const specificationsString = JSON.stringify(values.specifications || []);
+      const specificationsString = JSON.stringify(specificationsArray);
 
       const data = {
         productId: product.productId,
@@ -287,37 +318,84 @@ const EditProduct = ({ product, setModalChild, handleRefresh, categoriesList = [
 
             <Divider>Thông số kỹ thuật</Divider>
 
-            <Form.List name="specifications">
-              {(fields, { add, remove }, { errors }) => (
-                <>
-                  {fields.map(({ key, name, ...restField }) => (
-                    <Space key={key} style={{ display: 'flex', marginBottom: 8, alignItems: 'baseline' }} align="baseline">
-                      <Form.Item {...restField} name={[name, 'group']} rules={[{ required: true, message: 'Nhập nhóm' }]}>
-                        <Input placeholder="Nhóm" />
-                      </Form.Item>
-                      <Form.Item {...restField} name={[name, 'title']} rules={[{ required: true, message: 'Nhập tiêu đề' }]}>
-                        <Input placeholder="Tiêu đề" />
-                      </Form.Item>
-                      <Form.Item {...restField} name={[name, 'content']} rules={[{ required: true, message: 'Nhập nội dung' }]}>
-                        <Input placeholder="Nội dung" />
-                      </Form.Item>
-                      <MinusCircleOutlined onClick={() => remove(name)} title="Xóa thông số này" />
-                    </Space>
-                  ))}
-                  <Form.Item>
-                    <Button type="dashed" onClick={() => add({ group: '', title: '', content: '' })} block icon={<PlusOutlined />}>
-                      Thêm thông số kỹ thuật
+            <Form.List
+                name="specificationGroups"
+                rules={[{
+                    validator: async (_, groups) => {
+                        if (!groups || groups.length < 1) { return; }
+                        const invalidGroup = groups.some(group => group && group.groupName?.trim() && (!group.details || group.details.length === 0 || group.details.every(d => !d?.title?.trim() || !d?.content?.trim())));
+                        if (invalidGroup) {
+                            return Promise.reject(new Error('Mỗi nhóm thông số đã tạo tên phải có ít nhất một chi tiết (Tiêu đề & Nội dung) hợp lệ.'));
+                        }
+                    }
+                }]}
+            >
+                {(groupFields, { add: addGroup, remove: removeGroup }, { errors: groupErrors }) => (
+                    <div style={{ display: 'flex', flexDirection: 'column', rowGap: 16 }}>
+                    {groupFields.map(({ key: groupKey, name: groupName }) => (
+                        <Card key={groupKey} size="small" type="inner" title={`Nhóm Thông Số ${groupFields.length > 1 ? `#${groupKey + 1}` : ''}`}
+                            extra={
+                                <Button type="text" danger onClick={() => removeGroup(groupName)} icon={<MinusCircleOutlined />} title="Xóa nhóm này"/>
+                            }
+                        >
+                        <Form.Item
+                            name={[groupName, "groupName"]}
+                            label="Tên Nhóm"
+                            rules={[{ required: true, message: "Tên nhóm không được trống!" }, { whitespace: true, message: "Tên nhóm không được trống!" }]}
+                            style={{marginBottom: 12}}
+                        >
+                            <Input placeholder="Ví dụ: Màn hình, Cấu hình & Bộ nhớ..." size="large"/>
+                        </Form.Item>
+
+                        <Form.List 
+                            name={[groupName, "details"]}
+                            rules={[{
+                                validator: async (_, details) => {
+                                    if (!details || details.length < 1) {
+                                        return Promise.reject(new Error('Thêm ít nhất một chi tiết cho nhóm này.'));
+                                    }
+                                    const invalidDetail = details.some(d => (!d || !d.title?.trim() || !d.content?.trim()) && (d?.title?.trim() || d?.content?.trim()));
+                                    if (invalidDetail) {
+                                        return Promise.reject(new Error('Tiêu đề và Nội dung của chi tiết không được để trống nếu một trong hai có giá trị.'));
+                                    }
+                                }
+                            }]}
+                        >
+                            {(detailFields, { add: addDetail, remove: removeDetail }, { errors: detailErrors }) => (
+                            <div style={{ display: 'flex', flexDirection: 'column', rowGap: 10 }}>
+                                {detailFields.map(({ key: detailKey, name: detailName }) => (
+                                <Space key={detailKey} style={{ display: 'flex', alignItems: 'center' }} align="center">
+                                    <Form.Item name={[detailName, "title"]} style={{ flex: 1, marginBottom: 0 }} rules={[{ required: true, message: "!"}, { whitespace: true, message: "!" }]}>
+                                        <Input placeholder="Tiêu đề (VD: Kích thước)" size="large"/>
+                                    </Form.Item>
+                                    <Text style={{margin: '0 8px'}}>:</Text>
+                                    <Form.Item name={[detailName, "content"]} style={{ flex: 2, marginBottom: 0 }} rules={[{ required: true, message: "!"}, { whitespace: true, message: "!" }]}>
+                                        <Input placeholder="Nội dung (VD: 6.7 inch)" size="large"/>
+                                    </Form.Item>
+                                    <Button type="text" danger onClick={() => removeDetail(detailName)} icon={<MinusCircleOutlined />} title="Xóa chi tiết này" style={{padding: '4px 8px'}}/>
+                                </Space>
+                                ))}
+                                <Button type="dashed" onClick={() => addDetail({ title: "", content: "" })} block icon={<PlusOutlined />} style={{marginTop: 8}}>
+                                Thêm chi tiết
+                                </Button>
+                                <Form.ErrorList errors={detailErrors} />
+                            </div>
+                            )}
+                        </Form.List>
+                        </Card>
+                    ))}
+                    <Button type="dashed" onClick={() => addGroup({ groupName: "", details: [{ title: "", content: "" }] })} block icon={<PlusOutlined />} style={{marginTop: 16}}>
+                        Thêm Nhóm Thông Số Khác
                     </Button>
-                    <Form.ErrorList errors={errors} />
-                  </Form.Item>
-                </>
-              )}
+                     <Form.ErrorList errors={groupErrors} />
+                    </div>
+                )}
             </Form.List>
           </Col>
 
           <Col xs={24} md={12}>
             <h3 style={{ marginBottom: 16, textAlign: "center" }}>Mẫu Sản Phẩm</h3>
-            <div style={{ maxHeight: "65vh", overflowY: "auto", paddingRight: "10px" }}>
+            <div style={{ overflowY: "auto", paddingRight: "10px" }}>
               {variants.map((variant, index) => (
                 <div key={variant.key} style={{ marginBottom: 16, padding: "16px", border: "1px solid #e8e8e8", borderRadius: "8px", position: "relative" }}>
                   {variants.length > 1 && (

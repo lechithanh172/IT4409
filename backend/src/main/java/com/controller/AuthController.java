@@ -1,22 +1,21 @@
 package com.controller;
 
-import com.entity.User;
 import com.request.LoginRequest;
 import com.request.SignUpOTPRequest;
 import com.request.SignUpRequest;
+import com.request.TokenRefreshRequest;
 import com.response.StatusResponse;
-import com.service.JwtService;
-import com.service.OtpService;
-import com.service.UserService;
+import com.response.TokenResponse;
+import com.service.*;
+import com.entity.User;
+import org.hibernate.Version;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.io.UnsupportedEncodingException;
+import java.util.List;
 import java.util.Optional;
 
 @RequestMapping("/auth")
@@ -69,5 +68,13 @@ public class AuthController {
             return ResponseEntity.status(401).body(new StatusResponse("Wrong password"));
         }
         return ResponseEntity.status(200).body(jwtService.generateTokenWithUserDetails(user.get()));
+    }
+    @PostMapping("refresh-token")
+    public ResponseEntity<?> refreshToken(@RequestBody TokenRefreshRequest request) {
+        try {
+            return ResponseEntity.status(200).body(jwtService.refreshToken(request.getRefreshToken()));
+        } catch (Exception e) {
+            return ResponseEntity.status(400).body(new StatusResponse("Refresh token fail"));
+        }
     }
 }

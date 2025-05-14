@@ -99,6 +99,41 @@ public class JwtService {
             return false;
         }
     }
+
+    public TokenResponse refreshToken(String refreshToken) {
+        if (!isTokenValid(refreshToken)) {
+            throw new IllegalArgumentException("Refresh token is invalid or expired");
+        }
+
+        Claims claims = extractAllClaims(refreshToken);
+        String username = claims.getSubject();
+        String roleStr = claims.get("role", String.class);
+        Role role = Role.valueOf(roleStr);
+
+        // Tạo access token mới
+        Map<String, Object> newClaims = new HashMap<>();
+        newClaims.put("role", role.name());
+
+        String newAccessToken = Jwts.builder()
+                .setClaims(newClaims)
+                .setSubject(username)
+                .setIssuedAt(new Date())
+                .setExpiration(new Date(System.currentTimeMillis() + ACCESS_TOKEN_EXPIRATION))
+                .signWith(getSignKey(), SignatureAlgorithm.HS256)
+                .compact();
+
+        // Có thể dùng lại refreshToken cũ, hoặc tạo refresh token mới tuỳ nhu cầu
+        // Trong ví dụ này, tạo refresh token mới
+//        String newRefreshToken = Jwts.builder()
+//                .setClaims(newClaims)
+//                .setSubject(username)
+//                .setIssuedAt(new Date())
+//                .setExpiration(new Date(System.currentTimeMillis() + REFRESH_TOKEN_EXPIRATION))
+//                .signWith(getSignKey(), SignatureAlgorithm.HS256)
+//                .compact();
+
+        return new TokenResponse(newAccessToken);
+    }
 }
 
 

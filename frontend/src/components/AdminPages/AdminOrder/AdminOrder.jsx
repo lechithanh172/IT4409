@@ -1,264 +1,662 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { Button, Modal, Space, Table, message, Input } from 'antd';
-import { SearchOutlined, DeleteFilled, ExclamationCircleFilled } from '@ant-design/icons';
-import Highlighter from 'react-highlight-words';
-import OrderDetails from './OrderDetails';
-import axios from 'axios'; // Import axios for API requests
-import apiService from '../../../services/api';
+import React, { useEffect, useRef, useState, useCallback } from "react";
+import {
+  Button,
+  Modal,
+  Space,
+  Table,
+  message,
+  Input,
+  Tag,
+  Select,
+  Dropdown,
+  Menu,
+  Typography,
+  Spin,
+  Tooltip,
+} from "antd";
+import {
+  SearchOutlined,
+  EditOutlined,
+  EyeOutlined,
+} from "@ant-design/icons";
+import Highlighter from "react-highlight-words";
+import OrderDetails from "./OrderDetails";
+import apiService from "../../../services/api";
 
+const { Text } = Typography;
 
-// Helper function to format date
+const STATUS_DETAILS = {
+  PENDING: { label: "Chờ xử lý", color: "gold" },
+  APPROVED: { label: "Đã duyệt", color: "lime" },
+  REJECTED: { label: "Bị từ chối", color: "error" },
+  SHIPPING: { label: "Đang giao", color: "processing" },
+  DELIVERED: { label: "Đã giao", color: "success" },
+};
+
+const OrderStatusTag = ({ status }) => {
+  const statusUpper = status?.toUpperCase();
+  const details = STATUS_DETAILS[statusUpper] || {
+    label: status || "N/A",
+    color: "default",
+  };
+  return <Tag color={details.color}>{details.label}</Tag>;
+};
+
+const VALID_STATUS_TRANSITIONS = {
+  PENDING: ["APPROVED", "REJECTED"],
+  APPROVED: ["SHIPPING", "REJECTED"],
+  SHIPPING: ["DELIVERED", "REJECTED"],
+  DELIVERED: [],
+  REJECTED: ["PENDING", "APPROVED"],
+};
+
 function formatDate(isoString) {
+  if (!isoString) return "N/A";
+  try {
     const date = new Date(isoString);
-    const day = String(date.getDate()).padStart(2, '0');
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const year = date.getFullYear();
-    const hours = String(date.getHours()).padStart(2, '0');
-    const minutes = String(date.getMinutes()).padStart(2, '0');
-    const seconds = String(date.getSeconds()).padStart(2, '0');
-    return `${hours}:${minutes}:${seconds}\n${day}/${month}/${year}`;
+    if (isNaN(date.getTime())) return "N/A";
+    return date.toLocaleString("vi-VN", {
+      hour: "2-digit",
+      minute: "2-digit",
+      second: "2-digit",
+      day: "2-digit",
+      month: "2-digit",
+      year: "numeric",
+      hour12: false,
+    });
+  } catch (error) {
+    return "Invalid Date";
+  }
 }
 
+const formatCurrency = (value) => {
+  if (typeof value !== "number" || isNaN(value)) return "N/A";
+  return new Intl.NumberFormat("vi-VN", {
+    style: "currency",
+    currency: "VND",
+  }).format(value);
+};
+
 const AdminOrder = () => {
-    const [refresh, setRefresh] = useState(false);
-    const [orders, setOrders] = useState([]);
-    const [modalChild, setModalChild] = useState(null);
-    const [loading, setLoading] = useState(false);
+  const [processedOrders, setProcessedOrders] = useState([]);
+  const [displayedOrders, setDisplayedOrders] = useState([]);
+  const [detailsModalContent, setDetailsModalContent] = useState({
+    visible: false,
+    orderId: null,
+  });
+  const [loading, setLoading] = useState(true);
+  const [statusFilter, setStatusFilter] = useState("all");
+  const [loadingAction, setLoadingAction] = useState(null);
+  const [searchText, setSearchText] = useState("");
+  const [searchedColumn, setSearchedColumn] = useState("");
+  const searchInput = useRef(null);
 
-    useEffect(() => {
-        const fetchData = async () => {
-            setLoading(true);
-            try {
-                // Lấy token từ localStorage hoặc cookie
-                const token = localStorage.getItem('authToken');
+  const [confirmModalState, setConfirmModalState] = useState({
+    visible: false,
+    record: null,
+    targetStatus: null,
+    isLoading: false,
+  });
 
-                if (!token) {
-                    message.error('Bạn cần đăng nhập để truy cập dữ liệu!');
-                    return;
-                }
-                // Gửi yêu cầu API với Authorization header
-                const response = await apiService.getAllOrders();
-                // Map the order data for table display
-                const ordersData = response.data.map((order) => ({
-                    maDonHang: order._id,
-                    userName: order.userId.userName,
-                    ngayDat: formatDate(order.createdAt),
-                    items: order.items,
-                    paymentMethod: order.paymentMethod,
-                    paymentStatus: order.paymentStatus,
-                    orderStatus: order.orderStatus,
-                    totalAmount: order.totalAmount,
-                    order: order,
-                }));
+  const fetchData = useCallback(
+    async (showSuccessMessage = false) => {
+      setLoading(true);
+      if (!loadingAction) {
+        setProcessedOrders([]);
+        setDisplayedOrders([]);
+      }
+      try {
+        const [orderResponse, userResponse] = await Promise.all([
+          apiService.getAllOrders(),
+          apiService.getUsersByRole("CUSTOMER"),
+        ]);
+        const fetchedOrders = orderResponse?.data || [];
+        const fetchedUsers = userResponse?.data || [];
 
-                setOrders(ordersData);
-            } catch (error) {
-                console.error(error);
-                message.error('Không thể lấy dữ liệu đơn hàng!');
-            } finally {
-                setLoading(false);
-            }
-        };
+        if (!Array.isArray(fetchedOrders))
+          throw new Error("Dữ liệu đơn hàng trả về không hợp lệ.");
 
-        fetchData();
-    }, [refresh]);
+        const userMap = new Map(
+          fetchedUsers.map((user) => [user.userId, user])
+        );
 
-    const onRefresh = () => {
-        setRefresh((prev) => !prev);
-    };
+        const finalProcessedData = fetchedOrders.map((order) => {
+          const itemsAmount = order.totalAmount ?? 0;
+          const shippingFee = order.shippingFee ?? 0;
+          const calculatedGrandTotal = itemsAmount + shippingFee;
 
-    const deleteOrder = async (record) => {
-        try {
-            await apiService.deleteOrder(record._id);
+          return {
+            key: order.orderId,
+            orderId: order.orderId,
+            userId: order.userId,
+            userName: userMap.get(order.userId)?.username || "N/A",
+            formattedCreatedAt: formatDate(order.createdAt),
+            paymentMethod: order.paymentMethod || "N/A",
+            status: order.status?.toUpperCase() || "PENDING",
+            totalAmount: calculatedGrandTotal,
+          };
+        });
 
-            const updatedOrders = orders.filter((order) => order.maDonHang !== record.maDonHang);
-            setOrders(updatedOrders);
-            message.success(`Đã hủy đơn hàng của: ${record.userName}`);
-        } catch (error) {
-            console.error(error);
-            message.error(`Hủy đơn hàng thất bại: Mã ${record.maDonHang}`);
+        setProcessedOrders(finalProcessedData);
+
+        const ordersToDisplay =
+          statusFilter === "all"
+            ? finalProcessedData
+            : finalProcessedData.filter(
+                (o) => o.status.toLowerCase() === statusFilter.toLowerCase()
+              );
+        setDisplayedOrders(ordersToDisplay);
+
+        if (showSuccessMessage) {
+          message.success(
+            `Tải lại danh sách ${finalProcessedData.length} đơn hàng thành công.`
+          );
         }
-    };
+      } catch (error) {
+        message.error(
+          `Lỗi tải dữ liệu: ${error.message || "Lỗi không xác định"}`
+        );
+        setProcessedOrders([]);
+        setDisplayedOrders([]);
+      } finally {
+        setLoading(false);
+      }
+    },
+    [statusFilter, loadingAction]
+  );
 
-    const [searchText, setSearchText] = useState('');
-    const [searchedColumn, setSearchedColumn] = useState('');
-    const searchInput = useRef(null);
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
 
-    const handleSearch = (selectedKeys, confirm, dataIndex) => {
-        confirm();
-        setSearchText(selectedKeys[0]);
-        setSearchedColumn(dataIndex);
-    };
+  useEffect(() => {
+    if (!loading) {
+      const ordersToDisplay =
+        statusFilter === "all"
+          ? processedOrders
+          : processedOrders.filter(
+              (order) =>
+                order.status.toLowerCase() === statusFilter.toLowerCase()
+            );
+      setDisplayedOrders(ordersToDisplay);
+    }
+  }, [statusFilter, processedOrders, loading]);
 
-    const getColumnSearchProps = (dataIndex) => ({
-        filterDropdown: ({ setSelectedKeys, selectedKeys, confirm, clearFilters, close }) => (
-            <div
-                style={{
-                    padding: 8,
-                }}
-                onKeyDown={(e) => e.stopPropagation()}
-            >
-                <Input
-                    ref={searchInput}
-                    placeholder={`Search ${dataIndex}`}
-                    value={selectedKeys[0]}
-                    onChange={(e) => setSelectedKeys(e.target.value ? [e.target.value] : [])}
-                    onPressEnter={() => handleSearch(selectedKeys, confirm, dataIndex)}
-                    style={{
-                        marginBottom: 8,
-                        display: 'block',
-                    }}
-                />
-                <Space>
-                    <Button
-                        type="primary"
-                        onClick={() => handleSearch(selectedKeys, confirm, dataIndex)}
-                        icon={<SearchOutlined />}
-                        size="small"
-                        style={{
-                            width: 90,
-                        }}
-                    >
-                        Search
-                    </Button>
-                    <Button
-                        onClick={() => {
-                            clearFilters && clearFilters();
-                            confirm();
-                            setSearchText('');
-                            setSearchedColumn(dataIndex);
-                        }}
-                        size="small"
-                        style={{
-                            width: 90,
-                        }}
-                    >
-                        Reset
-                    </Button>
-                    <Button
-                        type="link"
-                        size="small"
-                        onClick={() => {
-                            close();
-                        }}
-                    >
-                        close
-                    </Button>
-                </Space>
-            </div>
-        ),
-        filterIcon: (filtered) => (
-            <SearchOutlined
-                style={{
-                    color: filtered ? '#1677ff' : undefined,
-                }}
-            />
-        ),
-        onFilter: (value, record) => record[dataIndex].toString().toLowerCase().includes(value.toLowerCase()),
-        onFilterDropdownOpenChange: (visible) => {
-            if (visible) {
-                setTimeout(() => searchInput.current?.select(), 100);
-            }
-        },
-        render: (text) =>
-            searchedColumn === dataIndex ? (
-                <Highlighter
-                    highlightStyle={{
-                        backgroundColor: '#ffc069',
-                        padding: 0,
-                    }}
-                    searchWords={[searchText]}
-                    autoEscape
-                    textToHighlight={text ? text.toString() : ''}
-                />
-            ) : (
-                text
-            ),
+  const onRefresh = useCallback(() => {
+    fetchData(true);
+  }, [fetchData]);
+
+  const handleApplyStatus = useCallback(
+    async (orderId, currentStatus, newStatus) => {
+      if (loadingAction === orderId) {
+        return;
+      }
+
+      if (!orderId || !currentStatus || !newStatus) {
+        return;
+      }
+
+      const currentStatusUpper = currentStatus?.toUpperCase();
+      const validTransitions =
+        VALID_STATUS_TRANSITIONS[currentStatusUpper] || [];
+
+      if (!validTransitions.includes(newStatus)) {
+        const warningMsg = `Không thể chuyển từ trạng thái '${
+          STATUS_DETAILS[currentStatusUpper]?.label || currentStatus
+        }' sang '${STATUS_DETAILS[newStatus]?.label || newStatus}'.`;
+        message.warning(warningMsg);
+        return;
+      }
+
+      setLoadingAction(orderId);
+      setConfirmModalState((prev) => ({ ...prev, isLoading: true }));
+
+      const originalProcessedOrders = [...processedOrders];
+
+      const updatedProcessedOrders = processedOrders.map((order) =>
+        order.orderId === orderId ? { ...order, status: newStatus } : order
+      );
+      setProcessedOrders(updatedProcessedOrders);
+
+      const updatedDisplayedOrders = updatedProcessedOrders.filter(
+        (o) =>
+          statusFilter === "all" ||
+          o.status.toLowerCase() === statusFilter.toLowerCase()
+      );
+      setDisplayedOrders(updatedDisplayedOrders);
+
+      try {
+        const payload = { orderId: orderId, status: newStatus.toLowerCase() };
+
+        if (!apiService || typeof apiService.updateOrderStatus !== "function") {
+          throw new Error(
+            "apiService hoặc apiService.updateOrderStatus không tồn tại!"
+          );
+        }
+
+        await apiService.updateOrderStatus(payload);
+
+        message.success(
+          `Đơn hàng #${orderId}: Trạng thái cập nhật thành công thành ${
+            STATUS_DETAILS[newStatus]?.label || newStatus
+          }.`
+        );
+        setConfirmModalState({
+          visible: false,
+          record: null,
+          targetStatus: null,
+          isLoading: false,
+        });
+      } catch (error) {
+        if (error.response) {
+          message.error(
+            `Lỗi API (${error.response.status}): ${
+              error.response.data?.message || "Không thể cập nhật."
+            }`
+          );
+        } else if (error.request) {
+          message.error("Không nhận được phản hồi từ máy chủ.");
+        } else {
+          message.error(`Lỗi: ${error.message}`);
+        }
+
+        setProcessedOrders(originalProcessedOrders);
+        const revertedDisplayedOrders = originalProcessedOrders.filter(
+          (o) =>
+            statusFilter === "all" ||
+            o.status.toLowerCase() === statusFilter.toLowerCase()
+        );
+        setDisplayedOrders(revertedDisplayedOrders);
+
+        setConfirmModalState((prev) => ({ ...prev, isLoading: false }));
+      } finally {
+        setLoadingAction(null);
+      }
+    },
+    [processedOrders, loadingAction, statusFilter]
+  );
+
+  const showStatusChangeConfirm = useCallback((record, targetStatus) => {
+    if (!record || !record.orderId || !record.status || !targetStatus) {
+      message.error("Lỗi: Thiếu thông tin để hiển thị xác nhận.");
+      return;
+    }
+    const fullRecord = processedOrders.find(o => o.orderId === record.orderId) || record;
+    setConfirmModalState({
+      visible: true,
+      record: fullRecord,
+      targetStatus: targetStatus,
+      isLoading: false,
     });
+  }, [processedOrders]);
 
-    const columns = [
-        {
-            title: 'Mã',
-            dataIndex: 'maDonHang',
-            key: 'ma',
-            ellipsis: true,
-            sorter: (a, b) => a.maDonHang - b.maDonHang,
-            sortDirections: ['descend', 'ascend'],
-        },
-        {
-            title: 'Tên người dùng',
-            dataIndex: 'userName',
-            key: 'userName',
-            ellipsis: true,
-            ...getColumnSearchProps('userName'),
-        },
-        {
-            title: 'Ngày đặt',
-            dataIndex: 'ngayDat',
-            key: 'ngayDat',
-            sorter: (a, b) => a.ngayDat.localeCompare(b.ngayDat),
-            sortDirections: ['descend', 'ascend'],
-            ...getColumnSearchProps('ngayDat'),
-        },
-        {
-            title: 'Hình thức thanh toán',
-            dataIndex: 'paymentMethod',
-            key: 'paymentMethod',
-            ellipsis: true,
-            sorter: (a, b) => a.paymentMethod.localeCompare(b.paymentMethod),
-            sortDirections: ['descend', 'ascend'],
-        },
-        {
-            title: 'Tình trạng thanh toán',
-            dataIndex: 'paymentStatus',
-            key: 'tinhTrang',
-            ellipsis: true,
-            sorter: (a, b) => a.paymentStatus.localeCompare(b.paymentStatus),
-            sortDirections: ['descend', 'ascend'],
-        },
-        {
-            title: 'Trạng thái giao hàng',
-            dataIndex: 'orderStatus',
-            key: 'orderStatus',
-            ellipsis: true,
-            sorter: (a, b) => a.orderStatus.localeCompare(b.orderStatus),
-            sortDirections: ['descend', 'ascend'],
-        },
-    ];
 
-    return (
-        <div>
-            <Modal
-                title={false}
-                centered
-                open={modalChild !== null}
-                onCancel={() => setModalChild(null)}
-                maskClosable={false}
-                footer={null}
-                destroyOnClose={true}
-                width="auto"
-            >
-                {modalChild}
-            </Modal>
-            <Table
-                onRow={(record) => ({
-                    onClick: () => {
-                        setModalChild(<OrderDetails order={record.order} handleRefresh={onRefresh} />);
-                    },
-                    onMouseEnter: (event) => {
-                        event.currentTarget.style.cursor = 'pointer';
-                    },
-                    onMouseLeave: (event) => {
-                        event.currentTarget.style.cursor = 'default';
-                    },
-                })}
-                columns={columns}
-                rowKey="_id"
-                loading={loading}
-                dataSource={orders}
-            />
-        </div>
-    );
+  const handleConfirmModalOk = useCallback(() => {
+    const { record, targetStatus } = confirmModalState;
+    if (record && targetStatus) {
+      handleApplyStatus(record.orderId, record.status, targetStatus);
+    } else {
+      message.error("Lỗi: Không tìm thấy thông tin đơn hàng để xác nhận.");
+      setConfirmModalState({
+        visible: false,
+        record: null,
+        targetStatus: null,
+        isLoading: false,
+      });
+    }
+  }, [confirmModalState, handleApplyStatus]);
+
+  const handleConfirmModalCancel = useCallback(() => {
+    setConfirmModalState({
+      visible: false,
+      record: null,
+      targetStatus: null,
+      isLoading: false,
+    });
+  }, []);
+
+  const handleSearch = (selectedKeys, confirm, dataIndex) => {
+    confirm();
+    setSearchText(selectedKeys[0]);
+    setSearchedColumn(dataIndex);
+  };
+
+  const handleReset = (clearFilters, confirm) => {
+    clearFilters();
+    setSearchText("");
+    confirm();
+    setSearchedColumn("");
+  };
+
+  const getColumnSearchProps = (dataIndex) => ({
+    filterDropdown: ({
+      setSelectedKeys,
+      selectedKeys,
+      confirm,
+      clearFilters,
+      close,
+    }) => (
+      <div style={{ padding: 8 }} onKeyDown={(e) => e.stopPropagation()}>
+        <Input
+          ref={searchInput}
+          placeholder={`Tìm ${dataIndex}`}
+          value={selectedKeys[0]}
+          onChange={(e) =>
+            setSelectedKeys(e.target.value ? [e.target.value] : [])
+          }
+          onPressEnter={() => handleSearch(selectedKeys, confirm, dataIndex)}
+          style={{ marginBottom: 8, display: "block" }}
+        />
+        <Space>
+          <Button
+            type="primary"
+            onClick={() => handleSearch(selectedKeys, confirm, dataIndex)}
+            icon={<SearchOutlined />}
+            size="small"
+            style={{ width: 90 }}
+          >
+            Tìm
+          </Button>
+          <Button
+            onClick={() => clearFilters && handleReset(clearFilters, confirm)}
+            size="small"
+            style={{ width: 90 }}
+          >
+            Reset
+          </Button>
+          <Button type="link" size="small" onClick={() => close()}>
+            Đóng
+          </Button>
+        </Space>
+      </div>
+    ),
+    filterIcon: (filtered) => (
+      <SearchOutlined style={{ color: filtered ? "#1677ff" : undefined }} />
+    ),
+    onFilter: (value, record) => {
+        const recordValue = record[dataIndex];
+        if (recordValue === null || typeof recordValue === 'undefined') {
+            return false;
+        }
+        return recordValue.toString().toLowerCase().includes(value.toLowerCase());
+    },
+    onFilterDropdownOpenChange: (visible) => {
+      if (visible) {
+        setTimeout(() => searchInput.current?.select(), 100);
+      }
+    },
+    render: (text) =>
+      searchedColumn === dataIndex ? (
+        <Highlighter
+          highlightStyle={{ backgroundColor: "#ffc069", padding: 0 }}
+          searchWords={[searchText]}
+          autoEscape
+          textToHighlight={text ? text.toString() : ""}
+        />
+      ) : (
+        text
+      ),
+  });
+
+  const statusOptions = [
+    { value: "all", label: "Tất cả trạng thái" },
+    ...Object.entries(STATUS_DETAILS).map(([key, { label }]) => ({
+      value: key.toLowerCase(),
+      label,
+    })),
+  ];
+
+  const columns = [
+    {
+      title: "Mã ĐH",
+      dataIndex: "orderId",
+      key: "orderId",
+      width: 80,
+      fixed: "left",
+      sorter: (a, b) => a.orderId - b.orderId,
+      ...getColumnSearchProps("orderId"),
+    },
+    {
+      title: "Người dùng",
+      dataIndex: "userName",
+      key: "userName",
+      width: 150,
+      ellipsis: true,
+      ...getColumnSearchProps("userName"),
+    },
+    {
+      title: "Ngày đặt",
+      dataIndex: "formattedCreatedAt",
+      key: "formattedCreatedAt",
+      width: 160,
+    },
+    {
+      title: "Tổng tiền",
+      dataIndex: "totalAmount",
+      key: "totalAmount",
+      width: 140,
+      align: "right",
+      render: formatCurrency,
+      sorter: (a, b) => a.totalAmount - b.totalAmount,
+    },
+    {
+      title: "PT Thanh toán",
+      dataIndex: "paymentMethod",
+      key: "paymentMethod",
+      width: 120,
+      filters: [
+        { text: "Tiền mặt (CASH)", value: "CASH" },
+        { text: "VNPAY", value: "VNPAY" },
+      ],
+      onFilter: (value, record) =>
+        record.paymentMethod?.toUpperCase() === value.toUpperCase(),
+    },
+    {
+      title: "Trạng thái ĐH",
+      dataIndex: "status",
+      key: "status",
+      width: 120,
+      render: (status) => <OrderStatusTag status={status} />,
+    },
+    {
+      title: "Hành động",
+      key: "actions",
+      width: 100,
+      align: "center",
+      fixed: "right",
+      render: (_, record) => {
+        const currentRecord = processedOrders.find(o => o.key === record.key) || record;
+        const currentStatusUpper = currentRecord.status;
+        const isLoadingThisRow = loadingAction === currentRecord.orderId;
+
+        if (currentStatusUpper === "DELIVERED") {
+          return (
+            <Tooltip title="Xem chi tiết đơn hàng">
+              <Button
+                icon={<EyeOutlined />}
+                size="small"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setDetailsModalContent({
+                    visible: true,
+                    orderId: currentRecord.orderId,
+                  });
+                }}
+                disabled={!!loadingAction && loadingAction !== currentRecord.orderId}
+              />
+            </Tooltip>
+          );
+        }
+
+        const possibleNextStatuses =
+          VALID_STATUS_TRANSITIONS[currentStatusUpper] || [];
+        if (possibleNextStatuses.length === 0 && currentStatusUpper !== 'DELIVERED') {
+             return (
+                <Tooltip title="Xem chi tiết đơn hàng">
+                 <Button
+                    icon={<EyeOutlined />}
+                    size="small"
+                    onClick={(e) => {
+                    e.stopPropagation();
+                    setDetailsModalContent({
+                        visible: true,
+                        orderId: currentRecord.orderId,
+                    });
+                    }}
+                    disabled={!!loadingAction && loadingAction !== currentRecord.orderId}
+                 />
+                </Tooltip>
+            );
+        }
+         if (possibleNextStatuses.length === 0) {
+             return <Text type="secondary">-</Text>;
+         }
+
+        const menuItems = possibleNextStatuses.map((targetStatusKey) => ({
+          key: targetStatusKey,
+          label: `Chuyển sang "${
+            STATUS_DETAILS[targetStatusKey]?.label || targetStatusKey
+          }"`,
+          danger: ["REJECTED"].includes(targetStatusKey),
+          onClick: (e) => {
+            e.domEvent.stopPropagation();
+            showStatusChangeConfirm(currentRecord, targetStatusKey);
+          },
+        }));
+
+        return (
+          <Dropdown menu={{ items: menuItems }} trigger={["click"]}>
+            <Tooltip title="Thay đổi trạng thái">
+              <Button
+                icon={<EditOutlined />}
+                size="small"
+                onClick={(e) => e.stopPropagation()}
+                loading={isLoadingThisRow}
+                disabled={!!loadingAction && loadingAction !== currentRecord.orderId}
+              />
+            </Tooltip>
+          </Dropdown>
+        );
+      },
+    },
+  ];
+
+  return (
+    <div>
+      <Space style={{ marginBottom: 16, display: "flex", justifyContent: "space-between" }}>
+        <Select
+          value={statusFilter}
+          style={{ width: 200 }}
+          onChange={(value) => setStatusFilter(value)}
+          options={statusOptions}
+          disabled={!!loadingAction}
+        />
+        <Button
+          onClick={onRefresh}
+          loading={loading && !loadingAction}
+          disabled={!!loadingAction}
+        >
+          {loading && !loadingAction ? "Đang tải..." : "Tải Lại DS"}
+        </Button>
+      </Space>
+
+      <Modal
+        title={`Chi Tiết Đơn Hàng #${detailsModalContent.orderId || ""}`}
+        open={detailsModalContent.visible}
+        onCancel={() => setDetailsModalContent({ visible: false, orderId: null })}
+        maskClosable={true}
+        footer={null}
+        destroyOnClose={true}
+        width="80vw"
+        style={{ top: 20 }}
+        bodyStyle={{ maxHeight: "85vh", overflowY: "auto" }}
+      >
+        {detailsModalContent.visible && detailsModalContent.orderId ? (
+          <OrderDetails
+            orderId={detailsModalContent.orderId}
+            handleRefreshParent={onRefresh}
+          />
+        ) : (
+          <div style={{ textAlign: "center", padding: "50px" }}>
+            <Spin size="large" />
+          </div>
+        )}
+      </Modal>
+
+      <Modal
+        title="Xác nhận thay đổi trạng thái?"
+        open={confirmModalState.visible}
+        onOk={handleConfirmModalOk}
+        onCancel={handleConfirmModalCancel}
+        okText="Xác nhận"
+        cancelText="Hủy"
+        confirmLoading={confirmModalState.isLoading}
+        maskClosable={false}
+      >
+        {confirmModalState.record && confirmModalState.targetStatus ? (
+          <div>
+            <p>
+              Đơn hàng: <Text strong>#{confirmModalState.record.orderId}</Text>
+            </p>
+            <p>
+              Trạng thái hiện tại:{" "}
+              <Text strong>
+                <OrderStatusTag status={confirmModalState.record.status} />
+              </Text>
+            </p>
+            <p>
+              Chuyển thành:{" "}
+              <Text strong>
+                <OrderStatusTag status={confirmModalState.targetStatus} />
+              </Text>
+            </p>
+            <p>Bạn có chắc muốn thực hiện thay đổi này?</p>
+          </div>
+        ) : (
+          <p>Đang tải thông tin xác nhận...</p>
+        )}
+      </Modal>
+
+      <Table
+        columns={columns}
+        dataSource={displayedOrders}
+        rowKey="key"
+        loading={loading || !!loadingAction}
+        pagination={{
+          pageSize: 10,
+          showSizeChanger: true,
+          pageSizeOptions: ["10", "20", "50"],
+          size: "large",
+          showTotal: (total, range) =>
+            `${range[0]}-${range[1]} trên ${total} mục`,
+        }}
+        scroll={{ x: 1150 }}
+        bordered
+        size="middle"
+        onRow={(record) => ({
+          onClick: (event) => {
+            const fullRecord = processedOrders.find(o => o.key === record.key) || record;
+            const targetTagName = event.target.tagName.toLowerCase();
+            const isActionClick = event.target.closest('.ant-btn, .ant-dropdown-trigger, .ant-dropdown-menu-item');
+
+            if (!isActionClick && loadingAction !== fullRecord.orderId) {
+              setDetailsModalContent({
+                visible: true,
+                orderId: fullRecord.orderId,
+              });
+            }
+          },
+          style: {
+            cursor:
+              loadingAction && loadingAction !== record.orderId
+                ? "not-allowed"
+                : "pointer",
+          },
+        })}
+        rowClassName={(record) => (loadingAction === record.orderId ? "table-row-action-loading" : "")}
+      />
+    </div>
+  );
 };
 
 export default AdminOrder;

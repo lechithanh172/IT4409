@@ -1,238 +1,217 @@
-import React, { useEffect, useRef, useState } from 'react';
-import axios from 'axios';
-import { Button, Modal, Space, Table, message, Input } from 'antd';
-import { DeleteFilled, ExclamationCircleFilled, SearchOutlined } from '@ant-design/icons';
+import React, { useEffect, useRef, useState, useCallback } from 'react';
+import { Button, Modal, Space, Table, message, Input, Tag, Tabs } from 'antd';
+import { DeleteFilled, EditOutlined, ExclamationCircleFilled, SearchOutlined, SyncOutlined } from '@ant-design/icons';
 import Highlighter from 'react-highlight-words';
 import apiService from '../../../services/api';
+import EditUser from './EditUser';
+
+const { confirm } = Modal;
+const { TabPane } = Tabs;
+
+const ROLES = ['ADMIN', 'PRODUCT_MANAGER', 'CUSTOMER'];
 
 const AdminUser = () => {
-    const [users, setUsers] = useState(null);
-
-    const [loading, setLoading] = useState(false);
-
-    useEffect(() => {
-        const fetchData = async () => {
-            setLoading(true);
-            try {
-                const token = localStorage.getItem('authToken'); // Lấy token từ localStorage
-
-                if (!token) {
-                    message.error('Bạn cần phải đăng nhập!');
-                    return; // Nếu không có token, dừng lại và không gọi API
-                }
-
-                const response = await apiService.getAllUsers();
-                const usersData = response.data.users;
-                setUsers(usersData);
-            } catch (error) {
-                console.error(error);
-                message.error('Không thể lấy dữ liệu người dùng');
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        fetchData();
-    }, []);
-
+    const [usersData, setUsersData] = useState({});
+    const [loadingStates, setLoadingStates] = useState({});
+    const [activeRole, setActiveRole] = useState(ROLES[0]);
+    const [modalChild, setModalChild] = useState(null);
     const [searchText, setSearchText] = useState('');
     const [searchedColumn, setSearchedColumn] = useState('');
     const searchInput = useRef(null);
+
+    const fetchUsers = useCallback(async (roleToFetch, forceRefresh = false) => {
+        if (loadingStates[roleToFetch]) {
+            return;
+        }
+        if (forceRefresh || usersData[roleToFetch] === undefined) {
+            setLoadingStates(prev => ({ ...prev, [roleToFetch]: true }));
+            try {
+                const response = await apiService.getUsersByRole(roleToFetch);
+                const fetchedUsers = response.data;
+                console.log(response.data);
+                if (Array.isArray(fetchedUsers)) {
+                    setUsersData(prev => ({ ...prev, [roleToFetch]: fetchedUsers }));
+                    if (fetchedUsers.length > 0 && forceRefresh) {
+                         message.success(`Đã tải xong dữ liệu cho ${roleToFetch}.`);
+                    }
+                } else {
+                    message.error(`Lỗi định dạng dữ liệu nhận được cho role ${roleToFetch}.`);
+                    setUsersData(prev => ({ ...prev, [roleToFetch]: [] }));
+                }
+            } catch (error) {
+                const errorMessage = error.response?.data?.message || error.message || `Không thể tải dữ liệu cho ${roleToFetch}`;
+                message.error(errorMessage);
+                setUsersData(prev => ({ ...prev, [roleToFetch]: [] }));
+            } finally {
+                setLoadingStates(prev => ({ ...prev, [roleToFetch]: false }));
+            }
+        }
+    }, [usersData, loadingStates]);
+
+    useEffect(() => {
+        fetchUsers(activeRole);
+    }, [activeRole, fetchUsers]);
+
+    const handleRefresh = useCallback(() => {
+        fetchUsers(activeRole, true);
+        setSearchText('');
+        setSearchedColumn('');
+    }, [activeRole, fetchUsers]);
+
+    const onTabChange = (key) => {
+        setActiveRole(key);
+        setSearchText('');
+        setSearchedColumn('');
+    };
 
     const handleSearch = (selectedKeys, confirm, dataIndex) => {
         confirm();
         setSearchText(selectedKeys[0]);
         setSearchedColumn(dataIndex);
     };
+
+    const handleReset = (clearFilters, confirm) => {
+        clearFilters && clearFilters();
+        setSearchText('');
+        setSearchedColumn('');
+        confirm();
+    };
+
     const getColumnSearchProps = (dataIndex) => ({
         filterDropdown: ({ setSelectedKeys, selectedKeys, confirm, clearFilters, close }) => (
-            <div
-                style={{
-                    padding: 8,
-                }}
-                onKeyDown={(e) => e.stopPropagation()}
-            >
+            <div style={{ padding: 8 }} onKeyDown={(e) => e.stopPropagation()}>
                 <Input
                     ref={searchInput}
-                    placeholder={`Search ${dataIndex}`}
+                    placeholder={`Tìm ${dataIndex}`}
                     value={selectedKeys[0]}
                     onChange={(e) => setSelectedKeys(e.target.value ? [e.target.value] : [])}
                     onPressEnter={() => handleSearch(selectedKeys, confirm, dataIndex)}
-                    style={{
-                        marginBottom: 8,
-                        display: 'block',
-                    }}
+                    style={{ marginBottom: 8, display: 'block' }}
                 />
                 <Space>
-                    <Button
-                        type="primary"
-                        onClick={() => handleSearch(selectedKeys, confirm, dataIndex)}
-                        icon={<SearchOutlined />}
-                        size="small"
-                        style={{
-                            width: 90,
-                        }}
-                    >
-                        Search
-                    </Button>
-                    <Button
-                        onClick={() => {
-                            clearFilters && clearFilters();
-                            confirm();
-                            setSearchText('');
-                            setSearchedColumn(dataIndex);
-                        }}
-                        size="small"
-                        style={{
-                            width: 90,
-                        }}
-                    >
-                        Reset
-                    </Button>
-                    <Button
-                        type="link"
-                        size="small"
-                        onClick={() => {
-                            close();
-                        }}
-                    >
-                        close
-                    </Button>
+                    <Button type="primary" onClick={() => handleSearch(selectedKeys, confirm, dataIndex)} icon={<SearchOutlined />} size="small" style={{ width: 90 }}>Tìm</Button>
+                    <Button onClick={() => clearFilters && handleReset(clearFilters, confirm)} size="small" style={{ width: 90 }}>Reset</Button>
+                    <Button type="link" size="small" onClick={() => close()}>Đóng</Button>
                 </Space>
             </div>
         ),
-        filterIcon: (filtered) => (
-            <SearchOutlined
-                style={{
-                    color: filtered ? '#1677ff' : undefined,
-                }}
-            />
-        ),
-        onFilter: (value, record) => record[dataIndex].toString().toLowerCase().includes(value.toLowerCase()),
+        filterIcon: (filtered) => <SearchOutlined style={{ color: filtered ? '#1677ff' : undefined }} />,
+        onFilter: (value, record) => record[dataIndex]?.toString().toLowerCase().includes(value.toLowerCase()),
         onFilterDropdownOpenChange: (visible) => {
-            if (visible) {
-                setTimeout(() => searchInput.current?.select(), 100);
-            }
+            if (visible) { setTimeout(() => searchInput.current?.select(), 100); }
         },
-        render: (text) =>
-            searchedColumn === dataIndex ? (
-                <Highlighter
-                    highlightStyle={{
-                        backgroundColor: '#ffc069',
-                        padding: 0,
-                    }}
-                    searchWords={[searchText]}
-                    autoEscape
-                    textToHighlight={text ? text.toString() : ''}
-                />
-            ) : (
-                text
-            ),
+        render: (text) => searchedColumn === dataIndex ? (
+            <Highlighter highlightStyle={{ backgroundColor: '#ffc069', padding: 0 }} searchWords={[searchText]} autoEscape textToHighlight={text ? text.toString() : ''} />
+        ) : (text),
     });
 
-    const deleteUser = async (record) => {
+    const deleteUser = async (userToDelete) => {
+        const userIdToDelete = userToDelete.userId;
+        const usernameToDelete = userToDelete.username;
+        if (!userIdToDelete) {
+            message.error('Không tìm thấy thông tin định danh (userId) để xóa.');
+            return;
+        }
+
+        setLoadingStates(prev => ({ ...prev, [activeRole]: true }));
         try {
-            await apiService.deleteUser(record._id);
+            await apiService.deleteUser(userIdToDelete);
 
-            const updatedUsers = users.filter((user) => user._id !== record._id);
-            setUsers(updatedUsers);
-
-            message.success(`Đã xóa user: ${record._id}`);
+            setUsersData(prev => {
+                const currentRoleUsers = prev[activeRole] || [];
+                const updatedUsers = currentRoleUsers.filter((user) => user.userId !== userIdToDelete);
+                return { ...prev, [activeRole]: updatedUsers };
+            });
+            message.success(`Đã xóa người dùng: ${usernameToDelete} (ID: ${userIdToDelete}) thành công.`);
         } catch (error) {
-            console.error(error);
-            message.error(`Xóa user thất bại: ${record._id}`);
+            const errorMessage = error.response?.data?.message || error.message || `Xóa người dùng ${usernameToDelete} thất bại`;
+            message.error(errorMessage);
+        } finally {
+            setLoadingStates(prev => ({ ...prev, [activeRole]: false }));
         }
     };
 
-    const { confirm } = Modal;
     const showDeleteConfirm = (user) => {
         confirm({
-            title: `Xác nhận xóa user ${user._id}!`,
+            title: `Bạn có chắc muốn xóa người dùng "${user.username}" (ID: ${user.userId})?`,
             icon: <ExclamationCircleFilled />,
-            content: `User name: ${user.userName}`,
+            content: 'Hành động này không thể hoàn tác.',
+            okText: 'Xóa',
+            okType: 'danger',
+            cancelText: 'Hủy',
+            centered: true,
             onOk() {
                 deleteUser(user);
             },
-            onCancel() {},
         });
     };
+
+    const handleEditUser = (user) => {
+        setModalChild(<EditUser userData={user} setModalChild={setModalChild} handleRefresh={handleRefresh} />);
+    };
+
     const columns = [
+        { title: 'STT', key: 'stt', align: 'center', width: '5%', render: (_, record, index) => index + 1, },
+        { title: 'Username', dataIndex: 'username', key: 'username', width: '15%', ellipsis: true, ...getColumnSearchProps('username'), },
+        { title: 'Email', dataIndex: 'email', key: 'email', width: '20%', ellipsis: true, ...getColumnSearchProps('email'), },
+        { title: 'Họ Tên', key: 'fullName', width: '15%', ellipsis: true, render: (_, record) => `${record.firstName || ''} ${record.lastName || ''}`.trim(), sorter: (a, b) => `${a.firstName} ${a.lastName}`.localeCompare(`${b.firstName} ${b.lastName}`), },
+        { title: 'SĐT', dataIndex: 'phoneNumber', key: 'phoneNumber', width: '12%', ellipsis: true, ...getColumnSearchProps('phoneNumber'), },
+        { title: 'Địa chỉ', dataIndex: 'address', key: 'address', ellipsis: true, ...getColumnSearchProps('address'), },
+        { title: 'Role', dataIndex: 'role', key: 'role', width: '12%', align: 'center', render: (role) => {
+            let color = 'default';
+            if (role === 'ADMIN') color = 'volcano';
+            else if (role === 'PRODUCT_MANAGER') color = 'geekblue';
+            else if (role === 'CUSTOMER') color = 'green';
+            return <Tag color={color}>{role}</Tag>;
+        }, },
         {
-            title: 'STT',
-            dataIndex: 'stt',
-            key: 'stt',
-            render: (text) => text,
-            width: '5%', // Chỉnh độ rộng của cột STT
-        },
-        {
-            title: 'ID',
-            dataIndex: '_id',
-            key: '_id',
-            ellipsis: true,
-            sorter: (a, b) => a._id - b._id,
-            sortDirections: ['descend', 'ascend'],
-            width: '15%', // Chỉnh độ rộng của cột ID
-            ...getColumnSearchProps('_id'),
-        },
-        {
-            title: 'User name',
-            dataIndex: 'userName',
-            key: 'userName',
-            ellipsis: true,
-            width: '20%', // Chỉnh độ rộng của cột User name
-            ...getColumnSearchProps('userName'),
-        },
-        {
-            title: 'Phone number',
-            dataIndex: 'phoneNumber',
-            key: 'phoneNumber',
-            ellipsis: true,
-            width: '20%', // Chỉnh độ rộng của cột Phone number
-            ...getColumnSearchProps('phoneNumber'),
-        },
-        {
-            title: 'Địa chỉ',
-            dataIndex: 'diaChi',
-            key: 'diaChi',
-            ellipsis: true,
-            width: '30%', // Chỉnh độ rộng của cột Địa chỉ
-            ...getColumnSearchProps('diaChi'),
-        },
-        {
-            title: 'Actions', // Cột này để chứa các hành động
+            title: 'Hành động',
             key: 'actions',
-            width: '10%', // Chỉnh độ rộng của cột Actions
+            align: 'center',
+            width: '10%',
             render: (_, record) => (
-                <Button
-                    style={{ transform: 'scale(1.5,1.5)' }}
-                    type="text"
-                    size="small"
-                    shape="circle"
-                    danger
-                    icon={<DeleteFilled />}
-                    onClick={(e) => {
-                        e.stopPropagation();
-                        showDeleteConfirm(record);
-                    }}
-                />
+                <Space size="small">
+                    <Button type="text" icon={<EditOutlined />} onClick={(e) => { e.stopPropagation(); handleEditUser(record); }} title="Thay đổi vai trò" />
+                    <Button type="text" danger icon={<DeleteFilled />} onClick={(e) => { e.stopPropagation(); showDeleteConfirm(record); }} title="Xóa người dùng" />
+                </Space>
             ),
         },
     ];
 
+    const currentDataSource = usersData[activeRole] || [];
+    const currentLoading = loadingStates[activeRole] || false;
+
     return (
         <div>
-            <Table
-                columns={columns}
-                loading={loading}
-                dataSource={users ? users.map((user, index) => ({ ...user, key: user._id, stt: index + 1 })) : []}
-                pagination={{
-                    pageSizeOptions: ['5', '10', '15'],
-                    showSizeChanger: true,
-                    defaultPageSize: 5,
-                    style: { marginBottom: '20px' },
-                }}
-            />
+            <Tabs activeKey={activeRole} onChange={onTabChange} tabBarExtraContent={
+                 <Button icon={<SyncOutlined />} onClick={handleRefresh} loading={currentLoading}> Làm mới </Button>
+            }>
+                {ROLES.map(role => (
+                    <TabPane tab={`${role} (${usersData[role]?.length ?? 0})`} key={role}>
+                        <Table
+                            columns={columns}
+                            loading={currentLoading}
+                            dataSource={currentDataSource.map((user) => ({ ...user, key: user.userId }))}
+                            pagination={{
+                                pageSizeOptions: ['5', '10', '15', '20'],
+                                showSizeChanger: true,
+                                defaultPageSize: 10,
+                                style: { marginTop: '24px' },
+                                showTotal: (total, range) => `${range[0]}-${range[1]} của ${total} mục`,
+                            }}
+                            bordered
+                            size="middle"
+                            scroll={{ x: 'max-content' }}
+                        />
+                    </TabPane>
+                ))}
+            </Tabs>
+
+            <Modal open={modalChild !== null} onCancel={() => setModalChild(null)} footer={null} destroyOnClose={true} width={600} centered>
+                {modalChild}
+            </Modal>
         </div>
     );
 };
+
 export default AdminUser;

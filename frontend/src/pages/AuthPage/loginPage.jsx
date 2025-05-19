@@ -34,7 +34,7 @@ function LoginPage() {
         try {
             const user = await login(userName, password);
             // Điều hướng về trang chủ sau khi login thành công (theo yêu cầu mới nhất)
-             navigate('/', { replace: true });
+            navigate('/', { replace: true });
             // Hoặc giữ logic điều hướng theo role nếu cần
             /*
             switch (user.role.toLowerCase()) {
@@ -116,7 +116,7 @@ function LoginPage() {
                             </div>
                         </div>
 
-                         {/* Hiển thị lỗi */}
+                        {/* Hiển thị lỗi */}
                         {error && (
                             <p id="login-error" className={styles.error}>
                                 <FiAlertCircle /> {error}
@@ -125,7 +125,7 @@ function LoginPage() {
 
                         {/* Link quên mật khẩu */}
                         <div className={styles.forgotPasswordLinkContainer}>
-                             <Link to="/forgot-password" className={styles.link}>Quên mật khẩu?</Link>
+                            <Link to="/forget-password" className={styles.link}>Quên mật khẩu?</Link>
                         </div>
 
 
@@ -143,10 +143,10 @@ function LoginPage() {
                             )}
                         </Button>
 
-                         {/* Liên kết Đăng ký */}
+                        {/* Liên kết Đăng ký */}
                         <div className={styles.signupLinkContainer}>
                             <span>Chưa có tài khoản?</span>
-                            <Link to="/signup" className={`${styles.link} ${styles.signupLink}`}>
+                            <Link to="/pre-signup" className={`${styles.link} ${styles.signupLink}`}>
                                 Đăng ký ngay
                             </Link>
                         </div>

@@ -12,15 +12,16 @@ import ProductDetailPage from './pages/ProductDetailPage/ProductDetailPage';
 import CartPage from './pages/CartPage/CartPage';
 import UserProfilePage from './pages/UserProfilePage/UserProfilePage';
 import LoginPage from './pages/AuthPage/loginPage';
-import EmailInputPage from './pages/AuthPage/emailPage';
 import SignupPage from './pages/AuthPage/signupPage';
 import ChangePassword from './pages/AuthPage/changePasswordPage';
-import OtpPage from './pages/AuthPage/otpPage';
+import ForgetPasswordPage from './pages/AuthPage/forgetPassword';
+import SignupNoOtpPage from './pages/AuthPage/signupNoOtp';
+import ResetPasswordPage from './pages/AuthPage/resetPassword';
 import ProductListPage from './components/ProductListPage/ProductListPage'; // Assuming this is also a page
 import PlaceOrder from './pages/PlaceOrder/PlaceOrder';
 import VNPayReturn from './pages/VNPayReturn/VNPayReturn';
 import OrderHistoryPage from './pages/OrderHistoryPage/OrderHistoryPage'; // Import OrderHistoryPage
-
+import AdminPage from './pages/AdminPage/AdminPage';
 // Protected Route Component
 import ProtectedRoute from './components/Auth/ProtectedRoute';
 
@@ -37,10 +38,11 @@ function App() {
 
         {/* Authentication Pages (within MainLayout) */}
         <Route path="login" element={<LoginPage />} />
-        <Route path="email" element={<EmailInputPage />} />
-        <Route path="signup" element={<SignupPage />} />
-        <Route path="change-password" element={<ChangePassword />} />
-        <Route path="otp" element={<OtpPage />} />
+         <Route path="pre-signup" element={<SignupNoOtpPage />} />
+                <Route path="signup" element={<SignupPage />} />
+       <Route path="forget-password" element={<ForgetPasswordPage />} />
+               <Route path="reset-password" element={<ResetPasswordPage />} />
+               <Route path="change-password" element={<ChangePassword />} />
 
         {/* Payment Callback Route (Publicly accessible but likely processes sensitive info) */}
         <Route path="/vnpay_jsp/vnpay_return.jsp" element={<VNPayReturn />} />
@@ -62,7 +64,17 @@ function App() {
           {/* Add other protected routes here */}
         </Route>
       </Route>
-
+      <Route
+        path="/admin"
+        element={
+          <ProtectedRoute requiredRole="admin"> {/* Yêu cầu đăng nhập VÀ role 'admin' */}
+            {/* Nếu muốn có Admin Layout riêng thì thay AdminPage bằng AdminLayout */}
+            {/* <AdminLayout> */}
+              <AdminPage />
+            {/* </AdminLayout> */}
+          </ProtectedRoute>
+        }
+      > </Route>
       {/* --- Routes Outside MainLayout (e.g., Admin, Fullscreen Auth) --- */}
       {/* Example:
       <Route path="/admin" element={<AdminLayout />}>

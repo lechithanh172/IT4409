@@ -20,64 +20,82 @@ const formatCurrency = (amount, hideSymbol = false) => {
     return formatted;
 };
 
-// --- Các tùy chọn lọc cố định (Dùng cho UI lọc dung lượng RAM và Lưu trữ/Ổ cứng) ---
-const availableRamCapacityOptions = ['2GB', '4GB', '6GB', '8GB', '12GB', '16GB', '32GB', '64GB'];
-// Danh sách này vẫn dùng chung cho cả Smartphone và Laptop trong UI filter
-const availableStorageOptions = ['64GB', '128GB', '256GB', '512GB', '1TB', '2TB'];
+// --- Các tùy chọn lọc cố định cho UI checkboxes ---
+const availableRamCapacityOptionsUI = ['2GB', '4GB', '6GB', '8GB', '12GB', '16GB', '32GB', '64GB'];
+const availableStorageOptionsUI = ['64GB', '128GB', '256GB', '512GB', '1TB', '2TB'];
+
 
 const FilterSortPanel = ({
-    currentFilters,         // Object chứa các bộ lọc hiện tại (bao gồm ramCapacity, storage, cpu, ramType)
+    currentFilters,         // Object chứa các bộ lọc hiện tại
     onFilterChange,         // Hàm callback để cập nhật bộ lọc ở component cha
     availableBrands = [],   // Danh sách các thương hiệu có sẵn
-    minPrice = 0,           // Giá tối thiểu
-    maxPrice = 50000000,    // Giá tối đa
-    currentCategory = '',      // Category hiện tại (QUAN TRỌNG để hiển thị filter đúng ngữ cảnh)
-    availableCpuOptions = [],  // Danh sách TÙY CHỌN LỌC CPU (đã được chuẩn hóa)
-    availableRamTypes = []   // Danh sách TÙY CHỌN LỌC Loại RAM (chỉ cho Laptop)
+    minPrice = 0,           // Giá tối thiểu (từ dữ liệu fetched ở ProductListPage)
+    maxPrice = 50000000,    // Giá tối đa (từ dữ liệu fetched ở ProductListPage)
+    currentCategory = '',      // Category hiện tại
+    availableCpuOptions = [],  // Danh sách TÙY CHỌN LỌC CPU (đã được chuẩn hóa từ dữ liệu fetched)
 }) => {
     // --- State quản lý trạng thái mở/đóng của các section ---
     const [isSortOpen, setIsSortOpen] = useState(true);
     const [isPriceOpen, setIsPriceOpen] = useState(true);
     const [isBrandOpen, setIsBrandOpen] = useState(true);
-    const [isRamCapacityOpen, setIsRamCapacityOpen] = useState(true); // State cho dung lượng RAM
-    const [isStorageOpen, setIsStorageOpen] = useState(true);        // State cho lưu trữ/ổ cứng
+    const [isMemoryOpen, setIsMemoryOpen] = useState(true);
+    const [isStorageOpen, setIsStorageOpen] = useState(true);
     const [isCpuOpen, setIsCpuOpen] = useState(true);
-    const [isRamTypeOpen, setIsRamTypeOpen] = useState(true);       // State cho loại RAM Laptop
 
     // --- Trích xuất các giá trị lọc hiện tại từ props ---
     const {
         sort = '',
-        brand = '',
+        // API key is brandName, URL param is brandName, internal state can use brandName for consistency
+        brandName = '',
         price_gte = minPrice.toString(),
         price_lte = maxPrice.toString(),
-        ramCapacity = [], // Filter key cho dung lượng RAM
-        storage = [],       // Filter key cho lưu trữ/ổ cứng (key giữ nguyên là 'storage')
-        cpu = [],
-        ramType = []     // Filter key cho loại RAM
+        // API key and URL param is memory, internal state uses memory
+        memory = [], // Filter key cho dung lượng RAM (API: 'memory')
+        // API key and URL param is storage, internal state uses storage
+        storage = [],       // Filter key cho lưu trữ/ổ cứng (API: 'storage')
+        // API key and URL param is cpu, internal state uses cpu
+        cpu = [],           // Filter key cho CPU (API: 'cpu')
     } = currentFilters;
 
+
+    // --- FIX START: Calculate valid min/max price BEFORE state and effect ---
+    // Calculate valid min/max price for the slider based on props minPrice/maxPrice
+    const validMinPrice = isNaN(parseInt(minPrice.toString(), 10)) ? 0 : parseInt(minPrice.toString(), 10);
+    const validMaxPrice = isNaN(parseInt(maxPrice.toString(), 10)) || parseInt(maxPrice.toString(), 10) <= validMinPrice
+        ? validMinPrice > 0 ? validMinPrice + 100000 : 100000 // Ensure max > min, default to 100k if min is 0
+        : parseInt(maxPrice.toString(), 10);
+    const step = Math.max(100000, Math.round((validMaxPrice - validMinPrice) / 100)); // Dynamic step, min 100k
+    // --- FIX END ---
+
     // --- State quản lý giá trị của thanh trượt giá ---
+    // Initialize priceRange state using parsed values from props,
+    // falling back to the NOW DECLARED validMinPrice/validMaxPrice if parsing fails
     const [priceRange, setPriceRange] = useState([
-        parseInt(price_gte, 10) || minPrice,
-        parseInt(price_lte, 10) || maxPrice
+        parseInt(price_gte, 10) || validMinPrice,
+        parseInt(price_lte, 10) || validMaxPrice
     ]);
 
     // --- Effect cập nhật thanh trượt giá khi bộ lọc giá thay đổi từ bên ngoài ---
     useEffect(() => {
-        const numGte = parseInt(price_gte, 10);
-        const numLte = parseInt(price_lte, 10);
-        const currentRangeMin = priceRange[0]; // Giữ nguyên kiểu number
-        const currentRangeMax = priceRange[1];
+        // Parse props price_gte and price_lte, using validMinPrice/validMaxPrice as fallbacks
+        const newMin = parseInt(price_gte, 10) || validMinPrice;
+        const newMax = parseInt(price_lte, 10) || validMaxPrice;
 
-        if ((!isNaN(numGte) && numGte !== currentRangeMin) || (!isNaN(numLte) && numLte !== currentRangeMax)) {
-            console.log(`FilterSortPanel: Updating priceRange state from props [${numGte || minPrice}, ${numLte || maxPrice}]`);
-            setPriceRange([
-                !isNaN(numGte) ? numGte : minPrice,
-                !isNaN(numLte) ? numLte : maxPrice
-            ]);
+        // Ensure newMin is not greater than newMax and within overall bounds (optional, but robust)
+        const validatedNewMin = Math.max(validMinPrice, Math.min(newMin, validMaxPrice));
+        const validatedNewMax = Math.max(validMinPrice, Math.min(newMax, validMaxPrice));
+
+        // Update priceRange state only if the validated prop values are different
+        // from the current internal state values.
+        if (validatedNewMin !== priceRange[0] || validatedNewMax !== priceRange[1]) {
+            console.log(`FilterSortPanel: Updating priceRange state from props [${validatedNewMin}, ${validatedNewMax}]`);
+            setPriceRange([validatedNewMin, validatedNewMax]);
         }
+    // Dependency array: Depend on price_gte, price_lte props and the calculated bounds
+    // The bounds (validMinPrice, validMaxPrice) are now declared *before* the effect, so this is safe.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [price_gte, price_lte, minPrice, maxPrice]);
+    }, [price_gte, price_lte, validMinPrice, validMaxPrice]);
+
 
     // --- Hàm xử lý thay đổi bộ lọc ---
     const handleSortChange = (e) => {
@@ -85,20 +103,31 @@ const FilterSortPanel = ({
     };
 
     const handleBrandChange = (e) => {
-        onFilterChange({ brand: e.target.value });
+        // Send the brand name to the API filter using the key 'brandName'
+        onFilterChange({ brandName: e.target.value });
     };
 
     // Hàm được gọi khi người dùng thả thanh trượt giá
+    // Price filtering is handled client-side, so we update price_gte and price_lte URL params
     const handlePriceChangeFinal = (values) => {
-        const currentGte = parseInt(price_gte, 10) || minPrice;
-        const currentLte = parseInt(price_lte, 10) || maxPrice;
+         // Only trigger change if the final values are different from the current filter values (parsed from props)
+         // Use validMinPrice/validMaxPrice as fallbacks for comparison
+         const currentGte = parseInt(price_gte, 10) || validMinPrice;
+         const currentLte = parseInt(price_lte, 10) || validMaxPrice;
+
         if (values[0] !== currentGte || values[1] !== currentLte) {
+            console.log(`FilterSortPanel: onFinalChange triggered with [${values[0]}, ${values[1]}]`);
+            // Pass price_gte and price_lte with the same keys used in ProductListPage's state/URL
             onFilterChange({ price_gte: values[0].toString(), price_lte: values[1].toString() });
+        } else {
+             console.log(`FilterSortPanel: onFinalChange - no change detected [${values[0]}, ${values[1]}]`);
         }
     };
 
     // --- Hàm xử lý thay đổi bộ lọc cho các checkbox (Chung) ---
+    // filterKey will be 'cpu', 'storage', or 'memory'
     const handleCheckboxChange = (filterKey, value) => {
+        // Access the current selected array using the filterKey
         const currentSelected = currentFilters[filterKey] || [];
         let newSelected;
         if (currentSelected.includes(value)) {
@@ -106,27 +135,20 @@ const FilterSortPanel = ({
         } else {
             newSelected = [...currentSelected, value];
         }
+        // Pass the updated array for the specific filterKey back to the parent
         onFilterChange({ [filterKey]: newSelected });
     };
 
     // --- Hàm tiện ích để toggle mở/đóng section ---
     const toggleSection = (setter) => setter(prev => !prev);
 
-    // --- Tính toán giá trị min/max hợp lệ và bước nhảy cho thanh trượt giá ---
-    const validMinPrice = isNaN(parseInt(minPrice.toString(), 10)) ? 0 : parseInt(minPrice.toString(), 10);
-    const validMaxPrice = isNaN(parseInt(maxPrice.toString(), 10)) || parseInt(maxPrice.toString(), 10) <= validMinPrice
-        ? validMinPrice + 100000
-        : parseInt(maxPrice.toString(), 10);
-    const step = Math.max(100000, Math.round((validMaxPrice - validMinPrice) / 100));
 
-    // --- Xác định xem có nên hiển thị bộ lọc Laptop không ---
-    const isLaptopCategory = currentCategory.toLowerCase() === 'laptop';
-
+    // --- Render ---
     return (
         <aside className={styles.filterPanel}>
             <h3 className={styles.panelTitle}><FiFilter /> Bộ lọc & Sắp xếp</h3>
 
-            {/* --- Bộ lọc Sắp xếp --- */}
+            {/* --- Bộ lọc Sắp xếp (Client-side) --- */}
             <div className={styles.filterGroup}>
                 <button className={styles.groupHeader} onClick={() => toggleSection(setIsSortOpen)} aria-expanded={isSortOpen} aria-controls="sort-content">
                     <span>Sắp xếp theo</span>
@@ -148,7 +170,7 @@ const FilterSortPanel = ({
                 )}
             </div>
 
-            {/* --- Bộ lọc Khoảng giá --- */}
+            {/* --- Bộ lọc Khoảng giá (Client-side) --- */}
             <div className={styles.filterGroup}>
                 <button className={styles.groupHeader} onClick={() => toggleSection(setIsPriceOpen)} aria-expanded={isPriceOpen} aria-controls="price-content">
                     <span>Khoảng giá</span>
@@ -161,6 +183,7 @@ const FilterSortPanel = ({
                             <span>Đến: {formatCurrency(priceRange[1])}</span>
                         </div>
                         <div className={styles.rangeSliderWrapper}>
+                            {/* Only render the slider if the range is valid */}
                             {validMinPrice < validMaxPrice ? (
                                 <Range
                                     values={priceRange}
@@ -208,7 +231,7 @@ const FilterSortPanel = ({
                 )}
             </div>
 
-            {/* --- Bộ lọc Thương hiệu --- */}
+            {/* --- Bộ lọc Thương hiệu (API: brandName) --- */}
             <div className={styles.filterGroup}>
                 <button className={styles.groupHeader} onClick={() => toggleSection(setIsBrandOpen)} aria-expanded={isBrandOpen} aria-controls="brand-content">
                     <span>Thương hiệu</span>
@@ -219,7 +242,9 @@ const FilterSortPanel = ({
                         <label className={styles.radioLabel}>
                             <input
                                 type="radio" name="brandFilter" value=""
-                                checked={!brand} onChange={handleBrandChange}
+                                // Check against currentFilters.brandName
+                                checked={!brandName} // Use brandName prop
+                                onChange={handleBrandChange}
                                 className={styles.radioInput}
                             />
                             <span className={styles.labelText}>Tất cả</span>
@@ -228,7 +253,9 @@ const FilterSortPanel = ({
                             <label key={b.brandId || b.brandName} className={styles.radioLabel}>
                                 <input
                                     type="radio" name="brandFilter" value={b.brandName}
-                                    checked={brand === b.brandName} onChange={handleBrandChange}
+                                    // Check against currentFilters.brandName
+                                    checked={brandName === b.brandName} // Use brandName prop
+                                    onChange={handleBrandChange}
                                     className={styles.radioInput}
                                 />
                                 <span className={styles.labelText}>{b.brandName}</span>
@@ -238,7 +265,8 @@ const FilterSortPanel = ({
                 )}
             </div>
 
-            {/* --- Bộ lọc CPU --- */}
+            {/* --- Bộ lọc CPU (API: cpu) --- */}
+            {/* Only show if there are options available (derived from fetched products) */}
             {availableCpuOptions.length > 0 && (
                 <div className={styles.filterGroup}>
                     <button className={styles.groupHeader} onClick={() => toggleSection(setIsCpuOpen)} aria-expanded={isCpuOpen} aria-controls="cpu-content">
@@ -252,7 +280,9 @@ const FilterSortPanel = ({
                                     <input
                                         type="checkbox"
                                         value={cpuValueOption}
-                                        checked={cpu.includes(cpuValueOption)}
+                                        // Check against currentFilters.cpu array
+                                        checked={(cpu || []).includes(cpuValueOption)} // Use cpu prop
+                                        // Call handler with key 'cpu'
                                         onChange={() => handleCheckboxChange('cpu', cpuValueOption)}
                                         className={styles.checkboxInput}
                                     />
@@ -264,85 +294,65 @@ const FilterSortPanel = ({
                 </div>
             )}
 
-            {/* --- Bộ lọc RAM (Dung lượng) --- */}
+            {/* --- Bộ lọc RAM (Dung lượng) (API: memory) --- */}
             <div className={styles.filterGroup}>
-                <button className={styles.groupHeader} onClick={() => toggleSection(setIsRamCapacityOpen)} aria-expanded={isRamCapacityOpen} aria-controls="ramCapacity-content">
+                <button className={styles.groupHeader} onClick={() => toggleSection(setIsMemoryOpen)} aria-expanded={isMemoryOpen} aria-controls="memory-content">
                     <span>RAM (Dung lượng)</span>
-                    {isRamCapacityOpen ? <FiChevronUp /> : <FiChevronDown />}
+                    {isMemoryOpen ? <FiChevronUp /> : <FiChevronDown />}
                 </button>
-                {isRamCapacityOpen && (
-                    <div id="ramCapacity-content" className={`${styles.groupContent} ${styles.scrollableList}`}>
-                        {availableRamCapacityOptions.map((ramCapacityValue) => (
-                            <label key={`ramCapacity-${ramCapacityValue}`} className={styles.checkboxLabel}>
+                {isMemoryOpen && (
+                    <div id="memory-content" className={`${styles.groupContent} ${styles.scrollableList}`}>
+                        {/* Using the predefined UI options list */}
+                        {availableRamCapacityOptionsUI.map((memoryValueOption) => (
+                            <label key={`memory-${memoryValueOption}`} className={styles.checkboxLabel}>
                                 <input
                                     type="checkbox"
-                                    value={ramCapacityValue}
-                                    checked={ramCapacity.includes(ramCapacityValue)}
-                                    onChange={() => handleCheckboxChange('ramCapacity', ramCapacityValue)}
+                                    value={memoryValueOption}
+                                    // Check against currentFilters.memory array
+                                    checked={(memory || []).includes(memoryValueOption)} // Use memory prop
+                                    // Call handler with key 'memory'
+                                    onChange={() => handleCheckboxChange('memory', memoryValueOption)}
                                     className={styles.checkboxInput}
                                 />
-                                <span className={styles.labelText}>{ramCapacityValue}</span>
+                                <span className={styles.labelText}>{memoryValueOption}</span>
                             </label>
                         ))}
                     </div>
                 )}
             </div>
 
-            {/* --- Bộ lọc Loại RAM (Chỉ cho Laptop) --- */}
-            {isLaptopCategory && availableRamTypes.length > 0 && (
-                <div className={styles.filterGroup}>
-                    <button className={styles.groupHeader} onClick={() => toggleSection(setIsRamTypeOpen)} aria-expanded={isRamTypeOpen} aria-controls="ramType-content">
-                        <span>Loại RAM (Laptop)</span>
-                        {isRamTypeOpen ? <FiChevronUp /> : <FiChevronDown />}
-                    </button>
-                    {isRamTypeOpen && (
-                        <div id="ramType-content" className={`${styles.groupContent} ${styles.scrollableList}`}>
-                            {availableRamTypes.map((ramTypeValue) => (
-                                <label key={`ramType-${ramTypeValue}`} className={styles.checkboxLabel}>
-                                    <input
-                                        type="checkbox"
-                                        value={ramTypeValue}
-                                        checked={ramType.includes(ramTypeValue)}
-                                        onChange={() => handleCheckboxChange('ramType', ramTypeValue)}
-                                        className={styles.checkboxInput}
-                                    />
-                                    <span className={styles.labelText}>{ramTypeValue}</span>
-                                </label>
-                            ))}
-                        </div>
-                    )}
-                </div>
-            )}
 
-            {/* --- Bộ lọc Dung lượng lưu trữ / Ổ cứng --- */}
-            {/* Key vẫn là 'storage', chỉ thay đổi label hiển thị */}
+            {/* --- Bộ lọc Dung lượng lưu trữ / Ổ cứng (API: storage) --- */}
             <div className={styles.filterGroup}>
                 <button className={styles.groupHeader} onClick={() => toggleSection(setIsStorageOpen)} aria-expanded={isStorageOpen} aria-controls="storage-content">
-                    {/* *** THAY ĐỔI NHÃN Ở ĐÂY *** */}
+                    {/* Label update remains */}
                     <span>
-                        {isLaptopCategory ? 'Dung lượng ổ cứng' : 'Dung lượng lưu trữ'}
+                        {currentCategory.toLowerCase() === 'laptop' ? 'Dung lượng ổ cứng' : 'Dung lượng lưu trữ'}
                     </span>
                     {isStorageOpen ? <FiChevronUp /> : <FiChevronDown />}
                 </button>
                 {isStorageOpen && (
                     <div id="storage-content" className={`${styles.groupContent} ${styles.scrollableList}`}>
-                        {/* UI options và logic vẫn dùng key 'storage' */}
-                        {availableStorageOptions.map((storageValue) => (
-                            <label key={`storage-${storageValue}`} className={styles.checkboxLabel}>
+                        {/* Using the predefined UI options list */}
+                        {availableStorageOptionsUI.map((storageValueOption) => (
+                            <label key={`storage-${storageValueOption}`} className={styles.checkboxLabel}>
                                 <input
                                     type="checkbox"
-                                    value={storageValue}
-                                    checked={storage.includes(storageValue)}
-                                    // Handler vẫn dùng key 'storage'
-                                    onChange={() => handleCheckboxChange('storage', storageValue)}
+                                    value={storageValueOption}
+                                    // Check against currentFilters.storage array
+                                    checked={(storage || []).includes(storageValueOption)} // Use storage prop
+                                    // Call handler with key 'storage'
+                                    onChange={() => handleCheckboxChange('storage', storageValueOption)}
                                     className={styles.checkboxInput}
                                 />
-                                <span className={styles.labelText}>{storageValue}</span>
+                                <span className={styles.labelText}>{storageValueOption}</span>
                             </label>
                         ))}
                     </div>
                 )}
             </div>
+
+            {/* Add refreshRate filter group here if needed */}
 
         </aside>
     );

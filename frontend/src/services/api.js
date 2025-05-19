@@ -98,7 +98,36 @@ const apiService = {
   searchProducts: (keyword) => apiInstance.get(`/product/search=${encodeURIComponent(keyword)}`),
   getProductById: (productId) => apiInstance.get(`/product/${productId}`),
   getAllProducts: () => apiInstance.get("/product/all"),
+ filterProducts: (filters = {}) => {
+        console.log("[apiService] Calling product/filter POST with filters:", filters);
 
+        // Construct the body. Only include fields that have non-empty values.
+        const body = {};
+        if (filters.type) {
+             body.type = filters.type;
+        }
+        if (filters.brandName) {
+             body.brandName = filters.brandName;
+        }
+        if (filters.cpu && filters.cpu.length > 0) {
+             body.cpu = filters.cpu; // Assuming array is accepted
+        }
+        if (filters.storage && filters.storage.length > 0) {
+             body.storage = filters.storage; // Assuming array is accepted
+        }
+        if (filters.memory && filters.memory.length > 0) {
+             body.memory = filters.memory; // Assuming array is accepted
+        }
+        // If refreshRate filter is added later:
+        // if (filters.refreshRate) {
+        //     body.refreshRate = filters.refreshRate;
+        // }
+
+        // The API doc does not include price, sort, page in the *body*.
+        // These will be handled client-side in ProductListPage.
+
+        return apiInstance.post("product/filter", body);
+    },
   // CART ITEM
   getCartItems: () => apiInstance.get("/cart-item/"),
   addToCart: (data) => apiInstance.post("/cart-item/add", data),

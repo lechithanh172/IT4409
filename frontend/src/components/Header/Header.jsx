@@ -72,7 +72,7 @@ const Header = () => {
   const closeAllDropdowns = () => { setIsMobileMenuOpen(false); setIsCategoryDropdownOpen(false); setIsUserDropdownOpen(false); };
   const handleMobileLinkClick = () => setIsMobileMenuOpen(false);
   const handleLoginClick = () => { closeAllDropdowns(); navigate('/login'); };
-  const handleSignupClick = () => { closeAllDropdowns(); navigate('/signup'); };
+  const handleSignupClick = () => { closeAllDropdowns(); navigate('/pre-signup'); };
   const handleLogout = () => {
       logout(); // Call the logout function from AuthContext
       closeAllDropdowns(); // Close menus after logout

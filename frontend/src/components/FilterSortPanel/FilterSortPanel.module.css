@@ -6,7 +6,7 @@
     border-radius: 10px;
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.07);
     border: 1px solid #e5e7eb;
-    width: 100%;
+    width: 100%; /* Hoặc đặt width cố định nếu muốn */
     box-sizing: border-box;
   }
   
@@ -22,13 +22,13 @@
     gap: 10px;
   }
   .panelTitle svg {
-      color: #6366f1;
+      color: #6366f1; /* Màu icon tiêu đề */
       font-size: 1.3rem;
   }
   
   .filterGroup {
     margin-bottom: 15px;
-    border-bottom: 1px solid #f3f4f6;
+    border-bottom: 1px solid #f3f4f6; /* Đường kẻ phân cách mờ hơn */
     padding-bottom: 15px;
   }
   .filterGroup:last-child {
@@ -44,39 +44,50 @@
     width: 100%;
     background: none;
     border: none;
-    padding: 5px 0;
+    padding: 5px 0; /* Khoảng cách trên dưới cho header */
     cursor: pointer;
     text-align: left;
   }
   .groupHeader span {
-      font-weight: 600;
-      color: #374151;
+      font-weight: 600; /* Chữ đậm hơn */
+      color: #374151; /* Màu chữ tối hơn */
       font-size: 1rem;
   }
   .groupHeader svg {
-      color: #9ca3af;
+      color: #9ca3af; /* Màu icon chevron */
       transition: transform 0.2s ease;
       font-size: 1.1rem;
   }
   
+  /* --- Nội dung của group, dùng chung cho các loại filter --- */
   .groupContent {
       padding-top: 15px;
       overflow: hidden;
-      max-height: 500px;
+      /* Transition cho hiệu ứng xổ xuống/đóng lại mượt mà */
+      /* Có thể bỏ transition nếu không cần hiệu ứng */
       transition: max-height 0.3s ease-out, padding-top 0.3s ease-out, opacity 0.2s linear 0.1s;
       opacity: 1;
   }
- 
+  /* CSS để ẩn content khi đóng (cần JS để thêm/xóa class hoặc thay đổi style trực tiếp) */
+  /* .groupContentHidden {
+      max-height: 0;
+      padding-top: 0;
+      opacity: 0;
+      overflow: hidden;
+  } */
+  
+  /* --- Select sắp xếp --- */
   .sortSelect {
     width: 100%;
     padding: 10px 14px;
-    border: 1px solid #d1d5db;
-    border-radius: 8px;
+    border: 1px solid #d1d5db; /* Border màu xám nhạt */
+    border-radius: 8px; /* Bo góc nhiều hơn */
     font-size: 0.95rem;
     background-color: #fff;
     cursor: pointer;
     transition: border-color 0.2s ease, box-shadow 0.2s ease;
-    appearance: none;
+    appearance: none; /* Loại bỏ giao diện mặc định */
+    /* Icon mũi tên tùy chỉnh */
     background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
     background-position: right 0.8rem center;
     background-repeat: no-repeat;
@@ -84,10 +95,11 @@
   }
   .sortSelect:focus {
     outline: none;
-    border-color: #6366f1;
-    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+    border-color: #6366f1; /* Highlight border khi focus */
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2); /* Hiệu ứng glow nhẹ */
   }
   
+  /* --- Bộ lọc giá --- */
   .priceRangeValues {
       display: flex;
       justify-content: space-between;
@@ -97,111 +109,138 @@
       font-weight: 500;
   }
   .priceRangeValues span:last-child {
-      font-weight: 600;
+      font-weight: 600; /* Giá trị "Đến" đậm hơn */
       color: #1f2937;
   }
-  .priceError { 
+  .priceError {
       font-size: 0.9rem;
-      color: #ef4444;
+      color: #ef4444; /* Màu đỏ cho lỗi */
       font-style: italic;
   }
   
   .rangeSliderWrapper {
-      padding: 15px 10px 5px 10px; 
+      padding: 15px 10px 5px 10px; /* Khoảng đệm quanh thanh trượt */
   }
   
   .rangeTrackContainer {
-      height: 36px;
+      height: 36px; /* Chiều cao vùng chứa track để dễ click */
       display: flex;
       width: 100%;
   }
   
   .rangeTrack {
-      height: 5px;
+      height: 5px; /* Độ dày của thanh track */
       width: 100%;
       border-radius: 3px;
-      background: #e5e7eb;
-      align-self: center;
+      background: #e5e7eb; /* Màu nền mặc định của track */
+      align-self: center; /* Căn giữa thanh track theo chiều dọc */
   }
   
   .rangeThumb {
-      height: 16px; 
+      height: 16px; /* Kích thước thumb */
       width: 16px;
-      border-radius: 50%;
-      background-color: #6366f1;
-      border: 3px solid #fff; 
-      box-shadow: 0px 1px 4px rgba(0,0,0,0.3); 
+      border-radius: 50%; /* Thumb hình tròn */
+      background-color: #6366f1; /* Màu chính của thumb */
+      border: 3px solid #fff; /* Viền trắng cho thumb nổi bật */
+      box-shadow: 0px 1px 4px rgba(0,0,0,0.3); /* Đổ bóng nhẹ */
       display: flex;
       justify-content: center;
       align-items: center;
-      cursor: grab;
-      outline: none;
+      cursor: grab; /* Con trỏ khi chưa kéo */
+      outline: none; /* Bỏ outline mặc định */
   }
-  .rangeThumb:active { cursor: grabbing; }
-  .rangeThumb:focus-visible { box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.3); }
+  .rangeThumb:active { cursor: grabbing; } /* Con trỏ khi đang kéo */
+  /* Hiệu ứng focus cho thumb (khi dùng bàn phím) */
+  .rangeThumb:focus-visible {
+      box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.3);
+  }
   
-  .brandList {
-      max-height: 280px;
-      overflow-y: auto;
-      padding-right: 8px;
-      margin-right: -8px;
+  /* --- Danh sách các tùy chọn (Dùng chung cho Brand, RAM, Storage) --- */
+  .scrollableList {
+      max-height: 250px; /* Giới hạn chiều cao để có scroll */
+      overflow-y: auto; /* Hiện thanh cuộn khi cần */
+      padding-right: 8px; /* Khoảng trống cho thanh cuộn */
+      margin-right: -8px; /* Bù trừ padding để nội dung không bị lệch */
       display: flex;
       flex-direction: column;
-      gap: 6px;
+      gap: 5px; /* Khoảng cách giữa các dòng tùy chọn */
   }
-  .brandList::-webkit-scrollbar { width: 5px; }
-  .brandList::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 10px; }
-  .brandList::-webkit-scrollbar-thumb { background: #ccc; border-radius: 10px; }
-  .brandList::-webkit-scrollbar-thumb:hover { background: #aaa; }
+  /* Tùy chỉnh thanh cuộn (Webkit browsers) */
+  .scrollableList::-webkit-scrollbar { width: 5px; }
+  .scrollableList::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 10px; }
+  .scrollableList::-webkit-scrollbar-thumb { background: #ccc; border-radius: 10px; }
+  .scrollableList::-webkit-scrollbar-thumb:hover { background: #aaa; }
   
-  .brandLabel {
+  /* --- Style chung cho Label của Radio và Checkbox --- */
+  .radioLabel,
+  .checkboxLabel {
       display: flex;
       align-items: center;
-      gap: 10px;
-      padding: 10px;
+      gap: 10px; /* Khoảng cách giữa input và text */
+      padding: 8px 10px; /* Padding cho mỗi dòng */
       cursor: pointer;
       border-radius: 6px;
       transition: background-color 0.2s ease;
   }
-  .brandLabel:hover { background-color: #f4f4f5; }
+  .radioLabel:hover,
+  .checkboxLabel:hover {
+      background-color: #f4f4f5; /* Highlight nhẹ khi hover */
+  }
   
-  .radioInput {
+  /* --- Style chung cho Input Radio và Checkbox --- */
+  .radioInput,
+  .checkboxInput {
       width: 16px;
       height: 16px;
       cursor: pointer;
-      accent-color: #6366f1;
-      flex-shrink: 0;
-      margin-top: 1px;
+      accent-color: #6366f1; /* Màu khi được check (hỗ trợ trình duyệt mới) */
+      flex-shrink: 0; /* Không co lại khi text dài */
+      margin-top: 1px; /* Căn chỉnh vị trí dọc nếu cần */
+      /* Fallback cho trình duyệt cũ hơn không hỗ trợ accent-color (tùy chọn) */
+      /* background-color: #fff;
+      border: 1px solid #ccc;
+      appearance: none;
+      border-radius: 50%; */ /* Cho radio */
+      /* border-radius: 3px; */ /* Cho checkbox */
   }
+  /* .radioInput:checked { background-color: #6366f1; border-color: #6366f1; } */
+  /* .checkboxInput:checked { background-color: #6366f1; border-color: #6366f1; } */
   
-  .brandName {
+  /* --- Style chung cho Text của Label --- */
+  .labelText {
       font-size: 0.95rem;
       color: #374151;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
+      white-space: nowrap; /* Không xuống dòng */
+      overflow: hidden; /* Ẩn phần dư thừa */
+      text-overflow: ellipsis; /* Hiển thị '...' nếu quá dài */
       transition: color 0.2s ease, font-weight 0.2s ease;
   }
-  .brandLabel input[type="radio"]:checked + .brandName {
+  
+  /* Làm đậm text khi Radio/Checkbox được chọn */
+  .radioLabel input[type="radio"]:checked + .labelText,
+  .checkboxLabel input[type="checkbox"]:checked + .labelText {
       font-weight: 600;
-      color: #4f46e5;
+      color: #4f46e5; /* Màu đậm hơn */
   }
-  .noOptions { 
+  
+  /* --- Thông báo khi không có tùy chọn --- */
+  .noOptions {
       font-size: 0.9rem;
       color: #9ca3af;
       font-style: italic;
       padding: 10px 5px;
   }
   
+  /* --- Responsive (Ví dụ) --- */
   @media (max-width: 992px) {
+      /* Trên màn hình nhỏ hơn, có thể bạn muốn bỏ shadow, border và title */
       .filterPanel {
           box-shadow: none;
           border: none;
-          padding: 10px;
-          padding-top: 0;
+          padding: 10px 0; /* Giảm padding */
       }
-       .panelTitle { display: none; } 
+       .panelTitle { display: none; } /* Ẩn title */
         .filterGroup { margin-bottom: 15px; padding-bottom: 15px; }
-        .groupHeader span { font-size: 1rem; }
-        .brandList { max-height: none; }
+        .groupHeader span { font-size: 1rem; } /* Giữ kích thước chữ header */
+        .scrollableList { max-height: none; } /* Bỏ giới hạn chiều cao trên mobile */
   }

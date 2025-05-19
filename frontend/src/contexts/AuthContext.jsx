@@ -6,22 +6,22 @@ const AuthContext = createContext();
 
 // --- Hàm fetchUserInfo (Giả sử API trả về đầy đủ trừ username và role cần chuẩn hóa) ---
 const fetchUserInfo = async (username) => {
-    if (!username) throw new Error("Thiếu username để fetch info.");
-    try {
-        const response = await apiService.getUserInfo(username);
-        if (response?.data && typeof response.data === 'object' && response.data.role) {
-            return {
-                ...response.data,
-                username: username, // Thêm username
-                role: String(response.data.role).toLowerCase() // Chuẩn hóa role
-            };
-        } else {
-            throw new Error("Dữ liệu user info không hợp lệ từ API.");
-        }
-    } catch (error) {
-        console.error(`Lỗi fetch user info cho ${username}:`, error);
-        throw error; // Ném lỗi lên
+  if (!username) throw new Error("Thiếu username để fetch info.");
+  try {
+    const response = await apiService.getUserInfo(username);
+    if (response?.data && typeof response.data === 'object' && response.data.role) {
+      return {
+        ...response.data,
+        username: username, // Thêm username
+        role: String(response.data.role).toLowerCase() // Chuẩn hóa role
+      };
+    } else {
+      throw new Error("Dữ liệu user info không hợp lệ từ API.");
     }
+  } catch (error) {
+    console.error(`Lỗi fetch user info cho ${username}:`, error);
+    throw error; // Ném lỗi lên
+  }
 };
 
 export const AuthProvider = ({ children }) => {
@@ -104,7 +104,7 @@ export const AuthProvider = ({ children }) => {
     localStorage.setItem('pendingUsername', username);
 
     try {
-      const loginResponse = await apiService.loginUser({ username, password });
+      const loginResponse = await apiService.login({ username, password });
       const token = loginResponse.data?.accessToken;
       const refreshToken = loginResponse.data?.refreshToken;
 
@@ -131,36 +131,94 @@ export const AuthProvider = ({ children }) => {
       console.error("[AuthContext] Login failed:", error);
       logout(true); // Dọn dẹp triệt để khi login lỗi
       const message = error.response?.data?.message ||
-                      (error.response?.status === 401 ? 'Sai tên đăng nhập hoặc mật khẩu' : null) ||
-                      error.message ||
-                      'Đăng nhập thất bại.';
+        (error.response?.status === 401 ? 'Sai tên đăng nhập hoặc mật khẩu' : null) ||
+        error.message ||
+        'Đăng nhập thất bại.';
       throw new Error(message); // Ném lỗi cho LoginPage hiển thị
     }
   };
-
+  const preSignup = async (data) => {
+    console.log("[AuthContext] Attempting pre-signup with data:", data);
+    try {
+      const response = await apiService.requestSignup(data); // Bạn cần tạo hàm này trong apiService
+      console.log("[AuthContext] Pre-signup success:", response);
+      return response.data;
+    } catch (error) {
+      console.error("[AuthContext] Pre-signup error:", error);
+      const message = error.response?.data?.message || error.message || "Gửi email OTP không thành công.";
+      throw new Error(message);
+    }
+  };
   // --- Hàm Đăng ký ---
   const signup = async (signupData) => {
     // Code hàm signup giữ nguyên
-     console.log("[AuthContext] Attempting signup with data:", signupData);
-        try {
-            const response = await apiService.signupUser(signupData);
-            console.log("[AuthContext] API Signup Response:", response);
-            if (response.status === 200 || response.status === 201) {
-                console.log("[AuthContext] Signup successful");
-                return response.data;
-            } else {
-                 console.error("[AuthContext] Signup API returned unexpected status:", response.status, response.data);
-                 throw new Error("Đăng ký không thành công.");
-            }
-        } catch (error) {
-            console.error("[AuthContext] Context Signup Error:", error);
-            const message = error.response?.data?.message || error.message || "Đăng ký không thành công.";
-            throw new Error(message);
-        }
+    console.log("[AuthContext] Attempting signup with data:", signupData);
+    try {
+      const response = await apiService.signupWithOtp(signupData);
+      console.log("[AuthContext] API Signup Response:", response);
+      if (response.status === 200 || response.status === 201) {
+        console.log("[AuthContext] Signup successful");
+        return response.data;
+      } else {
+        console.error("[AuthContext] Signup API returned unexpected status:", response.status, response.data);
+        throw new Error("Đăng ký không thành công.");
+      }
+    } catch (error) {
+      console.error("[AuthContext] Context Signup Error:", error);
+      const message = error.response?.data?.message || error.message || "Đăng ký không thành công.";
+      throw new Error(message);
+    }
+  };
+  // --- Hàm Quên Mật Khẩu ---
+  const forgetPassword = async (email) => {
+    console.log("[AuthContext] Sending forget password request for:", email);
+    try {
+      const response = await apiService.forgetPassword(email);
+      console.log("[AuthContext] Forget password response:", response);
+      return response.data || "OTP đã được gửi đến email của bạn.";
+    } catch (error) {
+      console.error("[AuthContext] Forget password error:", error);
+      const message = error.response?.data?.message || error.message || "Không thể gửi OTP.";
+      throw new Error(message);
+    }
   };
 
+  const resetPassword = async (data) => {
+    try {
+      const response = await apiService.resetPassword(data);
+      return response.data;
+    } catch (error) {
+      // Xử lý lỗi trả về từ server
+      const message = error.response?.data?.message || 'Đặt lại mật khẩu thất bại.';
+      throw new Error(message);
+    }
+  };
+  // đổi mật khẩu
+  const changePassword = async ({ currentPassword, newPassword }) => {
+    try {
+      const storedUser = JSON.parse(localStorage.getItem('userData'));
+      const email = storedUser?.email;
+
+      if (!email) throw new Error('Không tìm thấy email người dùng.');
+
+      const response = await apiService.changePassword({
+        email,
+        currentPassword,
+        newPassword
+      });
+
+      console.log('[AuthContext] Password changed:', response.data);
+      return response.data;
+    } catch (error) {
+      console.error('[AuthContext] Change password error:', error);
+      const message = error.response?.data?.message || error.message || 'Đổi mật khẩu thất bại.';
+      throw new Error(message);
+    }
+  };
+
+
   // Giá trị context
-  const value = { user, isAuthenticated: !!user, isLoading, login, logout, signup };
+  const value = { user, isAuthenticated: !!user, isLoading, login, logout, preSignup, signup, forgetPassword, resetPassword, changePassword };
 
   // Render children khi loading xong, hoặc luôn render và để ProtectedRoute xử lý
   return <AuthContext.Provider value={value}>{!isLoading ? children : null}</AuthContext.Provider>;
@@ -177,3 +235,4 @@ export const useAuth = () => {
   }
   return context;
 };
+

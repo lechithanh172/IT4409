@@ -1,5 +1,3 @@
-/* src/pages/AuthPage/changePasswordPage.module.css */
-
 /* --- Container bao ngoài trang --- */
 .pageContainer {
     display: flex;
@@ -7,14 +5,14 @@
     align-items: center;
     min-height: 100vh;
     padding: 1.5rem;
-    background-image: linear-gradient(135deg, #f6ad55 0%, #f6e9d5 100%);
-    /* Gradient cam nhạt */
+    background-image: linear-gradient(135deg, #a1c4fd 0%, #c2e9fb 100%);
+    /* Gradient nhẹ nhàng, khác LoginPage */
     box-sizing: border-box;
     overflow: hidden;
 }
 
-/* --- Card đổi mật khẩu --- */
-.changePasswordCard {
+/* --- Card đăng ký --- */
+.signupCard {
     display: flex;
     width: 100%;
     max-width: 900px;
@@ -41,7 +39,7 @@
 /* --- Cột trang trí bên trái --- */
 .decorativeSide {
     flex-basis: 45%;
-    background: linear-gradient(to bottom, #f6ad55 0%, #f6e9d5 100%);
+    background: linear-gradient(to bottom, #a1c4fd 0%, #c2e9fb 100%);
     /* Gradient đồng bộ với pageContainer */
     padding: 3rem 2rem;
     color: #fff;
@@ -84,7 +82,7 @@
 }
 
 /* --- Form --- */
-.changePasswordForm {
+.signupForm {
     width: 100%;
     max-width: 380px;
     margin: 0 auto;
@@ -150,71 +148,15 @@
     background-color: #f7fafc;
 }
 
-.input[type="password"],
-.input[type="text"][name="currentPassword"],
-.input[type="text"][name="newPassword"],
-.input[type="text"][name="confirmPassword"] {
-    padding-right: 3.2rem;
-}
-
 .input::placeholder {
     color: #a0aec0;
 }
 
 .input:focus {
     outline: none;
-    border-color: #ed8936;
-    /* Cam đậm */
+    border-color: #63b3ed;
     background-color: #fff;
-    box-shadow: 0 0 0 3px rgba(237, 137, 54, 0.2);
-}
-
-/* --- Nút ẩn/hiện mật khẩu --- */
-.passwordToggle {
-    position: absolute;
-    right: 0;
-    top: 0;
-    bottom: 0;
-    display: flex;
-    align-items: center;
-    padding: 0 0.9rem;
-    cursor: pointer;
-    color: #a0aec0;
-    font-size: 1.3rem;
-    background: none;
-    border: none;
-    outline: none;
-    transition: color 0.2s ease;
-}
-
-.passwordToggle:hover {
-    color: #718096;
-}
-
-.passwordToggle:focus-visible {
-    box-shadow: 0 0 0 2px rgba(237, 137, 54, 0.5);
-    border-radius: 50%;
-}
-
-/* --- Success Message --- */
-.success {
-    color: #2f855a;
-    /* Xanh lá đậm */
-    background-color: #c6f6d5;
-    border: 1px solid #9ae6b4;
-    padding: 0.8rem 1rem;
-    border-radius: 6px;
-    font-size: 0.9rem;
-    margin: 0 0 1rem 0;
-    display: flex;
-    align-items: center;
-    gap: 0.6rem;
-    text-align: left;
-}
-
-.success svg {
-    flex-shrink: 0;
-    font-size: 1.1rem;
+    box-shadow: 0 0 0 3px rgba(99, 179, 237, 0.2);
 }
 
 /* --- Error Message --- */
@@ -241,8 +183,8 @@
 .submitButton {
     width: 100%;
     padding: 0.9rem 1rem !important;
-    background-image: linear-gradient(to right, #ed8936 0%, #dd6b20 100%);
-    /* Gradient cam đậm */
+    background-image: linear-gradient(to right, #48bb78 0%, #38a169 100%);
+    /* Gradient xanh lá */
     color: white !important;
     border: none !important;
     border-radius: 8px !important;
@@ -259,14 +201,14 @@
 }
 
 .submitButton:hover:not(:disabled) {
-    background-image: linear-gradient(to right, #dd6b20 0%, #ed8936 100%);
-    box-shadow: 0 7px 20px rgba(237, 137, 54, 0.4) !important;
+    background-image: linear-gradient(to right, #38a169 0%, #48bb78 100%);
+    box-shadow: 0 7px 20px rgba(72, 187, 120, 0.4) !important;
     transform: translateY(-3px) !important;
 }
 
 .submitButton:active:not(:disabled) {
     transform: translateY(-1px) !important;
-    box-shadow: 0 4px 10px rgba(237, 137, 54, 0.3) !important;
+    box-shadow: 0 4px 10px rgba(72, 187, 120, 0.3) !important;
 }
 
 .submitButton:disabled {
@@ -281,8 +223,8 @@
     border-left-color: #a0aec0 !important;
 }
 
-/* --- Back Link Container --- */
-.backLinkContainer {
+/* --- Login Link Container --- */
+.loginLinkContainer {
     margin-top: 2rem;
     text-align: center;
     font-size: 0.9rem;
@@ -301,7 +243,7 @@
     text-decoration: underline;
 }
 
-.backLink {
+.loginLink {
     font-weight: 600;
     margin-left: 0.4rem;
 }
@@ -317,7 +259,7 @@
         padding: 2.5rem 2rem;
     }
 
-    .changePasswordCard {
+    .signupCard {
         max-width: 450px;
         flex-direction: column;
     }
@@ -328,7 +270,7 @@
         padding: 1rem;
     }
 
-    .changePasswordCard {
+    .signupCard {
         padding: 0;
         border-radius: 15px;
         box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
@@ -357,23 +299,17 @@
         font-size: 1rem;
     }
 
-    .passwordToggle {
-        padding: 0 0.7rem;
-        font-size: 1.2rem;
-    }
-
     .submitButton {
         padding: 0.8rem !important;
         font-size: 1rem !important;
     }
 
-    .error,
-    .success {
+    .error {
         font-size: 0.85rem;
         padding: 0.7rem 0.9rem;
     }
 
-    .backLinkContainer {
+    .loginLinkContainer {
         font-size: 0.85rem;
     }
 }

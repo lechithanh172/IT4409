@@ -57,9 +57,9 @@ apiInstance.interceptors.response.use(
 // --- API Service ---
 const apiService = {
   // AUTH
-  loginUser: (credentials) => apiInstance.post(LOGIN_ENDPOINT, credentials),
-  signupUser: (userData) => apiInstance.post(SIGNUP_ENDPOINT, userData),
-  signupWithOtp: (data) => apiInstance.post("/auth/signup-otp", data),
+  requestSignup: (data) => apiInstance.post("/auth/signup", data), // 1. API Yêu cầu đăng ký
+  signupWithOtp: (data) => apiInstance.post("/auth/signup-otp", data), // 2. API Đăng ký khi có otp
+  login: (data) => apiInstance.post("/auth/login", data), // 3. API Login
   // USER
   // Hàm này cần username
   getUserInfo: (username) => apiInstance.get(`/user/info/${username}`),

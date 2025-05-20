@@ -502,7 +502,7 @@ public class ProductService {
         String normalizedExpected = normalize(expectedValue);
 
         for (Map<String, String> spec : specs) {
-            System.out.println(spec.toString());
+//            System.out.println(spec.toString());
             String specTitle = spec.get("title");
             String specContent = spec.get("content");
             if (specTitle != null && specContent != null) {

@@ -61,41 +61,6 @@ public class OrderService {
         return originalPrice * (100 - discountPercentage) / 100;
     }
 
-//    public Integer shippingFeeCalculate(String address, Double weight, DeliveryMethod deliveryMethod) {
-//        String[] shippingAddress = address.split(", ");
-//        String wardAddress = shippingAddress[0];
-//        String districtAddress = shippingAddress[1];
-//        String provinceAddress = shippingAddress[2];
-//        Province province = provinceRepository.findByName(provinceAddress);
-//        District district = districtRepository.findByFullName(districtAddress);
-//        Integer roundWeight = (int) Math.round(weight);
-//        Integer totalAmount = 0;
-//        if(province.getName().equals("Hà Nội") || province.getName().equals("Hồ Chí Minh")) {
-//            if(deliveryMethod.equals(DeliveryMethod.STANDARD)) totalAmount = 15 * 1000;
-//            else if(deliveryMethod.equals(DeliveryMethod.EXPRESS)) totalAmount = 30 * 1000;
-//        }
-//        else {
-//            if(district.getAdministrativeUnitId() == 4) {
-//                if(deliveryMethod.equals(DeliveryMethod.STANDARD)) totalAmount = 20 * 1000;
-//                else if(deliveryMethod.equals(DeliveryMethod.EXPRESS)) totalAmount = 35 * 1000;
-//            }
-//            if(district.getAdministrativeUnitId() == 5) {
-//                if(deliveryMethod.equals(DeliveryMethod.STANDARD)) totalAmount = 25 * 1000;
-//                else if(deliveryMethod.equals(DeliveryMethod.EXPRESS)) totalAmount = 40 * 1000;
-//            }
-//            if(district.getAdministrativeUnitId() == 6) {
-//                if(deliveryMethod.equals(DeliveryMethod.STANDARD)) totalAmount = 30 * 1000;
-//                else if(deliveryMethod.equals(DeliveryMethod.EXPRESS)) totalAmount = 45 * 1000;
-//            }
-//            if(district.getAdministrativeUnitId() == 7) {
-//                if(deliveryMethod.equals(DeliveryMethod.STANDARD)) totalAmount = 40 * 1000;
-//                else if(deliveryMethod.equals(DeliveryMethod.EXPRESS)) totalAmount = 55 * 1000;
-//            }
-//        }
-//        totalAmount = 60 * 1000;
-//        totalAmount = totalAmount + (roundWeight/4 * 10 * 1000);
-//        return totalAmount;
-//    }
     public Optional<Order> getOrderById(Integer orderId) {
         return orderRepository.findOrderByOrderId(orderId);
     }
@@ -116,7 +81,7 @@ public class OrderService {
             order.get().setStatus(status);
             orderRepository.save(order.get());
             if(status == OrderStatus.APPROVED) {
-//                OrderItem item = new OrderItem(orderId, );
+
             }
             return order.get();
         }

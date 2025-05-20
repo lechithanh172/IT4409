@@ -1,5 +1,5 @@
 package com.enums;
 
 public enum Role {
-    CUSTOMER, PRODUCT_MANAGER, ADMIN
+    CUSTOMER, SHIPPER, PRODUCT_MANAGER, ADMIN
 }

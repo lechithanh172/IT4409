@@ -113,4 +113,40 @@ public class OrderController {
         }
     }
 
+    @GetMapping("/unassigned")
+    public ResponseEntity<List<Order>> getOrdersWithoutShipper() {
+        List<Order> orders = orderService.getOrdersWithoutShipper();
+        return ResponseEntity.status(200).body(orders);
+    }
+
+    @GetMapping("/shipper/{shipperId}")
+    public ResponseEntity<List<Order>> getOrdersByShipperId(@PathVariable Integer shipperId) {
+        List<Order> orders = orderService.getOrdersByShipperId(shipperId);
+        return ResponseEntity.ok(orders);
+    }
+
+    @PostMapping("/assign/{orderId}")
+    public ResponseEntity<?> assignOrderToShipper(@PathVariable Integer orderId,
+                                                  @RequestParam Integer shipperId) {
+        try {
+            Order assignedOrder = orderService.assignOrderToShipper(orderId, shipperId);
+            return ResponseEntity.status(200).body(assignedOrder);
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(400).body(new StatusResponse("Order not found or already assigned"));
+        }
+    }
+
+    @PostMapping("/status/{orderId}")
+    public ResponseEntity<?> updateOrderStatus(@PathVariable Integer orderId,
+                                               @RequestParam OrderStatus status) {
+        try {
+            Order updatedOrder = orderService.updateOrderStatus(orderId, status);
+            return ResponseEntity.status(200).body(updatedOrder);
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(400).body("Order not found");
+        }
+    }
+
+
+
 }

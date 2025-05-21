@@ -1,21 +1,23 @@
 package com.controller;
 
+import com.entity.User;
 import com.request.LoginRequest;
 import com.request.SignUpOTPRequest;
 import com.request.SignUpRequest;
 import com.request.TokenRefreshRequest;
 import com.response.StatusResponse;
-import com.response.TokenResponse;
-import com.service.*;
-import com.entity.User;
-import org.hibernate.Version;
+import com.service.JwtService;
+import com.service.OtpService;
+import com.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.io.UnsupportedEncodingException;
-import java.util.List;
 import java.util.Optional;
 
 @RequestMapping("/auth")

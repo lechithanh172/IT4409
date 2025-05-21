@@ -46,6 +46,12 @@ public class Order {
 
     private String note;
 
+    @Column(name = "shipper_id")
+    private Integer shipperId = null;
+
+    @Column(name = "delivered_at")
+    private LocalDateTime deliveredAt = null;
+
     public Order(OrderRequest orderRequest, Integer userId) {
         this.userId = userId;
         shippingAddress = orderRequest.getShippingAddress();

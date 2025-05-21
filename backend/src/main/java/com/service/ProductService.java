@@ -178,6 +178,9 @@ public class ProductService {
         product.setWeight(request.getWeight());
         product.setPrice(request.getPrice());
         product.setSupportRushOrder(request.getSupportRushOrder());
+        if(request.getIsActive() != null) {
+            product.setIsActive(request.getIsActive());
+        }
 
         if (request.getIsActive() != null) {
             product.setIsActive(request.getIsActive());

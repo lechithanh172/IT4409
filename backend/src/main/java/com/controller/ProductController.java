@@ -2,7 +2,6 @@ package com.controller;
 
 import com.entity.dto.ProductDTO;
 import com.request.ProductRequest;
-import com.request.SearchFilterRequest;
 import com.response.StatusResponse;
 import com.service.JwtService;
 import com.service.ProductService;
@@ -92,19 +91,6 @@ public class ProductController {
     @GetMapping("/all")
     public ResponseEntity<?> getAllProducts() {
         return ResponseEntity.status(200).body(productService.getAllProducts());
-    }
-
-//    @PostMapping("/price-range")
-//    public ResponseEntity<?> searchProductsInRange(@RequestBody SearchFilterRequest request) {
-//        return ResponseEntity.status(200).body(productService.searchProductsByPriceRange(request.getLowerBound(), request.getUpperBound()));
-//    }
-    @PostMapping("/filter")
-    public ResponseEntity<?> searchProductsInFilter(@RequestBody SearchFilterRequest request) {
-        request.setType(request.getType().toLowerCase());
-        if(!request.getType().equalsIgnoreCase("smartphone") && !request.getType().equalsIgnoreCase("laptop"))
-            return ResponseEntity.status(404).body(new StatusResponse("Type not supported"));
-
-        return ResponseEntity.status(200).body(productService.searchProductsWithFilter(request));
     }
 
 }

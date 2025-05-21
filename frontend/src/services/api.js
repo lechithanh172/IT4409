@@ -252,6 +252,12 @@ const apiService = {
   getOrdersByStatus: (status) => apiInstance.get(`/order/status/${status}`), // Cho admin
   approveOrder: (orderId) => apiInstance.post(`/order/approve/${orderId}`), // Cho admin
   getAllOrders: () => apiInstance.get('/order/view/all'),
+
+
+  // RATE
+  postRate: (data) => apiInstance.post("/rating/submit", data),
+  getListRateOfProduct: (productId) => apiInstance.get(`/rating/list/${productId}`),
+  getAverageRateOfProduct: (productId) => apiInstance.get(`/rating/average/${productId}`),
 };
 
 export default apiService;

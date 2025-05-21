@@ -1,9 +1,13 @@
+/* src/components/ProductCard/ProductCard.module.css */
+
 .cardLink {
   display: block;
   text-decoration: none;
   color: inherit;
   height: 100%;
   transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+  /* Cần position: relative cho thẻ giá */
+  position: relative;
 }
 
 .cardLink:hover {
@@ -12,7 +16,7 @@
 }
 
 .card {
-  position: relative;
+  position: relative; /* Cần position: relative cho ảnh để thẻ giá absolute dựa vào */
   display: flex;
   flex-direction: column;
   height: 100%;
@@ -20,40 +24,47 @@
   border-radius: 8px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   transition: box-shadow 0.2s ease-in-out;
+  overflow: hidden; /* Đảm bảo không có gì tràn ra khỏi card */
 }
 
 .productImage {
-  width: 9rem;
-  height: 9rem;
-  object-fit: cover;
+  width: 9rem; /* Kích thước cố định */
+  height: 9rem; /* Kích thước cố định */
+  object-fit: contain; /* Chứa toàn bộ ảnh, không cắt */
   background-color: #ffffff;
-  margin: auto;
-  padding: 24px;
+  margin: 0 auto; /* Căn giữa ảnh */
+  padding: 24px; /* Khoảng đệm xung quanh ảnh */
+  display: block; /* Đảm bảo ảnh là block element để margin auto hoạt động */
+  flex-shrink: 0; /* Ngăn ảnh bị co lại */
 }
 
 .cardBody {
   padding: 15px;
   display: flex;
   flex-direction: column;
-  flex-grow: 1;
+  flex-grow: 1; /* Cho phép body mở rộng */
+  /* Cần min-height hoặc đảm bảo nội dung đủ dài để push bottomDiv xuống dưới */
+  justify-content: space-between; /* Căn giữa nội dung và push bottomDiv xuống cuối */
 }
+
 
 .productName {
   font-size: 1.1rem;
   font-weight: 600;
   color: #333;
   margin: 0 0 10px 0;
-  min-height: 2.4em;
+  min-height: 2.8em; /* Đảm bảo hiển thị ít nhất 2 dòng cho tên dài */
   display: -webkit-box;
   -webkit-box-orient: vertical;
   overflow: hidden;
   text-overflow: ellipsis;
+  -webkit-line-clamp: 2; /* Giới hạn tên sản phẩm 2 dòng */
 }
 
 .boxPrice {
   display: flex;
-  align-items: flex-end;
-  flex-wrap: wrap;
+  align-items: flex-end; /* Căn chỉnh giá mới và cũ */
+  flex-wrap: wrap; /* Cho phép giá xuống dòng nếu không đủ chỗ */
   gap: 5px;
   margin-bottom: 10px;
 }
@@ -61,84 +72,98 @@
 .productPriceNew {
   font-size: 1.3rem;
   font-weight: bold;
-  color: #e74c3c;
+  color: #e74c3c; /* Màu đỏ nổi bật */
   margin: 0;
+  line-height: 1; /* Căn chỉnh dòng */
 }
 
 .productPriceOld {
   font-size: 0.9rem;
   font-weight: 600;
-  color: #707070;
+  color: #707070; /* Màu xám cho giá cũ */
   margin: 0;
   text-decoration: line-through;
+  line-height: 1.2; /* Căn chỉnh dòng */
 }
 
-.cardLink .itemPricePercent {
-  background: url(../../assets/price_tag.png) 50% no-repeat;
-  height: 31px;
-  width: 80px;
+/* Style cho thẻ giá giảm */
+.itemPricePercent {
+  background: url(../../assets/price_tag.png) 50% no-repeat; /* Sử dụng ảnh nền */
+  height: 31px; /* Chiều cao của ảnh nền */
+  width: 80px; /* Chiều rộng của ảnh nền */
   position: absolute;
   top: 3px;
   left: -5px;
   background-size: 98%;
-  z-index: 1;
+  z-index: 2; /* Đảm bảo nằm trên ảnh và các phần khác */
   display: flex;
   align-items: center;
   justify-content: center;
+  /* Cần thêm overflow: hidden cho .card hoặc .cardLink nếu thẻ giá bị tràn ra ngoài */
 }
 
 .itemPricePercentDetail {
-  color: #fff;
+  color: #fff; /* Màu chữ trắng */
   font-size: 12px;
   font-weight: 700;
   text-align: center;
   padding: 0 5px;
 }
 
-.productCategory {
-  font-size: 0.9rem;
-  color: #777;
-  margin-bottom: 15px;
-  flex-grow: 1;
-}
+/* .productCategory { ... } - Giữ nguyên hoặc xóa nếu không dùng */
 
-.addToCartButton {
-  width: 100%;
-  margin-top: auto;
-}
+/* .addToCartButton { ... } - Giữ nguyên hoặc xóa nếu không dùng ở đây */
+
 
 .card .bottomDiv {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  margin: 5px;
-  margin-top: auto;
+  justify-content: flex-start; /* Căn các mục sang trái */
+  margin-top: auto; /* Đẩy khối này xuống cuối cardBody */
+  padding-top: 10px; /* Khoảng cách giữa nội dung trên và rating */
+  border-top: 1px solid #eee; /* Đường kẻ phân cách */
 }
 
-.card .bottomDiv .itemRating {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
+/* Style cho RatingStars component bên trong bottomDiv */
+/* RatingStars có class .rating và .stars bên trong */
+/* Nếu cần style riêng cho sao trong card, target như sau: */
+.card .bottomDiv .rating {
+    /* Điều chỉnh font-size hoặc các style khác nếu cần */
+    font-size: 1em; /* Kích thước sao trong card */
 }
 
-.card .bottomDiv .itemRating .iconStar {
-  display: inline;
+.card .bottomDiv .rating .stars {
+    /* Điều chỉnh margin-right nếu cần */
+     margin-right: 5px;
 }
 
-.card .bottomDiv .itemRating .iconStar svg {
-  color: #f59e0b;
-  height: 15px;
+.card .bottomDiv .rating .starIcon {
+    /* Màu và kích thước icon sao cụ thể */
+    color: #f59e0b; /* Màu vàng */
+    /* Kích thước đã được điều chỉnh bởi font-size của .rating */
+     height: 1em; /* Chiều cao dựa trên font-size */
+     width: 1em; /* Chiều rộng dựa trên font-size */
+     margin-right: 1px;
 }
 
+.card .bottomDiv .rating .reviewCount {
+    /* Style cho số lượt đánh giá */
+    font-size: 0.9em; /* Kích thước nhỏ hơn */
+    color: #555;
+}
+
+
+/* Styles cho khối khuyến mãi */
 .itemPromotions {
   margin-bottom: 10px;
 }
 
 .itemPromotions .promotion {
-  align-items: flex-start;
-  background: #818388;
-  color: #fff;
-  border: 1px solid #e5e7eb;
+  /* Đảm bảo style hiển thị đúng như ảnh mẫu */
+  align-items: flex-start; /* Căn trên nội dung text */
+  background: #f0f0f0; /* Nền xám nhạt */
+  color: #333; /* Màu chữ đậm */
+  border: 1px solid #ccc;
   border-radius: 5px;
   display: flex;
   font-size: 12px;
@@ -149,8 +174,35 @@
 }
 
 .itemPromotions .promotion .couponPrice {
+  /* Style để giới hạn số dòng nếu cần, hoặc chỉ đơn giản là flex item */
   -webkit-box-orient: vertical;
   display: -webkit-box;
   overflow: hidden;
   width: 100%;
+  /* Có thể giới hạn số dòng: -webkit-line-clamp: 2; */
 }
+
+/* Style cho nút "Xem thêm" trong review item (nếu dùng ReviewItem ở đây) */
+/* Nếu bạn chỉ dùng ReviewItem trong ProductDisplay, style này không cần thiết ở đây */
+/* Nhưng nếu bạn muốn dùng chung ReviewItem cho cả card và detail, hãy thêm style này */
+/* Hoặc tạo một component ReviewItem riêng cho card với style khác */
+
+/* Note: ReviewItem is typically used in ProductDisplay, not ProductCard.
+   Adding this style here is only necessary if you decide to render full reviews
+   inside the ProductCard, which is unusual for a list view.
+   Assuming ReviewItem is ONLY in ProductDisplay for now. */
+
+/* If ReviewItem were used here, you would need styles like:
+.card .reviewItem {
+    ... smaller padding, fonts ...
+}
+.card .viewMoreButton {
+    ... style for "Xem thêm" button ...
+}
+*/
+
+/* Xóa style FontAwesomeIcon trực tiếp nếu không còn dùng */
+/*
+.card .bottomDiv .itemRating .iconStar { display: inline; } // Không còn cần
+.card .bottomDiv .itemRating .iconStar svg { ... } // Không còn cần
+*/

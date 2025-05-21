@@ -15,33 +15,171 @@ import { FiLogIn } from 'react-icons/fi';
 
 // --- Hàm tiện ích ---
 const formatCurrency = (amount) => {
-  if (typeof amount !== 'number' || isNaN(amount)) return 'Liên hệ'; // Xử lý cả NaN
+  if (typeof amount !== 'number' || isNaN(amount)) return 'Liên hệ';
   return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(amount);
 };
 
+const formatDateTime = (isoString) => {
+  if (!isoString) return '';
+  try {
+    const date = new Date(isoString);
+    if (isNaN(date.getTime())) return isoString;
+
+    const options = {
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: false
+    };
+    // Format và loại bỏ dấu phẩy nếu có
+    return date.toLocaleString('vi-VN', options).replace(',', ' '); // Thay dấu phẩy bằng khoảng trắng
+  } catch (error) {
+    console.error("Error formatting date:", error);
+    return isoString;
+  }
+};
+
+// Ngưỡng ký tự để hiển thị nút "Xem thêm"
+const COMMENT_TRUNCATE_LIMIT = 200;
+
+
 // --- Component con: Hiển thị sao đánh giá ---
-const RatingStars = ({ rating = 0, reviewCount = 0 }) => {
-    const fullStars = Math.floor(rating);
-    const hasHalfStar = rating > 0 && rating % 1 >= 0.3; // Ngưỡng hiển thị nửa sao
+const RatingStars = ({ rating = 0, reviewCount = null, isIndividualReview = false }) => {
+    const clampedRating = Math.max(0, Math.min(5, rating)); // Đảm bảo rating nằm trong khoảng 0-5
+    const fullStars = Math.floor(clampedRating);
+    const hasHalfStar = clampedRating > 0 && (clampedRating % 1) >= 0.25 && (clampedRating % 1) < 0.75;
     const emptyStars = 5 - fullStars - (hasHalfStar ? 1 : 0);
 
-    if (rating <= 0 && reviewCount <= 0) {
+     // Nếu là đánh giá cá nhân và rating <= 0, hiển thị 5 sao rỗng
+     if (isIndividualReview && rating <= 0) {
+         return (
+             <div className={styles.reviewRatingStars}>
+                 <div className={styles.stars}>
+                      {[...Array(5)].map((_, i) => <FaRegStar key={`empty-${i}`} className={styles.starIcon} />)}
+                 </div>
+             </div>
+         );
+     }
+     // Nếu là đánh giá cá nhân và rating hợp lệ > 0, hiển thị sao tương ứng
+     if (isIndividualReview && rating > 0) {
+         return (
+              <div className={styles.reviewRatingStars}>
+                 <div className={styles.stars}>
+                    {[...Array(fullStars)].map((_, i) => <FaStar key={`full-${i}`} className={styles.starIcon} />)}
+                    {hasHalfStar && <FaStarHalfAlt key="half" className={styles.starIcon} />}
+                    {[...Array(Math.max(0, emptyStars))].map((_, i) => <FaRegStar key={`empty-${i}`} className={styles.starIcon} />)}
+                 </div>
+             </div>
+         );
+     }
+
+
+    // Nếu là rating tổng và chưa có đánh giá (reviewCount <= 0 hoặc null/undefined)
+    // Chỉ hiển thị "Chưa có đánh giá" nếu KHÔNG có lượt đánh giá
+    if (!isIndividualReview && (reviewCount === null || reviewCount <= 0)) {
         return <div className={styles.rating}><span className={styles.reviewCount}>Chưa có đánh giá</span></div>;
     }
 
+    // Render sao và số lượt đánh giá cho rating tổng (> 0 reviews)
     return (
-      <div className={styles.rating}>
+      <div className={styles.rating}> {/* Chỉ component rating tổng dùng styles.rating */}
         <div className={styles.stars}>
-          {/* Render sao đầy */}
           {[...Array(fullStars)].map((_, i) => <FaStar key={`full-${i}`} className={styles.starIcon} />)}
-          {/* Render nửa sao nếu có */}
           {hasHalfStar && <FaStarHalfAlt key="half" className={styles.starIcon} />}
-          {/* Render sao rỗng (đảm bảo không âm) */}
           {[...Array(Math.max(0, emptyStars))].map((_, i) => <FaRegStar key={`empty-${i}`} className={styles.starIcon} />)}
         </div>
-        {/* Render số lượt đánh giá nếu có */}
-        {reviewCount > 0 && <a href="#reviews" className={styles.reviewCountLink}>({reviewCount} đánh giá)</a>}
+        {/* Render số lượt đánh giá chỉ cho rating tổng nếu reviewCount > 0 */}
+        {/* reviewCount có thể là số 0 ngay cả khi averageRating > 0 nếu API trả về như vậy */}
+        {/* Hiển thị count chỉ khi nó > 0 để phù hợp với "Chưa có đánh giá" */}
+        {reviewCount > 0 && (
+             // Sử dụng link đến phần đánh giá chi tiết bên dưới
+             <a href="#reviews" className={styles.reviewCountLink}>({reviewCount} đánh giá)</a>
+        )}
       </div>
+    );
+};
+
+// --- Component con: Hiển thị một đánh giá cụ thể ---
+const ReviewItem = ({ review }) => {
+    // State để quản lý trạng thái mở rộng của comment
+    const [isCommentExpanded, setIsCommentExpanded] = useState(false);
+
+    if (!review) return null;
+
+    const comment = review.rateComment || '';
+    // Kiểm tra xem comment có dài hơn ngưỡng không
+    const isCommentTooLong = comment.length > COMMENT_TRUNCATE_LIMIT;
+    // Nội dung comment sẽ hiển thị (rút gọn hoặc đầy đủ)
+    const displayedComment = isCommentTooLong && !isCommentExpanded
+        ? comment.substring(0, COMMENT_TRUNCATE_LIMIT) + '...'
+        : comment;
+
+    return (
+        <div className={styles.reviewItem}>
+            <div className={styles.reviewerInfo}>
+                 <strong className={styles.reviewerName}>{review.email || 'Người dùng ẩn danh'}</strong>
+                <span className={styles.reviewDate}>{formatDateTime(review.ratingDate)}</span>
+            </div>
+            <RatingStars rating={review.rating} isIndividualReview={true} />
+            {/* Hiển thị nội dung đánh giá */}
+            <p className={styles.reviewComment}>{displayedComment}</p>
+            {/* Hiển thị nút "Xem thêm" nếu comment dài và chưa được mở rộng */}
+            {isCommentTooLong && !isCommentExpanded && (
+                <button
+                    className={styles.viewMoreButton}
+                    onClick={() => setIsCommentExpanded(true)} // Mở rộng comment
+                >
+                    Xem thêm
+                </button>
+            )}
+             {/* Tùy chọn: Nút "Thu gọn" nếu comment đã được mở rộng và dài */}
+             {/* {isCommentTooLong && isCommentExpanded && (
+                 <button
+                     className={styles.viewMoreButton} // Có thể dùng class khác cho "Thu gọn"
+                     onClick={() => setIsCommentExpanded(false)} // Thu gọn comment
+                 >
+                     Thu gọn
+                 </button>
+             )} */}
+        </div>
+    );
+};
+
+// --- Component con: Hiển thị mô tả sản phẩm ---
+const ProductDescription = ({ description }) => {
+    if (!description) return null;
+
+    return (
+        <div className={styles.descriptionColumn}>
+            <h3 className={styles.detailsHeading}>Mô tả sản phẩm</h3>
+             {/* Cẩn thận với dangerouslySetInnerHTML để tránh XSS */}
+             {/* <div dangerouslySetInnerHTML={{ __html: description }} /> */}
+            <p>{description}</p>
+        </div>
+    );
+};
+
+// --- Component con: Hiển thị thông số kỹ thuật ---
+const TechnicalSpecs = ({ specs }) => {
+     // Giả định specs là một mảng các object { name: string, value: string }
+    if (!specs || !Array.isArray(specs) || specs.length === 0) return null;
+
+    return (
+        <div className={styles.specsColumn}>
+            <h3 className={styles.detailsHeading}>Thông số kỹ thuật</h3>
+            <table className={styles.specsTable}>
+                 <tbody>
+                    {specs.map((spec, index) => (
+                        <tr key={index}>
+                            <td className={styles.specName}>{spec.name}:</td>
+                            <td className={styles.specValue}>{spec.value}</td>
+                        </tr>
+                    ))}
+                 </tbody>
+             </table>
+        </div>
     );
 };
 
@@ -49,356 +187,429 @@ const RatingStars = ({ rating = 0, reviewCount = 0 }) => {
 // --- Component chính: ProductDisplay ---
 const ProductDisplay = ({ product }) => {
   // Hooks
-  // const { addItemToCart } = useCart(); // Có thể inject hàm này từ Context nếu cần update state global
-  const { isAuthenticated, user } = useAuth(); // Lấy trạng thái đăng nhập và user data từ Auth Context
-  const navigate = useNavigate();         // Hook để điều hướng
+  const { isAuthenticated, user } = useAuth();
+  const navigate = useNavigate();
 
-  // State
-  const [selectedVariantIndex, setSelectedVariantIndex] = useState(0); // Index của variant đang được chọn
-  const [isAddingToCart, setIsAddingToCart] = useState(false);       // Trạng thái loading khi thêm vào giỏ
-  const [addToCartError, setAddToCartError] = useState('');       // Thông báo lỗi khi thêm vào giỏ
+  // State cho Product Display (đã có)
+  const [selectedVariantIndex, setSelectedVariantIndex] = useState(0);
+  const [isAddingToCart, setIsAddingToCart] = useState(false);
+  const [addToCartError, setAddToCartError] = useState('');
 
-  // Effect để tự động chọn variant đầu tiên còn hàng khi component được mount hoặc `product` prop thay đổi
-  useEffect(() => {
-    if (product?.variants?.length > 0) { // Kiểm tra product và variants tồn tại
-        // Tìm index của variant đầu tiên có stockQuantity > 0
-        const firstAvailableIndex = product.variants.findIndex(v => v.stockQuantity > 0);
-        // Nếu tìm thấy variant còn hàng, chọn nó. Nếu không, chọn variant đầu tiên (index 0).
-        setSelectedVariantIndex(firstAvailableIndex >= 0 ? firstAvailableIndex : 0);
-    } else {
-        // Nếu không có variant nào, đặt index về 0
-        setSelectedVariantIndex(0);
-    }
-  }, [product]); // Chạy lại effect này mỗi khi `product` prop thay đổi
+  // State cho Reviews List và Average Rating
+  const [reviews, setReviews] = useState([]);
+  const [isLoadingReviews, setIsLoadingReviews] = useState(true);
+  const [reviewsError, setReviewsError] = useState('');
 
-  // Lấy object variant đang được chọn dựa trên selectedVariantIndex
-  // Xử lý trường hợp product.variants không tồn tại hoặc index không hợp lệ
-  const selectedVariant = (product?.variants && product.variants.length > selectedVariantIndex)
-                           ? product.variants[selectedVariantIndex]
-                           : null;
+  // State cho Average Rating (FETCHED FROM API)
+  const [averageRating, setAverageRating] = useState(0);
+  const [averageReviewCount, setAverageReviewCount] = useState(0); // Lấy count từ API list review
 
-  // --- Handlers ---
-  // Xử lý khi người dùng click chọn một variant khác
-  const handleSelectVariant = (index) => {
-      setSelectedVariantIndex(index);
-      setAddToCartError(''); // Xóa thông báo lỗi cũ (nếu có) khi người dùng chọn màu khác
-  };
 
-  // Xử lý khi nhấn nút "Thêm vào giỏ hàng"
-  const handleAddToCart = async () => {
-    // 1. Kiểm tra đăng nhập
-    if (!isAuthenticated) {
-        toast.warn('Vui lòng đăng nhập để thêm sản phẩm!', { position: "bottom-right" });
-        return; // Dừng thực thi
-    }
+  // State cho form gửi đánh giá
+  const [newRating, setNewRating] = useState(0);
+  const [newComment, setNewComment] = useState('');
+  const [isSubmittingReview, setIsSubmittingReview] = useState(false);
+  const [submitReviewError, setSubmitReviewError] = useState('');
 
-    // 1.5 Kiểm tra xem có thông tin User ID không
-    if (!user?.userId) {
-      console.error("Add to cart failed: User ID not found in AuthContext.");
-      toast.error("Lỗi: Không thể xác định người dùng. Vui lòng thử đăng nhập lại.", { position: "bottom-right" });
-      return; // Dừng thực thi
-    }
+  // Hàm riêng để fetch BOTH reviews list AND average rating
+  const fetchProductReviewsData = async (productId) => {
+      if (!productId) {
+          setReviews([]);
+          setAverageRating(0);
+          setAverageReviewCount(0);
+          setIsLoadingReviews(false);
+          setReviewsError('');
+          return;
+      }
 
-    // 2. Kiểm tra xem variant có hợp lệ, còn hàng và không đang trong quá trình thêm khác không
-    if (!selectedVariant || selectedVariant.stockQuantity <= 0 || isAddingToCart) {
-        if (selectedVariant && selectedVariant.stockQuantity <= 0) {
-             toast.error('Sản phẩm đã hết hàng!', { position: "bottom-right" });
-        }
-        console.warn("Add to cart stopped: Invalid variant, out of stock, or already adding.");
-        return; // Dừng thực thi
-    }
+      setIsLoadingReviews(true);
+      setReviewsError(''); // Clear lỗi trước khi fetch
 
-    // 3. Bắt đầu quá trình: Bật loading, xóa lỗi cũ
-    setIsAddingToCart(true);
-    setAddToCartError('');
-
-    try {
-        // 4. Chuẩn bị dữ liệu gửi lên API (THEO ĐÚNG DOCUMENTATION)
-        const cartItemData = {
-            userId: user.userId,                // Lấy từ AuthContext
-            productId: product.productId,       // ID sản phẩm chính
-            variantId: selectedVariant.variantId, // ID của variant (màu sắc) được chọn
-            quantity: 1,                      // Mặc định thêm 1 sản phẩm
-            isSelected: true                  // Mặc định là true khi thêm vào giỏ
-        };
-        console.log("Attempting to add to cart with data:", cartItemData); // Log dữ liệu gửi đi
-
-        // 5. Gọi API để thêm sản phẩm vào giỏ hàng
-        const response = await apiService.addToCart(cartItemData);
-        console.log("API Add to Cart Response:", response);
-
-        // 6. Xử lý thành công: Hiển thị toast thông báo
-        toast.success(`Đã thêm "${product.productName} - ${selectedVariant.color}" vào giỏ hàng!`, {
-             position: "bottom-right",
-             autoClose: 2500,
-        });
-
-        // 7. (Tùy chọn) Cập nhật state global (ví dụ: CartContext) để cập nhật số lượng trên icon giỏ hàng
-        // Ví dụ: dispatch({ type: 'FETCH_CART_COUNT' }); // Hoặc một cách khác để cập nhật
-
-    } catch (err) { // 8. Xử lý lỗi
-        console.error("Lỗi khi thêm vào giỏ hàng:", err);
-        // Cố gắng lấy message lỗi cụ thể từ response của API
-        let errorMessage = "Thêm vào giỏ hàng thất bại.";
-        if (err.response) {
-          // Lỗi có response từ server (4xx, 5xx)
-          errorMessage = err.response.data?.message || err.response.data || `Lỗi ${err.response.status}`;
-          console.error("API Error Response:", err.response.data);
-        } else if (err.request) {
-          // Lỗi request được gửi nhưng không nhận được response
-          errorMessage = "Không nhận được phản hồi từ máy chủ.";
-          console.error("API No Response:", err.request);
-        } else {
-          // Lỗi xảy ra trong quá trình thiết lập request
-          errorMessage = err.message;
-          console.error("API Request Setup Error:", err.message);
-        }
-
-        setAddToCartError(errorMessage); // Lưu lỗi để có thể hiển thị gần nút (nếu cần)
-        // Hiển thị toast báo lỗi
-        toast.error(errorMessage, { position: "bottom-right" });
-    } finally {
-        // 9. Kết thúc loading dù thành công hay thất bại
-        setIsAddingToCart(false);
-    }
-  };
-
-  // Xử lý khi nhấn nút "Đặt Hàng"
-  const handleOrderNow = async () => {
-     // 1. Kiểm tra đăng nhập
-     if (!isAuthenticated) {
-        toast.warn('Vui lòng đăng nhập để đặt hàng!', { position: "bottom-right" });
-        return;
-     }
-
-     // 1.5 Kiểm tra xem có thông tin User ID không
-     if (!user?.userId) {
-       console.error("Order now failed: User ID not found in AuthContext.");
-       toast.error("Lỗi: Không thể xác định người dùng. Vui lòng thử đăng nhập lại.", { position: "bottom-right" });
-       return; // Dừng thực thi
-     }
-
-     // 2. Kiểm tra variant, tồn kho, loading
-    if (!selectedVariant || selectedVariant.stockQuantity <= 0 || isAddingToCart) {
-        if (selectedVariant && selectedVariant.stockQuantity <= 0) {
-            toast.error('Sản phẩm đã hết hàng, không thể đặt ngay!', { position: "bottom-right" });
-        }
-        return;
-    }
-
-    // 3. Bắt đầu loading (có thể dùng chung state isAddingToCart)
-    setIsAddingToCart(true);
-    setAddToCartError('');
-
-    try {
-        // 4. Thêm sản phẩm vào giỏ hàng trước khi chuyển trang
-        //    (Payload giống hệt như handleAddToCart)
-         const cartItemData = {
-            userId: user.userId,
-            productId: product.productId,
-            variantId: selectedVariant.variantId,
-            quantity: 1,
-            isSelected: true // Item mới thêm thường được chọn sẵn trong giỏ
-        };
-        console.log("Adding item to cart before navigating (Order Now):", cartItemData);
-        await apiService.addToCart(cartItemData); // Gọi API thêm vào giỏ
-        console.log("Item added to cart successfully, navigating to /cart");
-
-        // 5. Chuyển hướng đến trang giỏ hàng
-        navigate('/cart');
-        // Không cần tắt loading ở đây nếu navigate thành công, vì component sẽ unmount
-
-    } catch(err) { // 6. Xử lý lỗi nếu thêm vào giỏ thất bại
-         console.error("Lỗi khi thêm vào giỏ (trong Đặt hàng):", err);
-         // Xử lý lỗi tương tự như handleAddToCart
-         let errorMessage = "Không thể xử lý đặt hàng.";
-         if (err.response) {
-            errorMessage = err.response.data?.message || err.response.data || `Lỗi ${err.response.status}`;
-            console.error("API Error Response (Order Now):", err.response.data);
-          } else if (err.request) {
-            errorMessage = "Không nhận được phản hồi từ máy chủ.";
-            console.error("API No Response (Order Now):", err.request);
+      try {
+          // Fetch danh sách đánh giá (API trả về mảng trực tiếp)
+          const reviewsResponse = await apiService.getListRateOfProduct(productId);
+          console.log("API Get Reviews List Response:", reviewsResponse);
+          if (Array.isArray(reviewsResponse.data)) {
+               setReviews(reviewsResponse.data);
+               // Lấy số lượng đánh giá từ độ dài mảng danh sách
+               setAverageReviewCount(reviewsResponse.data.length);
           } else {
-            errorMessage = err.message;
-            console.error("API Request Setup Error (Order Now):", err.message);
+               console.warn("API Get Reviews List returned non-array data:", reviewsResponse.data);
+               setReviews([]);
+               setAverageReviewCount(0);
           }
 
-         setAddToCartError(errorMessage);
-         toast.error(`Đặt hàng thất bại: ${errorMessage}`, { position: "bottom-right" });
-         setIsAddingToCart(false); // Quan trọng: Tắt loading nếu lỗi ở bước này
-    }
-    // Nếu không có lỗi ở try, isAddingToCart sẽ tự reset khi component unmount hoặc navigate
+          // Fetch đánh giá trung bình (API trả về chỉ số 4.0)
+          const averageResponse = await apiService.getAverageRateOfProduct(productId);
+          console.log("API Get Average Rating Response:", averageResponse);
+
+          // Giả định API trả về chỉ một số (ví dụ: 4.0)
+          if (typeof averageResponse.data === 'number') {
+              setAverageRating(averageResponse.data);
+              // averageReviewCount đã được set từ danh sách reviews
+          }
+          // Giả định API có thể trả về object { averageRating: number, totalReviews: number } theo docs cũ
+          // Nếu API thực tế TRẢ VỀ OBJECT CÓ count, có thể ưu tiên count từ đây
+          else if (averageResponse.data && typeof averageResponse.data === 'object' && typeof averageResponse.data.averageRating === 'number') {
+              setAverageRating(averageResponse.data.averageRating);
+               // Nếu object có totalReviews và nó là số, có thể cập nhật count từ đây
+              if (typeof averageResponse.data.totalReviews === 'number') {
+                  setAverageReviewCount(averageResponse.data.totalReviews);
+              }
+          }
+          else {
+               console.warn("API Get Average Rating returned unexpected data format:", averageResponse.data);
+               // Giữ nguyên averageRating và averageReviewCount đã set từ danh sách hoặc 0
+          }
+
+
+      } catch (err) {
+        console.error("Lỗi khi fetch đánh giá (list hoặc average):", err);
+        let errorMessage = "Không thể tải thông tin đánh giá.";
+         if (err.response) {
+            console.error("API Error Response (Fetch Reviews):", err.response.data);
+            errorMessage = err.response.data?.message || `Lỗi ${err.response.status} khi tải đánh giá.`;
+          } else if (err.request) {
+            errorMessage = "Không nhận được phản hồi khi tải đánh giá.";
+            console.error("API No Response (Fetch Reviews):", err.request);
+          } else {
+            errorMessage = err.message;
+            console.error("API Request Setup Error (Fetch Reviews):", err.message);
+          }
+        setReviewsError(errorMessage); // Lưu lỗi chung
+        setReviews([]); // Clear danh sách
+        setAverageRating(0); // Reset trung bình
+        setAverageReviewCount(0); // Reset count
+      } finally {
+        setIsLoadingReviews(false); // Tắt loading chung
+      }
   };
 
+
+  // Effect để fetch reviews & average rating và chọn variant
+  useEffect(() => {
+    fetchProductReviewsData(product?.productId);
+
+    // Logic chọn variant (giữ nguyên)
+    if (product?.variants?.length > 0) {
+        const firstAvailableIndex = product.variants.findIndex(v => v.stockQuantity > 0);
+        setSelectedVariantIndex(firstAvailableIndex >= 0 ? firstAvailableIndex : 0);
+    } else {
+        setSelectedVariantIndex(0);
+    }
+
+    // Reset review form state when product changes
+    setNewRating(0);
+    setNewComment('');
+    setSubmitReviewError('');
+
+  }, [product?.productId, product?.variants]);
+
+
+  // Lấy effective variant
+  const selectedVariant = (product?.variants && product.variants.length > selectedVariantIndex) ? product.variants[selectedVariantIndex] : null;
+  const effectiveVariant = selectedVariant || (product?.variants?.length > 0 ? product.variants[0] : null);
+
+
+  // --- Handlers (giữ nguyên) ---
+   const handleSelectVariant = (index) => { setSelectedVariantIndex(index); setAddToCartError(''); };
+   // Logic handleAddToCart và handleOrderNow giữ nguyên như code trước
+   const handleAddToCart = async () => { /* ... logic ... */
+       if (!isAuthenticated) { toast.warn('Vui lòng đăng nhập để thêm sản phẩm!', { position: "bottom-right" }); navigate('/login'); return; }
+       if (!user?.userId) { console.error("Add to cart failed: User ID not found."); toast.error("Lỗi: Không thể xác định người dùng.", { position: "bottom-right" }); return; }
+       if (!effectiveVariant || effectiveVariant.stockQuantity <= 0 || isAddingToCart) { if (effectiveVariant && effectiveVariant.stockQuantity <= 0) { toast.error('Sản phẩm đã hết hàng!', { position: "bottom-right" }); } return; }
+       setIsAddingToCart(true); setAddToCartError('');
+       try {
+           const cartItemData = { userId: user.userId, productId: product.productId, variantId: effectiveVariant.variantId, quantity: 1, isSelected: true };
+           await apiService.addToCart(cartItemData);
+           toast.success(`Đã thêm "${product.productName} - ${effectiveVariant.color}" vào giỏ hàng!`, { position: "bottom-right", autoClose: 2500, });
+       } catch (err) { console.error("Lỗi khi thêm vào giỏ hàng:", err); let errorMessage = "Thêm vào giỏ hàng thất bại."; if (err.response) { console.error("API Error Response (Add to Cart):", err.response.data); errorMessage = err.response.data?.message || err.response.data || `Lỗi ${err.response.status}`; } else if (err.request) { errorMessage = "Không nhận được phản hồi từ máy chủ khi thêm giỏ hàng."; console.error("API No Response (Add to Cart):", err.request); } else { errorMessage = err.message; console.error("API Request Setup Error (Add to Cart):", err.message); } setAddToCartError(errorMessage); toast.error(errorMessage, { position: "bottom-right" }); } finally { setIsAddingToCart(false); }
+   };
+   const handleOrderNow = async () => { /* ... logic ... */
+       if (!isAuthenticated) { toast.warn('Vui lòng đăng nhập để đặt hàng!', { position: "bottom-right" }); navigate('/login'); return; }
+       if (!user?.userId) { console.error("Order now failed: User ID not found."); toast.error("Lỗi: Không thể xác định người dùng.", { position: "bottom-right" }); return; }
+       if (!effectiveVariant || effectiveVariant.stockQuantity <= 0 || isAddingToCart) { if (effectiveVariant && effectiveVariant.stockQuantity <= 0) { toast.error('Sản phẩm đã hết hàng, không thể đặt ngay!', { position: "bottom-right" }); } return; }
+       setIsAddingToCart(true); setAddToCartError('');
+       try {
+            const cartItemData = { userId: user.userId, productId: product.productId, variantId: effectiveVariant.variantId, quantity: 1, isSelected: true };
+            await apiService.addToCart(cartItemData);
+            navigate('/cart');
+       } catch(err) { console.error("Lỗi khi thêm vào giỏ (trong Đặt hàng):", err); let errorMessage = "Không thể xử lý đặt hàng."; if (err.response) { console.error("API Error Response (Order Now):", err.response.data); errorMessage = err.response.data?.message || err.response.data || `Lỗi ${err.response.status}`; } else if (err.request) { errorMessage = "Không nhận được phản hồi từ máy chủ."; console.error("API No Response (Order Now):", err.request); } else { errorMessage = err.message; console.error("API Request Setup Error (Order Now):", err.message); } setAddToCartError(errorMessage); toast.error(`Đặt hàng thất bại: ${errorMessage}`, { position: "bottom-right" }); setIsAddingToCart(false); }
+   };
+
+  // --- Handlers cho Form Đánh giá (giữ nguyên logic, cập nhật fetch sau submit) ---
+   const handleRatingClick = (rating) => { setNewRating(rating); };
+   const handleCommentChange = (event) => { setNewComment(event.target.value); };
+   const handleSubmitReview = async () => {
+       if (!isAuthenticated || !user?.userId) { toast.warn('Vui lòng đăng nhập để gửi đánh giá!', { position: "bottom-right" }); navigate('/login'); return; }
+       if (!product?.productId) { toast.error('Lỗi: Không tìm thấy ID sản phẩm để gửi đánh giá.', { position: "bottom-right" }); return; }
+       if (newRating === 0) { toast.warn('Vui lòng chọn số sao đánh giá.', { position: "bottom-right" }); return; }
+       if (!newComment.trim()) { toast.warn('Vui lòng nhập nội dung đánh giá.', { position: "bottom-right" }); return; }
+       if (isSubmittingReview) { console.warn("Already submitting a review."); return; }
+
+       setIsSubmittingReview(true); setSubmitReviewError('');
+       try {
+           const reviewData = { productId: product.productId, rating: newRating, ratingComment: newComment.trim(), userId: user.userId };
+           await apiService.postRate(reviewData);
+           toast.success('Đánh giá của bạn đã được gửi thành công!', { position: "bottom-right" });
+           setNewRating(0); setNewComment('');
+           // Refetch CẢ danh sách và average rating sau khi gửi thành công
+           fetchProductReviewsData(product.productId);
+       } catch (err) {
+           console.error("Lỗi khi gửi đánh giá:", err);
+           let errorMessage = "Gửi đánh giá thất bại.";
+            if (err.response) { console.error("API Error Response (Submit Review):", err.response.data); errorMessage = err.response.data?.message || err.response.data || `Lỗi ${err.response.status}`; } else if (err.request) { errorMessage = "Không nhận được phản hồi từ máy chủ khi gửi đánh giá."; console.error("API No Response (Submit Review):", err.request); } else { errorMessage = err.message; console.error("API Request Setup Error (Submit Review):", err.message); }
+           setSubmitReviewError(errorMessage); toast.error(errorMessage, { position: "bottom-right" });
+       } finally { setIsSubmittingReview(false); }
+   };
+
+
   // --- Render Conditions ---
-  // Kiểm tra dữ liệu đầu vào cơ bản
-  if (!product || !product.variants || product.variants.length === 0) {
-    // Có thể hiển thị một thông báo lỗi cụ thể hơn ở đây
-    return <div className={styles.productDisplayContainer}><p className={styles.errorMessage}>Không tìm thấy thông tin sản phẩm hoặc sản phẩm không có biến thể.</p></div>;
+  // Hiển thị loading ban đầu nếu chưa có product hoặc effectiveVariant hợp lệ
+  if (!product || !product.variants || product.variants.length === 0 || !effectiveVariant) {
+     // Nếu đang load review list/average, hiển thị spinner chung
+    if (isLoadingReviews) {
+        return (
+            <div className={styles.productDisplayWrapper}>
+                <div className={styles.loadingReviews}>
+                    <Spinner /> Đang tải thông tin sản phẩm...
+                </div>
+            </div>
+        );
+    }
+    // Nếu không load và không có product/variants/effectiveVariant hợp lệ
+     return (
+        <div className={styles.productDisplayWrapper}>
+            <p className={styles.errorMessage}>Không tìm thấy thông tin sản phẩm hoặc sản phẩm không có biến thể hợp lệ.</p>
+        </div>
+     );
   }
-  // Đảm bảo luôn có một `currentVariant` để tránh lỗi (dù đã có useEffect xử lý)
-  const currentVariant = selectedVariant || product.variants[0];
-  // Kiểm tra lại xem currentVariant có thực sự tồn tại không (trường hợp cực hiếm)
-  if (!currentVariant) {
-      return <div className={styles.productDisplayContainer}><p className={styles.errorMessage}>Lỗi hiển thị biến thể sản phẩm.</p></div>;
-  }
+
 
   // --- JSX Output ---
   return (
-    <div className={styles.productDisplayContainer}>
+    <div className={styles.productDisplayWrapper}> {/* Wrapper cho toàn bộ nội dung */}
 
-      {/* === CỘT TRÁI: HÌNH ẢNH SẢN PHẨM === */}
-      <div className={styles.leftColumn}>
-          <div className={styles.imageWrapper}>
-              <img
-                  src={currentVariant.imageUrl || "/images/placeholder-image.png"} // Ảnh của variant đang chọn, có fallback
-                  alt={`${product.productName} - ${currentVariant.color}`} // Text mô tả ảnh
-                  className={styles.mainImage}
-                  key={currentVariant.variantId} // Key giúp React nhận biết và cập nhật ảnh khi variant đổi
-                  loading="lazy" // Tải ảnh trì hoãn
-                  onError={(e) => { // Xử lý khi ảnh bị lỗi không tải được
-                      e.target.onerror = null; // Ngăn vòng lặp lỗi vô hạn
-                      e.target.src="/images/placeholder-image.png"; // Hiển thị ảnh dự phòng
-                  }}
-              />
-              {/* Hiển thị badge giảm giá nếu có */}
-              {currentVariant.discount > 0 && (
-                  <div className={styles.imageDiscountBadge}>
-                      <FaTag /> -{currentVariant.discount.toFixed(0)}%
-                  </div>
+      {/* === KHỐI 1: CỘT TRÁI (ẢNH) VÀ CỘT PHẢI (THÔNG TIN CHÍNH & ACTIONS) === */}
+      <div className={styles.productDisplayContainer}> {/* Flex container cho Cột trái (ảnh) và Cột phải (info) */}
+
+        {/* CỘT TRÁI: HÌNH ẢNH SẢN PHẨM */}
+        <div className={styles.leftColumn}>
+             <div className={styles.imageWrapper}>
+                <img
+                    src={effectiveVariant.imageUrl || "/images/placeholder-image.png"}
+                    alt={`${product.productName} - ${effectiveVariant.color}`}
+                    className={styles.mainImage}
+                    key={effectiveVariant.variantId}
+                    loading="lazy"
+                    onError={(e) => { e.target.onerror = null; e.target.src="/images/placeholder-image.png"; }}
+                />
+                {effectiveVariant.discount > 0 && (
+                    <div className={styles.imageDiscountBadge}>
+                        <FaTag /> -{effectiveVariant.discount.toFixed(0)}%
+                    </div>
+                )}
+            </div>
+        </div>
+
+        {/* CỘT PHẢI: THÔNG TIN CHÍNH & ACTIONS */}
+        <div className={styles.rightColumn}>
+            <h1 className={styles.productName}>{product.productName}</h1>
+
+            {/* HIỂN THỊ ĐÁNH GIÁ TRUNG BÌNH VÀ SỐ LƯỢT NGAY DƯỚI TÊN */}
+            {/* Sử dụng state averageRating và averageReviewCount từ API */}
+            {/* averageReviewCount được lấy từ độ dài mảng reviews, averageRating từ API average */}
+            <RatingStars rating={averageRating} reviewCount={averageReviewCount} isIndividualReview={false} />
+
+            {product.supportRushOrder && (
+                <div className={styles.badge} style={{ backgroundColor: '#e6f7ff', color: '#1890ff', borderColor: '#91d5ff'}}>
+                    <FaBolt /> Hỗ trợ giao hàng nhanh
+                </div>
+            )}
+             {product.weight && (
+                <div className={styles.badge} style={{ backgroundColor: '#f0fdf4', color: '#16a34a', borderColor: '#bbf7d0'}}>
+                    ⚖️ {product.weight} kg
+                </div>
+             )}
+
+            <hr className={styles.divider} />
+
+            <div className={styles.priceSection}>
+                <span className={styles.currentPrice}>{formatCurrency(effectiveVariant.finalPrice)}</span>
+                {effectiveVariant.discount > 0 && effectiveVariant.basePrice && effectiveVariant.basePrice > effectiveVariant.finalPrice && (
+                    <span className={styles.oldPrice}>{formatCurrency(effectiveVariant.basePrice)}</span>
+                )}
+            </div>
+
+            <div className={styles.variantSelector}>
+              <p className={styles.selectorTitle}>Chọn màu sắc:</p>
+              <div className={styles.variantGrid}>
+                {product.variants.map((variant, index) => (
+                  <button
+                    key={variant.variantId}
+                    className={`
+                        ${styles.variantCard}
+                        ${index === selectedVariantIndex ? styles.selectedVariant : ''}
+                        ${variant.stockQuantity <= 0 ? styles.disabledVariant : ''}
+                    `}
+                    onClick={() => handleSelectVariant(index)}
+                    title={`${variant.color}\nGiá: ${formatCurrency(variant.finalPrice)}\n${variant.stockQuantity > 0 ? `Kho: ${variant.stockQuantity}` : 'Tạm hết hàng'}`}
+                    disabled={variant.stockQuantity <= 0}
+                  >
+                    <img
+                      src={variant.imageUrl || "/images/placeholder-image.png"}
+                      alt={variant.color}
+                      className={styles.variantThumb}
+                      loading="lazy"
+                      onError={(e) => { e.target.style.display='none'; }}
+                    />
+                    <div className={styles.variantInfo}>
+                        <span className={styles.variantColorName}>{variant.color}</span>
+                        <span className={styles.variantPriceTag}>{formatCurrency(variant.finalPrice)}</span>
+                    </div>
+                    {index === selectedVariantIndex && (
+                       <FaCheck className={styles.checkmarkIcon} />
+                    )}
+                    {variant.stockQuantity <= 0 && (
+                         <div className={styles.outOfStockOverlay}>Hết hàng</div>
+                    )}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+             {effectiveVariant.stockQuantity <= 0 && (
+                 <p className={styles.variantOutOfStockMsg}>
+                     <FaExclamationCircle /> Màu [{effectiveVariant.color}] hiện đã hết hàng. Vui lòng chọn màu khác.
+                 </p>
+             )}
+             {addToCartError && !isAddingToCart && (
+                 <p className={`${styles.variantOutOfStockMsg} ${styles.addToCartError}`}>
+                     <FaExclamationCircle /> {addToCartError}
+                 </p>
+             )}
+
+             <div className={styles.actionButtons}>
+                    <Button
+                        variant="primary"
+                        className={styles.orderNowButton}
+                        onClick={handleOrderNow}
+                        disabled={effectiveVariant.stockQuantity <= 0 || isAddingToCart || !isAuthenticated}
+                    >
+                         {isAddingToCart ? <Spinner size="small" color="#fff"/> : <strong>ĐẶT HÀNG</strong> }
+                         {!isAddingToCart && <span>Giao hàng tận nơi</span>}
+                    </Button>
+
+                    <Button
+                        variant="outline"
+                        className={styles.addToCartButton}
+                        onClick={handleAddToCart}
+                        disabled={effectiveVariant.stockQuantity <= 0 || isAddingToCart || !isAuthenticated}
+                    >
+                        {isAddingToCart ? <Spinner size="small" /> : <FaCartPlus />}
+                        <span>{isAddingToCart ? 'Đang xử lý...' : 'Thêm vào giỏ'}</span>
+                    </Button>
+             </div>
+              {!isAuthenticated && (
+                   <Button
+                      variant="secondary"
+                      onClick={() => navigate('/login')}
+                      className={styles.loginPromptButton}
+                    >
+                        <FiLogIn /> Đăng nhập để mua hàng
+                   </Button>
               )}
-          </div>
-      </div>
+        </div>
+      </div> {/* End of .productDisplayContainer */}
 
-      {/* === CỘT PHẢI: THÔNG TIN & ACTIONS === */}
-      <div className={styles.rightColumn}>
-          {/* Tên sản phẩm */}
-          <h1 className={styles.productName}>{product.productName}</h1>
-          {/* Đánh giá sao và số lượt đánh giá */}
-          <RatingStars rating={product.rating || 0} reviewCount={product.reviewCount || 0} />
 
-          {/* Badge hỗ trợ giao nhanh */}
-          {product.supportRushOrder && (
-              <div className={styles.badge} style={{ backgroundColor: '#e6f7ff', color: '#1890ff', borderColor: '#91d5ff'}}>
-                  <FaBolt /> Hỗ trợ giao hàng nhanh
+      {/* === KHỐI 2: MÔ TẢ VÀ THÔNG SỐ KỸ THUẬT === */}
+      {/* Nằm dưới khối 1, chiếm full width */}
+      <div className={styles.detailsSection}>
+          {/* Truyền dữ liệu mô tả và specs từ product prop */}
+          {/* Giả định product có các field description (string) và specs (array of {name, value}) */}
+          <ProductDescription description={product.description} />
+          <TechnicalSpecs specs={product.specs} />
+      </div> {/* End of .detailsSection */}
+
+
+      {/* === KHỐI 3: HIỂN THỊ ĐÁNH GIÁ CHI TIẾT === */}
+      {/* Nằm dưới khối 2, chiếm full width */}
+      <div className={styles.reviewsSection} id="reviews">
+          {/* Hiển thị số lượng đánh giá trong tiêu đề */}
+          {/* Sử dụng averageReviewCount từ state (lấy từ độ dài danh sách reviews) */}
+          <h2 className={styles.reviewsHeading}>Đánh giá sản phẩm ({averageReviewCount || 0})</h2>
+
+          {/* Form viết đánh giá */}
+          {isAuthenticated && (
+              <div className={styles.reviewForm}>
+                  <h3 className={styles.reviewFormTitle}>Viết đánh giá của bạn</h3>
+                  <div className={styles.starPicker}>
+                      {[1, 2, 3, 4, 5].map(star => (
+                          <span
+                              key={star}
+                              className={`${styles.starPickerIcon} ${star <= newRating ? styles.starSelected : ''}`}
+                              onClick={() => handleRatingClick(star)}
+                          >
+                              <FaStar />
+                          </span>
+                      ))}
+                  </div>
+                  <textarea
+                      className={styles.commentInput}
+                      placeholder="Nhập nội dung đánh giá của bạn..."
+                      value={newComment}
+                      onChange={handleCommentChange}
+                      rows={4}
+                  />
+                   {submitReviewError && (
+                       <p className={`${styles.addToCartError} ${styles.submitReviewError}`}>
+                           <FaExclamationCircle /> {submitReviewError}
+                       </p>
+                   )}
+                  <Button
+                      variant="primary"
+                      onClick={handleSubmitReview}
+                      disabled={isSubmittingReview || newRating === 0 || !newComment.trim()}
+                      className={styles.submitReviewButton}
+                  >
+                       {isSubmittingReview ? <Spinner size="small" color="#fff"/> : 'Gửi đánh giá'}
+                  </Button>
               </div>
           )}
-          {/* Badge cân nặng */}
-           {product.weight && (
-              <div className={styles.badge} style={{ backgroundColor: '#f0fdf4', color: '#16a34a', borderColor: '#bbf7d0'}}>
-                  ⚖️ {product.weight} kg
+           {/* Prompt đăng nhập nếu chưa đăng nhập */}
+           {!isAuthenticated && (
+               <p className={styles.loginToReviewPrompt}>
+                  <FiLogIn /> Vui lòng <a href="/login">đăng nhập</a> để gửi đánh giá về sản phẩm này.
+               </p>
+           )}
+
+          {/* Danh sách các đánh giá đã có */}
+          {isLoadingReviews && (
+              <div className={styles.loadingReviews}>
+                  <Spinner /> Đang tải đánh giá...
               </div>
-           )}
+          )}
+          {!isLoadingReviews && reviewsError && (
+              <p className={styles.reviewsErrorMessage}>
+                  <FaExclamationCircle /> {reviewsError}
+              </p>
+          )}
+          {!isLoadingReviews && !reviewsError && reviews.length === 0 && (
+              <p className={styles.noReviewsMessage}>Chưa có đánh giá nào cho sản phẩm này.</p>
+          )}
+          {/* Hiển thị danh sách nếu có reviews */}
+          {!isLoadingReviews && !reviewsError && reviews.length > 0 && (
+              <div className={styles.reviewsList}>
+                  {reviews.map((review, index) => (
+                      // Sử dụng key duy nhất, kết hợp user/date/index nếu API không có ID
+                      <ReviewItem key={`${review.userId}-${review.ratingDate}-${index}`} review={review} />
+                  ))}
+              </div>
+          )}
+      </div> {/* End of .reviewsSection */}
 
-          {/* Đường kẻ ngang */}
-          <hr className={styles.divider} />
-
-          {/* Khu vực giá */}
-          <div className={styles.priceSection}>
-              {/* Giá bán hiện tại (đã tính discount) */}
-              <span className={styles.currentPrice}>{formatCurrency(currentVariant.finalPrice)}</span>
-              {/* Giá gốc (chỉ hiển thị nếu có discount) */}
-              {currentVariant.discount > 0 && currentVariant.basePrice && currentVariant.basePrice > currentVariant.finalPrice && (
-                  <span className={styles.oldPrice}>{formatCurrency(currentVariant.basePrice)}</span>
-              )}
-          </div>
-
-          {/* Khu vực chọn màu sắc (variant) */}
-          <div className={styles.variantSelector}>
-            <p className={styles.selectorTitle}>Chọn màu sắc:</p>
-            <div className={styles.variantGrid}>
-              {/* Lặp qua mảng product.variants để tạo các nút chọn màu */}
-              {product.variants.map((variant, index) => (
-                <button
-                  key={variant.variantId} // Key duy nhất cho mỗi variant
-                  className={`
-                      ${styles.variantCard}
-                      ${index === selectedVariantIndex ? styles.selectedVariant : ''}
-                      ${variant.stockQuantity <= 0 ? styles.disabledVariant : ''}
-                  `}
-                  onClick={() => handleSelectVariant(index)} // Gọi hàm xử lý khi click
-                  // Tooltip hiển thị thông tin chi tiết khi hover
-                  title={`${variant.color}\nGiá: ${formatCurrency(variant.finalPrice)}\n${variant.stockQuantity > 0 ? `Kho: ${variant.stockQuantity}` : 'Tạm hết hàng'}`}
-                  disabled={variant.stockQuantity <= 0} // Disable button nếu hết hàng
-                >
-                  {/* Ảnh thumbnail của variant */}
-                  <img
-                    src={variant.imageUrl || "/images/placeholder-image.png"} // Nên dùng ảnh thumbnail nếu API cung cấp, có fallback
-                    alt={variant.color}
-                    className={styles.variantThumb}
-                    loading="lazy"
-                    onError={(e) => { e.target.style.display='none'; /* Ẩn nếu ảnh thumb lỗi */ }}
-                  />
-                  {/* Thông tin tên màu và giá */}
-                  <div className={styles.variantInfo}>
-                      <span className={styles.variantColorName}>{variant.color}</span>
-                      <span className={styles.variantPriceTag}>{formatCurrency(variant.finalPrice)}</span>
-                  </div>
-                  {/* Icon check nếu variant này được chọn */}
-                  {index === selectedVariantIndex && (
-                     <FaCheck className={styles.checkmarkIcon} />
-                  )}
-                  {/* Lớp phủ hiển thị "Hết hàng" */}
-                  {variant.stockQuantity <= 0 && (
-                       <div className={styles.outOfStockOverlay}>Hết hàng</div>
-                  )}
-                </button>
-              ))}
-            </div>
-          </div>
-
-           {/* Thông báo nếu màu đang chọn hết hàng */}
-           {currentVariant.stockQuantity <= 0 && (
-               <p className={styles.variantOutOfStockMsg}>
-                   <FaExclamationCircle /> Màu [{currentVariant.color}] hiện đã hết hàng. Vui lòng chọn màu khác.
-               </p>
-           )}
-           {/* Thông báo lỗi khi thêm vào giỏ (nếu có) */}
-           {addToCartError && !isAddingToCart && ( // Chỉ hiển thị lỗi khi không đang loading
-               <p className={`${styles.variantOutOfStockMsg} ${styles.addToCartError}`}>
-                   <FaExclamationCircle /> {addToCartError}
-               </p>
-           )}
-
-           {/* Các nút hành động: Đặt hàng & Thêm vào giỏ */}
-           <div className={styles.actionButtons}>
-                  {/* Nút Đặt Hàng */}
-                  <Button
-                      variant="primary" // Sử dụng variant primary (có thể custom gradient trong CSS)
-                      className={styles.orderNowButton}
-                      onClick={handleOrderNow} // Gọi hàm xử lý đặt hàng
-                      // Disable nút nếu hết hàng hoặc đang xử lý thêm vào giỏ
-                      disabled={currentVariant.stockQuantity <= 0 || isAddingToCart || !isAuthenticated} // Disable nếu chưa đăng nhập
-                  >
-                       {/* Hiển thị spinner nếu đang xử lý */}
-                      {isAddingToCart ? <Spinner size="small" color="#fff"/> : <strong>ĐẶT HÀNG</strong> }
-                      {!isAddingToCart && <span>Giao hàng tận nơi</span>}
-                  </Button>
-
-                  {/* Nút Thêm vào giỏ hàng */}
-                  <Button
-                      variant="outline" // Sử dụng variant outline (hoặc secondary)
-                      className={styles.addToCartButton}
-                      onClick={handleAddToCart} // Gọi hàm xử lý thêm vào giỏ
-                      disabled={currentVariant.stockQuantity <= 0 || isAddingToCart || !isAuthenticated} // Disable khi hết hàng, đang loading hoặc chưa đăng nhập
-                  >
-                      {/* Hiển thị spinner hoặc icon tùy trạng thái loading */}
-                      {isAddingToCart ? <Spinner size="small" /> : <FaCartPlus />}
-                      <span>{isAddingToCart ? 'Đang xử lý...' : 'Thêm vào giỏ'}</span>
-                  </Button>
-           </div>
-            {/* Nút đăng nhập nếu chưa đăng nhập */}
-            {!isAuthenticated && (
-                 <Button
-                    variant="secondary"
-                    onClick={() => navigate('/login')}
-                    className={styles.loginPromptButton}
-                  >
-                      <FiLogIn /> Đăng nhập để mua hàng
-                 </Button>
-            )}
-      </div>
-    </div>
+    </div> // End of .productDisplayWrapper
   );
 };
 

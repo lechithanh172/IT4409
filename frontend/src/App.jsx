@@ -1,6 +1,5 @@
 import React from 'react';
 import { Routes, Route, Outlet } from 'react-router-dom'; // Import Outlet
-
 // Layouts
 import MainLayout from './layouts/MainLayout';
 // Import other layouts if needed

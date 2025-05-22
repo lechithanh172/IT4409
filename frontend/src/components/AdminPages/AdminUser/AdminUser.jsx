@@ -8,7 +8,7 @@ import EditUser from './EditUser';
 const { confirm } = Modal;
 const { TabPane } = Tabs;
 
-const ROLES = ['ADMIN', 'PRODUCT_MANAGER', 'CUSTOMER'];
+const ROLES = ['ADMIN', 'PRODUCT_MANAGER', 'SHIPPER', 'CUSTOMER'];
 
 const AdminUser = () => {
     const [usersData, setUsersData] = useState({});
@@ -161,6 +161,7 @@ const AdminUser = () => {
             let color = 'default';
             if (role === 'ADMIN') color = 'volcano';
             else if (role === 'PRODUCT_MANAGER') color = 'geekblue';
+            else if (role === 'SHIPPER') color = 'purple';
             else if (role === 'CUSTOMER') color = 'green';
             return <Tag color={color}>{role}</Tag>;
         }, },

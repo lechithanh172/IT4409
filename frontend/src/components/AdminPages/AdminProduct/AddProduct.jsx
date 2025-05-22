@@ -333,11 +333,26 @@ const AddProduct = ({ closeModal, onProductAdded, categoriesList = [], brandsLis
                     <Card key={variant.key} type="inner" size="small" title={`Mẫu #${index + 1}`} style={{ marginBottom: 16 }} extra={variants.length > 1 && (<Button icon={<MinusCircleOutlined />} onClick={() => removeVariant(variant.key)} type="text" danger title="Xóa mẫu này"/>)}>
                         <Row gutter={16}>
                             <Col span={16}>
-                                <Form.Item label={`Màu sắc #${index + 1}`} required validateStatus={!variant.color ? "error" : ""} help={!variant.color ? "Vui lòng nhập màu sắc" : ""}>
-                                    <Input placeholder="VD: Xanh dương" value={variant.color} onChange={(e) => handleVariantChange(variant.key, "color", e.target.value)} size="large"/>
+                                <Form.Item 
+                                    label={`Màu sắc #${index + 1}`} 
+                                    required 
+                                    validateStatus={isSubmitting && !variant.color ? "error" : ""} 
+                                    help={isSubmitting && !variant.color ? "Vui lòng nhập màu sắc" : ""}
+                                >
+                                    <Input 
+                                        placeholder="VD: Xanh dương" 
+                                        value={variant.color} 
+                                        onChange={(e) => handleVariantChange(variant.key, "color", e.target.value)} 
+                                        size="large"
+                                    />
                                 </Form.Item>
                                 <Form.Item label={`Url ảnh #${index + 1}`}> 
-                                    <Input placeholder="https://example.com/anh-mau-san-pham.jpg" value={variant.imageUrl} onChange={(e) => handleVariantChange(variant.key, "imageUrl", e.target.value)} size="large"/>
+                                    <Input 
+                                        placeholder="https://example.com/anh-mau-san-pham.jpg" 
+                                        value={variant.imageUrl} 
+                                        onChange={(e) => handleVariantChange(variant.key, "imageUrl", e.target.value)} 
+                                        size="large"
+                                    />
                                 </Form.Item>
                             </Col>
                             <Col span={8}>
@@ -354,13 +369,38 @@ const AddProduct = ({ closeModal, onProductAdded, categoriesList = [], brandsLis
                         </Row>
                         <Row gutter={16}>
                             <Col span={12}>
-                                <Form.Item label={`Số lượng #${index + 1}`} required validateStatus={variant.stockQuantity === null || variant.stockQuantity < 0 ? 'error' : ''} help={variant.stockQuantity === null || variant.stockQuantity < 0 ? 'Số lượng phải >= 0!' : ''}>
-                                    <InputNumber min={0} value={variant.stockQuantity} onChange={(value) => handleVariantChange(variant.key, "stockQuantity", value ?? 0)} style={{ width: "100%" }} placeholder="0" size="large"/>
+                                <Form.Item 
+                                    label={`Số lượng #${index + 1}`} 
+                                    required 
+                                    validateStatus={isSubmitting && (variant.stockQuantity === null || variant.stockQuantity < 0) ? 'error' : ''} 
+                                    help={isSubmitting && (variant.stockQuantity === null || variant.stockQuantity < 0) ? 'Số lượng phải >= 0!' : ''}
+                                >
+                                    <InputNumber 
+                                        min={0} 
+                                        value={variant.stockQuantity} 
+                                        onChange={(value) => handleVariantChange(variant.key, "stockQuantity", value ?? 0)} 
+                                        style={{ width: "100%" }} 
+                                        placeholder="0" 
+                                        size="large"
+                                    />
                                 </Form.Item>
                             </Col>
                             <Col span={12}>
-                                <Form.Item label={`Giảm giá (%) #${index + 1}`} validateStatus={variant.discountPercentage === null || variant.discountPercentage < 0 || variant.discountPercentage > 100 ? 'error' : ''} help={variant.discountPercentage === null || variant.discountPercentage < 0 || variant.discountPercentage > 100 ? 'Từ 0 đến 100!' : ''}>
-                                    <InputNumber min={0} max={100} value={variant.discountPercentage} onChange={(value) => handleVariantChange(variant.key, "discountPercentage", value ?? 0)} style={{ width: "100%" }} placeholder="0" addonAfter="%" size="large"/>
+                                <Form.Item 
+                                    label={`Giảm giá (%) #${index + 1}`} 
+                                    validateStatus={isSubmitting && (variant.discountPercentage === null || variant.discountPercentage < 0 || variant.discountPercentage > 100) ? 'error' : ''} 
+                                    help={isSubmitting && (variant.discountPercentage === null || variant.discountPercentage < 0 || variant.discountPercentage > 100) ? 'Từ 0 đến 100!' : ''}
+                                >
+                                    <InputNumber 
+                                        min={0} 
+                                        max={100} 
+                                        value={variant.discountPercentage} 
+                                        onChange={(value) => handleVariantChange(variant.key, "discountPercentage", value ?? 0)} 
+                                        style={{ width: "100%" }} 
+                                        placeholder="0" 
+                                        addonAfter="%" 
+                                        size="large"
+                                    />
                                 </Form.Item>
                             </Col>
                         </Row>

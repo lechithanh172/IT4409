@@ -1,17 +1,19 @@
 package com.service;
 
-import com.entity.Order;
-import com.entity.Product;
-import com.entity.User;
-import com.enums.DeliveryMethod;
+import com.entity.*;
+import com.entity.dto.OrderItemDTO;
 import com.enums.OrderStatus;
+import com.repository.OrderItemRepository;
 import com.repository.OrderRepository;
 import com.repository.ProductRepository;
+import com.repository.ProductVariantRepository;
 import com.request.Item;
 import com.request.OrderRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -23,42 +25,74 @@ public class OrderService {
     @Autowired
     private ProductRepository productRepository;
     @Autowired
-    UserService userService;
+    private UserService userService;
     @Autowired
-    JwtService jwtService;
+    private OrderItemRepository orderItemRepository;
+    @Autowired
+    private ProductVariantRepository productVariantRepository;
+    @Autowired
+    private CartService cartService;
+    @Autowired
+    private EmailService emailService;
+
+    public List<Order> getOrdersWithoutShipper() {
+        return orderRepository.findOrdersByStatusAndShipperIdIsNull(OrderStatus.APPROVED);
+    }
+    public List<Order> getOrdersByShipperId(Integer shipperId) {
+        return orderRepository.findOrdersByShipperId(shipperId);
+    }
 
     public Integer createOrder(OrderRequest orderRequest, String token) {
         if(orderRequest.getItems().length == 0) return -1;
         User user = userService.getInfo(token).get();
         Order order = new Order(orderRequest, user.getUserId());
-//        order.setShippingFee(shippingFeeCalculate(orderRequest));
-        // tạm thời trước khi update địa chỉ
-        order.setShippingFee(50000);
-
+        System.out.println(order.getOrderId());
         Long totalAmount = 0L;
         for(Item item : orderRequest.getItems()) {
+            ProductVariant productVariant = productVariantRepository.findById(item.getVariantId()).get();
             Product product = productRepository.findById(item.getProductId()).get();
-            totalAmount += product.getPrice() * item.getQuantity();
+            totalAmount += priceCalculate(product.getPrice(), productVariant.getDiscountPercentage()) * item.getQuantity();
         }
         order.setTotalAmount(totalAmount);
         order.setNote(orderRequest.getNote());
+        order.setShippingFee(orderRequest.getShippingFee());
+        System.out.println(order.getStatus());
         orderRepository.save(order);
+
+
+        for(Item item : orderRequest.getItems()) {
+            OrderItem orderItem = new OrderItem(order.getOrderId(), item.getProductId(), item.getVariantId(), item.getQuantity());
+            orderItemRepository.save(orderItem);
+            cartService.removeCartItemWhenCreateOrder(user.getUserId(), item.getProductId(), item.getVariantId());
+        }
+
+        // --- Gửi email xác nhận đơn hàng ---
+        try {
+            String to = user.getEmail();
+            String subject = "Xác nhận đơn hàng #" + order.getOrderId();
+            StringBuilder content = new StringBuilder();
+            content.append("Chào ").append(user.getFullName()).append(",\n\n");
+            content.append("Cảm ơn bạn đã đặt hàng tại cửa hàng của chúng tôi.\n");
+            content.append("Thông tin đơn hàng:\n");
+            content.append("Mã đơn hàng: ").append(order.getOrderId()).append("\n");
+            content.append("Tổng tiền: ").append(totalAmount).append(" VND\n");
+            content.append("Phí vận chuyển: ").append(order.getShippingFee()).append(" VND\n");
+            content.append("Ghi chú: ").append(order.getNote() != null ? order.getNote() : "Không có").append("\n\n");
+            content.append("Chúng tôi sẽ sớm xử lý đơn hàng của bạn.\n");
+            content.append("Trân trọng,\nĐội ngũ cửa hàng");
+
+            emailService.sendEmail(to, subject, content.toString());
+        } catch (Exception e) {
+            System.out.println("Gửi email thất bại: " + e.getMessage());
+        }
+
+
         return order.getOrderId();
     }
-
-    public Integer shippingFeeCalculate(OrderRequest orderRequest) {
-        String shippingAddress = orderRequest.getShippingAddress().split(", ")[2];
-        DeliveryMethod deliveryMethod = orderRequest.getDeliveryMethod();
-        if(shippingAddress.equals("Hà Nội") || shippingAddress.equals("TP Hồ Chí Minh")) {
-            if(deliveryMethod.equals(DeliveryMethod.STANDARD)) return 50 * 1000;
-            else if(deliveryMethod.equals(DeliveryMethod.EXPRESS)) return 150 * 1000;
-        }
-        else {
-            if(deliveryMethod.equals(DeliveryMethod.STANDARD)) return 100 * 1000;
-            else if(deliveryMethod.equals(DeliveryMethod.EXPRESS)) return 200 * 1000;
-        }
-        return 100 * 1000;
+    public Long priceCalculate(Long originalPrice, Integer discountPercentage) {
+        return originalPrice * (100 - discountPercentage) / 100;
     }
+
     public Optional<Order> getOrderById(Integer orderId) {
         return orderRepository.findOrderByOrderId(orderId);
     }
@@ -78,11 +112,66 @@ public class OrderService {
         if(order.isPresent()) {
             order.get().setStatus(status);
             orderRepository.save(order.get());
+            if(status == OrderStatus.APPROVED) {
+//                OrderItem item = new OrderItem(orderId, );
+            }
             return order.get();
         }
         else {
             return null;
         }
+    }
+    public List<OrderItemDTO> getProductsByOrderId(Integer orderId) {
+        List<OrderItem> orderItems = orderItemRepository.findByOrderId(orderId);
+        List<OrderItemDTO> orderItemDTOs = new ArrayList<>();
+        for(OrderItem orderItem : orderItems) {
+            OrderItemDTO item = new OrderItemDTO();
+            Optional<Product> optionalProduct = productRepository.findByProductId(orderItem.getProductId());
+            if(optionalProduct.isEmpty()) {
+                item.setProductId(orderItem.getProductId());
+            }
+            else {
+                Product product = optionalProduct.get();
+                for(ProductVariant productVariant : product.getVariants()) {
+                    if(productVariant.getVariantId() == orderItem.getVariantId()) {
+                        item.setVariantId(productVariant.getVariantId());
+                        item.setPrice(priceCalculate(product.getPrice(), productVariant.getDiscountPercentage()));
+                        item.setColor(productVariant.getColor());
+                        item.setImageUrl(productVariant.getImageUrl());
+                        break;
+                    }
+                }
+                item.setProductId(product.getProductId());
+                item.setProductName(product.getProductName());
+                item.setDescription(product.getDescription());
+                item.setSpecifications(product.getSpecifications());
+                item.setWeight(product.getWeight());
+                item.setQuantity(orderItem.getQuantity());
+            }
+            orderItemDTOs.add(item);
+        }
+        return orderItemDTOs;
+    }
+
+    public Order assignOrderToShipper(Integer orderId, Integer shipperId) {
+        // Chỉ nhận đơn chưa được gán shipper
+        Order order = orderRepository.findOrderByOrderId(orderId)
+                .orElseThrow(() -> new RuntimeException("Order not found or already assigned"));
+
+        // Gán shipper và cập nhật trạng thái (nếu cần)
+        order.setShipperId(shipperId);
+        order.setStatus(OrderStatus.SHIPPING); // hoặc DELIVERING tùy hệ thống
+
+        return orderRepository.save(order);
+    }
+
+    public Order updateOrderStatus(Integer orderId, OrderStatus newStatus) {
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new RuntimeException("Order not found"));
+
+        order.setStatus(newStatus);
+        if(newStatus == OrderStatus.DELIVERED) order.setDeliveredAt(LocalDateTime.now());
+        return orderRepository.save(order);
     }
 
 }

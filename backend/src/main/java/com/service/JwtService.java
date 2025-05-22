@@ -5,6 +5,7 @@ import com.enums.Role;
 import com.response.TokenResponse;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -21,8 +22,8 @@ public class JwtService {
 
     private final String SECRET_KEY = "z2Xh9KD5c8sNFd7wQie3Ruty1HdkJ1Kx";
 
-    private final long ACCESS_TOKEN_EXPIRATION = 1000 * 60 * 15;
-    private final long REFRESH_TOKEN_EXPIRATION = 1000L * 60 * 60 * 24 * 7;
+    private final long ACCESS_TOKEN_EXPIRATION = 1000 * 60 * 5;
+    private final long REFRESH_TOKEN_EXPIRATION = 1000L * 60 * 60 * 24;
 
     // Generate token
     private Key getSignKey() {
@@ -54,11 +55,20 @@ public class JwtService {
     }
 
     private Claims extractAllClaims(String token) {
-        return Jwts.parser()
-                .setSigningKey(getSignKey())
-                .build()
-                .parseClaimsJws(token)
-                .getBody();
+        if (token != null && token.startsWith("Bearer ")) {
+            token = token.substring(7);
+        }
+        token = token.trim();
+        try {
+            return Jwts.parser()
+                    .setSigningKey(getSignKey())
+                    .build()
+                    .parseClaimsJws(token)
+                    .getBody();
+        } catch (MalformedJwtException e) {
+            System.out.println("‼ Malformed JWT: " + token);
+            throw e;
+        }
     }
 
     public String extractUsername(String token) {
@@ -66,6 +76,7 @@ public class JwtService {
             token = token.substring(7);
         }
 
+        token = token.trim();
         return Jwts.parser()
                 .setSigningKey(getSignKey())
                 .build()
@@ -87,6 +98,41 @@ public class JwtService {
         } catch (Exception e) {
             return false;
         }
+    }
+
+    public TokenResponse refreshToken(String refreshToken) {
+        if (!isTokenValid(refreshToken)) {
+            throw new IllegalArgumentException("Refresh token is invalid or expired");
+        }
+
+        Claims claims = extractAllClaims(refreshToken);
+        String username = claims.getSubject();
+        String roleStr = claims.get("role", String.class);
+        Role role = Role.valueOf(roleStr);
+
+        // Tạo access token mới
+        Map<String, Object> newClaims = new HashMap<>();
+        newClaims.put("role", role.name());
+
+        String newAccessToken = Jwts.builder()
+                .setClaims(newClaims)
+                .setSubject(username)
+                .setIssuedAt(new Date())
+                .setExpiration(new Date(System.currentTimeMillis() + ACCESS_TOKEN_EXPIRATION))
+                .signWith(getSignKey(), SignatureAlgorithm.HS256)
+                .compact();
+
+        // Có thể dùng lại refreshToken cũ, hoặc tạo refresh token mới tuỳ nhu cầu
+        // Trong ví dụ này, tạo refresh token mới
+//        String newRefreshToken = Jwts.builder()
+//                .setClaims(newClaims)
+//                .setSubject(username)
+//                .setIssuedAt(new Date())
+//                .setExpiration(new Date(System.currentTimeMillis() + REFRESH_TOKEN_EXPIRATION))
+//                .signWith(getSignKey(), SignatureAlgorithm.HS256)
+//                .compact();
+
+        return new TokenResponse(newAccessToken, refreshToken);
     }
 }
 

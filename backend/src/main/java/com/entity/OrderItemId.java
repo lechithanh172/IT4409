@@ -12,4 +12,5 @@ import java.io.Serializable;
 public class OrderItemId implements Serializable {
     private Integer orderId;
     private Integer productId;
+    private Integer variantId;
 }

@@ -1,6 +1,7 @@
 package com.service;
 
 import com.entity.User;
+import com.enums.Role;
 import com.repository.UserRepository;
 import com.request.SignUpOTPRequest;
 import com.request.UpdateInfoRequest;
@@ -9,6 +10,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 @Service
 public class UserService {
@@ -18,6 +20,7 @@ public class UserService {
     private PasswordEncoder passwordEncoder;
     @Autowired
     private JwtService jwtService;
+    public Optional<User> findById(Integer userId) {return userRepository.findById(userId);}
 
     public Optional<User> findByEmail(String email) {return userRepository.findByEmail(email);}
 
@@ -66,5 +69,19 @@ public class UserService {
             return true;
         }
         else return false;
+    }
+    public List<User> getUserByRole(Role role) {
+        return userRepository.findUsersByRole(role);
+    }
+
+    public User setRole(Integer userId, Role role) {
+        Optional<User> optionalUser = userRepository.findById(userId);
+        if(optionalUser.isPresent()) {
+            User user = optionalUser.get();
+            user.setRole(role);
+            userRepository.save(user);
+            return user;
+        }
+        return null;
     }
 }

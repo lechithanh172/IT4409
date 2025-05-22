@@ -43,9 +43,20 @@ public class CartService {
         }
         return false;
     }
+    public void removeCartItemWhenCreateOrder(Integer userId, Integer productId, Integer variantId) {
+        Optional<CartItem> item = cartItemRepository.findCartItemByUserIdAndProductIdAndVariantId(userId, productId, variantId);
+        if(item.isPresent()) {
+            cartItemRepository.delete(item.get());
+        }
+    }
 
     public List<CartItem> getCartItems(Integer userId) {
         return cartItemRepository.findCartItemsByUserId(userId);
+    }
+
+    public void deleteAllCartItems(Integer userId) {
+        List<CartItem> cartItems = cartItemRepository.findCartItemsByUserId(userId);
+        cartItemRepository.deleteAll(cartItems);
     }
 
 

@@ -22,5 +22,8 @@ public class OrderItem {
     private Integer orderId;
     @Id
     private Integer productId;
+    @Id
+    private Integer variantId;
+
     private Integer quantity;
 }

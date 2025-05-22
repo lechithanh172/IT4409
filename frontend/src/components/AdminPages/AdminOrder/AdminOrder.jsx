@@ -13,11 +13,17 @@ import {
   Typography,
   Spin,
   Tooltip,
+  Card,
+  Row,
+  Col,
+  Statistic,
 } from "antd";
 import {
   SearchOutlined,
   EditOutlined,
   EyeOutlined,
+  DollarOutlined,
+  CalendarOutlined,
 } from "@ant-design/icons";
 import Highlighter from "react-highlight-words";
 import OrderDetails from "./OrderDetails";
@@ -27,10 +33,10 @@ const { Text } = Typography;
 
 const STATUS_DETAILS = {
   PENDING: { label: "Chờ xử lý", color: "gold" },
-  APPROVED: { label: "Đã duyệt", color: "lime" },
-  REJECTED: { label: "Bị từ chối", color: "error" },
   SHIPPING: { label: "Đang giao", color: "processing" },
   DELIVERED: { label: "Đã giao", color: "success" },
+  FAILED_DELIVERY: { label: "Giao thất bại", color: "error" },
+  REJECTED: { label: "Bị từ chối", color: "error" },
 };
 
 const OrderStatusTag = ({ status }) => {
@@ -43,11 +49,11 @@ const OrderStatusTag = ({ status }) => {
 };
 
 const VALID_STATUS_TRANSITIONS = {
-  PENDING: ["APPROVED", "REJECTED"],
-  APPROVED: ["SHIPPING", "REJECTED"],
-  SHIPPING: ["DELIVERED", "REJECTED"],
+  PENDING: ["SHIPPING", "REJECTED"],
+  SHIPPING: ["DELIVERED", "FAILED_DELIVERY"],
   DELIVERED: [],
-  REJECTED: ["PENDING", "APPROVED"],
+  FAILED_DELIVERY: ["SHIPPING"],
+  REJECTED: [],
 };
 
 function formatDate(isoString) {
@@ -97,6 +103,9 @@ const AdminOrder = () => {
     targetStatus: null,
     isLoading: false,
   });
+
+  const [monthlyRevenue, setMonthlyRevenue] = useState(0);
+  const [yearlyRevenue, setYearlyRevenue] = useState(0);
 
   const fetchData = useCallback(
     async (showSuccessMessage = false) => {
@@ -226,18 +235,21 @@ const AdminOrder = () => {
       setDisplayedOrders(updatedDisplayedOrders);
 
       try {
-        const payload = { orderId: orderId, status: newStatus.toLowerCase() };
-
         if (!apiService || typeof apiService.updateOrderStatus !== "function") {
           throw new Error(
             "apiService hoặc apiService.updateOrderStatus không tồn tại!"
           );
         }
 
-        await apiService.updateOrderStatus(payload);
+        const orderIdNumber = parseInt(orderId, 10);
+        if (isNaN(orderIdNumber)) {
+          throw new Error("ID đơn hàng không hợp lệ");
+        }
+
+        await apiService.updateOrderStatus(orderIdNumber, newStatus.toUpperCase());
 
         message.success(
-          `Đơn hàng #${orderId}: Trạng thái cập nhật thành công thành ${
+          `Đơn hàng #${orderIdNumber}: Trạng thái cập nhật thành công thành ${
             STATUS_DETAILS[newStatus]?.label || newStatus
           }.`
         );
@@ -247,6 +259,7 @@ const AdminOrder = () => {
           targetStatus: null,
           isLoading: false,
         });
+        onRefresh();
       } catch (error) {
         if (error.response) {
           message.error(
@@ -413,6 +426,7 @@ const AdminOrder = () => {
       key: "orderId",
       width: 80,
       fixed: "left",
+      align: "center",
       sorter: (a, b) => a.orderId - b.orderId,
       ...getColumnSearchProps("orderId"),
     },
@@ -469,7 +483,7 @@ const AdminOrder = () => {
         const currentStatusUpper = currentRecord.status;
         const isLoadingThisRow = loadingAction === currentRecord.orderId;
 
-        if (currentStatusUpper === "DELIVERED") {
+        if (currentStatusUpper === "DELIVERED" || currentStatusUpper === "REJECTED") {
           return (
             <Tooltip title="Xem chi tiết đơn hàng">
               <Button
@@ -490,7 +504,7 @@ const AdminOrder = () => {
 
         const possibleNextStatuses =
           VALID_STATUS_TRANSITIONS[currentStatusUpper] || [];
-        if (possibleNextStatuses.length === 0 && currentStatusUpper !== 'DELIVERED') {
+        if (possibleNextStatuses.length === 0) {
              return (
                 <Tooltip title="Xem chi tiết đơn hàng">
                  <Button
@@ -508,16 +522,13 @@ const AdminOrder = () => {
                 </Tooltip>
             );
         }
-         if (possibleNextStatuses.length === 0) {
-             return <Text type="secondary">-</Text>;
-         }
 
         const menuItems = possibleNextStatuses.map((targetStatusKey) => ({
           key: targetStatusKey,
           label: `Chuyển sang "${
             STATUS_DETAILS[targetStatusKey]?.label || targetStatusKey
           }"`,
-          danger: ["REJECTED"].includes(targetStatusKey),
+          danger: ["REJECTED", "FAILED_DELIVERY"].includes(targetStatusKey),
           onClick: (e) => {
             e.domEvent.stopPropagation();
             showStatusChangeConfirm(currentRecord, targetStatusKey);
@@ -541,8 +552,80 @@ const AdminOrder = () => {
     },
   ];
 
+  const calculateRevenue = useCallback((orders) => {
+    const now = new Date();
+    const currentMonth = now.getMonth() + 1;
+    const currentYear = now.getFullYear();
+
+    const monthlyTotal = orders.reduce((sum, order) => {
+      const [time, date] = order.formattedCreatedAt.split(' ');
+      const [day, month, year] = date.split('/');
+      const orderDate = new Date(year, month - 1, day);
+      const orderMonth = orderDate.getMonth() + 1;
+      
+      if (orderMonth === currentMonth && orderDate.getFullYear() === currentYear) {
+        return sum + (order.totalAmount || 0);
+      }
+      return sum;
+    }, 0);
+
+    const yearlyTotal = orders.reduce((sum, order) => {
+      const [time, date] = order.formattedCreatedAt.split(' ');
+      const [day, month, year] = date.split('/');
+      const orderDate = new Date(year, month - 1, day);
+      if (orderDate.getFullYear() === currentYear) {
+        return sum + (order.totalAmount || 0);
+      }
+      return sum;
+    }, 0);
+
+    setMonthlyRevenue(monthlyTotal);
+    setYearlyRevenue(yearlyTotal);
+  }, []);
+
+  useEffect(() => {
+    if (processedOrders.length > 0) {
+      calculateRevenue(processedOrders);
+    }
+  }, [processedOrders, calculateRevenue]);
+
   return (
     <div>
+      <Row gutter={[16, 16]} style={{ marginBottom: 24 }}>
+        <Col span={12}>
+          <Card bordered={false} style={{ background: '#f0f5ff' }}>
+            <Statistic
+              title={
+                <Space>
+                  <CalendarOutlined />
+                  <span>Doanh thu tháng {new Date().getMonth() + 1}/{new Date().getFullYear()}</span>
+                </Space>
+              }
+              value={monthlyRevenue}
+              precision={0}
+              valueStyle={{ color: '#1677ff', fontWeight: 'bold' }}
+              formatter={(value) => formatCurrency(value)}
+            />
+          </Card>
+        </Col>
+        <Col span={12}>
+          <Card bordered={false} style={{ background: '#f6ffed' }}>
+            <Statistic
+              title={
+                <Space>
+                  <CalendarOutlined />
+                  <span>Doanh thu năm {new Date().getFullYear()}</span>
+                </Space>
+              }
+              value={yearlyRevenue}
+              precision={0}
+              valueStyle={{ color: '#52c41a', fontWeight: 'bold' }}
+              formatter={(value) => formatCurrency(value)}
+            />
+          </Card>
+        </Col>
+      </Row>
+
       <Space style={{ marginBottom: 16, display: "flex", justifyContent: "space-between" }}>
         <Select
           value={statusFilter}

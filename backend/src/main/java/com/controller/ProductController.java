@@ -2,6 +2,7 @@ package com.controller;
 
 import com.entity.dto.ProductDTO;
 import com.request.ProductRequest;
+import com.request.SearchFilterRequest;
 import com.response.StatusResponse;
 import com.service.JwtService;
 import com.service.ProductService;
@@ -81,4 +82,30 @@ public class ProductController {
         }
         else return ResponseEntity.status(200).body(products);
     }
+    @DeleteMapping("/variant/delete")
+    public ResponseEntity<?> deleteVariant(@RequestParam Integer variantId) {
+        if(productService.deleteVariant(variantId)) {
+            return ResponseEntity.status(200).body(new StatusResponse("Variant deleted successfully"));
+        }
+        else return ResponseEntity.status(404).body(new StatusResponse("Variant does not exist"));
+    }
+    @GetMapping("/all")
+    public ResponseEntity<?> getAllProducts() {
+        return ResponseEntity.status(200).body(productService.getAllProducts());
+    }
+
+//    @PostMapping("/price-range")
+//    public ResponseEntity<?> searchProductsInRange(@RequestBody SearchFilterRequest request) {
+//        return ResponseEntity.status(200).body(productService.searchProductsByPriceRange(request.getLowerBound(), request.getUpperBound()));
+//    }
+    @PostMapping("/filter")
+    public ResponseEntity<?> searchProductsInFilter(@RequestBody SearchFilterRequest request) {
+        if(request.getType() == null) return ResponseEntity.status(400).body(new StatusResponse("Type is null"));
+        request.setType(request.getType().toLowerCase());
+        if(!request.getType().equalsIgnoreCase("smartphone") && !request.getType().equalsIgnoreCase("laptop"))
+            return ResponseEntity.status(404).body(new StatusResponse("Type not supported"));
+
+        return ResponseEntity.status(200).body(productService.searchProductsWithFilter(request));
+    }
+
 }

@@ -28,7 +28,7 @@ public class Product {
     @Column(columnDefinition = "TEXT")
     private String description;
 
-    @Column(name = "specifications", columnDefinition = "TEXT[]")
+    @Column(name = "specifications", columnDefinition = "TEXT")
     private String specifications;
 
     private Double weight;

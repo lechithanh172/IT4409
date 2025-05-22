@@ -31,16 +31,16 @@ const formatCurrency = (amount, hideSymbol = false) => {
 // Các chuỗi trong mảng đời chip (value) PHẢI KHỚP CHÍNH XÁC với giá trị bạn muốn gửi đến API FILTER endpoint cho trường 'cpu'
 const CPU_OPTIONS_NESTED = {
     // Đảm bảo key này khớp với giá trị bạn muốn nhận từ API/props category
-    LAPTOP: {
+    LAPTOP: { // Tên category phải khớp với data bạn nhận từ API (sau khi normalize)
         'Apple Silicon': ['Apple M1', 'Apple M1 Pro', 'Apple M1 Max', 'Apple M2', 'Apple M2 Pro', 'Apple M2 Max', 'Apple M3', 'Apple M3 Pro', 'Apple M3 Max'],
         'Intel': ['Intel Core i3', 'Intel Core i5', 'Intel Core i7', 'Intel Core i9', 'Intel Core Ultra 5', 'Intel Core Ultra 7', 'Intel Core Ultra 9'],
         'AMD': ['AMD Ryzen 3', 'AMD Ryzen 5', 'AMD Ryzen 7', 'AMD Ryzen 9'],
     },
     // TODO: Thêm data cho SMARTPHONE nếu cần lọc chip theo category này và cấu trúc API cho phép
-    // SMARTPHONE: { ... }
+    // SMARTPHONE: { 'Qualcomm': ['Snapdragon 8 Gen 1', 'Snapdragon 8 Gen 2'], 'Apple': ['A15 Bionic', 'A16 Bionic'] }
 };
 
-// Các tùy chọn lọc cố định khác (không lồng nhau) - Giữ nguyên như code bạn cung cấp
+// Các tùy chọn lọc cố định khác (không lồng nhau)
 const availableRamCapacityOptionsUI = ['2GB', '4GB', '6GB', '8GB', '12GB', '16GB', '32GB', '64GB'];
 const availableStorageOptionsUI = ['64GB', '128GB', '256GB', '512GB', '1TB', '2TB'];
 const availableRefreshRateOptionsUI = ['60Hz', '90Hz', '120Hz', '144Hz', '240Hz'];
@@ -56,16 +56,26 @@ const FilterSortPanel = ({
     currentCategory = '', // Category đang chọn từ URL (đã normalize về string)
     isLoading = false, // Trạng thái loading từ ProductListPage
 }) => {
+    // Normalize currentCategory to lower case for consistent comparison
+    const lowerCaseCurrentCategory = currentCategory.toLowerCase();
+
     // --- State quản lý trạng thái mở/đóng của các section ---
     const [isSortOpen, setIsSortOpen] = useState(true);
     const [isPriceOpen, setIsPriceOpen] = useState(true);
-    const [isBrandOpen, setIsBrandOpen] = useState(true);
     const [isCategoryOpen, setIsCategoryOpen] = useState(true);
-    const [isMemoryOpen, setIsMemoryOpen] = useState(true);
-    const [isStorageOpen, setIsStorageOpen] = useState(true);
-    // CPU chỉ mở mặc định nếu category hiện tại là Laptop (không phân biệt hoa thường)
-    const [isCpuOpen, setIsCpuOpen] = useState(currentCategory.toLowerCase() === 'laptop');
-    const [isRefreshRateOpen, setIsRefreshRateOpen] = useState(true);
+
+    // Kiểm tra xem category hiện tại có phải Laptop hoặc Smartphone không
+    const isLaptopOrSmartphone = lowerCaseCurrentCategory === 'laptop' || lowerCaseCurrentCategory === 'smartphone';
+
+    // Mở mặc định các section chỉ khi category là Laptop hoặc Smartphone
+    // Bao gồm cả Brand theo yêu cầu mới
+    const [isBrandOpen, setIsBrandOpen] = useState(isLaptopOrSmartphone);
+    const [isMemoryOpen, setIsMemoryOpen] = useState(isLaptopOrSmartphone);
+    const [isStorageOpen, setIsStorageOpen] = useState(isLaptopOrSmartphone);
+    // CPU chỉ mở mặc định nếu category hiện tại là Laptop (vì CPU_OPTIONS_NESTED chỉ có data cho Laptop)
+    const [isCpuOpen, setIsCpuOpen] = useState(lowerCaseCurrentCategory === 'laptop');
+    const [isRefreshRateOpen, setIsRefreshRateOpen] = useState(isLaptopOrSmartphone);
+
 
     // --- State quản lý trạng thái mở/đóng của từng hãng chip con ---
     // Sử dụng Set để lưu trữ tên các hãng đang mở
@@ -123,32 +133,29 @@ const FilterSortPanel = ({
         const isCurrentStateMatchingProps = priceRange[0] === newMin && priceRange[1] === newMax;
 
         if (!isCurrentStateMatchingProps) {
-            console.log(`FilterSortPanel: Cập nhật state priceRange từ props [${newMin}, ${newMax}]. State hiện tại [${priceRange[0]}, ${priceRange[1]}]`);
+            console.log(`[FilterSortPanel] Cập nhật state priceRange từ props [${newMin}, ${newMax}]. State hiện tại [${priceRange[0]}, ${priceRange[1]}]`);
             setPriceRange([newMin, newMax]);
         } else {
-             // console.log(`FilterSortPanel: State priceRange đã khớp với props [${newMin}, ${newMax}]`);
+             // console.log(`[FilterSortPanel] State priceRange đã khớp với props [${newMin}, ${newMax}]`);
         }
     }, [price_gte, price_lte, validMinPrice, validMaxPrice]); // Phụ thuộc vào tham số URL và bounds giá
 
 
     // --- Tạo danh sách tùy chọn CPU lồng nhau CHỈ KHI CATEGORY LÀ LAPTOP ---
     const nestedCpuOptions = useMemo(() => {
-        // Chuyển category hiện tại sang chữ thường để so sánh
-        const lowerCaseCategory = currentCategory.toLowerCase();
+        // Lấy data CPU chỉ cho category LAPTOP từ cấu trúc CPU_OPTIONS_NESTED tĩnh
+        // Nếu CPU_OPTIONS_NESTED['LAPTOP'] không tồn tại hoặc category không phải 'laptop', trả về null
+        const optionsForCategory = lowerCaseCurrentCategory === 'laptop' ? CPU_OPTIONS_NESTED['LAPTOP'] : null;
 
-        // Nếu category không phải 'laptop', trả về null để ẩn section CPU
-        if (lowerCaseCategory !== 'laptop') {
-             console.log("[FilterSortPanel] Category không phải Laptop. Không tạo danh sách tùy chọn CPU.");
+        if (!optionsForCategory) {
+             console.log(`[FilterSortPanel] Category không phải Laptop (${lowerCaseCurrentCategory}). Không tạo danh sách tùy chọn CPU.`);
             return null;
         }
 
-        console.log("[FilterSortPanel] Category là Laptop. Tạo danh sách tùy chọn CPU.");
-
-        // Lấy data CPU cho category LAPTOP
-        const optionsForLaptop = CPU_OPTIONS_NESTED['LAPTOP'] || {};
+        console.log(`[FilterSortPanel] Category là Laptop (${lowerCaseCurrentCategory}). Tạo danh sách tùy chọn CPU.`);
 
         // Chuyển object các hãng/đời chip thành mảng object { manufacturer, models }
-        let manufacturersData = Object.entries(optionsForLaptop).map(([manufacturer, models]) => ({
+        let manufacturersData = Object.entries(optionsForCategory).map(([manufacturer, models]) => ({
              manufacturer,
              models: models ? [...models].sort() : [] // Copy mảng và sort đời chip, xử lý null/undefined models
          }));
@@ -156,10 +163,10 @@ const FilterSortPanel = ({
         // Sort các hãng chip theo tên
         manufacturersData.sort((a, b) => a.manufacturer.localeCompare(b.manufacturer));
 
-        // Trả về danh sách đã tạo. Nếu không có hãng/đời chip nào, nó sẽ là []
+        // Trả về danh sách đã tạo. Nếu không có hãng/đời chip nào, nó sẽ là [] (nếu optionsForCategory rỗng)
         return manufacturersData;
 
-    }, [currentCategory]); // Tính toán lại khi category thay đổi
+    }, [lowerCaseCurrentCategory]); // Tính toán lại khi category thay đổi
 
 
     // --- Hàm xử lý đóng/mở section hãng chip con ---
@@ -179,6 +186,7 @@ const FilterSortPanel = ({
     // --- Hàm xử lý thay đổi bộ lọc Category ---
      const handleCategoryChange = (e) => {
          const newCategory = e.target.value;
+         const lowerCaseNewCategory = newCategory.toLowerCase();
          console.log(`[FilterSortPanel] Thay đổi category: "${currentCategory}" -> "${newCategory}"`);
 
          const filtersToUpdate = {
@@ -186,20 +194,26 @@ const FilterSortPanel = ({
              // Khi category thay đổi, LUÔN reset các bộ lọc con
              // vì chúng có thể không liên quan đến category mới.
              // Điều này ĐẢM BẢO lọc CPU bị xóa khi chuyển khỏi Laptop.
+             brandName: '', // Reset Brand filter theo yêu cầu mới
              cpu: [], // Reset CPU filter
              storage: [], // Reset Storage filter
              memory: [], // Reset Memory filter
              refreshRate: [] // Reset RefreshRate filter
          };
-         // TODO: Thêm các bộ lọc spec khác vào đây để reset khi đổi category
+         // TODO: Thêm các bộ lọc spec khác vào đây để reset khi đổi category (ví dụ: screen size, camera)
 
          onFilterChange(filtersToUpdate);
 
          // Tùy chọn: đóng tất cả các hãng chip con khi đổi category
          setOpenCpuManufacturers(new Set());
 
-         // Cập nhật trạng thái mở/đóng section CPU dựa trên category mới
-         setIsCpuOpen(newCategory.toLowerCase() === 'laptop'); // Chỉ mở nếu category mới là Laptop
+         // Cập nhật trạng thái mở/đóng mặc định của các section dựa trên category mới
+         const isNewCategoryLaptopOrSmartphone = lowerCaseNewCategory === 'laptop' || lowerCaseNewCategory === 'smartphone';
+         setIsBrandOpen(isNewCategoryLaptopOrSmartphone); // Brand mở mặc định cho Laptop/Smartphone
+         setIsMemoryOpen(isNewCategoryLaptopOrSmartphone);
+         setIsStorageOpen(isNewCategoryLaptopOrSmartphone);
+         setIsCpuOpen(lowerCaseNewCategory === 'laptop'); // CPU chỉ mở mặc định cho Laptop
+         setIsRefreshRateOpen(isNewCategoryLaptopOrSmartphone);
      };
 
     const handleSortChange = useCallback((e) => {
@@ -208,8 +222,9 @@ const FilterSortPanel = ({
 
 
     const handleBrandChange = useCallback((e) => {
+        console.log(`[FilterSortPanel] Thay đổi brand: "${brandName}" -> "${e.target.value}"`);
         onFilterChange({ brandName: e.target.value });
-    }, [onFilterChange]);
+    }, [onFilterChange, brandName]);
 
 
     // Hàm được gọi khi người dùng thả thanh trượt giá
@@ -229,11 +244,11 @@ const FilterSortPanel = ({
         const isPriceChanged = values[0] !== compareGte || values[1] !== compareLte;
 
         if (isPriceChanged) {
-             console.log(`FilterSortPanel: Giá trị thay đổi. Calling onFilterChange.`);
+             console.log(`[FilterSortPanel] Giá trị thay đổi. Calling onFilterChange.`);
              // Gọi onFilterChange với giá trị mới dưới dạng chuỗi
              onFilterChange({ price_gte: values[0].toString(), price_lte: values[1].toString() });
          } else {
-             console.log(`FilterSortPanel: Giá trị không thay đổi so với URL. Không gọi onFilterChange.`);
+             console.log(`[FilterSortPanel] Giá trị không thay đổi so với URL. Không gọi onFilterChange.`);
          }
     }, [price_gte, price_lte, validMinPrice, validMaxPrice, onFilterChange]); // Phụ thuộc vào giá trị URL, bounds và handler
 
@@ -250,7 +265,7 @@ const FilterSortPanel = ({
         } else {
             newSelected = [...currentSelected, value];
         }
-        console.log(`FilterSortPanel: Checkbox changed for "${filterKey}": "${value}". New selected:`, newSelected);
+        console.log(`[FilterSortPanel] Checkbox changed for "${filterKey}": "${value}". New selected:`, newSelected);
         onFilterChange({ [filterKey]: newSelected }); // Gửi mảng mới lên ProductListPage
     }, [currentFilters, onFilterChange]); // Phụ thuộc vào currentFilters và onFilterChange
 
@@ -265,7 +280,7 @@ const FilterSortPanel = ({
             <h3 className={styles.panelTitle}><FiFilter /> Bộ lọc & Sắp xếp</h3>
 
              {/* --- Bộ lọc Category (API: type) --- */}
-             {/* Hiển thị nếu có danh sách category hoặc đang loading */}
+             {/* Luôn hiển thị nếu có danh sách category hoặc đang loading */}
             { (availableCategories && availableCategories.length > 0) || isLoading ? (
                 <div className={styles.filterGroup}>
                     <button className={styles.groupHeader} onClick={() => toggleSection(setIsCategoryOpen)} aria-expanded={isCategoryOpen} aria-controls="category-content">
@@ -436,8 +451,8 @@ const FilterSortPanel = ({
             ) : null /* Không render section nếu không có data giá và không loading */ }
 
 
-            {/* --- Bộ lọc Thương hiệu (API: brandName) --- */}
-             { (availableBrands && availableBrands.length > 0) || isLoading ? (
+            {/* --- Bộ lọc Thương hiệu (API: brandName) - CHỈ HIỂN THỊ KHI CATEGORY LÀ LAPTOP HOẶC SMARTPHONE --- */}
+             { isLaptopOrSmartphone && ((availableBrands && availableBrands.length > 0) || isLoading) ? (
                 <div className={styles.filterGroup}>
                     <button className={styles.groupHeader} onClick={() => toggleSection(setIsBrandOpen)} aria-expanded={isBrandOpen} aria-controls="brand-content">
                         <span>Thương hiệu</span>
@@ -484,7 +499,7 @@ const FilterSortPanel = ({
                         </div>
                     )}
                 </div>
-            ) : null /* Không render section nếu không có data và không loading */ }
+            ) : null /* Không render section nếu không phải Laptop/Smartphone hoặc không có data brand và không loading */ }
 
 
             {/* --- Bộ lọc CPU (API: cpu) - CHỈ HIỂN THỊ KHI CATEGORY LÀ LAPTOP --- */}
@@ -538,13 +553,13 @@ const FilterSortPanel = ({
                         </div>
                     )}
                 </div>
-            ) : isLoading && currentCategory.toLowerCase() === 'laptop' ? (
+            ) : isLoading && lowerCaseCurrentCategory === 'laptop' ? (
                  // Hiển thị loading nếu category là Laptop nhưng nestedCpuOptions chưa có data (chờ ProductListPage fetch sản phẩm)
                  <div className={styles.filterGroup}> {/* Có thể hiển thị tiêu đề và spinner */}
-                     <button className={styles.groupHeader}>
+                     <button className={styles.groupHeader} aria-expanded={isCpuOpen} onClick={() => toggleSection(setIsCpuOpen)} aria-controls="cpu-content">
                         <span>Chip xử lý / CPU</span>
                          {/* Giả định styles.loadingIndicator tồn tại */}
-                          <span className={styles.loadingIndicator}>...</span>
+                          {isLoading ? <span className={styles.loadingIndicator}>...</span> : isCpuOpen ? <FiChevronUp /> : <FiChevronDown />}
                      </button>
                       {isCpuOpen && ( // Vẫn kiểm tra isCpuOpen để quyết định hiển thị loading message hay không
                          <div id="cpu-content" className={styles.groupContent}>
@@ -557,8 +572,8 @@ const FilterSortPanel = ({
 
 
             {/* --- Bộ lọc RAM (Dung lượng) (API: memory) --- */}
-            {/* Hiển thị nếu có các tùy chọn tĩnh (hoặc data động) */}
-            { availableRamCapacityOptionsUI && availableRamCapacityOptionsUI.length > 0 ? (
+            {/* Chỉ hiển thị nếu category là Laptop HOẶC Smartphone VÀ có các tùy chọn tĩnh (hoặc data động) */}
+            { isLaptopOrSmartphone && availableRamCapacityOptionsUI && availableRamCapacityOptionsUI.length > 0 ? (
                 <div className={styles.filterGroup}>
                     <button className={styles.groupHeader} onClick={() => toggleSection(setIsMemoryOpen)} aria-expanded={isMemoryOpen} aria-controls="memory-content">
                         <span>RAM (Dung lượng)</span>
@@ -582,17 +597,17 @@ const FilterSortPanel = ({
                         </div>
                     )}
                 </div>
-            ) : null /* Hoặc hiển thị loading/no options nếu dùng data động */ }
+            ) : null /* Hoặc hiển thị loading/no options nếu dùng data động và isLaptopOrSmartphone */ }
 
 
             {/* --- Bộ lọc Dung lượng lưu trữ / Ổ cứng (API: storage) --- */}
-            {/* Hiển thị nếu có các tùy chọn tĩnh (hoặc data động) */}
-             { availableStorageOptionsUI && availableStorageOptionsUI.length > 0 ? (
+            {/* Chỉ hiển thị nếu category là Laptop HOẶC Smartphone VÀ có các tùy chọn tĩnh (hoặc data động) */}
+             { isLaptopOrSmartphone && availableStorageOptionsUI && availableStorageOptionsUI.length > 0 ? (
                 <div className={styles.filterGroup}>
                     <button className={styles.groupHeader} onClick={() => toggleSection(setIsStorageOpen)} aria-expanded={isStorageOpen} aria-controls="storage-content">
                         <span>
                             {/* Có thể đổi tên hiển thị dựa trên category, ví dụ: "Ổ cứng (SSD/HDD)" cho Laptop */}
-                            {currentCategory.toLowerCase() === 'laptop' ? 'Ổ cứng (SSD/HDD)' : 'Dung lượng lưu trữ'}
+                            {lowerCaseCurrentCategory === 'laptop' ? 'Ổ cứng (SSD/HDD)' : 'Dung lượng lưu trữ'}
                         </span>
                         {isStorageOpen ? <FiChevronUp /> : <FiChevronDown />}
                     </button>
@@ -614,11 +629,11 @@ const FilterSortPanel = ({
                         </div>
                     )}
                 </div>
-            ) : null /* Hoặc hiển thị loading/no options nếu dùng data động */ }
+            ) : null /* Hoặc hiển thị loading/no options nếu dùng data động và isLaptopOrSmartphone */ }
 
              {/* --- Bộ lọc Tốc độ làm mới (Refresh Rate) (API: refreshRate) --- */}
-             {/* Hiển thị nếu có các tùy chọn tĩnh (hoặc data động) */}
-             { availableRefreshRateOptionsUI && availableRefreshRateOptionsUI.length > 0 ? (
+             {/* Chỉ hiển thị nếu category là Laptop HOẶC Smartphone VÀ có các tùy chọn tĩnh (hoặc data động) */}
+             { isLaptopOrSmartphone && availableRefreshRateOptionsUI && availableRefreshRateOptionsUI.length > 0 ? (
                 <div className={styles.filterGroup}>
                     <button className={styles.groupHeader} onClick={() => toggleSection(setIsRefreshRateOpen)} aria-expanded={isRefreshRateOpen} aria-controls="refreshRate-content">
                         <span>Tốc độ làm mới</span>
@@ -642,7 +657,7 @@ const FilterSortPanel = ({
                         </div>
                     )}
                 </div>
-             ) : null /* Hoặc hiển thị loading/no options nếu dùng data động */ }
+             ) : null /* Hoặc hiển thị loading/no options nếu dùng data động và isLaptopOrSmartphone */ }
 
 
         </aside>

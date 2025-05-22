@@ -21,6 +21,7 @@ import PlaceOrder from './pages/PlaceOrder/PlaceOrder';
 import VNPayReturn from './pages/VNPayReturn/VNPayReturn';
 import OrderHistoryPage from './pages/OrderHistoryPage/OrderHistoryPage'; // Import OrderHistoryPage
 import AdminPage from './pages/AdminPage/AdminPage';
+import UserInfoEdit from './pages/UserInfoEdit/UserInfoEdit';
 // Protected Route Component
 import ProtectedRoute from './components/Auth/ProtectedRoute';
 
@@ -58,6 +59,7 @@ function App() {
           <Route path="cart" element={<CartPage />} />
           <Route path="place-order" element={<PlaceOrder />} />
           <Route path="profile" element={<UserProfilePage />} />
+           <Route path="profile/edit" element={<UserInfoEdit />} />
           {/* Corrected route for Order History */}
           <Route path="profile/orders" element={<OrderHistoryPage />} />
           {/* Add other protected routes here */}

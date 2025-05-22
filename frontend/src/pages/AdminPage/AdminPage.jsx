@@ -4,13 +4,14 @@ import {
   BellOutlined,
   InfoCircleOutlined,
   TruckOutlined,
-  HddOutlined,
+  HomeOutlined,
   LogoutOutlined,
   MenuFoldOutlined,
   MenuUnfoldOutlined,
   AppstoreOutlined,
 } from "@ant-design/icons";
 import { Badge, Button, Menu, Layout, Space, Avatar, Dropdown, Typography } from "antd";
+import { useNavigate } from "react-router-dom";
 import AdminUser from "../../Components/AdminPages/AdminUser/AdminUser";
 import AdminProduct from "../../components/AdminPages/AdminProduct/AdminProduct";
 import AdminOrder from "../../components/AdminPages/AdminOrder/AdminOrder";
@@ -43,6 +44,7 @@ const items = [
 ];
 
 const Admin = () => {
+  const navigate = useNavigate();
   const [keySelected, setKeySelected] = useState("products");
   const [collapsed, setCollapsed] = useState(false);
   const [isTooltipVisible, setTooltipVisible] = useState(false);
@@ -84,11 +86,19 @@ const Admin = () => {
   const userMenuItems = [
     {
       key: 'profileLink',
-      label: 'Xem hồ sơ',
+      label: 'Xem hồ sơ', 
       icon: <UserOutlined />,
       onClick: () => {
           setKeySelected('profile');
           setTooltipVisible(false);
+      }
+    },
+    {
+      key: 'home',
+      label: 'Về trang chủ',
+      icon: <HomeOutlined />,
+      onClick: () => {
+        navigate('/');
       }
     },
     {

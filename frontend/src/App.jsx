@@ -21,6 +21,7 @@ import PlaceOrder from './pages/PlaceOrder/PlaceOrder';
 import VNPayReturn from './pages/VNPayReturn/VNPayReturn';
 import OrderHistoryPage from './pages/OrderHistoryPage/OrderHistoryPage'; // Import OrderHistoryPage
 import AdminPage from './pages/AdminPage/AdminPage';
+import ShipperPage from './pages/ShipperPage/ShipperPage';
 // Protected Route Component
 import ProtectedRoute from './components/Auth/ProtectedRoute';
 
@@ -75,12 +76,11 @@ function App() {
         }
       > </Route>
       {/* --- Routes Outside MainLayout (e.g., Admin, Fullscreen Auth) --- */}
-      {/* Example:
-      <Route path="/admin" element={<AdminLayout />}>
-          <Route index element={<AdminDashboard />} />
-          ... admin routes
+
+      <Route path="/shipper" element={<MainLayout />}>
+          <Route index element={<ShipperPage />} />
       </Route>
-      */}
+     
 
       {/* Global 404 Not Found Route (if no other route matches) */}
       {/* <Route path="*" element={<NotFoundPage />} /> */}

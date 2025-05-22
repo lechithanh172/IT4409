@@ -254,6 +254,16 @@ const apiService = {
   getAllOrders: () => apiInstance.get('/order/view/all'),
 
 
+  // SHIPPER
+  getUnassignedOrders: () => apiInstance.get("/order/unassigned"),
+  getShipperOrders: (shipperId) => apiInstance.get(`/order/shipper/${shipperId}`),
+  assignOrder: (orderId, shipperId) => apiInstance.post(`/order/assign/${orderId}`, null, {
+    params: { shipperId }
+  }),
+  updateOrderStatus: (orderId, status) => apiInstance.post(`/order/${orderId}/status`, null, {
+    params: { status }
+  }),
+
   // RATE
   postRate: (data) => apiInstance.post("/rating/submit", data),
   getListRateOfProduct: (productId) => apiInstance.get(`/rating/list/${productId}`),

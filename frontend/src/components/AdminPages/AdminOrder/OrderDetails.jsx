@@ -50,10 +50,10 @@ function formatDate(isoString) {
 
 const STATUS_DETAILS = {
   PENDING: { label: "Chờ xử lý", color: "gold" },
-  APPROVED: { label: "Đã duyệt", color: "lime" },
-  REJECTED: { label: "Bị từ chối", color: "error" },
   SHIPPING: { label: "Đang giao", color: "processing" },
   DELIVERED: { label: "Đã giao", color: "success" },
+  FAILED_DELIVERY: { label: "Giao thất bại", color: "error" },
+  REJECTED: { label: "Bị từ chối", color: "error" },
 };
 
 const DeliveryStatusComponent = ({ deliveryStatus }) => {
@@ -92,11 +92,11 @@ const DetailRow = ({
 );
 
 const VALID_STATUS_TRANSITIONS = {
-  PENDING: ["APPROVED", "REJECTED"],
-  APPROVED: ["SHIPPING", "REJECTED"],
-  SHIPPING: ["DELIVERED", "REJECTED"],
+  PENDING: ["SHIPPING", "REJECTED"],
+  SHIPPING: ["DELIVERED", "FAILED_DELIVERY"],
   DELIVERED: [],
-  REJECTED: ["PENDING", "APPROVED"],
+  FAILED_DELIVERY: ["SHIPPING"],
+  REJECTED: [],
 };
 
 
@@ -267,7 +267,7 @@ const OrderDetails = ({ orderId, handleRefreshParent }) => {
       try {
         const payload = {
           orderId: orderIdToUpdate,
-          status: newStatus.toLowerCase(),
+          status: newStatus.toUpperCase(),
         };
         await apiService.updateOrderStatus(payload);
 
@@ -356,7 +356,7 @@ const OrderDetails = ({ orderId, handleRefreshParent }) => {
       {possibleNextStatuses.map((statusKey) => (
         <Menu.Item
           key={statusKey}
-          danger={["REJECTED"].includes(statusKey)}
+          danger={["REJECTED", "FAILED_DELIVERY"].includes(statusKey)}
           onClick={() => showStatusConfirm(statusKey)}
         >
           Chuyển sang "{STATUS_DETAILS[statusKey]?.label || statusKey}"

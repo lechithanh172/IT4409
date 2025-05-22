@@ -5,7 +5,7 @@ import apiService from '../../../services/api';
 const { Title } = Typography;
 const { Option } = Select;
 
-const ROLES = ['CUSTOMER', 'ADMIN', 'PRODUCT_MANAGER'];
+const ROLES = ['CUSTOMER', 'SHIPPER', 'PRODUCT_MANAGER', 'ADMIN'];
 
 const EditUser = ({ userData, setModalChild, handleRefresh }) => {
     const [form] = Form.useForm();
@@ -70,7 +70,12 @@ const EditUser = ({ userData, setModalChild, handleRefresh }) => {
                  <Descriptions.Item label="Họ tên">{`${userData.firstName || ''} ${userData.lastName || ''}`.trim() || 'N/A'}</Descriptions.Item>
                  <Descriptions.Item label="Số điện thoại">{userData.phoneNumber || 'N/A'}</Descriptions.Item>
                  <Descriptions.Item label="Vai trò hiện tại">
-                     <Tag color={userData.role === 'ADMIN' ? 'red' : userData.role === 'PRODUCT_MANAGER' ? 'blue' : 'green'}>
+                     <Tag color={
+                         userData.role === 'ADMIN' ? 'red' : 
+                         userData.role === 'PRODUCT_MANAGER' ? 'blue' : 
+                         userData.role === 'SHIPPER' ? 'purple' : 
+                         'green'
+                     }>
                          {userData.role || 'N/A'}
                      </Tag>
                  </Descriptions.Item>

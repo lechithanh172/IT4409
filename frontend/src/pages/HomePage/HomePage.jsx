@@ -211,7 +211,7 @@ const HomePage = () => {
             )}
        </section>
 
-       {/* --- Section Danh Mục --- */}
+       {/* --- Section Danh Mục ---
       <section className={`${styles.section} ${styles.categoriesSectionBg}`}>
         <div className={styles.sectionHeader}>
              <h2 className={styles.sectionTitle}>Khám Phá Danh Mục</h2>
@@ -224,7 +224,7 @@ const HomePage = () => {
             {categories.map((category) => (
                 <Link to={`/products?category=${encodeURIComponent(category.name)}`} key={category.categoryId} className={styles.categoryCard}>
                 <div className={styles.categoryImageWrapper}>
-                    <img src={category.image || '/images/placeholder-category.png'} alt={`${category.name} category image`} className={styles.categoryImage} onError={(e)=>{e.target.src='/images/placeholder-category.png'}}/>
+                    <img src={category.imageUrl || '/images/placeholder-category.png'} alt={`${category.name} category image`} className={styles.categoryImage} onError={(e)=>{e.target.src='/images/placeholder-category.png'}}/>
                     <div className={styles.categoryOverlay}></div>
                 </div>
                 <h3 className={styles.categoryName}>{category.name}</h3>
@@ -234,7 +234,7 @@ const HomePage = () => {
          ) : (
              !error && <p className={styles.noProducts}>Không tìm thấy danh mục nào.</p>
          )}
-      </section>
+      </section> */}
 
     </div>
   );

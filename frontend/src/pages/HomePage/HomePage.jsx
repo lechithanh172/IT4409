@@ -199,7 +199,7 @@ const HomePage = () => {
           ) : brands.length > 0 ? (
                 <div className={styles.brandList}>
                 {brands.map((brand) => (
-                    <Link to={`/products?brand=${encodeURIComponent(brand.name)}`} key={brand.brandId} className={styles.brandCard} title={brand.name}>
+                    <Link to={`/products?brand=${encodeURIComponent(brand.brandName)}`} key={brand.brandId} className={styles.brandCard} title={brand.name}>
                     <div className={styles.brandImageWrapper}>
                         <img src={brand.logoUrl} alt={`${brand.name} logo`} className={styles.brandLogo} onError={(e)=>{e.target.style.opacity='0.5'; e.target.style.filter='grayscale(1)'}}/>
                     </div>
@@ -211,7 +211,6 @@ const HomePage = () => {
             )}
        </section>
 
-       {/* --- Section Danh Mục ---
       <section className={`${styles.section} ${styles.categoriesSectionBg}`}>
         <div className={styles.sectionHeader}>
              <h2 className={styles.sectionTitle}>Khám Phá Danh Mục</h2>
@@ -222,7 +221,7 @@ const HomePage = () => {
          ) : categories.length > 0 ? (
             <div className={styles.categoryList}>
             {categories.map((category) => (
-                <Link to={`/products?category=${encodeURIComponent(category.name)}`} key={category.categoryId} className={styles.categoryCard}>
+                <Link to={`/products?category=${encodeURIComponent(category.categoryName)}`} key={category.categoryId} className={styles.categoryCard}>
                 <div className={styles.categoryImageWrapper}>
                     <img src={category.imageUrl || '/images/placeholder-category.png'} alt={`${category.name} category image`} className={styles.categoryImage} onError={(e)=>{e.target.src='/images/placeholder-category.png'}}/>
                     <div className={styles.categoryOverlay}></div>
@@ -234,7 +233,7 @@ const HomePage = () => {
          ) : (
              !error && <p className={styles.noProducts}>Không tìm thấy danh mục nào.</p>
          )}
-      </section> */}
+      </section>
 
     </div>
   );

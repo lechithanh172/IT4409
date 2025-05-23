@@ -2,7 +2,7 @@
 import axios from "axios";
 
 // --- Cấu hình cơ bản ---
-export const base_url = "http://3.27.90.134:8080";
+export const base_url = "https://ducable.id.vn";
 const LOGIN_ENDPOINT = "/auth/login";
 const SIGNUP_REQUEST_ENDPOINT = "/auth/signup"; // Endpoint yêu cầu signup (gửi email)
 const SIGNUP_OTP_ENDPOINT = "/auth/signup-otp"; // Endpoint xác nhận OTP

@@ -88,7 +88,7 @@ const Header = () => {
   return (
     <header className={styles.header}>
       <div className={styles.container}>
-        <Link to="/" className={styles.logo} onClick={closeAllDropdowns}>MyEshop</Link>
+        <Link to="/" className={styles.logo} onClick={closeAllDropdowns}>HustShop</Link>
         <nav className={styles.desktopNav}>
              <NavLink to="/" className={({ isActive }) => isActive ? `${styles.navLink} ${styles.active}` : styles.navLink} end>Trang Chủ</NavLink>
               <div className={styles.dropdownContainer} ref={categoryDropdownRef}>

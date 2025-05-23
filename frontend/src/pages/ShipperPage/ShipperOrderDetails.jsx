@@ -39,6 +39,10 @@ const DetailRow = ({ label, value }) => (
 );
 
 const ShipperOrderDetails = ({ orderId }) => {
+    
+    useEffect(() => {
+            document.title = "Shipper | HustShop";
+        }, []);
     const [orderData, setOrderData] = useState(null);
     const [orderItems, setOrderItems] = useState([]);
     const [loading, setLoading] = useState(true);

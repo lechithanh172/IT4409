@@ -48,6 +48,9 @@ const getStatusClass = (status) => {
 };
 
 const OrderHistoryPage = () => {
+    useEffect(() => {
+            document.title = "Danh sách đơn hàng | HustShop";
+        }, []);
     const { user, isAuthenticated } = useAuth();
     const [orders, setOrders] = useState([]); 
     const [isLoading, setIsLoading] = useState(true);

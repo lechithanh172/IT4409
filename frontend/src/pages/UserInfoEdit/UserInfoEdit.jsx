@@ -11,6 +11,9 @@ import Spinner from '../../components/Spinner/Spinner'; // Import Spinner (nếu
 
 
 function UserInfoEdit() {
+  useEffect(() => {
+          document.title = "Chỉnh sửa thông tin | HustShop";
+      }, []);
   // Lấy user data và trạng thái loading ban đầu từ AuthContext
   // authLoading là loading của AuthContext, cho biết nó đã kiểm tra xong trạng thái đăng nhập chưa
   // user là thông tin người dùng đã đăng nhập (nếu có)

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import styles from './changePasswordPage.module.css';
 import { FiLock, FiRepeat, FiCheckCircle, FiAlertCircle, FiEye, FiEyeOff } from 'react-icons/fi';
@@ -7,6 +7,9 @@ import Spinner from '../../components/Spinner/Spinner';
 import { useAuth } from '../../contexts/AuthContext';
 
 function ChangePasswordPage() {
+    useEffect(() => {
+            document.title = "Đổi mật khẩu | HustShop";
+        }, []);
     const { changePassword } = useAuth();
     const [formData, setFormData] = useState({
         currentPassword: '',

@@ -42,6 +42,9 @@ const calculateTotalFromItems = (items) => {
 
 
 const VNPayReturn = () => {
+    useEffect(() => {
+            document.title = "Kết quả đặt hàng | HustShop";
+        }, []);
     const location = useLocation();
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState(null);

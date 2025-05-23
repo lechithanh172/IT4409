@@ -13,6 +13,9 @@ const PRODUCTS_PER_PAGE = 12; // Số sản phẩm trên mỗi trang
 
 const SearchProductListPage = () => {
   // Hooks
+  useEffect(() => {
+          document.title = "Tìm kiếm | HustShop";
+      }, []);
   const [searchParams, setSearchParams] = useSearchParams();
 
   // State

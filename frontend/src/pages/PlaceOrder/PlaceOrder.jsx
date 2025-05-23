@@ -31,6 +31,9 @@ const calculateTotalFromItems = (items) => { if (!Array.isArray(items)) return 0
 // -------------------------------------------------------------------
 
 const PlaceOrder = () => {
+    useEffect(() => {
+            document.title = "Đặt hàng | HustShop";
+        }, []);
     const navigate = useNavigate();
     const { user, isAuthenticated } = useAuth();
     const [shippingInfo, setShippingInfo] = useState({ cityCode: '', provinceName: '', districtCode: '', districtFullName: '', wardCode: '', wardFullName: '', detailedAddress: '', phone: '', email: '', shippingMethod: 'STANDARD', notes: '' });

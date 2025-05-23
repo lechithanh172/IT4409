@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import styles from './signupPage.module.css';
 import { useAuth } from '../../contexts/AuthContext';
@@ -12,6 +12,9 @@ import { toast } from 'react-toastify';
 
 function SignupPage() {
     // --- FIX START ---
+    useEffect(() => {
+            document.title = "Đăng ký | HustShop";
+        }, []);
     // Uncomment these lines to define location and prefillData
     const location = useLocation();
     const prefillData = location.state || {};

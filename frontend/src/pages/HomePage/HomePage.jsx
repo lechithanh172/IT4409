@@ -58,7 +58,9 @@ const HomePage = () => {
 
   // State quản lý lỗi chung
   const [error, setError] = useState(null);
-
+  useEffect(() => {
+        document.title = "Trang chủ | HustShop";
+    }, []);
   // Cấu hình cho Hero Slider (giữ nguyên)
   const heroSliderSettings = {
     dots: true,

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect} from 'react';
 import { Link, Navigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import styles from './forgetPassword.module.css';
@@ -7,6 +7,9 @@ import Button from '../../components/Button/Button';
 import Spinner from '../../components/Spinner/Spinner';
 
 const ForgetPasswordPage = () => {
+    useEffect(() => {
+            document.title = "Quên mật khẩu | HustShop";
+        }, []);
     const { forgetPassword } = useAuth();
     const [email, setEmail] = useState('');
     const [message, setMessage] = useState('');

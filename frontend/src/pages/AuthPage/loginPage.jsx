@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate, Link, useLocation } from 'react-router-dom'; // Thêm useLocation
 import styles from './loginPage.module.css'; // Sử dụng CSS Module
 import { useAuth } from '../../contexts/AuthContext'; // Import Auth Hook
@@ -7,6 +7,9 @@ import Button from '../../components/Button/Button'; // Import Button nếu mu�
 import Spinner from '../../components/Spinner/Spinner'; // Import Spinner cho trạng thái loading
 
 function LoginPage() {
+    useEffect(() => {
+            document.title = "Đăng nhập | HustShop";
+        }, []);
     const [userName, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [showPassword, setShowPassword] = useState(false); // State ẩn/hiện mật khẩu

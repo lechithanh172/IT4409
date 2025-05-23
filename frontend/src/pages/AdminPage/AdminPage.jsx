@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   UserOutlined,
   BellOutlined,
@@ -44,6 +44,9 @@ const items = [
 ];
 
 const Admin = () => {
+  useEffect(() => {
+        document.title = "Admin | HustShop";
+    }, []);
   const navigate = useNavigate();
   const [keySelected, setKeySelected] = useState("products");
   const [collapsed, setCollapsed] = useState(false);

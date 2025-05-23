@@ -4,6 +4,10 @@ import apiService, { setupApiInterceptors, base_url } from '../services/api';
 import axios from 'axios'; // Import axios để gọi API refresh trực tiếp trong timer
 import Spinner from '../components/Spinner/Spinner'; // Giả sử Spinner tồn tại
 
+// === Import toast từ react-toastify ===
+import { toast } from 'react-toastify';
+// ======================================
+
 const AuthContext = createContext();
 
 // Keys for localStorage
@@ -96,6 +100,16 @@ export const AuthProvider = ({ children }) => {
     }
     // Có thể thêm logic chuyển hướng về trang login tại đây nếu cần
     // window.location.href = '/login'; // Chuyển hướng cứng nếu cần
+
+    // === Thêm toast đăng xuất thành công nếu không phải do lỗi ===
+    if (!triggeredByError) {
+        toast.success("Đăng xuất thành công!");
+        console.log("[AuthContext] Showing logout success toast.");
+    } else {
+         console.warn("[AuthContext] Logout triggered by error, skipping success toast.");
+    }
+    // =========================================================
+
   }, []); // Dependencies trống vì nó không phụ thuộc vào state/props thay đổi
 
   // --- Hàm thực hiện refresh token định kỳ ---
@@ -122,7 +136,7 @@ export const AuthProvider = ({ children }) => {
 
         if (!currentRefreshToken) {
             console.warn("[AuthContext] No refresh token found during timer tick. Logging out.");
-            logout(true); // Logout nếu không tìm thấy refresh token
+            logout(true); // Logout nếu không tìm thấy refresh token (triggeredByError = true)
             return;
         }
 
@@ -147,12 +161,12 @@ export const AuthProvider = ({ children }) => {
             } else {
                 console.error("[AuthContext] Timer refresh failed: No new access token received in response.");
                 // Refresh thành công nhưng không có token mới -> Trạng thái lỗi -> Đăng xuất
-                logout(true);
+                logout(true); // Logout do lỗi (triggeredByError = true)
             }
         } catch (refreshError) {
             console.error("[AuthContext] Timer refresh API call failed:", refreshError.response?.data || refreshError.message);
             // Refresh thất bại (vd: refresh token hết hạn, server lỗi) -> Đăng xuất
-            logout(true);
+            logout(true); // Logout do lỗi (triggeredByError = true)
         }
     }, REFRESH_INTERVAL);
 
@@ -232,18 +246,18 @@ export const AuthProvider = ({ children }) => {
           } else {
             // fetchUserInfo không trả về user hợp lệ (mặc dù không ném lỗi)
             console.warn("[AuthContext] Fetched user info is invalid or missing.");
-            logout(true); // Logout do trạng thái không hợp lệ
+            logout(true); // Logout do trạng thái không hợp lệ (triggeredByError = true)
           }
         } catch (error) {
           // fetchUserInfo lỗi (có thể do API down, network error, hoặc lỗi khác không phải 401 đã được interceptor xử lý)
           console.error("[AuthContext] Error during initial user info fetch:", error);
           // Interceptor đã xử lý 401 (refresh/logout). Nếu lỗi khác, vẫn nên logout để đảm bảo trạng thái sạch.
-          logout(true);
+          logout(true); // Logout do lỗi (triggeredByError = true)
         }
       } else {
         // Không có đủ token hoặc username để khôi phục session
         console.log("[AuthContext] No valid tokens or username found for session restore.");
-        logout(false); // Dọn dẹp bất kỳ token/data cũ nào có thể còn sót và đặt user=null
+        logout(false); // Dọn dẹp bất kỳ token/data cũ nào có thể còn sót và đặt user=null (không do lỗi API trực tiếp)
       }
 
       setIsLoading(false); // Kết thúc kiểm tra ban đầu
@@ -283,11 +297,12 @@ export const AuthProvider = ({ children }) => {
         localStorage.removeItem(PENDING_USERNAME_KEY); // Dọn dẹp pending
         console.log("[AuthContext] Login successful. User state updated:", userInfo);
         startRefreshTokenTimer(); // <<< Start timer here after successful login
+        // Không cần toast ở đây, thường toast login thành công được hiển thị ở LoginPage
         return userInfo; // Trả về cho LoginPage
       } else {
         // Lỗi không mong muốn: Có token nhưng không lấy được info hợp lệ
         console.error("[AuthContext] Login successful but could not fetch user info.");
-        logout(true); // Dọn dẹp do trạng thái không nhất quán
+        logout(true); // Dọn dẹp do trạng thái không nhất quán (triggeredByError = true)
         throw new Error("Đăng nhập thành công nhưng không thể lấy thông tin tài khoản."); // Báo lỗi cho người dùng
       }
     } catch (error) {
@@ -381,10 +396,14 @@ export const AuthProvider = ({ children }) => {
       });
 
       console.log('[AuthContext] Password changed successfully.');
+       // Có thể thêm toast đổi mật khẩu thành công ở đây nếu cần
+       // toast.success("Mật khẩu đã được đổi thành công!");
        return response.data; // Trả về kết quả từ API
     } catch (error) {
       console.error('[AuthContext] Change password error:', error);
       const message = error.response?.data?.message || error.message || 'Đổi mật khẩu thất bại.';
+      // Có thể thêm toast lỗi ở đây
+      // toast.error(`Đổi mật khẩu thất bại: ${message}`);
       throw new Error(message);
     }
   };
@@ -396,7 +415,7 @@ export const AuthProvider = ({ children }) => {
       isAuthenticated: !!user, // Dễ dàng kiểm tra trạng thái đăng nhập
       isLoading, // Cho biết AuthProvider đang kiểm tra ban đầu
       login,
-      logout,
+      logout, // Hàm logout đã được cập nhật
       preSignup, // Yêu cầu đăng ký (gửi OTP)
       signup,    // Hoàn tất đăng ký với OTP
       forgetPassword,
@@ -407,8 +426,13 @@ export const AuthProvider = ({ children }) => {
 
   // Chỉ render children sau khi quá trình loading ban đầu hoàn tất.
   if (isLoading) {
-      // Hoặc bạn có thể render một Spinner toàn trang
-      return <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}><Spinner size="large" /></div>;
+      // Render Spinner toàn trang khi đang kiểm tra auth ban đầu
+      return (
+        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', width: '100%' }}>
+           {/* Spinner sẽ tự lấp đầy div này nhờ CSS đã chỉnh sửa */}
+          <Spinner />
+        </div>
+      );
   }
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

@@ -1,0 +1,235 @@
+/* src/components/UserInfoEdit/UserInfoEdit.module.css */
+
+/*
+   Sử dụng container style từ UserProfilePage để giới hạn chiều rộng và căn giữa.
+   Component UserInfoEdit.jsx giờ đây bọc mọi thứ trong div này.
+*/
+.profileContainer {
+    /* 
+       Giữ nguyên max-width và margin ở đây. Điều này giúp container không quá rộng
+       trên màn hình lớn và cung cấp padding xung quanh card bên trong.
+       max-width: 800px; /* Giới hạn chiều rộng tối đa của khu vực chứa card */
+       margin: 40px auto; /* Căn giữa container trên trang */
+       padding: 20px; /* Padding bên trong container */
+       box-sizing: border-box;
+       /* Không có animation ở đây, animation áp dụng cho card bên trong */
+       /* Bỏ comment các dòng trên nếu bạn muốn sử dụng class này để bao bọc card */
+       /* trong component UserInfoEdit.jsx như đã làm ở câu trả lời trước */
+
+       /* Nếu bạn chỉ muốn formCard tự căn giữa và fit-content mà không cần bọc ngoài */
+       /* bằng profileContainer, thì bạn có thể bỏ class profileContainer ở JSX */
+       /* và đưa các style centering trực tiếp vào formCard. */
+       /* Tuy nhiên, theo cấu trúc JSX hiện tại, profileContainer đang là cha */
+       /* nên style centering trên formCard sẽ căn giữa nó trong profileContainer. */
+       /* Hãy giữ cấu trúc JSX hiện tại và làm formCard fit-content và căn giữa cha nó. */
+}
+
+
+/* Animation xuất hiện cho card */
+@keyframes fadeInCard {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Style cho card chứa form (tương tự .profileCard) */
+.formCard {
+    background-color: #ffffff;
+    border-radius: 12px; /* Bo góc nhiều hơn */
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08); /* Shadow nhẹ hơn */
+    overflow: hidden;
+    padding: 30px; /* Padding cho nội dung form bên trong card */
+    animation: fadeInCard 0.5s ease-out; /* Animation xuất hiện */
+
+    /* --- Các style mới để căn giữa và fit-content --- */
+    width: fit-content; /* Độ dài fit với nội dung */
+    margin: 0 auto; /* Căn giữa theo chiều ngang trong container cha */
+    /* Removed: max-width: 50%; (không cần nữa vì dùng width: fit-content) */
+    /* Đảm bảo card không quá rộng trên màn hình nhỏ nếu nội dung quá dài */
+     max-width: calc(100% - 40px); /* 100% chiều rộng trừ đi padding của container */
+                                 /* Điều chỉnh 40px nếu padding của .profileContainer khác */
+}
+
+/* Title form - style giống sectionTitle */
+.formTitle {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #1a3b5d; /* Xanh navy */
+    margin: 0 0 25px 0;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #e2e8f0; /* Đường kẻ nhạt hơn */
+    text-align: center; /* Căn giữa tiêu đề */
+    /* Để tiêu đề không đẩy card rộng ra quá mức fit-content */
+    white-space: nowrap; /* Ngăn tiêu đề xuống dòng */
+    overflow: hidden; /* Ẩn phần bị tràn */
+    text-overflow: ellipsis; /* Thêm dấu ... nếu tràn */
+    max-width: 100%; /* Đảm bảo nó không tràn ra ngoài formCard */
+    box-sizing: border-box;
+}
+
+
+/* --- Form Group Styling (label + input) --- */
+.formGroup {
+    margin-bottom: 20px; /* Khoảng cách giữa các nhóm input */
+    min-width: 280px; /* Đặt min-width cho form group để form không quá hẹp */
+}
+
+.formGroup label {
+    display: block;
+    margin-bottom: 8px;
+    font-size: 0.85rem;
+    color: #a0aec0;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-weight: 500;
+}
+
+.formGroup input[type="text"] {
+    width: 100%; /* Input chiếm toàn bộ chiều rộng của formGroup (min-width) */
+    padding: 10px 15px;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    box-sizing: border-box;
+    font-size: 1rem;
+    color: #2d3748;
+    background-color: #f9fafb;
+    transition: border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+}
+
+.formGroup input[type="text"]:focus {
+    border-color: #6366f1;
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+    background-color: #fff;
+}
+
+/* --- Button Styling (tương tự actionButton) --- */
+.submitButton {
+    width: 100%; /* Nút chiếm toàn bộ chiều rộng của form */
+    padding: 12px 20px;
+    background-color: #6366f1;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.3s ease, opacity 0.3s ease;
+    margin-top: 10px;
+}
+
+.submitButton:hover:not(:disabled) {
+    background-color: #4f46e5;
+}
+
+.submitButton:disabled {
+    background-color: #cccccc;
+    cursor: not-allowed;
+    opacity: 0.7;
+}
+
+/* --- Feedback Messages --- */
+.errorMessage {
+    margin-top: 15px;
+    padding: 12px;
+    background-color: #fee2e2;
+    color: #991b1b;
+    border: 1px solid #fca5a5;
+    border-radius: 8px;
+    text-align: center;
+    font-size: 0.95rem;
+}
+
+.successMessage {
+    margin-top: 15px;
+    padding: 12px;
+    background-color: #d1fae5;
+    color: #065f46;
+    border: 1px solid #a7f3d0;
+    border-radius: 8px;
+    text-align: center;
+    font-size: 0.95rem;
+}
+
+
+/* --- Loading State Styling (AuthContext) --- */
+.loadingContainer {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    min-height: 60vh;
+    gap: 15px;
+}
+
+.loadingContainer p {
+    color: #4b5563;
+    font-size: 1.1rem;
+}
+
+
+/* --- Authentication Error State Styling (AuthContext) --- */
+.authErrorContainer {
+    background-color: #fff;
+    padding: 30px;
+    border-radius: 8px;
+    text-align: center;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    max-width: 500px;
+    margin: 40px auto;
+}
+
+.authErrorContainer p {
+     color: #e53e3e;
+     font-size: 1.1rem;
+     font-weight: 500;
+}
+
+
+/* --- Responsive Adjustments --- */
+@media (max-width: 768px) {
+    .profileContainer { margin: 30px auto; padding: 15px; }
+    .formCard { padding: 25px; border-radius: 10px; max-width: calc(100% - 30px);} /* Điều chỉnh max-width */
+    .formTitle { font-size: 1.2rem; margin-bottom: 20px; }
+    .formGroup { margin-bottom: 15px; min-width: unset; /* Bỏ min-width trên mobile nếu cần */ }
+    .formGroup label { font-size: 0.8rem; } /* Nhỏ hơn */
+    .formGroup input[type="text"] { padding: 10px 12px; }
+    .submitButton { padding: 10px 15px; font-size: 1rem; }
+    /* Loading/Error containers */
+    .loadingContainer, .authErrorContainer { margin: 30px auto; padding: 25px;}
+}
+
+@media (max-width: 480px) {
+     .profileContainer { margin: 20px auto; padding: 10px; }
+     .formCard { padding: 20px; border-radius: 8px; max-width: calc(100% - 20px);} /* Điều chỉnh max-width */
+     .formTitle { font-size: 1.1rem; margin-bottom: 15px; }
+     .formGroup { margin-bottom: 12px; }
+     .formGroup label { font-size: 0.75rem; } /* Nhỏ hơn nữa */
+     .formGroup input[type="text"] { font-size: 0.95rem; }
+     .submitButton { font-size: 1rem; padding: 10px; }
+     /* Loading/Error containers */
+     .loadingContainer, .authErrorContainer { margin: 20px auto; padding: 20px;}
+}
+
+.backLinkContainer {
+    margin-top: 2rem;
+    text-align: center;
+    font-size: 0.9rem;
+    color: #718096;
+}
+
+.link {
+    color: #4299e1;
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.2s ease;
+}
+
+.link:hover {
+    color: #2b6cb0;
+    text-decoration: underline;
+}
+
+.backLink {
+    font-weight: 600;
+    margin-left: 0.4rem;
+}

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect} from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import styles from './resetPassword.module.css';
@@ -7,6 +7,9 @@ import Button from '../../components/Button/Button';
 import Spinner from '../../components/Spinner/Spinner';
 
 function ResetPasswordPage() {
+    useEffect(() => {
+            document.title = "Đặt lại mật khẩu | HustShop";
+        }, []);
     const [formData, setFormData] = useState({
         email: '',
         otp: '',

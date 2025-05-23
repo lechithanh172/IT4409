@@ -21,7 +21,9 @@ const ProductDetailPage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [isSpecDialogOpen, setIsSpecDialogOpen] = useState(false);
-
+  useEffect(() => {
+          document.title = "Chi tiết sản phẩm | HustShop";
+      }, []);
   useEffect(() => {
     setLoading(true);
     setError(null);

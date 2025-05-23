@@ -68,6 +68,9 @@ const getStatusClass = (status) => {
 };
 
 const ShipperPage = () => {
+    useEffect(() => {
+            document.title = "Shipper | HustShop";
+        }, []);
     const { user } = useAuth();
     const [activeTab, setActiveTab] = useState('available');
     const [allOrders, setAllOrders] = useState([]);

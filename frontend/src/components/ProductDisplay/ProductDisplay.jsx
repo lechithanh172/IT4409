@@ -496,7 +496,7 @@ const ProductDisplay = ({ product }) => {
                         onClick={handleOrderNow}
                         disabled={effectiveVariant.stockQuantity <= 0 || isAddingToCart || !isAuthenticated}
                     >
-                         {isAddingToCart ? <Spinner size="small" color="#fff"/> : <strong>ĐẶT HÀNG</strong> }
+                         {isAddingToCart ? <Spinner size="small" color="#fff"/> : 'ĐẶT HÀNG' }
                          {!isAddingToCart && <span>Giao hàng tận nơi</span>}
                     </Button>
 

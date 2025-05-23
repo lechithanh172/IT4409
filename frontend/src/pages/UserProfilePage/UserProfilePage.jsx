@@ -1,4 +1,4 @@
-import React from 'react'; // Không cần useState, useEffect ở đây nếu chỉ hiển thị
+import {React, useEffect} from 'react'; // Không cần useState, useEffect ở đây nếu chỉ hiển thị
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext'; // Hook để lấy thông tin user
 import Button from '../../components/Button/Button';     // Component Button
@@ -10,7 +10,9 @@ const UserProfilePage = () => {
   // Lấy thông tin user, trạng thái loading và hàm logout từ AuthContext
   const { user, isLoading } = useAuth();
   const navigate = useNavigate(); // Hook để điều hướng
-
+useEffect(() => {
+        document.title = "Thông tin cá nhân | HustShop";
+    }, []);
   // Hàm xử lý khi nhấn nút chỉnh sửa (chuyển đến trang chỉnh sửa)
   const handleEditProfile = () => {
     // Bạn cần tạo trang/component riêng cho việc chỉnh sửa

@@ -13,21 +13,17 @@ const DEFAULT_IMAGE_URL = '/images/placeholder-image.png';
 const CartItem = ({ item, onRemove, onQuantityChange, onToggleSelect, isUpdating }) => {
     const itemKey = item.uniqueId;
 
-    // Khi bấm nút TĂNG: Thông báo cho cha cần thay đổi +1
     const handleIncreaseQuantity = () => {
         if (item.quantity >= item.stockQuantity) {
             alert(`Số lượng tồn kho của "${item.name} - ${item.color}" chỉ còn ${item.stockQuantity}.`);
             return;
         }
-        // *** THAY ĐỔI QUAN TRỌNG: Gửi +1 ***
-        onQuantityChange(itemKey, 1); // Gửi số lượng cần THAY ĐỔI, không phải số lượng mới
+        onQuantityChange(itemKey, 1); 
     };
 
-    // Khi bấm nút GIẢM: Thông báo cho cha cần thay đổi -1
     const handleDecreaseQuantity = () => {
         if (item.quantity > 1) {
-            // *** THAY ĐỔI QUAN TRỌNG: Gửi -1 ***
-            onQuantityChange(itemKey, -1); // Gửi số lượng cần THAY ĐỔI
+            onQuantityChange(itemKey, -1);
         }
     };
 
@@ -42,7 +38,6 @@ const CartItem = ({ item, onRemove, onQuantityChange, onToggleSelect, isUpdating
 
     return (
         <tr className={`${styles.cartItemRow} ${item.error ? styles.itemWithError : ''}`}>
-            {/* Checkbox */}
             <td className={styles.columnSelect}>
                 <input
                     type="checkbox"
@@ -53,7 +48,6 @@ const CartItem = ({ item, onRemove, onQuantityChange, onToggleSelect, isUpdating
                     aria-label={`Chọn sản phẩm ${item.name} - ${item.color}`}
                 />
             </td>
-            {/* Sản phẩm */}
             <td className={styles.columnProduct}>
                 <div className={styles.productInfo}>
                     <Link to={`/product/${item.productId}`} className={styles.productImageLink}>
@@ -74,18 +68,17 @@ const CartItem = ({ item, onRemove, onQuantityChange, onToggleSelect, isUpdating
                     </div>
                 </div>
             </td>
-            {/* Số lượng */}
             <td className={styles.columnQuantity}>
                 <div className={styles.quantityControl}>
                     <button
-                        onClick={handleDecreaseQuantity} // Gọi hàm giảm (gửi -1)
+                        onClick={handleDecreaseQuantity} 
                         className={styles.quantityButton}
                         disabled={isDisabled || item.quantity <= 1}
                         aria-label="Giảm số lượng"
                     > <FaMinus /> </button>
                     <span className={styles.quantityDisplay}>{item.quantity}</span>
                     <button
-                        onClick={handleIncreaseQuantity} // Gọi hàm tăng (gửi +1)
+                        onClick={handleIncreaseQuantity}
                         className={styles.quantityButton}
                         disabled={isDisabled || item.quantity >= item.stockQuantity}
                         aria-label="Tăng số lượng"
@@ -95,14 +88,11 @@ const CartItem = ({ item, onRemove, onQuantityChange, onToggleSelect, isUpdating
                      <span className={styles.maxQuantityNote}>Tối đa</span>
                 )}
             </td>
-            {/* Đơn giá */}
             <td className={`${styles.columnPrice} ${styles.alignRight}`}> {formatCurrency(item.price)} </td>
-            {/* Thành tiền */}
             <td className={`${styles.columnTotal} ${styles.alignRight}`}> {formatCurrency(item.price * item.quantity)} </td>
-            {/* Xóa */}
             <td className={styles.columnActions}>
                 <button
-                    onClick={() => onRemove(itemKey)} // Vẫn thông báo cho cha như cũ
+                    onClick={() => onRemove(itemKey)}
                     className={styles.removeButton}
                     title={`Xóa ${item.name} - ${item.color}`}
                     aria-label={`Xóa ${item.name} - ${item.color}`}

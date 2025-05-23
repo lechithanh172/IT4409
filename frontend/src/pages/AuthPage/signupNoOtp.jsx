@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import styles from './signupNoOtp.module.css';
 import { FiUser, FiMail, FiAlertCircle, FiUserPlus } from 'react-icons/fi';
@@ -7,6 +7,9 @@ import Button from '../../components/Button/Button';
 import Spinner from '../../components/Spinner/Spinner';
 import { Link } from 'react-router-dom'
 function SignupNoOtpPage() {
+    useEffect(() => {
+            document.title = "Đăng ký | HustShop";
+        }, []);
     const [formData, setFormData] = useState({ username: '', email: '' });
     const [error, setError] = useState('');
     const [isLoading, setIsLoading] = useState(false);

@@ -12,7 +12,7 @@ import styles from './HomePage.module.css';                             // CSS M
 import apiService from '../../services/api';                     // Service gọi API
 import { FiChevronRight } from 'react-icons/fi';                      // Icon cho link "Xem thêm"
 
-// --- Data cho Hero Slider (Ví dụ) ---
+// --- Data cho Hero Slider (Sử dụng ảnh của bạn) ---
 const heroSlides = [
   {
     id: 1,
@@ -20,23 +20,27 @@ const heroSlides = [
     subtitle: 'Sản phẩm chính hãng, giá tốt hàng đầu.',
     ctaText: 'Mua Sắm Ngay',
     ctaLink: '/products',
-    bgUrl: 'https://images.unsplash.com/photo-1498049795616-cb5fd79b0da4?auto=format&fit=crop&w=1920&q=80', // Example 1
+    // Sử dụng đường dẫn ảnh từ thư mục public
+    bgUrl: '/images/bg1.jpg', // <-- Thay đổi đường dẫn ảnh nền slide 1
   },
   {
     id: 2,
     title: 'Ưu Đãi Hấp Dẫn Mỗi Ngày',
     subtitle: 'Đừng bỏ lỡ cơ hội sở hữu sản phẩm yêu thích với giá tốt.',
     ctaText: 'Xem Ưu Đãi',
-    ctaLink: '/promotions', // Tạo trang /promotions nếu cần
-    bgUrl: 'https://images.unsplash.com/photo-1505740420928-95470228c2b5?auto=format&fit=crop&w=1920&q=80', // Example 2
+    ctaLink: '/promotions',
+    // Sử dụng đường dẫn ảnh từ thư mục public
+    bgUrl: '/images/bg2.jpg', // <-- Thay đổi đường dẫn ảnh nền slide 2
   },
   {
     id: 3,
     title: 'Bộ Sưu Tập Mới Nhất',
     subtitle: 'Cập nhật xu hướng công nghệ mới nhất.',
     ctaText: 'Khám Phá Ngay',
-    ctaLink: '/latest', // Tạo trang /latest nếu cần
-    bgUrl: 'https://images.unsplash.com/photo-1525547719571-cbceb387ad09?auto=format&fit=crop&w=1920&q=80', // Example 3
+    ctaLink: '/latest',
+    // Bạn có thể sử dụng lại ảnh 1 hoặc 2, hoặc thêm ảnh thứ 3 nếu có
+    bgUrl: '/images/bg3.jpg', // <-- Ví dụ sử dụng lại ảnh 1 cho slide 3
+    // Nếu bạn có ảnh thứ 3 (ví dụ: bg3.jpg) thì dùng: bgUrl: '/images/bg3.jpg',
   },
 ];
 
@@ -54,8 +58,10 @@ const HomePage = () => {
 
   // State quản lý lỗi chung
   const [error, setError] = useState(null);
-
-  // Cấu hình cho Hero Slider
+  useEffect(() => {
+        document.title = "Trang chủ | HustShop";
+    }, []);
+  // Cấu hình cho Hero Slider (giữ nguyên)
   const heroSliderSettings = {
     dots: true,
     infinite: true,
@@ -70,7 +76,7 @@ const HomePage = () => {
   };
 
 
-  // useEffect để fetch tất cả dữ liệu cần thiết
+  // useEffect để fetch tất cả dữ liệu cần thiết (giữ nguyên)
   useEffect(() => {
     const loadHomePageData = async () => {
       setIsProductsLoading(true);
@@ -81,12 +87,11 @@ const HomePage = () => {
       try {
         console.log("Starting to fetch all homepage data...");
         const [productsRes, categoryRes, brandRes] = await Promise.allSettled([
-          apiService.getAllProducts(), // Fetch TẤT CẢ sản phẩm
+          apiService.getAllProducts(),
           apiService.getAllCategories(),
           apiService.getAllBrands()
         ]);
 
-        // Xử lý kết quả Products
         if (productsRes.status === 'fulfilled' && Array.isArray(productsRes.value?.data)) {
           console.log("All products data fetched:", productsRes.value.data);
           setProducts(productsRes.value.data);
@@ -96,7 +101,6 @@ const HomePage = () => {
         }
         setIsProductsLoading(false);
 
-        // Xử lý kết quả Categories
         if (categoryRes.status === 'fulfilled' && Array.isArray(categoryRes.value?.data)) {
           console.log("Categories data fetched:", categoryRes.value.data);
           setCategories(categoryRes.value.data);
@@ -106,7 +110,6 @@ const HomePage = () => {
         }
         setIsCategoryLoading(false);
 
-         // Xử lý kết quả Brands
          if (brandRes.status === 'fulfilled' && Array.isArray(brandRes.value?.data)) {
             console.log("Brands data fetched:", brandRes.value.data);
             setBrands(brandRes.value.data);
@@ -116,7 +119,6 @@ const HomePage = () => {
           }
          setIsBrandLoading(false);
 
-        // Gộp lỗi từ các Promise.allSettled nếu có
         const errors = [];
         if (productsRes.status === 'rejected') errors.push(`Sản phẩm: ${productsRes.reason?.message || 'Lỗi không xác định'}`);
         if (categoryRes.status === 'rejected') errors.push(`Danh mục: ${categoryRes.reason?.message || 'Lỗi không xác định'}`);
@@ -150,7 +152,7 @@ const HomePage = () => {
             <div key={slide.id} className={styles.heroSlide}>
               <div
                 className={styles.heroSlideBackground}
-                style={{ backgroundImage: `url(${slide.bgUrl})` }}
+                style={{ backgroundImage: `url(${slide.bgUrl})` }} // Sử dụng bgUrl từ slide data
               ></div>
               <div className={styles.heroSlideOverlay}></div>
               <div className={styles.heroSlideContent}>
@@ -171,7 +173,7 @@ const HomePage = () => {
       {error && <p className={`${styles.error} ${styles.pageError}`}>{error}</p>}
 
 
-      {/* --- Section Sản phẩm mới về (Sử dụng danh sách TẤT CẢ sản phẩm) --- */}
+      {/* --- Section Sản phẩm mới về --- */}
       <section className={styles.section}>
          <div className={styles.sectionHeader}>
             <h2 className={styles.sectionTitle}>Sản Phẩm Mới Về</h2>
@@ -191,18 +193,14 @@ const HomePage = () => {
        <section className={`${styles.section} ${styles.brandsSectionBg}`}>
           <div className={styles.sectionHeader}>
               <h2 className={styles.sectionTitle}>Thương Hiệu Hàng Đầu</h2>
-               {/* Đã bỏ Link "Xem tất cả" tại đây */}
-               {/* <Link to={`/brands`} className={styles.viewAllLink}>Xem tất cả <FiChevronRight/></Link> */}
           </div>
           {isBrandLoading ? (
              <div className={styles.loadingContainer}><Spinner /></div>
           ) : brands.length > 0 ? (
                 <div className={styles.brandList}>
                 {brands.map((brand) => (
-                    // Link đến trang sản phẩm theo thương hiệu
-                    <Link to={`/products?brand=${encodeURIComponent(brand.name)}`} key={brand.brandId} className={styles.brandCard} title={brand.name}>
+                    <Link to={`/products?brand=${encodeURIComponent(brand.brandName)}`} key={brand.brandId} className={styles.brandCard} title={brand.name}>
                     <div className={styles.brandImageWrapper}>
-                         {/* Sử dụng brand.logoUrl nếu có, có thể thêm alt text tốt hơn */}
                         <img src={brand.logoUrl} alt={`${brand.name} logo`} className={styles.brandLogo} onError={(e)=>{e.target.style.opacity='0.5'; e.target.style.filter='grayscale(1)'}}/>
                     </div>
                     </Link>
@@ -213,7 +211,6 @@ const HomePage = () => {
             )}
        </section>
 
-       {/* --- Section Danh Mục --- */}
       <section className={`${styles.section} ${styles.categoriesSectionBg}`}>
         <div className={styles.sectionHeader}>
              <h2 className={styles.sectionTitle}>Khám Phá Danh Mục</h2>
@@ -224,11 +221,9 @@ const HomePage = () => {
          ) : categories.length > 0 ? (
             <div className={styles.categoryList}>
             {categories.map((category) => (
-                // Link đến trang sản phẩm theo danh mục
-                <Link to={`/products?category=${encodeURIComponent(category.name)}`} key={category.categoryId} className={styles.categoryCard}>
+                <Link to={`/products?category=${encodeURIComponent(category.categoryName)}`} key={category.categoryId} className={styles.categoryCard}>
                 <div className={styles.categoryImageWrapper}>
-                    {/* Sử dụng category.imageUrl nếu có, hoặc fallback */}
-                    <img src={category.image || '/images/placeholder-category.png'} alt={`${category.name} category image`} className={styles.categoryImage} onError={(e)=>{e.target.src='/images/placeholder-category.png'}}/>
+                    <img src={category.imageUrl || '/images/placeholder-category.png'} alt={`${category.name} category image`} className={styles.categoryImage} onError={(e)=>{e.target.src='/images/placeholder-category.png'}}/>
                     <div className={styles.categoryOverlay}></div>
                 </div>
                 <h3 className={styles.categoryName}>{category.name}</h3>

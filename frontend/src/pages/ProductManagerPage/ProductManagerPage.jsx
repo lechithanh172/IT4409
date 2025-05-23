@@ -18,7 +18,7 @@ import AdminOrder from "../../components/AdminPages/AdminOrder/AdminOrder";
 import AdminBrands from "../../components/AdminPages/AdminBrand/AdminBrands";
 import AdminCategories from "../../components/AdminPages/AdminCategory/AdminCategories";
 import AdminProfile from "../../components/AdminPages/AdminProfile/AdminProfile";
-import styles from "./AdminPage.module.css";
+import styles from "./ProductManager.module.css";
 
 const { Header, Sider, Content } = Layout;
 const { Title } = Typography;
@@ -38,9 +38,7 @@ const items = [
     { key: "categories", label: "Danh mục" },
     { key: "brands", label: "Thương hiệu" },
   ]),
-  getItem("Người dùng", "users", <UserOutlined />),
   getItem("Đơn hàng", "orders", <TruckOutlined />),
-  getItem("Thông tin Admin", "profile", <InfoCircleOutlined />),
 ];
 
 const Admin = () => {
@@ -76,12 +74,10 @@ const Admin = () => {
 
   const renderPage = (key) => {
     switch (key) {
-      case "users": return <AdminUser />;
       case "products": return <AdminProduct />;
       case "categories": return <AdminCategories />;
       case "brands": return <AdminBrands />;
       case "orders": return <AdminOrder />;
-      case "profile": return <AdminProfile />;
       default: return <AdminProduct />;
     }
   };
@@ -117,7 +113,7 @@ const Admin = () => {
     <Layout style={{ minHeight: '100vh' }}>
       <Header className={styles.header}>
         <div className={styles.logoArea}>
-           <Title level={3} className={styles.headerTitle}>Admin Dashboard</Title>
+           <Title level={3} className={styles.headerTitle}>Product Manager Dashboard</Title>
         </div>
 
         <div className={styles.headerRight}>

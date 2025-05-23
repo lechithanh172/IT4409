@@ -36,6 +36,9 @@ const getVariantFinalPrice = (variantDetail, mainProductPrice) => {
 // -------------------------------------------------------------------
 
 const CartPage = () => {
+  useEffect(() => {
+          document.title = "Giỏ hàng | HustShop";
+      }, []);
   // --- State Quản lý Component ---
   const [cartItems, setCartItems] = useState([]);
   const [isLoading, setIsLoading] = useState(true);

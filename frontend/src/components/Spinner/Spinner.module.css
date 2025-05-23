@@ -4,8 +4,6 @@
     justify-content: center;
     align-items: center;
     padding: 20px; /* Khoảng đệm xung quanh */
-    width: 100%; /* Chiếm toàn bộ chiều rộng nếu cần */
-    min-height: 100px; /* Chiều cao tối thiểu để thấy spinner */
   }
   
   /* Spinner chính */

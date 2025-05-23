@@ -218,7 +218,7 @@ const apiService = {
   searchProducts: (keyword) => apiInstance.get(`/product/search=${encodeURIComponent(keyword)}`),
   getProductById: (productId) => apiInstance.get(`/product/${productId}`),
   getAllProducts: () => apiInstance.get("/product/all"),
- filterProducts: (filters = {}) => {
+  filterProducts: (filters = {}) => {
         console.log("[apiService] Calling product/filter POST with filters:", filters);
         const body = {};
         if (filters.type) body.type = filters.type;
@@ -260,7 +260,7 @@ const apiService = {
   assignOrder: (orderId, shipperId) => apiInstance.post(`/order/assign/${orderId}`, null, {
     params: { shipperId }
   }),
-  updateOrderStatus: (orderId, status) => apiInstance.post(`/order/${orderId}/status`, null, {
+  updateOrderStatus: (orderId, status) => apiInstance.post(`/order/status/${orderId}`, null, {
     params: { status }
   }),
 

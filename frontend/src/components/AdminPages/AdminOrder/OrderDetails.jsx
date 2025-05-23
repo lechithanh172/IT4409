@@ -50,10 +50,11 @@ function formatDate(isoString) {
 
 const STATUS_DETAILS = {
   PENDING: { label: "Chờ xử lý", color: "gold" },
+  APPROVED: { label: "Đã duyệt", color: "blue" },
+  REJECTED: { label: "Bị từ chối", color: "error" },
   SHIPPING: { label: "Đang giao", color: "processing" },
   DELIVERED: { label: "Đã giao", color: "success" },
   FAILED_DELIVERY: { label: "Giao thất bại", color: "error" },
-  REJECTED: { label: "Bị từ chối", color: "error" },
 };
 
 const DeliveryStatusComponent = ({ deliveryStatus }) => {
@@ -92,11 +93,12 @@ const DetailRow = ({
 );
 
 const VALID_STATUS_TRANSITIONS = {
-  PENDING: ["SHIPPING", "REJECTED"],
+  PENDING: ["APPROVED", "REJECTED"],
+  APPROVED: ["SHIPPING"],
+  REJECTED: [],
   SHIPPING: ["DELIVERED", "FAILED_DELIVERY"],
   DELIVERED: [],
   FAILED_DELIVERY: ["SHIPPING"],
-  REJECTED: [],
 };
 
 
@@ -252,8 +254,7 @@ const OrderDetails = ({ orderId, handleRefreshParent }) => {
     async (orderIdToUpdate, currentStatus, newStatus) => {
       const currentStatusUpper = currentStatus?.toUpperCase();
       const newStatusUpper = newStatus.toUpperCase();
-      const validTransitions =
-        VALID_STATUS_TRANSITIONS[currentStatusUpper] || [];
+      const validTransitions = VALID_STATUS_TRANSITIONS[currentStatusUpper] || [];
       if (!validTransitions.includes(newStatusUpper)) {
         message.warning(
           `Không thể chuyển từ trạng thái '${STATUS_DETAILS[currentStatusUpper]?.label || currentStatus}' sang '${STATUS_DETAILS[newStatusUpper]?.label || newStatus}'.`
@@ -265,11 +266,10 @@ const OrderDetails = ({ orderId, handleRefreshParent }) => {
       setIsStatusModalVisible(false);
 
       try {
-        const payload = {
+        await apiService.applyOrderStatus({
           orderId: orderIdToUpdate,
-          status: newStatus.toUpperCase(),
-        };
-        await apiService.updateOrderStatus(payload);
+          status: newStatus.toUpperCase()
+        });
 
         setCurrentOrderStatus(newStatusUpper);
         setOrderData(prev => prev ? {...prev, status: newStatusUpper} : null);

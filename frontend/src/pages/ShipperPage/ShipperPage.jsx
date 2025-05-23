@@ -4,7 +4,7 @@ import styles from './ShipperPage.module.css';
 import apiService from '../../services/api';
 import { useAuth } from '../../contexts/AuthContext'; 
 import Spinner from '../../components/Spinner/Spinner'; 
-import { FaTruck, FaBox, FaExclamationTriangle, FaFilter, FaEye, FaEdit } from 'react-icons/fa';
+import { FaTruck, FaBox, FaExclamationTriangle, FaFilter, FaEye, FaEdit, FaCheck, FaTimes } from 'react-icons/fa';
 import { Modal, Button, Tooltip, message, Typography, Table, Image, Tag, Card, Row, Col, Divider, Spin, Alert } from 'antd';
 import ShipperOrderDetails from './ShipperOrderDetails';
 
@@ -12,18 +12,20 @@ const { Text, Paragraph, Title } = Typography;
 
 const STATUS_DETAILS = {
     PENDING: { label: "Chờ xử lý", color: "gold" },
+    APPROVED: { label: "Đã duyệt", color: "blue" },
+    REJECTED: { label: "Bị từ chối", color: "error" },
     SHIPPING: { label: "Đang giao", color: "processing" },
     DELIVERED: { label: "Đã giao", color: "success" },
     FAILED_DELIVERY: { label: "Giao thất bại", color: "error" },
-    REJECTED: { label: "Bị từ chối", color: "error" },
 };
 
 const VALID_STATUS_TRANSITIONS = {
-    PENDING: ["SHIPPING", "REJECTED"],
+    PENDING: ["APPROVED", "REJECTED"],
+    APPROVED: ["SHIPPING"],
+    REJECTED: [],
     SHIPPING: ["DELIVERED", "FAILED_DELIVERY"],
     DELIVERED: [],
     FAILED_DELIVERY: ["SHIPPING"],
-    REJECTED: [],
 };
 
 const formatCurrency = (amount) => {
@@ -143,7 +145,7 @@ const ShipperPage = () => {
         if (orderId) {
             setAcceptOrderModal(prev => ({ ...prev, isLoading: true }));
             try {
-                await apiService.assignOrder(orderId, 1);
+                await apiService.assignOrder(orderId, user.userId);
                 message.success('Nhận đơn hàng thành công');
                 setAcceptOrderModal({
                     visible: false,
@@ -151,7 +153,6 @@ const ShipperPage = () => {
                     isLoading: false,
                 });
                 await loadData();
-                // Chuyển sang tab đơn hàng đã nhận
                 setActiveTab('assigned');
             } catch (err) {
                 console.error("Error accepting order:", err);
@@ -171,7 +172,10 @@ const ShipperPage = () => {
 
     const handleUpdateStatus = async (orderId, newStatus) => {
         try {
-            await apiService.updateOrderStatus(orderId, newStatus);
+            await apiService.applyOrderStatus({
+                orderId: orderId,
+                status: newStatus
+            });
             message.success('Cập nhật trạng thái đơn hàng thành công');
             await loadData();
         } catch (err) {
@@ -291,6 +295,36 @@ const ShipperPage = () => {
                                         </button>
                                     ) : (
                                         <div className={styles.actionButtons}>
+                                            {order.status === 'PENDING' && (
+                                                <>
+                                                    <Tooltip title="Duyệt đơn hàng">
+                                                        <button 
+                                                            className={`${styles.actionButton} ${styles.updateStatusButton}`}
+                                                            onClick={() => showStatusChangeConfirm(order, 'APPROVED')}
+                                                        >
+                                                            <FaCheck /> Duyệt
+                                                        </button>
+                                                    </Tooltip>
+                                                    <Tooltip title="Từ chối đơn hàng">
+                                                        <button 
+                                                            className={`${styles.actionButton} ${styles.failButton}`}
+                                                            onClick={() => showStatusChangeConfirm(order, 'REJECTED')}
+                                                        >
+                                                            <FaTimes /> Từ chối
+                                                        </button>
+                                                    </Tooltip>
+                                                </>
+                                            )}
+                                            {order.status === 'APPROVED' && (
+                                                <Tooltip title="Bắt đầu giao hàng">
+                                                    <button 
+                                                        className={`${styles.actionButton} ${styles.updateStatusButton}`}
+                                                        onClick={() => showStatusChangeConfirm(order, 'SHIPPING')}
+                                                    >
+                                                        <FaTruck /> Bắt đầu giao
+                                                    </button>
+                                                </Tooltip>
+                                            )}
                                             {order.status === 'SHIPPING' && (
                                                 <>
                                                     <Tooltip title="Xác nhận đã giao hàng">
@@ -310,6 +344,16 @@ const ShipperPage = () => {
                                                         </button>
                                                     </Tooltip>
                                                 </>
+                                            )}
+                                            {order.status === 'FAILED_DELIVERY' && (
+                                                <Tooltip title="Thử giao lại">
+                                                    <button 
+                                                        className={`${styles.actionButton} ${styles.updateStatusButton}`}
+                                                        onClick={() => showStatusChangeConfirm(order, 'SHIPPING')}
+                                                    >
+                                                        <FaTruck /> Giao lại
+                                                    </button>
+                                                </Tooltip>
                                             )}
                                             <Tooltip title="Xem chi tiết đơn hàng">
                                                 <button 

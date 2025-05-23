@@ -17,6 +17,9 @@ import {
   Row,
   Col,
   Statistic,
+  Image,
+  Divider,
+  Alert,
 } from "antd";
 import {
   SearchOutlined,
@@ -33,10 +36,11 @@ const { Text } = Typography;
 
 const STATUS_DETAILS = {
   PENDING: { label: "Chờ xử lý", color: "gold" },
+  APPROVED: { label: "Đã duyệt", color: "blue" },
+  REJECTED: { label: "Bị từ chối", color: "error" },
   SHIPPING: { label: "Đang giao", color: "processing" },
   DELIVERED: { label: "Đã giao", color: "success" },
   FAILED_DELIVERY: { label: "Giao thất bại", color: "error" },
-  REJECTED: { label: "Bị từ chối", color: "error" },
 };
 
 const OrderStatusTag = ({ status }) => {
@@ -49,11 +53,12 @@ const OrderStatusTag = ({ status }) => {
 };
 
 const VALID_STATUS_TRANSITIONS = {
-  PENDING: ["SHIPPING", "REJECTED"],
+  PENDING: ["APPROVED", "REJECTED"],
+  APPROVED: ["SHIPPING"],
+  REJECTED: [],
   SHIPPING: ["DELIVERED", "FAILED_DELIVERY"],
   DELIVERED: [],
   FAILED_DELIVERY: ["SHIPPING"],
-  REJECTED: [],
 };
 
 function formatDate(isoString) {
@@ -106,6 +111,15 @@ const AdminOrder = () => {
 
   const [monthlyRevenue, setMonthlyRevenue] = useState(0);
   const [yearlyRevenue, setYearlyRevenue] = useState(0);
+
+  const [shipperModalState, setShipperModalState] = useState({
+    visible: false,
+    orderId: null,
+    targetStatus: null,
+    shipperId: null,
+    shipperList: [],
+    loading: false
+  });
 
   const fetchData = useCallback(
     async (showSuccessMessage = false) => {
@@ -206,8 +220,7 @@ const AdminOrder = () => {
       }
 
       const currentStatusUpper = currentStatus?.toUpperCase();
-      const validTransitions =
-        VALID_STATUS_TRANSITIONS[currentStatusUpper] || [];
+      const validTransitions = VALID_STATUS_TRANSITIONS[currentStatusUpper] || [];
 
       if (!validTransitions.includes(newStatus)) {
         const warningMsg = `Không thể chuyển từ trạng thái '${
@@ -235,21 +248,13 @@ const AdminOrder = () => {
       setDisplayedOrders(updatedDisplayedOrders);
 
       try {
-        if (!apiService || typeof apiService.updateOrderStatus !== "function") {
-          throw new Error(
-            "apiService hoặc apiService.updateOrderStatus không tồn tại!"
-          );
-        }
-
-        const orderIdNumber = parseInt(orderId, 10);
-        if (isNaN(orderIdNumber)) {
-          throw new Error("ID đơn hàng không hợp lệ");
-        }
-
-        await apiService.updateOrderStatus(orderIdNumber, newStatus.toUpperCase());
+        await apiService.applyOrderStatus({
+          orderId: orderId,
+          status: newStatus
+        });
 
         message.success(
-          `Đơn hàng #${orderIdNumber}: Trạng thái cập nhật thành công thành ${
+          `Đơn hàng #${orderId}: Trạng thái cập nhật thành công thành ${
             STATUS_DETAILS[newStatus]?.label || newStatus
           }.`
         );
@@ -289,20 +294,95 @@ const AdminOrder = () => {
     [processedOrders, loadingAction, statusFilter]
   );
 
+  const fetchShippers = async () => {
+    try {
+      const response = await apiService.getUsersByRole('SHIPPER');
+      if (response?.data) {
+        setShipperModalState(prev => ({
+          ...prev,
+          shipperList: response.data.map(shipper => ({
+            value: shipper.userId,
+            label: `${shipper.username} - ${shipper.phoneNumber || 'Chưa có số điện thoại'}`
+          }))
+        }));
+      }
+    } catch (error) {
+      message.error('Không thể tải danh sách shipper');
+    }
+  };
+
   const showStatusChangeConfirm = useCallback((record, targetStatus) => {
     if (!record || !record.orderId || !record.status || !targetStatus) {
       message.error("Lỗi: Thiếu thông tin để hiển thị xác nhận.");
       return;
     }
+
     const fullRecord = processedOrders.find(o => o.orderId === record.orderId) || record;
-    setConfirmModalState({
-      visible: true,
-      record: fullRecord,
-      targetStatus: targetStatus,
-      isLoading: false,
-    });
+    
+    if (targetStatus === 'SHIPPING') {
+      setShipperModalState({
+        visible: true,
+        orderId: fullRecord.orderId,
+        targetStatus: targetStatus,
+        shipperId: null,
+        shipperList: [],
+        loading: false
+      });
+      fetchShippers();
+    } else {
+      setConfirmModalState({
+        visible: true,
+        record: fullRecord,
+        targetStatus: targetStatus,
+        isLoading: false,
+      });
+    }
   }, [processedOrders]);
 
+  const handleShipperModalOk = async () => {
+    const { orderId, targetStatus, shipperId } = shipperModalState;
+    if (!shipperId) {
+      message.warning('Vui lòng chọn shipper');
+      return;
+    }
+
+    setShipperModalState(prev => ({ ...prev, loading: true }));
+    try {
+      // Đầu tiên gán shipper cho đơn hàng
+      await apiService.assignOrder(orderId, shipperId);
+      // Sau đó cập nhật trạng thái
+      await apiService.applyOrderStatus({
+        orderId: orderId,
+        status: targetStatus
+      });
+
+      message.success('Đã gán shipper và cập nhật trạng thái đơn hàng thành công');
+      setShipperModalState({
+        visible: false,
+        orderId: null,
+        targetStatus: null,
+        shipperId: null,
+        shipperList: [],
+        loading: false
+      });
+      onRefresh();
+    } catch (error) {
+      message.error('Không thể cập nhật đơn hàng');
+    } finally {
+      setShipperModalState(prev => ({ ...prev, loading: false }));
+    }
+  };
+
+  const handleShipperModalCancel = () => {
+    setShipperModalState({
+      visible: false,
+      orderId: null,
+      targetStatus: null,
+      shipperId: null,
+      shipperList: [],
+      loading: false
+    });
+  };
 
   const handleConfirmModalOk = useCallback(() => {
     const { record, targetStatus } = confirmModalState;
@@ -698,6 +778,28 @@ const AdminOrder = () => {
         ) : (
           <p>Đang tải thông tin xác nhận...</p>
         )}
+      </Modal>
+
+      <Modal
+        title="Chọn shipper giao hàng"
+        open={shipperModalState.visible}
+        onOk={handleShipperModalOk}
+        onCancel={handleShipperModalCancel}
+        confirmLoading={shipperModalState.loading}
+        okText="Xác nhận"
+        cancelText="Hủy"
+      >
+        <div style={{ marginBottom: 16 }}>
+          <p>Vui lòng chọn shipper để giao đơn hàng #{shipperModalState.orderId}</p>
+          <Select
+            style={{ width: '100%' }}
+            placeholder="Chọn shipper"
+            options={shipperModalState.shipperList}
+            value={shipperModalState.shipperId}
+            onChange={(value) => setShipperModalState(prev => ({ ...prev, shipperId: value }))}
+            loading={shipperModalState.loading}
+          />
+        </div>
       </Modal>
 
       <Table

@@ -6,7 +6,6 @@ import apiService from '../../services/api'; // Đảm bảo đường dẫn đ�
 import Button from '../Button/Button';
 import styles from './Header.module.css';
 import useClickOutside from '../../hooks/useClickOutside';
-import Spinner from '../Spinner/Spinner';
 import {
   FiShoppingCart, FiSearch, FiUser, FiMenu, FiX, FiChevronDown,
   FiLogOut, FiBox, FiUserCheck, FiLogIn, FiGrid, FiPackage, FiShield // Removed unused FiSettings
@@ -93,11 +92,10 @@ const Header = () => {
              <NavLink to="/" className={({ isActive }) => isActive ? `${styles.navLink} ${styles.active}` : styles.navLink} end>Trang Chủ</NavLink>
               <div className={styles.dropdownContainer} ref={categoryDropdownRef}>
                 <button onClick={toggleCategoryDropdown} className={`${styles.navLink} ${styles.dropdownToggle}`} disabled={isCategoryLoading} aria-haspopup="true" aria-expanded={isCategoryDropdownOpen}>
-                  Danh Mục {isCategoryLoading ? <Spinner size="tinyInline"/> : <FiChevronDown className={`${styles.chevronIcon} ${isCategoryDropdownOpen ? styles.chevronOpen : ''}`} />}
+                  Danh Mục { <FiChevronDown className={`${styles.chevronIcon} ${isCategoryDropdownOpen ? styles.chevronOpen : ''}`} />}
                 </button>
                 <div className={` ${styles.dropdownMenu} ${styles.categoryDropdown} ${isCategoryDropdownOpen ? styles.show : ''} `} role="menu">
-                    {isCategoryLoading ? ( <div className={styles.dropdownLoading} role="menuitem" aria-disabled="true"><Spinner size="small"/> Đang tải...</div> )
-                     : categories.length > 0 ? ( <>
+                    {categories.length > 0 ? ( <>
                            <Link to="/products" className={styles.dropdownItem} onClick={closeAllDropdowns} role="menuitem"><FiGrid className={styles.categoryIcon} /> Tất cả sản phẩm</Link>
                            <hr className={styles.dropdownDivider}/>
                            {categories.map((category) => (<Link to={`/products?category=${encodeURIComponent(category.categoryName)}`} key={category.categoryId} className={styles.dropdownItem} onClick={closeAllDropdowns} role="menuitem"><span className={styles.categoryEmoji}></span>{category.categoryName}</Link>))}
@@ -181,8 +179,8 @@ const Header = () => {
           <div className={styles.mobileCategorySection}>
                <div className={styles.mobileNavGroupTitle}>Danh Mục</div>
                <Link to="/products" className={styles.mobileNavLink} onClick={handleMobileLinkClick}><FiGrid className={styles.mobileCategoryIcon}/> Tất cả sản phẩm</Link>
-               {isCategoryLoading ? <div className={styles.mobileLoading}><Spinner size="small"/> Đang tải...</div>
-                : categories.length > 0 ? (
+               {
+                categories.length > 0 ? (
                     categories.map((category) => (<Link to={`/products?category=${encodeURIComponent(category.categoryName)}`} key={category.categoryId} className={styles.mobileNavLink} onClick={handleMobileLinkClick}><span className={styles.mobileCategoryIcon}></span> {category.categoryName}</Link>))
                ) : (<p className={styles.mobileError}>Không tải được.</p>)}
           </div>

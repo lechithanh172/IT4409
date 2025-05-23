@@ -21,7 +21,7 @@ import PlaceOrder from './pages/PlaceOrder/PlaceOrder';
 import VNPayReturn from './pages/VNPayReturn/VNPayReturn';
 import OrderHistoryPage from './pages/OrderHistoryPage/OrderHistoryPage'; // Import OrderHistoryPage
 import AdminPage from './pages/AdminPage/AdminPage';
-
+import ProductMangerPage from './pages/ProductManagerPage/ProductManagerPage'
 import UserInfoEdit from './pages/UserInfoEdit/UserInfoEdit';
 
 import ShipperPage from './pages/ShipperPage/ShipperPage';
@@ -76,6 +76,17 @@ function App() {
             {/* Nếu muốn có Admin Layout riêng thì thay AdminPage bằng AdminLayout */}
             {/* <AdminLayout> */}
               <AdminPage />
+            {/* </AdminLayout> */}
+          </ProtectedRoute>
+        }
+      > </Route>
+      <Route
+        path="/pm"
+        element={
+          <ProtectedRoute requiredRole="product_manager"> {/* Yêu cầu đăng nhập VÀ role 'admin' */}
+            {/* Nếu muốn có Admin Layout riêng thì thay AdminPage bằng AdminLayout */}
+            {/* <AdminLayout> */}
+              <ProductMangerPage />
             {/* </AdminLayout> */}
           </ProtectedRoute>
         }

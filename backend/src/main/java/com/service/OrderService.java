@@ -61,7 +61,9 @@ public class OrderService {
 
 
         for(Item item : orderRequest.getItems()) {
-            OrderItem orderItem = new OrderItem(order.getOrderId(), item.getProductId(), item.getVariantId(), item.getQuantity());
+            Product product = productRepository.findById(item.getProductId()).get();
+            ProductVariant productVariant = productVariantRepository.findById(item.getVariantId()).get();
+            OrderItem orderItem = new OrderItem(order.getOrderId(), item.getProductId(), item.getVariantId(), item.getQuantity(), priceCalculate(product.getPrice(), productVariant.getDiscountPercentage()));
             orderItemRepository.save(orderItem);
             cartService.removeCartItemWhenCreateOrder(user.getUserId(), item.getProductId(), item.getVariantId());
         }
@@ -127,26 +129,32 @@ public class OrderService {
         for(OrderItem orderItem : orderItems) {
             OrderItemDTO item = new OrderItemDTO();
             Optional<Product> optionalProduct = productRepository.findByProductId(orderItem.getProductId());
+            ProductVariant productVariant = productVariantRepository.findById(orderItem.getVariantId()).get();
             if(optionalProduct.isEmpty()) {
                 item.setProductId(orderItem.getProductId());
             }
             else {
                 Product product = optionalProduct.get();
-                for(ProductVariant productVariant : product.getVariants()) {
-                    if(productVariant.getVariantId() == orderItem.getVariantId()) {
-                        item.setVariantId(productVariant.getVariantId());
-                        item.setPrice(priceCalculate(product.getPrice(), productVariant.getDiscountPercentage()));
-                        item.setColor(productVariant.getColor());
-                        item.setImageUrl(productVariant.getImageUrl());
-                        break;
-                    }
-                }
                 item.setProductId(product.getProductId());
                 item.setProductName(product.getProductName());
                 item.setDescription(product.getDescription());
                 item.setSpecifications(product.getSpecifications());
                 item.setWeight(product.getWeight());
                 item.setQuantity(orderItem.getQuantity());
+                item.setPrice(orderItem.getPrice());
+                item.setVariantId(orderItem.getVariantId());
+                item.setColor(productVariant.getColor());
+                item.setImageUrl(productVariant.getImageUrl());
+//                for(ProductVariant productVariant : product.getVariants()) {
+//                    if(productVariant.getVariantId() == orderItem.getVariantId()) {
+//                        item.setVariantId(productVariant.getVariantId());
+//                        item.setPrice(priceCalculate(product.getPrice(), productVariant.getDiscountPercentage()));
+//                        item.setColor(productVariant.getColor());
+//                        item.setImageUrl(productVariant.getImageUrl());
+//                        break;
+//                    }
+//                }
+
             }
             orderItemDTOs.add(item);
         }

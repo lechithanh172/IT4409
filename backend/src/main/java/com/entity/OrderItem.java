@@ -26,4 +26,6 @@ public class OrderItem {
     private Integer variantId;
 
     private Integer quantity;
+
+    private Long price;
 }

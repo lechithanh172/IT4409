@@ -62,6 +62,17 @@ public class ProductController {
 
         return ResponseEntity.status(200).body(products);
     }
+    @GetMapping("/brand={brand}")
+    public ResponseEntity<?> getProductByBrand(@PathVariable String brand) {
+        List<ProductDTO> products = productService.getProductByBrand(brand);
+        if(products == null)
+            return ResponseEntity.status(404).body(new StatusResponse("This brand does not exist"));
+
+        if(products.isEmpty())
+            return ResponseEntity.status(200).body(new StatusResponse("This brand does not have any products"));
+
+        return ResponseEntity.status(200).body(products);
+    }
 
     @GetMapping("/{category}/{brand}")
     public ResponseEntity<?> getProductsByCategoryAndBrand(@PathVariable String category, @PathVariable String brand) {

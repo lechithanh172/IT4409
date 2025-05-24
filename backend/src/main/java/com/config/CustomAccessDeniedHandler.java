@@ -21,7 +21,6 @@ public class CustomAccessDeniedHandler implements AccessDeniedHandler {
         response.setContentType("application/json");
         ObjectMapper mapper = new ObjectMapper();
         String json = mapper.writeValueAsString(new StatusResponse("Access denied"));
-        System.out.println();
         response.getWriter().write(json);
     }
 }

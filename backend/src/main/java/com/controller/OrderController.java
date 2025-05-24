@@ -37,7 +37,6 @@ public class OrderController {
     public ResponseEntity<?> createOrder(@RequestBody OrderRequest request, @RequestHeader("Authorization") String token) {
         Integer orderCodeReturn = orderService.createOrder(request, token);
         if(orderCodeReturn != -1) {
-            System.out.println(orderCodeReturn);
             return ResponseEntity.status(200).body(orderService.getOrderById(orderCodeReturn));
 
         }
@@ -145,6 +144,24 @@ public class OrderController {
         } catch (RuntimeException e) {
             return ResponseEntity.status(400).body("Order not found");
         }
+    }
+    @GetMapping("/shipper-info")
+    public ResponseEntity<?> shipperInfo(@RequestParam Integer orderId, @RequestHeader("Authorization") String token) {
+        System.out.println(orderId);
+        Optional<User> u = userService.getInfo(token);
+        if(u.isPresent()) {
+            User user = u.get();
+            Optional<Order> order = orderService.getOrderById(orderId);
+            if(order.isPresent()) {
+                if(order.get().getShipperId() == null) return ResponseEntity.status(404).body(new StatusResponse("Order not have shipper yet"));
+                if(order.get().getUserId().equals(user.getUserId()) || jwtService.extractRole(token).equals(Role.ADMIN) || jwtService.extractRole(token).equals(Role.SHIPPER)) {
+                    return ResponseEntity.status(200).body(orderService.getShipperInfo(orderId));
+                }
+                else return ResponseEntity.status(400).body(new StatusResponse("Unauthorized"));
+            }
+            else return ResponseEntity.status(404).body(new StatusResponse("Order not found"));
+        }
+        else return ResponseEntity.status(404).body(new StatusResponse("Unauthorized"));
     }
 
 

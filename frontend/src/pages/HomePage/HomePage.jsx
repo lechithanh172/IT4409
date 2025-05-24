@@ -58,9 +58,11 @@ const HomePage = () => {
 
   // State quản lý lỗi chung
   const [error, setError] = useState(null);
+
   useEffect(() => {
-        document.title = "Trang chủ | HustShop";
-    }, []);
+    document.title = "Trang chủ | HustShop";
+  }, []);
+
   // Cấu hình cho Hero Slider (giữ nguyên)
   const heroSliderSettings = {
     dots: true,
@@ -92,25 +94,29 @@ const HomePage = () => {
           apiService.getAllBrands()
         ]);
 
+        let fetchedProducts = [];
         if (productsRes.status === 'fulfilled' && Array.isArray(productsRes.value?.data)) {
-          console.log("All products data fetched:", productsRes.value.data);
-          setProducts(productsRes.value.data);
+          fetchedProducts = productsRes.value.data; // Lưu tạm dữ liệu sản phẩm
+          console.log("All products data fetched:", fetchedProducts);
+          // setProducts(fetchedProducts); // Chưa set ngay, đợi xử lý category
         } else {
           console.error("Lỗi fetch All Products:", productsRes.reason || productsRes.value);
-          setProducts([]);
+          // setProducts([]);
         }
         setIsProductsLoading(false);
 
+        let fetchedCategories = [];
         if (categoryRes.status === 'fulfilled' && Array.isArray(categoryRes.value?.data)) {
-          console.log("Categories data fetched:", categoryRes.value.data);
-          setCategories(categoryRes.value.data);
+          fetchedCategories = categoryRes.value.data; // Lưu tạm dữ liệu category
+          console.log("Categories data fetched:", fetchedCategories);
+          setCategories(fetchedCategories); // Set category state
         } else {
           console.error("Lỗi fetch Categories:", categoryRes.reason || categoryRes.value);
           setCategories([]);
         }
         setIsCategoryLoading(false);
 
-         if (brandRes.status === 'fulfilled' && Array.isArray(brandRes.value?.data)) {
+        if (brandRes.status === 'fulfilled' && Array.isArray(brandRes.value?.data)) {
             console.log("Brands data fetched:", brandRes.value.data);
             setBrands(brandRes.value.data);
           } else {
@@ -118,6 +124,36 @@ const HomePage = () => {
             setBrands([]);
           }
          setIsBrandLoading(false);
+
+
+        // --- Xử lý gắn categoryName vào sản phẩm sau khi có cả 2 dữ liệu ---
+        // Tạo map categoryId -> categoryName để lookup nhanh
+        const categoryMap = fetchedCategories.reduce((map, category) => {
+          // Giả định category object có categoryId và name
+          if (category.categoryId) {
+              map[category.categoryId] = category.name;
+          } else if (category.id) { // Fallback nếu sử dụng 'id' thay vì categoryId
+              map[category.id] = category.name;
+          }
+          return map;
+        }, {});
+
+        // Gắn categoryName vào từng sản phẩm
+        const productsWithCategoryNames = fetchedProducts.map(product => {
+          // Giả định product object có categoryId
+          const categoryName = product.categoryId
+            ? categoryMap[product.categoryId]
+            : 'Chưa phân loại'; // Giá trị mặc định nếu không tìm thấy danh mục
+
+          return {
+            ...product, // Sao chép tất cả thuộc tính hiện có của sản phẩm
+            categoryName: categoryName // Thêm thuộc tính categoryName mới
+          };
+        });
+
+        setProducts(productsWithCategoryNames); // Set state products với dữ liệu đã được gắn categoryName
+        // --- Kết thúc xử lý ---
+
 
         const errors = [];
         if (productsRes.status === 'rejected') errors.push(`Sản phẩm: ${productsRes.reason?.message || 'Lỗi không xác định'}`);
@@ -136,11 +172,20 @@ const HomePage = () => {
         setIsProductsLoading(false);
         setIsCategoryLoading(false);
         setIsBrandLoading(false);
+         // Vẫn set products/categories/brands về rỗng trong trường hợp catch toàn bộ lỗi
+        setProducts([]);
+        setCategories([]);
+        setBrands([]);
       }
     };
 
     loadHomePageData();
   }, []); // Chỉ chạy 1 lần khi component mount
+
+  // Lọc và lấy 15 sản phẩm đầu tiên để hiển thị trong slider
+  // Data products lúc này đã bao gồm categoryName
+  const productsForSlider = products.slice(0, 15);
+
 
   return (
     <div className={styles.homePage}>
@@ -176,9 +221,9 @@ const HomePage = () => {
          </div>
         {isProductsLoading ? (
              <div className={styles.loadingContainer}><Spinner /></div>
-        ) : products.length > 0 ? (
-            // Truyền danh sách sản phẩm vào ProductSlider (giới hạn số lượng nếu cần)
-             <ProductSlider products={products.slice(0, 15)} />
+        ) : productsForSlider.length > 0 ? ( // Sử dụng productsForSlider đã qua xử lý
+            // Truyền danh sách sản phẩm đã được gắn categoryName vào ProductSlider
+             <ProductSlider products={productsForSlider} />
         ) : (
             !error && <p className={styles.noProducts}>Hiện chưa có sản phẩm nào.</p>
         )}
@@ -206,21 +251,26 @@ const HomePage = () => {
             )}
        </section>
 
+      {/* --- Section Danh Mục (Không hiển thị link "Xem thêm" vì không có trang danh mục riêng) --- */}
       <section className={`${styles.section} ${styles.categoriesSectionBg}`}>
         <div className={styles.sectionHeader}>
              <h2 className={styles.sectionTitle}>Khám Phá Danh Mục</h2>
+             {/* <Link to={`/categories`} className={styles.viewAllLink}>Xem tất cả <FiChevronRight/></Link> */} {/* Bỏ link xem thêm */}
         </div>
          {isCategoryLoading ? (
              <div className={styles.loadingContainer}><Spinner /></div>
          ) : categories.length > 0 ? (
             <div className={styles.categoryList}>
             {categories.map((category) => (
+                // Link đến trang sản phẩm theo danh mục
                 <Link to={`/products?category=${encodeURIComponent(category.categoryName)}`} key={category.categoryId} className={styles.categoryCard}>
                 <div className={styles.categoryImageWrapper}>
+                    {/* Sử dụng imageUrl từ category nếu có, fallback về placeholder */}
                     <img src={category.imageUrl || '/images/placeholder-category.png'} alt={`${category.name} category image`} className={styles.categoryImage} onError={(e)=>{e.target.src='/images/placeholder-category.png'}}/>
                     <div className={styles.categoryOverlay}></div>
                 </div>
-                <h3 className={styles.categoryName}>{category.name}</h3>
+                {/* Hiển thị tên danh mục */}
+                <h3 className={styles.categoryName}>{category.categoryName}</h3>
                 </Link>
             ))}
             </div>

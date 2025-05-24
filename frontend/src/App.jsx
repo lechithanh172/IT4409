@@ -65,6 +65,7 @@ function App() {
           <Route path="profile" element={<UserProfilePage />} />
            <Route path="profile/edit" element={<UserInfoEdit />} />
            <Route path="order-success-cod" element={<OrderSuccessPage />} />
+           <Route path="shipper" element={<ShipperPage />} />
           {/* Corrected route for Order History */}
           <Route path="profile/orders" element={<OrderHistoryPage />} />
           {/* Add other protected routes here */}
@@ -93,12 +94,6 @@ function App() {
         }
       > </Route>
       {/* --- Routes Outside MainLayout (e.g., Admin, Fullscreen Auth) --- */}
-
-      <Route path="/shipper" element={<MainLayout />}>
-          <Route index element={<ShipperPage />} />
-      </Route>
-     
-
       {/* Global 404 Not Found Route (if no other route matches) */}
       {/* <Route path="*" element={<NotFoundPage />} /> */}
 

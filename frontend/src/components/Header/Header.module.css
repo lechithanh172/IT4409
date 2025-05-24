@@ -1,37 +1,77 @@
 /* src/components/Header/Header.module.css */
 
+/* --- Variables (using your provided colors and spacing) --- */
+:root {
+  --primary-color: #007bff; /* Blue - Example Primary */
+  --secondary-color: #f8fafc; /* Light Grayish Blue */
+  --text-color-dark: #1a3b5d; /* Dark Blue */
+  --text-color-light: #4a5568; /* Grayish Blue */
+  --border-color: #e2e8f0; /* Light Gray Border */
+  --shadow-base: 0 1px 4px rgba(0, 0, 0, 0.07); /* Gentle Shadow */
+  --spacing-xs: 8px;
+  --spacing-sm: 12px;
+  --spacing-md: 20px;
+}
+
+/* Dark mode variables (Based on common dark mode patterns, adjust if you have a specific dark theme) */
+/* Using existing variables as fallback */
+@media (prefers-color-scheme: dark) {
+    :root {
+        --primary-color: #66aaff; /* Lighter blue */
+        --secondary-color: #2d3748; /* Darker background */
+        --text-color-dark: #f7fafc; /* White */
+        --text-color-light: #a0aec0; /* Light gray */
+        --border-color: #4a5568; /* Dark gray border */
+        --shadow-base: 0 2px 8px rgba(0, 0, 0, 0.4);
+        /* Add card/background variables from homepage if used here */
+        /* --card-background: #2d3748; */
+        /* --background-color-light: #1a202c; */
+    }
+}
+
+
 /* --- Base Header Styles --- */
 .header {
-  background-color: #ffffff;
-  padding: 12px 0; /* Padding trên dưới */
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.07); /* Shadow nhẹ nhàng */
-  position: sticky; /* Giữ header cố định khi cuộn */
+  background-color: #ffffff; /* Keeping original white background */
+  padding: var(--spacing-sm) 0;
+  box-shadow: var(--shadow-base);
+  position: sticky;
   top: 0;
-  z-index: 1000; /* Đảm bảo nằm trên các phần tử khác */
+  z-index: 1000;
   transition: box-shadow 0.2s ease;
 }
+/* Optional: Dark mode for header background if you have a global dark mode switch */
+/* @media (prefers-color-scheme: dark) {
+    .header {
+        background-color: var(--card-background, #2d3748);
+        box-shadow: var(--shadow-base);
+    }
+} */
+
 
 .container {
-  max-width: 1300px; /* Chiều rộng tối đa của nội dung header */
-  margin: 0 auto; /* Căn giữa container */
-  padding: 0 20px; /* Padding trái phải */
+  max-width: 1300px;
+  margin: 0 auto;
+  padding: 0 var(--spacing-md);
   display: flex;
-  justify-content: space-between; /* Đẩy các phần tử ra hai bên */
-  align-items: center; /* Căn giữa theo chiều dọc */
-  gap: 15px; /* Khoảng cách giữa logo, nav, actions */
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--spacing-sm);
 }
 
+/* --- Logo Style --- */
 .logo {
-  font-size: 1.7rem;
-  font-weight: 700;
-  color: #1a3b5d; /* Màu xanh navy đậm */
-  text-decoration: none;
-  flex-shrink: 0; /* Ngăn logo bị co lại */
-  letter-spacing: -0.5px;
-  transition: color 0.2s ease;
+   text-decoration: none;
+   flex-shrink: 0;
+   display: flex;
+   align-items: center;
 }
-.logo:hover {
-    color: #007bff; /* Đổi màu khi hover */
+
+.logo img {
+  height: 36px;
+  width: auto;
+  object-fit: contain;
+  vertical-align: middle;
 }
 
 
@@ -39,15 +79,15 @@
 .desktopNav {
   display: flex;
   align-items: center;
-  gap: 8px; /* Khoảng cách giữa các mục nav */
+  gap: var(--spacing-xs);
 }
 
-.navLink, .dropdownToggle { /* Style chung cho link và nút dropdown */
-  color: #4a5568; /* Màu chữ chính */
-  padding: 8px 14px;
+.navLink, .dropdownToggle {
+  color: var(--text-color-light);
+  padding: 8px var(--spacing-sm);
   border-radius: 6px;
   text-decoration: none;
-  font-weight: 500; /* Độ đậm vừa */
+  font-weight: 500;
   transition: background-color 0.2s ease, color 0.2s ease;
   display: inline-flex;
   align-items: center;
@@ -57,93 +97,108 @@
   cursor: pointer;
   font-size: 0.95rem;
   font-family: inherit;
-  white-space: nowrap; /* Ngăn xuống dòng */
+  white-space: nowrap;
 }
-/* Style khi nút bị vô hiệu hóa (ví dụ: đang load category) */
+
 .dropdownToggle:disabled {
     cursor: not-allowed;
     opacity: 0.7;
 }
-/* Style spinner inline bên trong nút */
+
 .dropdownToggle .spinner > div {
      width: 14px !important;
      height: 14px !important;
      border-width: 2px !important;
      margin-left: 5px;
-     border-left-color: currentColor !important; /* Màu spinner theo màu chữ */
+     border-left-color: currentColor !important;
      vertical-align: middle;
 }
 
-/* Hiệu ứng Hover (trừ khi đang active hoặc disabled) */
 .navLink:hover:not(.active):not(:disabled),
 .dropdownToggle:hover:not(:disabled) {
-  background-color: #f8fafc; /* Nền siêu nhạt */
-  color: #2b6cb0; /* Xanh đậm khi hover */
+  background-color: var(--secondary-color);
+  color: var(--text-color-dark);
 }
 
 /* Style cho link đang active */
 .navLink.active {
-  background-color: #ebf4ff; /* Nền xanh nhạt */
-  color: #2b6cb0; /* Xanh đậm */
-  font-weight: 600; /* Đậm hơn */
+  background-color: #ebf4ff;
+  color: var(--primary-color);
+  font-weight: 600;
+}
+@media (prefers-color-scheme: dark) {
+    .navLink.active {
+        background-color: rgba(102, 126, 234, 0.2); /* Semi-transparent blue */
+        color: var(--primary-color);
+    }
 }
 
-/* --- Dropdown Styles --- */
-.dropdownContainer {
-  position: relative; /* Container cho dropdown */
+
+/* --- Dropdown Styles (Category, User, Search) --- */
+.dropdownContainer, .searchDropdownContainer { /* Added .searchDropdownContainer */
+  position: relative;
+  display: inline-block;
+  z-index: 900;
+  vertical-align: middle;
+  width: auto; /* Ensure width is auto for searchDropdownContainer */
+  overflow: visible; /* Ensure search dropdown is not clipped */
 }
 
 .chevronIcon {
   transition: transform 0.2s ease;
   font-size: 0.8em;
   margin-left: 2px;
-  color: #a0aec0; /* Màu chevron nhạt */
+  color: var(--text-color-light); /* Màu chevron nhạt mặc định */
 }
-.dropdownToggle:hover .chevronIcon { color: #2b6cb0; }
+.dropdownToggle:hover .chevronIcon { color: var(--text-color-dark); }
 .userChevron { font-size: 1em; margin-left: 4px; }
-/* Xoay chevron khi dropdown mở */
 .chevronOpen {
   transform: rotate(180deg);
 }
 
 .dropdownMenu {
   position: absolute;
-  top: calc(100% + 10px); /* Vị trí dưới nút toggle */
-  left: 0; /* Căn trái với nút toggle */
-  background-color: #fff;
-  border-radius: 8px;
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+  top: calc(100% + 10px);
+  left: 0;
+  background-color: var(--card-background, #ffffff); /* Using default white or variable */
+  border-radius: var(--border-radius-sm);
+  box-shadow: var(--shadow-base);
   padding: 8px 0;
-  min-width: 220px; /* Độ rộng tối thiểu */
-  z-index: 1001; /* Nằm trên các phần tử khác */
-  border: 1px solid #e2e8f0; /* Viền nhẹ */
-  /* Mặc định ẩn */
+  min-width: 220px;
+  z-index: 1001;
+  border: 1px solid var(--border-color);
   opacity: 0;
   visibility: hidden;
   transform: translateY(5px);
   transition: opacity 0.25s ease, visibility 0.25s ease, transform 0.25s ease;
-  overflow: hidden; /* Giấu phần tràn nếu cần */
+  overflow: hidden;
+}
+@media (prefers-color-scheme: dark) {
+    .dropdownMenu {
+        border-color: var(--text-color-light);
+         background-color: var(--card-background, #2d3748);
+    }
 }
 
-/* *** QUAN TRỌNG: Style để hiển thị dropdown khi có class .show *** */
 .dropdownMenu.show {
     opacity: 1;
     visibility: visible;
     transform: translateY(0);
 }
 
-/* Style cho dropdown category */
 .categoryDropdown {
-    max-height: 400px; /* Giới hạn chiều cao */
-    overflow-y: auto; /* Thêm thanh cuộn nếu quá dài */
+    max-height: 400px;
+    overflow-y: auto;
 }
 
 .dropdownItem {
   display: flex;
   align-items: center;
   gap: 10px;
-  padding: 10px 18px;
-  color: #4a5568;
+  padding: 10px var(--spacing-sm);
+  /* === SỬA MÀU CHỮ ITEM TRONG DROPDOWN MENU === */
+  color: var(--text-color-dark); /* Màu chữ item đậm hơn */
+  /* ========================================= */
   text-decoration: none;
   font-size: 0.95rem;
   white-space: nowrap;
@@ -153,121 +208,406 @@
   width: 100%;
   text-align: left;
   cursor: pointer;
+  font-family: inherit;
 }
 .dropdownItem:hover {
-  background-color: #f7fafc;
-  color: #2b6cb0;
-  padding-left: 22px; /* Hiệu ứng thụt vào */
+  background-color: var(--secondary-color);
+  /* === MÀU CHỮ ITEM TRONG DROPDOWN KHI HOVER === */
+  color: var(--text-color-dark); /* Giữ màu đậm khi hover */
+  /* === HOẶC ĐỔI SANG MÀU NHẤN PRIMARY === */
+  /* color: var(--primary-color); */
+  /* ======================================= */
+  padding-left: calc(var(--spacing-sm) + 4px);
 }
 
-.categoryIcon { /* Icon "Tất cả sản phẩm" */
+.categoryIcon, .categoryEmoji, .dropdownIcon {
     font-size: 1.1em;
-    color: #718096;
+    /* === SỬA MÀU ICON TRONG DROPDOWN MENU === */
+    color: var(--text-color-dark); /* Icon màu đậm hơn */
+    /* ======================================= */
     margin-right: 8px;
     vertical-align: middle;
+    flex-shrink: 0;
+    transition: color 0.2s ease; /* Thêm transition màu cho icon */
 }
-.categoryEmoji { /* Emoji hoặc icon cho từng category */
-    font-size: 1em;
-    width: 1.2em;
-    text-align: center;
-    display: inline-block;
-    color: #718096;
-    margin-right: 8px;
-}
+.categoryEmoji { width: 1.2em; text-align: center; }
+
 .dropdownItem:hover .categoryIcon,
 .dropdownItem:hover .categoryEmoji,
 .dropdownItem:hover .dropdownIcon {
-     color: #2b6cb0; /* Đổi màu icon khi hover */
+     /* === MÀU ICON TRONG DROPDOWN KHI HOVER ITEM === */
+     color: var(--primary-color); /* Màu nhấn khi hover */
+     /* ============================================ */
 }
 
-.dropdownDivider { border: none; border-top: 1px solid #f1f5f9; margin: 6px 0; }
-.dropdownError, .dropdownLoading { padding: 10px 18px; color: #a0aec0; font-style: italic; font-size: 0.9rem; display: flex; align-items: center; gap: 8px; }
+.dropdownDivider { border: none; border-top: 1px solid var(--border-color); margin: 6px 0; }
+.dropdownError, .dropdownLoading { padding: 10px var(--spacing-sm); color: var(--text-color-light); font-style: italic; font-size: 0.9rem; display: flex; align-items: center; gap: 8px; }
 .dropdownLoading .spinner > div { width: 14px !important; height: 14px !important; border-width: 2px !important;}
 
 /* User Dropdown */
 .userDropdown { left: auto; right: 0; min-width: 200px; }
-.dropdownHeader { padding: 10px 18px; font-weight: 600; color: #4a5568; font-size: 0.9rem; border-bottom: 1px solid #f1f5f9; margin-bottom: 5px; }
-.dropdownIcon { font-size: 1.1em; color: #718096; transition: color 0.2s ease; }
+.dropdownHeader { padding: 10px var(--spacing-sm); font-weight: 600; color: var(--text-color-dark); font-size: 0.9rem; border-bottom: 1px solid var(--border-color); margin-bottom: 5px; }
+
 .logoutButton { color: #e53e3e; }
-.logoutButton:hover { background-color: #fff5f5; color: #c53030; padding-left: 22px; }
+.logoutButton:hover { background-color: #fff5f5; color: #c53030; padding-left: calc(var(--spacing-sm) + 4px); }
 .logoutButton:hover .dropdownIcon { color: #c53030; }
 
+
 /* --- Actions Area --- */
-.actions { display: flex; align-items: center; gap: 12px; flex-shrink: 0; }
+.actions { display: flex; align-items: center; gap: var(--spacing-sm); flex-shrink: 0; }
 
 /* --- Search Bar --- */
-.searchBar { display: flex; align-items: center; background-color: #f1f5f9; border-radius: 20px; padding: 2px 5px 2px 15px; transition: all 0.2s ease; border: 1px solid transparent; }
-.searchBar:focus-within { background-color: #ffffff; border-color: #cbd5e0; box-shadow: 0 0 0 3px rgba(203, 213, 224, 0.3); }
-.searchInput { border: none; outline: none; background: none; padding: 8px 0; font-size: 0.9rem; width: 160px; transition: width 0.3s ease; color: #4a5568; }
-.searchInput::placeholder { color: #a0aec0; }
-.searchButton { background: none; border: none; color: #718096; padding: 8px; display: flex; cursor: pointer; border-radius: 50%; transition: background-color 0.2s ease, color 0.2s ease; }
-.searchButton:hover { background-color: #e2e8f0; color: #4a5568; }
+.searchBar {
+    display: flex;
+    align-items: center;
+    background-color: var(--secondary-color);
+    border-radius: 20px;
+    padding: 2px 5px 2px var(--spacing-sm);
+    transition: all 0.2s ease;
+    border: 1px solid transparent;
+    flex-grow: 1;
+    max-width: 250px;
+}
+.searchBar:focus-within {
+    background-color: var(--card-background, #ffffff);
+    border-color: #cbd5e0;
+    box-shadow: 0 0 0 3px rgba(203, 213, 224, 0.3);
+}
+@media (prefers-color-scheme: dark) {
+    .searchBar:focus-within {
+         border-color: var(--text-color-light);
+         box-shadow: 0 0 0 3px rgba(160, 170, 192, 0.2);
+    }
+}
+
+.searchInput {
+    border: none;
+    outline: none;
+    background: none;
+    padding: 8px 0;
+    font-size: 0.9rem;
+    flex-grow: 1;
+    width: 100%;
+    transition: width 0.3s ease;
+    color: var(--text-color-dark);
+}
+.searchInput::placeholder { color: var(--text-color-light); }
+
+.searchButton {
+    background: none;
+    border: none;
+    color: var(--text-color-light);
+    padding: 8px;
+    display: flex;
+    cursor: pointer;
+    border-radius: 50%;
+    transition: background-color 0.2s ease, color 0.2s ease;
+    flex-shrink: 0;
+}
+.searchButton:hover {
+    background-color: var(--secondary-color);
+    color: var(--text-color-dark);
+}
 
 /* --- Action Buttons (Cart, User) --- */
-.actionButton { position: relative; display: flex; align-items: center; justify-content: center; padding: 9px; background: none; border: none; border-radius: 50%; color: #4a5568; cursor: pointer; transition: background-color 0.2s ease, color 0.2s ease; font-size: 1.25rem; }
-.actionButton:hover { background-color: #f1f5f9; color: #2b6cb0; }
-.userButton { gap: 5px; padding-left: 6px; padding-right: 6px;} /* Giảm padding ngang cho nút user */
-.userNameDesktop { font-size: 0.9rem; font-weight: 500; margin: 0 4px 0 2px; color: #4a5568; display: inline; /* Luôn hiển thị tên ngắn */ white-space: nowrap; max-width: 100px; /* Giới hạn độ rộng tên */ overflow: hidden; text-overflow: ellipsis; vertical-align: middle; }
-.cartCount { position: absolute; top: 0px; right: 0px; background-color: #e53e3e; color: white; border-radius: 50%; padding: 1px 5px; font-size: 0.7rem; font-weight: 600; min-width: 16px; text-align: center; line-height: 1; border: 1px solid white; transform: translate(30%, -30%); }
+/* Style chung cho các nút icon hành động (Giỏ hàng, Tài khoản khi chưa login) */
+.actionButton {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 9px;
+    background: none; /* Nền trong suốt mặc định */
+    border: none;
+    border-radius: 50%; /* Hình tròn */
+    /* === SỬA MÀU CHO ICON (Giỏ hàng, User khi chưa login) === */
+    color: #353535; /* Sử dụng màu đậm hơn */
+    /* ===================================================== */
+    cursor: pointer;
+    transition: background-color 0.2s ease, color 0.2s ease;
+    font-size: 1.25rem; /* Kích thước icon */
+    font-weight: bold;
+    text-decoration: none; /* Nếu là Link */
+}
+.actionButton:hover { background-color: var(--secondary-color); color: #FFFFFF; } /* Hover effect */
+
+/* Style riêng cho nút User khi ĐÃ login (có tên bên cạnh) */
+.userButton {
+    gap: 5px;
+    padding-left: 6px;
+    padding-right: 6px;
+    /* === MÀU CHO NÚT USER KHI ĐÃ LOGIN (icon FiUserCheck và tên) === */
+    color: #353535; /* Sử dụng màu đậm hơn */
+    /* ========================================================= */
+    /* Override background/border-radius nếu cần style khác actionButton */
+    background-color: transparent; /* Vẫn giữ nền trong suốt */
+    border-radius: var(--border-radius-sm); /* Hoặc 20px để bo tròn theo chiều ngang */
+    /* Bỏ background/border-radius: 50% để chỉ bo góc nhẹ */
+}
+/* Hover effect riêng cho nút user đã login nếu cần */
+.userButton:hover {
+     background-color: var(--secondary-color);
+     color: #FFFFFF; /* Giữ màu đậm */
+     /* === HOẶC ĐỔI MÀU CHỮ/ICON SANG MÀU NHẤN PRIMARY KHI HOVER === */
+     /* color: var(--primary-color); */
+     /* ======================================================== */
+}
+
+
+.userNameDesktop {
+    font-size: 0.9rem;
+    font-weight: 500;
+    margin: 0 4px 0 2px;
+    /* === MÀU CHO TÊN USER TRONG NÚT === */
+    color: #353535; /* Sử dụng màu đậm hơn */
+    /* =============================== */
+    display: inline;
+    white-space: nowrap;
+    max-width: 100px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    vertical-align: middle;
+    /* Transition màu chữ nếu cần */
+    transition: color 0.2s ease;
+}
+.userNameDesktop.hover {
+    color:white;
+}
+/* === Màu tên user khi hover nút user === */
+/* .userButton:hover .userNameDesktop { color: var(--text-color-dark); } */ /* Giữ màu đậm khi hover */
+/* === HOẶC ĐỔI SANG MÀU NHẤN PRIMARY KHI HOVER === */
+/* .userButton:hover .userNameDesktop { color: var(--primary-color); } */
+/* =============================================== */
+
+
+.cartCount { position: absolute; top: 0px; right: 0px; background-color: #e53e3e; color: white; border-radius: 50%; padding: 1px 5px; font-size: 0.7rem; font-weight: 600; min-width: 16px; text-align: center; line-height: 1; border: 1px solid var(--card-background, white); transform: translate(30%, -30%); }
+@media (prefers-color-scheme: dark) {
+    .cartCount { border-color: var(--background-color-light); }
+}
+
 
 /* --- Auth Buttons (Desktop) --- */
-.desktopAuth { display: flex; align-items: center; gap: 8px; }
-.authButton { padding: 6px 14px !important; font-size: 0.9rem !important; border-radius: 6px !important; font-weight: bold;  }
+.desktopAuth { display: flex; align-items: center; gap: var(--spacing-xs); }
+.authButton { padding: 6px var(--spacing-sm) !important; font-size: 0.9rem !important; border-radius: var(--border-radius-sm) !important; font-weight: bold;  }
 .authButton svg { margin-right: 5px; font-size: 1em; vertical-align: middle; margin-top: -2px;}
 
+
 /* --- Mobile Menu Toggle --- */
-.mobileMenuToggle { display: none; background: none; border: none; font-size: 1.6rem; color: #4a5568; cursor: pointer; padding: 5px; }
+.mobileMenuToggle { display: none; background: none; border: none; font-size: 1.6rem; color: var(--text-color-dark); cursor: pointer; padding: 5px; }
+
 
 /* --- Mobile Menu Drawer --- */
-.mobileMenu { position: fixed; top: 0; right: -100%; width: 280px; max-width: 80%; height: 100vh; background-color: #ffffff; box-shadow: -4px 0 20px rgba(0, 0, 0, 0.1); z-index: 1100; transition: right 0.35s ease-in-out; overflow-y: auto; display: flex; flex-direction: column; }
+.mobileMenu { position: fixed; top: 0; right: -100%; width: 280px; max-width: 80%; height: 100vh; background-color: var(--card-background, #ffffff); box-shadow: -4px 0 20px rgba(0, 0, 0, 0.1); z-index: 1100; transition: right 0.35s ease-in-out; overflow-y: auto; display: flex; flex-direction: column; }
 .mobileMenuOpen { right: 0; }
-.mobileMenuHeader { display: flex; justify-content: space-between; align-items: center; padding: 15px 20px; border-bottom: 1px solid #f1f5f9; flex-shrink: 0; }
-.mobileMenuTitle { font-size: 1.1rem; font-weight: 600; color: #1a3b5d; }
-.closeButton { background: none; border: none; font-size: 1.5rem; color: #718096; cursor: pointer; padding: 5px; }
-.mobileUserInfo { padding: 20px; border-bottom: 1px solid #f1f5f9; flex-shrink: 0; }
-.mobileWelcome { display: flex; align-items: center; gap: 10px; font-weight: 600; margin-bottom: 15px; color: #333; font-size: 0.95rem; }
-.mobileUserIcon { font-size: 1.3rem; color: #6366f1; }
-.mobileAuthButtons { display: flex; flex-direction: column; gap: 10px; }
-.mobileAuthBtn { width: 100%; padding: 10px 15px !important; font-size: 0.95rem !important; font-weight: bold; }
-.mobileNavLink { display: flex; align-items: center; gap: 10px; padding: 11px 20px; /* Giảm padding dọc */ color: #4a5568; text-decoration: none; font-size: 0.95rem; /* Giảm font size */ transition: background-color 0.2s ease, color 0.2s ease, padding-left 0.2s ease; border: none; background: none; width: 100%; text-align: left; cursor: pointer; font-family: inherit; border-radius: 6px; margin: 1px 0; /* Giảm margin */ }
-.mobileNavLink:hover { background-color: #f7fafc; color: #2b6cb0; padding-left: 25px; }
-.mobileNavGroupTitle { padding: 12px 20px 6px 20px; font-size: 0.8rem; font-weight: 600; color: #a0aec0; text-transform: uppercase; letter-spacing: 0.5px; }
-.mobileCategorySection .mobileNavLink { padding-left: 20px; font-size: 0.9rem; }
-.mobileCategorySection .mobileNavLink:hover { padding-left: 25px; }
-.mobileCategoryIcon { font-size: 1rem; color: #718096; width: 1.2em; text-align: center; flex-shrink: 0; }
-.mobileNavLink:hover .mobileCategoryIcon { color: #2b6cb0; }
-.mobileMenuDivider { border: none; border-top: 1px solid #f1f5f9; margin: 6px 0; }
+.mobileMenuHeader { display: flex; justify-content: space-between; align-items: center; padding: var(--spacing-sm) var(--spacing-md); border-bottom: 1px solid var(--border-color); flex-shrink: 0; }
+.mobileMenuTitle { font-size: 1.1rem; font-weight: 600; color: var(--text-color-dark); }
+.closeButton { background: none; border: none; font-size: 1.5rem; color: var(--text-color-light); cursor: pointer; padding: 5px; }
+.mobileUserInfo { padding: var(--spacing-md); border-bottom: 1px solid var(--border-color); flex-shrink: 0; }
+.mobileWelcome { display: flex; align-items: center; gap: var(--spacing-xs); font-weight: 600; margin-bottom: var(--spacing-sm); color: var(--text-color-dark); font-size: 0.95rem; }
+.mobileUserIcon { font-size: 1.3rem; color: var(--primary-color); }
+.mobileAuthButtons { display: flex; flex-direction: column; gap: var(--spacing-xs); }
+.mobileAuthBtn { width: 100%; padding: 10px var(--spacing-sm) !important; font-size: 0.95rem !important; font-weight: bold; }
+.mobileNavLink { display: flex; align-items: center; gap: 10px; padding: var(--spacing-xs) var(--spacing-md); color: var(--text-color-dark); text-decoration: none; font-size: 0.95rem; transition: background-color 0.2s ease, color 0.2s ease, padding-left 0.2s ease; border: none; background: none; width: 100%; text-align: left; cursor: pointer; font-family: inherit; border-radius: var(--border-radius-sm); margin: 1px 0; }
+.mobileNavLink:hover { background-color: var(--secondary-color); color: var(--text-color-dark); padding-left: calc(var(--spacing-md) + 4px); }
+.mobileNavGroupTitle { padding: var(--spacing-sm) var(--spacing-md) var(--spacing-xs) var(--spacing-md); font-size: 0.8rem; font-weight: 600; color: var(--text-color-light); text-transform: uppercase; letter-spacing: 0.5px; }
+.mobileCategorySection .mobileNavLink { padding-left: var(--spacing-md); font-size: 0.95rem; }
+.mobileCategorySection .mobileNavLink:hover { padding-left: calc(var(--spacing-md) + 4px); }
+.mobileCategoryIcon { font-size: 1rem; color: var(--text-color-light); width: 1.2em; text-align: center; flex-shrink: 0; }
+.mobileNavLink:hover .mobileCategoryIcon { color: var(--text-color-dark); }
+.mobileMenuDivider { border: none; border-top: 1px solid var(--border-color); margin: 6px 0; }
 .mobileLogoutButton { color: #e53e3e; }
-.mobileLogoutButton:hover { background-color: #fff5f5; color: #c53030; padding-left: 25px; }
-.mobileLoading, .mobileError { padding: 12px 20px; color: #a0aec0; font-style: italic; font-size: 0.9rem; display: flex; align-items: center; gap: 8px; }
+.mobileLogoutButton:hover { background-color: #fff5f5; color: #c53030; padding-left: calc(var(--spacing-md) + 4px); }
+.mobileLoading, .mobileError { padding: var(--spacing-xs) var(--spacing-md); color: var(--text-color-light); font-style: italic; font-size: 0.9rem; display: flex; align-items: center; gap: 8px; }
 .mobileError { color: #e53e3e; }
 
 /* Overlay */
 .overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.5); z-index: 1050; opacity: 0; visibility: hidden; transition: opacity 0.35s ease, visibility 0.35s ease; }
 .mobileMenuOpen + .overlay { opacity: 1; visibility: visible; }
 
+
+/* --- STYLE CHO SEARCH DROPDOWN --- */
+
+/* Container chứa search input và dropdown, cần position: relative */
+.searchDropdownContainer {
+    position: relative;
+    display: inline-block;
+    vertical-align: middle;
+    z-index: 900;
+    width: auto;
+    overflow: visible;
+}
+
+
+/* Menu dropdown kết quả tìm kiếm */
+.searchResultsDropdown {
+    position: absolute;
+    top: calc(100% + 8px);
+    left: 0; /* Căn trái với container */
+    width: 100%;
+    background-color: var(--card-background, #ffffff);
+    border-radius: var(--border-radius-sm);
+    box-shadow: var(--shadow-base);
+    overflow: hidden;
+    z-index: 950;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(5px);
+    transition: opacity 0.25s ease, visibility 0.25s ease, transform 0.25s ease;
+
+    max-height: 300px;
+    overflow-y: auto;
+    border: 1px solid var(--border-color);
+}
+/* Class .show được thêm bởi JS */
+.searchResultsDropdown.show {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+@media (prefers-color-scheme: dark) {
+    .searchResultsDropdown {
+        border-color: var(--text-color-light);
+         background-color: var(--card-background, #2d3748);
+    }
+}
+
+
+/* Style cho trạng thái loading */
+.searchLoading,
+.searchEmpty {
+    padding: var(--spacing-sm);
+    text-align: center;
+    font-size: 0.9rem;
+}
+
+.searchLoading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+/* Danh sách kết quả */
+.searchResultsList {
+    /* No specific styles needed */
+}
+
+/* Từng item kết quả */
+.searchResultItem {
+    display: flex;
+    align-items: center;
+    padding: var(--spacing-xs) var(--spacing-sm);
+    text-decoration: none;
+    color: var(--text-color-dark); /* Màu chữ item kết quả đậm */
+    transition: background-color 0.2s ease;
+    border-bottom: 1px solid var(--border-color);
+}
+@media (prefers-color-scheme: dark) {
+    .searchResultItem {
+        border-bottom-color: var(--text-color-light);
+    }
+}
+
+.searchResultsList .searchResultItem:last-child {
+    border-bottom: none;
+}
+
+
+.searchResultItem:hover {
+    background-color: var(--secondary-color);
+}
+
+.searchResultImage {
+    width: 40px;
+    height: 40px;
+    object-fit: cover;
+    border-radius: 4px;
+    margin-right: var(--spacing-sm);
+    flex-shrink: 0;
+}
+
+.searchResultInfo {
+    flex-grow: 1;
+    overflow: hidden;
+}
+
+.searchResultName {
+    font-size: 0.95rem;
+    font-weight: 500;
+    margin-bottom: 4px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.searchResultPrice {
+    font-size: 0.85rem;
+    color: #e53e3e;
+    font-weight: 600;
+}
+@media (prefers-color-scheme: dark) {
+    .searchResultPrice {
+        color: #fc8181;
+    }
+}
+
+
+/* Link "Xem tất cả" */
+.searchViewAllLink {
+    display: block;
+    padding: var(--spacing-xs) var(--spacing-sm);
+    text-align: center;
+    color: var(--primary-color);
+    text-decoration: none;
+    font-weight: 500;
+    transition: background-color 0.2s ease;
+}
+.searchViewAllLink:hover {
+     background-color:white;
+}
+
 /* --- Responsive Adjustments --- */
 @media (max-width: 1024px) {
     .desktopNav, .desktopAuth { display: none; }
     .mobileMenuToggle { display: block; }
-    .searchInput { width: 140px; }
 }
 @media (max-width: 768px) {
-    .container { padding: 0 15px; gap: 12px; }
-    .logo { font-size: 1.5rem; }
-    .searchBar { display: none; } /* Ẩn hẳn search bar */
+    .container { padding: 0 var(--spacing-sm); gap: var(--spacing-xs); }
+    .logo img { height: 32px; }
+    /* Hide search bar and search dropdown container on tablet and mobile */
+    .searchBar { display: none; }
+    .searchDropdownContainer { display: none; }
+    .actions { gap: var(--spacing-xs); }
     .actionButton { font-size: 1.2rem; padding: 8px; }
     .cartCount { font-size: 0.65rem; min-width: 15px; padding: 1px 4px; top: -1px; right: -2px;}
      .mobileMenu { width: 260px; }
+     .mobileMenuHeader { padding: var(--spacing-sm) var(--spacing-md); }
+     .mobileUserInfo { padding: var(--spacing-md); }
+     .mobileNavLink { padding: var(--spacing-xs) var(--spacing-md); font-size: 0.95rem; }
+     .mobileNavLink:hover { padding-left: calc(var(--spacing-md) + 4px); }
+     .mobileCategorySection .mobileNavLink { padding-left: var(--spacing-md); font-size: 0.95rem; }
+     .mobileCategorySection .mobileNavLink:hover { padding-left: calc(var(--spacing-md) + 4px); }
 }
 @media (max-width: 480px) {
-    .container { padding: 0 10px; gap: 8px; }
+    .container { padding: 0 var(--spacing-xs); gap: var(--spacing-xs); }
     .header { padding: 10px 0; }
-    .logo { font-size: 1.4rem; }
-    .actions { gap: 6px; }
+    .logo img { height: 30px; }
+    .actions { gap: var(--spacing-xs); }
+    /* Search bar and dropdown remain hidden */
     .actionButton { font-size: 1.1rem; padding: 7px; }
      .mobileMenu { max-width: 90%; width: 250px; }
-     .mobileNavLink { padding: 10px 15px; font-size: 0.9rem; }
-     .mobileCategorySection .mobileNavLink { padding-left: 15px; font-size: 0.9rem; }
-     .mobileUserInfo { padding: 15px; }
+     .mobileMenuHeader { padding: var(--spacing-xs) var(--spacing-sm); }
+     .mobileMenuTitle { font-size: 1.1rem; }
+     .closeButton { font-size: 1.3rem; }
+     .mobileUserInfo { padding: var(--spacing-sm); }
+      .mobileWelcome { font-size: 0.9rem; }
+      .mobileUserIcon { font-size: 1.2rem; }
+     .mobileNavLink { padding: var(--spacing-xs) var(--spacing-sm); font-size: 0.9rem; }
+     .mobileNavLink:hover { padding-left: calc(var(--spacing-sm) + 4px); }
+     .mobileNavGroupTitle { padding: var(--spacing-xs) var(--spacing-sm) 4px var(--spacing-sm); font-size: 0.75rem; }
+     .mobileCategorySection .mobileNavLink { padding-left: var(--spacing-sm); font-size: 0.9rem; }
+     .mobileCategorySection .mobileNavLink:hover { padding-left: calc(var(--spacing-sm) + 4px); }
+      .mobileCategoryIcon { font-size: 0.9rem; }
+
 }

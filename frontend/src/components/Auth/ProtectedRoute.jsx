@@ -15,7 +15,7 @@ const ProtectedRoute = ({ children, requiredRole }) => {
     );
   }
 
-  if (!isAuthenticated) 
+  if (!isAuthenticated || !user) 
   {
     console.log('ProtectedRoute: Chưa đăng nhập, chuyển đến /login');
     return <Navigate to="/login" state={{ from: location }} replace />;
@@ -26,7 +26,7 @@ const ProtectedRoute = ({ children, requiredRole }) => {
     const rolesToCheck = Array.isArray(requiredRole) ? requiredRole : [requiredRole];
     if (!user || !user.role || !rolesToCheck.includes(user.role.toLowerCase())) {
       console.log(`ProtectedRoute: Không đủ quyền. Yêu cầu: ${requiredRole}, User có: ${user?.role}`);
-      return <Navigate to="/unauthorized" replace />;
+      return <Navigate to="/" state={{ from: location }} replace />;
     }
   } 
   return children;

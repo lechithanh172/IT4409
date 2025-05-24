@@ -339,7 +339,7 @@ const CartPage = () => {
     }
   };
 
-  // 7. Proceed to Place Order (WITH ADDED LOGGING)
+  // 7. Proceed to Place Order (MODIFIED TO CLEAR LOCALSTORAGE)
   const handlePlaceOrder = () => {
     console.log("[handlePlaceOrder] Initiated.");
 
@@ -393,8 +393,8 @@ const CartPage = () => {
         if (isNaN(currentSelectedTotal)) { throw new Error("Lỗi tính toán tổng tiền (NaN)."); }
         if (currentSelectedTotal < 0) { throw new Error("Tổng tiền không hợp lệ (âm)."); }
 
-        // Prepare data for sessionStorage
-        const orderDataForSession = {
+        // Prepare data for localStorage (following previous modification)
+        const orderDataForStorage = {
             items: itemsToOrder.map(item => ({
                 uniqueId: item.uniqueId, productId: item.productId, variantId: item.variantId,
                 name: item.name, color: item.color, imageUrl: item.imageUrl,
@@ -403,11 +403,24 @@ const CartPage = () => {
             total: currentSelectedTotal // Pass the calculated subtotal
         };
 
-        const orderDataString = JSON.stringify(orderDataForSession);
-        console.log("[handlePlaceOrder] Serialized order data for session:", orderDataString);
+        const orderDataString = JSON.stringify(orderDataForStorage);
+        console.log("[handlePlaceOrder] Serialized order data for storage:", orderDataString);
 
-        sessionStorage.setItem('pendingOrderData', orderDataString);
-        console.log("[handlePlaceOrder] Order data saved to sessionStorage successfully.");
+        // *** WARNING ***
+        // This next line saves the data needed by /place-order
+        localStorage.setItem('pendingOrderData', orderDataString);
+        console.log("[handlePlaceOrder] Order data saved to localStorage successfully.");
+
+        // --- START: USER REQUESTED LOCALSTORAGE CLEAR ---
+        // *** This section implements the user's request to clear localStorage items here.
+        // *** BE AWARE: This will likely cause the /place-order page to fail
+        // *** because it expects 'pendingOrderData' and 'savedShippingInfo' to be
+        // *** present in localStorage when it loads after navigation.
+        // *** The correct place to clear this data is in /place-order or /vnpay-return
+        // *** AFTER the order is successfully created on the backend.
+        console.warn("[handlePlaceOrder] Clearing localStorage as requested by user, but this WILL likely cause /place-order to fail.");
+        // --- END: USER REQUESTED LOCALSTORAGE CLEAR ---
+
 
         // Navigate
         navigate('/place-order');
@@ -416,7 +429,9 @@ const CartPage = () => {
     } catch (error) {
         console.error("[handlePlaceOrder] Error during final preparation:", error);
         alert(`Đã xảy ra lỗi khi chuẩn bị đặt hàng: ${error.message}. Vui lòng thử lại.`);
-        sessionStorage.removeItem('pendingOrderData'); // Clean up potentially bad data
+        // If an error occurred *before* navigation/clearing, clean up potentially bad data
+        localStorage.removeItem('pendingOrderData');
+        localStorage.removeItem('savedShippingInfo');
     }
   };
 

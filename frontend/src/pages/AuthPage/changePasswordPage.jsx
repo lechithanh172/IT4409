@@ -68,7 +68,7 @@ function ChangePasswordPage() {
             <div className={styles.changePasswordCard}>
                 {/* Phần trang trí bên trái */}
                 <div className={styles.decorativeSide}>
-                    <div className={styles.logoPlaceholder}>MyEshop</div>
+                    <div className={styles.logoPlaceholder}>HustShop</div>
                     <h3>Đổi mật khẩu</h3>
                     <p>Đảm bảo mật khẩu mới đủ mạnh để bảo vệ tài khoản của bạn.</p>
                 </div>

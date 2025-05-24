@@ -59,10 +59,11 @@ const ShipperOrderDetails = ({ orderId }) => {
                 if (orderResponse?.data) {
                     setOrderData(orderResponse.data);
                 }
-
+                console.log(orderResponse.data);    
                 if (itemsResponse?.data) {
                     setOrderItems(itemsResponse.data);
                 }
+                console.log(itemsResponse.data);
             } catch (err) {
                 console.error('Error fetching order details:', err);
                 setError('Không thể tải thông tin đơn hàng');

@@ -65,7 +65,7 @@ function ResetPasswordPage() {
             <div className={styles.resetPasswordCard}>
                 {/* Phần trang trí bên trái */}
                 <div className={styles.decorativeSide}>
-                    <div className={styles.logoPlaceholder}>MyEshop</div>
+                    <div className={styles.logoPlaceholder}>HustShop</div>
                     <h3>Đặt lại mật khẩu</h3>
                     <p>Nhập email, mã OTP và mật khẩu mới để khôi phục tài khoản.</p>
                 </div>

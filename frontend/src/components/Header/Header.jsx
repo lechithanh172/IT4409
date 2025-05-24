@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react'; // Added useCallback
 import { Link, NavLink, useNavigate } from 'react-router-dom';
-// Removed useCart import
+import { TbTruckDelivery } from "react-icons/tb";
 import { useAuth } from '../../contexts/AuthContext';
 import apiService from '../../services/api'; // Đảm bảo đường dẫn đúng
 import Button from '../Button/Button';
@@ -108,6 +108,11 @@ const Header = () => {
                        <FiShield className={styles.roleIcon} /> Admin Panel
                    </NavLink>
               )}
+              {isAuthenticated && userRole === 'shipper' && (
+                   <NavLink to="/shipper" className={({ isActive }) => isActive ? `${styles.navLink} ${styles.active}` : styles.navLink} onClick={closeAllDropdowns}>
+                       <TbTruckDelivery className={styles.roleIcon} /> Đơn hàng Shipper
+                   </NavLink>
+              )}
                {isAuthenticated && userRole === 'product_manager' && ( 
                    <NavLink to="/pm" className={({ isActive }) => isActive ? `${styles.navLink} ${styles.active}` : styles.navLink} onClick={closeAllDropdowns}>
                        <FiPackage className={styles.roleIcon} /> Quản lý SP
@@ -137,6 +142,7 @@ const Header = () => {
                         <Link to="/profile" className={styles.dropdownItem} onClick={closeAllDropdowns} role="menuitem"><FiUser className={styles.dropdownIcon}/> Hồ sơ</Link>
                         <Link to="/profile/orders" className={styles.dropdownItem} onClick={closeAllDropdowns} role="menuitem"><FiBox className={styles.dropdownIcon}/> Đơn hàng</Link>
                         {userRole === 'admin' && ( <Link to="/admin" className={styles.dropdownItem} onClick={closeAllDropdowns} role="menuitem"><FiShield className={styles.dropdownIcon} /> Admin Panel</Link> )}
+                         {userRole === 'shipper' && ( <Link to="/shipper" className={styles.dropdownItem} onClick={closeAllDropdowns} role="menuitem"><TbTruckDelivery className={styles.dropdownIcon} /> Đơn hàng vận chuyển</Link> )}
                         {userRole === 'product_manager' && ( <Link to="/pm" className={styles.dropdownItem} onClick={closeAllDropdowns} role="menuitem"><FiPackage className={styles.dropdownIcon} /> Quản lý SP</Link> )}
                         <hr className={styles.dropdownDivider}/>
                         <button onClick={handleLogout} className={`${styles.dropdownItem} ${styles.logoutButton}`} role="menuitem"><FiLogOut className={styles.dropdownIcon}/> Đăng xuất</button>

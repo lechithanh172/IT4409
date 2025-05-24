@@ -23,7 +23,7 @@ import OrderHistoryPage from './pages/OrderHistoryPage/OrderHistoryPage'; // Imp
 import AdminPage from './pages/AdminPage/AdminPage';
 import ProductMangerPage from './pages/ProductManagerPage/ProductManagerPage'
 import UserInfoEdit from './pages/UserInfoEdit/UserInfoEdit';
-
+import OrderSuccessPage from './pages/OrderSuccessPage/OrderSuccessPage';
 import ShipperPage from './pages/ShipperPage/ShipperPage';
 
 // Protected Route Component
@@ -64,6 +64,7 @@ function App() {
           <Route path="place-order" element={<PlaceOrder />} />
           <Route path="profile" element={<UserProfilePage />} />
            <Route path="profile/edit" element={<UserInfoEdit />} />
+           <Route path="order-success-cod" element={<OrderSuccessPage />} />
           {/* Corrected route for Order History */}
           <Route path="profile/orders" element={<OrderHistoryPage />} />
           {/* Add other protected routes here */}

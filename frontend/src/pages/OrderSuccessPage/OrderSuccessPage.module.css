@@ -1,7 +1,7 @@
-/* src/pages/VNPayReturn/VNPayReturn.module.css */
+/* src/pages/OrderSuccessPage/OrderSuccessPage.module.css */
 
-.vnPayReturnPage {
-    max-width: 700px; /* Control max width on large screens */
+.orderSuccessPageContainer {
+    max-width: 700px; /* Match max width with VNPayReturn */
     margin: 40px auto; /* Center the container */
     padding: 30px;
     background-color: #ffffff; /* Clean white background */
@@ -77,18 +77,19 @@
 .warning p { color: #6c757d; } /* Slightly different text color for warning */
 
 
-/* Transaction Details Section */
-.transactionDetails {
-    margin-top: 30px;
+/* Order Details Section (Optional, if you add more details here later) */
+/* Similar to transactionDetails in VNPayReturn if needed */
+/*
+.orderDetails {
+     margin-top: 30px;
     padding: 20px;
-    background-color: #f8f9fa; /* Very light grey background */
+    background-color: #f8f9fa;
     border-radius: 8px;
     border: 1px solid #e9ecef;
     width: 100%;
-    text-align: left; /* Align text left within details box */
+    text-align: left;
 }
-
-.transactionDetails h4 {
+.orderDetails h4 {
     margin-top: 0;
     margin-bottom: 15px;
     font-size: 1.2em;
@@ -97,17 +98,16 @@
     border-bottom: 1px solid #dee2e6;
     padding-bottom: 10px;
 }
-
-.transactionDetails p {
-    margin-bottom: 8px; /* Tighter spacing for detail lines */
+.orderDetails p {
+    margin-bottom: 8px;
     font-size: 1em;
     color: #495057;
 }
-
-.transactionDetails strong {
-    color: #007bff; /* Blue to highlight values */
+.orderDetails strong {
+    color: #007bff;
     font-weight: 600;
 }
+*/
 
 
 /* Actions Button Container */
@@ -124,39 +124,9 @@
     text-decoration: none; /* Remove default link underline */
 }
 
-/* Example custom button styles (assuming you have a Button component) */
-/* If your Button component handles variants internally, these might not be needed here */
-/*
-.actions button {
-    padding: 12px 25px;
-    font-size: 1.1em;
-    border: none;
-    border-radius: 6px;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-}
-
-.actions button.primary {
-    background-color: #007bff;
-    color: white;
-}
-.actions button.primary:hover {
-    background-color: #0056b3;
-}
-
-.actions button.secondary {
-    background-color: #6c757d;
-    color: white;
-}
-.actions button.secondary:hover {
-    background-color: #5a6268;
-}
-*/
-
-
-/* Responsive Adjustments */
+/* Responsive Adjustments (Match VNPayReturn) */
 @media (max-width: 768px) {
-    .vnPayReturnPage {
+    .orderSuccessPageContainer {
         margin: 20px 15px;
         padding: 20px;
     }
@@ -179,14 +149,14 @@
     .actions a button {
         width: 100%;
     }
-     .failed .errorMessage {
-          width: 100%;
-          padding: 10px;
-     }
+    .failed .errorMessage {
+         width: 100%;
+         padding: 10px;
+    }
 }
 
 @media (max-width: 480px) {
-     .vnPayReturnPage {
+     .orderSuccessPageContainer {
          margin: 15px 10px;
          padding: 15px;
      }
@@ -200,15 +170,18 @@
      .resultContainer p {
          font-size: 0.95em;
      }
-     .transactionDetails {
+     /* Adjust details padding if orderDetails section is added */
+     /*
+     .orderDetails {
          padding: 15px;
      }
-      .transactionDetails h4 {
+      .orderDetails h4 {
           font-size: 1.1em;
       }
-      .transactionDetails p {
+      .orderDetails p {
           font-size: 0.9em;
       }
+      */
      .actions {
          gap: 10px;
          margin-top: 30px;

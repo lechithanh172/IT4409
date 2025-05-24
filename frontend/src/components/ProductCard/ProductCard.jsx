@@ -152,11 +152,7 @@ const ProductCard = ({ product }) => {
           {/* --- Khối Đánh giá sao (Sử dụng RatingStars component) --- */}
           <div className={styles.bottomDiv}>
              {/* Hiển thị loading/error hoặc RatingStars */}
-             {isRatingLoading ? (
-                 <Spinner size="small" /> // Hiển thị spinner nhỏ khi đang load rating
-             ) : ratingError ? (
-                  <span className={styles.ratingErrorSmall}>Lỗi đánh giá</span> // Thông báo lỗi nhỏ
-             ) : (
+             {(
                 // Sử dụng RatingStars component với state riêng của card
                 <RatingStars
                    rating={cardAverageRating}

@@ -158,11 +158,6 @@ const HomePage = () => {
               <div className={styles.heroSlideContent}>
                 <h2 className={styles.heroSlideTitle}>{slide.title}</h2>
                 <p className={styles.heroSlideSubtitle}>{slide.subtitle}</p>
-                <Link to={slide.ctaLink}>
-                  <Button variant="primary" className={styles.heroSlideCtaButton}>
-                    {slide.ctaText}
-                  </Button>
-                </Link>
               </div>
             </div>
           ))}
@@ -214,7 +209,6 @@ const HomePage = () => {
       <section className={`${styles.section} ${styles.categoriesSectionBg}`}>
         <div className={styles.sectionHeader}>
              <h2 className={styles.sectionTitle}>Khám Phá Danh Mục</h2>
-              <Link to={`/categories`} className={styles.viewAllLink}>Xem tất cả <FiChevronRight/></Link>
         </div>
          {isCategoryLoading ? (
              <div className={styles.loadingContainer}><Spinner /></div>

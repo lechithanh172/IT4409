@@ -53,7 +53,7 @@ function SignupNoOtpPage() {
             <div className={styles.signupCard}>
                 {/* Phần trang trí bên trái */}
                 <div className={styles.decorativeSide}>
-                    <div className={styles.logoPlaceholder}>MyEshop</div>
+                    <div className={styles.logoPlaceholder}>HustShop</div>
                     <h3>Tham gia ngay!</h3>
                     <p>Tạo tài khoản để nhận nhiều ưu đãi hấp dẫn.</p>
                 </div>

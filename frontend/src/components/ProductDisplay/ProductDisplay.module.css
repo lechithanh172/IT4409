@@ -53,12 +53,15 @@
     }
     /* Bỏ gap và chuyển sang flex-direction column trên màn hình nhỏ */
     .productDisplayContainer {
-        gap: 0;
-        flex-direction: column;
+        /* Đã có flex-direction: column; */
+        /* SỬA: ĐẶT GAP HỢP LÝ CHO MOBILE THAY VÌ 0 */
+        gap: 20px; /* Khoảng cách giữa ảnh và info khi xếp chồng */
+        /* Đã có flex-direction: column; */
         margin-bottom: 20px; /* Giảm khoảng cách khi stacked */
     }
+    /* SỬA: BỎ MARGIN-BOTTOM TRÊN LEFTCOLUMN VÌ GAP TRÊN CHA ĐÃ XỬ LÝ */
     .leftColumn {
-        margin-bottom: 20px; /* Add space between image and info when stacked */
+        /* margin-bottom: 20px; */ /* REMOVE THIS LINE */
     }
 }
 
@@ -108,8 +111,11 @@
 /* Product info styles */
 .productName {
     font-size: 1.8em;
-    margin-bottom: 10px;
+    /* margin-bottom: 10px; */ /* Có thể giữ hoặc bỏ tùy vào khoảng cách mong muốn sau tên */
     color: #333;
+    /* Nếu gap trên cha đủ, margin-top/bottom trên tên có thể không cần nhiều */
+     margin-top: 0; /* Đảm bảo không có margin-top đẩy xuống từ trên */
+     margin-bottom: 10px; /* Giữ margin-bottom để cách các element bên dưới trong cột info */
 }
 
 /* General rating stars container (for average rating below product name) */
@@ -447,6 +453,7 @@
 }
 
 /* Login prompt button style */
+/* This is for the button under product actions, not the review prompt */
 .loginPromptButton {
     margin-top: 20px;
     width: 100%;
@@ -611,25 +618,23 @@
     color: #333;
 }
 
-/* Login prompt for review form */
-.loginToReviewPrompt {
-    margin-top: 20px;
-    padding: 15px;
-    background-color: #fff3cd;
-    /* Light yellow background */
-    border: 1px solid #ffeeba;
-    color: #856404;
-    /* Dark yellow text */
-    border-radius: 4px;
-    display: flex;
-    align-items: center;
-    gap: 8px;
+/* Media query để tinh chỉnh thêm trên màn hình rất nhỏ (< 576px là breakpoint phổ biến cho mobile nhỏ) */
+@media (max-width: 576px) {
+    .loginToReviewPrompt {
+        /* SỬA: Giảm padding trên màn hình rất nhỏ */
+        padding: 12px 15px;
+        /* SỬA: Giảm font size trên màn hình rất nhỏ */
+        font-size: 0.9em; /* Chữ nhỏ hơn một chút */
+        /* Có thể điều chỉnh lại gap nếu cần */
+        gap: 8px;
+    }
+
+    /* Có thể giảm kích thước icon trên màn hình rất nhỏ */
+     .loginToReviewPrompt svg {
+         font-size: 1em;
+     }
 }
 
-.loginToReviewPrompt a {
-    color: #856404;
-    font-weight: bold;
-}
 
 /* Review submission form styles */
 .reviewForm {

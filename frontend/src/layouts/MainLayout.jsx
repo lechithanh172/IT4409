@@ -1,33 +1,27 @@
 // src/layouts/MainLayout.jsx
 import React from 'react';
-import { Outlet } from 'react-router-dom';
+import { Outlet, useLocation } from 'react-router-dom'; // Import useLocation
 import Header from '../components/Header/Header';
 import Footer from '../components/Footer/Footer';
 import styles from './MainLayout.module.css';   // Import CSS Module
-import { ToastContainer, toast } from 'react-toastify'; // Import ToastContainer và toast // Import CSS mặc định của toastify
+import { ToastContainer, toast } from 'react-toastify';
+// Import CSS mặc định của toastify ở đây hoặc trong file CSS global của bạn
+import 'react-toastify/dist/ReactToastify.css';
 
 const MainLayout = () => {
-
-  // // Ví dụ test toast (có thể xóa đi)
-  // useEffect(() => {
-  //   const timer = setTimeout(() => {
-  //     toast.info("Toast từ MainLayout!");
-  //   }, 1000);
-  //   return () => clearTimeout(timer);
-  // }, []);
+  const location = useLocation(); // Lấy thông tin route hiện tại
+  const isHomePage = location.pathname === '/'; // Kiểm tra xem có phải trang chủ không
 
   return (
-    <div className={styles.layoutContainer}>
+    // Thêm class 'homepageActive' nếu đang ở trang chủ
+    <div className={`${styles.layoutContainer} ${isHomePage ? styles.homepageActive : ''}`}>
       <Header />
 
-      {/* Áp dụng class từ CSS Module */}
-      {/* Các props cấu hình chính vẫn nên giữ lại */}
+      {/* Đặt ToastContainer ở đây, không nằm trong main */}
       <ToastContainer
-          className={styles.customToastContainer} // *** THÊM CLASS CSS MODULE ***
-          toastClassName={styles.customToast} // Style cho từng toast (tùy chọn)
-          bodyClassName={styles.customToastBody} // Style cho nội dung toast (tùy chọn)
-          progressClassName={styles.customProgressBar} // Style thanh progress (tùy chọn)
-          position="top-right" // *** Vẫn nên giữ prop vị trí ở đây ***
+          className={styles.customToastContainer} // Vẫn giữ class tùy chỉnh
+          // ... các props khác của ToastContainer ...
+          position="top-right" // Vẫn nên cấu hình vị trí ở đây
           autoClose={3000}
           hideProgressBar={false}
           newestOnTop={false}
@@ -36,12 +30,12 @@ const MainLayout = () => {
           pauseOnFocusLoss
           draggable
           pauseOnHover
-          theme="light" // Theme vẫn có thể đặt ở đây hoặc custom bằng CSS
       />
 
       <main className={styles.mainContent}>
-        <Outlet />
+        <Outlet /> {/* Nội dung các trang con sẽ render ở đây */}
       </main>
+
       <Footer />
     </div>
   );

@@ -577,13 +577,6 @@ const ProductDisplay = ({ product }) => {
                   </Button>
               </div>
           )}
-           {/* Prompt đăng nhập nếu chưa đăng nhập */}
-           {!isAuthenticated && (
-               <p className={styles.loginToReviewPrompt}>
-                  <FiLogIn /> Vui lòng <a href="/login">đăng nhập</a> để gửi đánh giá về sản phẩm này.
-               </p>
-           )}
-
           {/* Danh sách các đánh giá đã có */}
           {isLoadingReviews && (
               <div className={styles.loadingReviews}>

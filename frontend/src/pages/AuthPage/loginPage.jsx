@@ -58,7 +58,7 @@ function LoginPage() {
             <div className={styles.loginCard}> {/* Đổi tên class cho rõ ràng hơn */}
                 {/* Phần hình ảnh trang trí bên trái (Tùy chọn) */}
                 <div className={styles.decorativeSide}>
-                    <div className={styles.logoPlaceholder}>MyEshop</div>
+                    <div className={styles.logoPlaceholder}>HustShop</div>
                     <h3>Chào mừng quay trở lại!</h3>
                     <p>Mua sắm thả ga, không lo về giá.</p>
                     {/* <img src="/path/to/login-illustration.svg" alt="Login Illustration" /> */}

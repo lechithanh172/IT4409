@@ -43,11 +43,11 @@ const CPU_OPTIONS_NESTED = {
 // Các tùy chọn lọc cố định khác (không lồng nhau)
 const availableRamCapacityOptionsUI = ['2GB', '4GB', '6GB', '8GB', '12GB', '16GB', '32GB', '64GB'];
 const availableStorageOptionsUI = ['64GB', '128GB', '256GB', '512GB', '1TB', '2TB'];
-const availableRefreshRateOptionsUI = ['60Hz', '90Hz', '120Hz', '144Hz', '240Hz'];
+const availableRefreshRateOptionsUI = ['60Hz', '90Hz', '120Hz', '140Hz', '144Hz', '165Hz', '240Hz', '300Hz', '360Hz']; // Thêm vài tùy chọn phổ biến
 
 
 const FilterSortPanel = ({
-    currentFilters, // Object chứa tất cả các filter đang áp dụng từ URL
+    currentFilters, // Object chứa tất cả các filter đang áp dụng từ URL (ví dụ: { brand: 'HP', category: 'Laptop', ... })
     onFilterChange, // Hàm callback để gửi các filter mới lên ProductListPage
     availableBrands = [], // Danh sách brands từ API
     availableCategories = [], // Danh sách categories từ API
@@ -60,6 +60,7 @@ const FilterSortPanel = ({
     const lowerCaseCurrentCategory = currentCategory.toLowerCase();
 
     // --- State quản lý trạng thái mở/đóng của các section ---
+    // Mở mặc định Price và Sort
     const [isSortOpen, setIsSortOpen] = useState(true);
     const [isPriceOpen, setIsPriceOpen] = useState(true);
     const [isCategoryOpen, setIsCategoryOpen] = useState(true);
@@ -67,26 +68,27 @@ const FilterSortPanel = ({
     // Kiểm tra xem category hiện tại có phải Laptop hoặc Smartphone không
     const isLaptopOrSmartphone = lowerCaseCurrentCategory === 'laptop' || lowerCaseCurrentCategory === 'smartphone';
 
-    // Mở mặc định các section chỉ khi category là Laptop hoặc Smartphone
-    // Bao gồm cả Brand theo yêu cầu mới
-    const [isBrandOpen, setIsBrandOpen] = useState(isLaptopOrSmartphone);
-    const [isMemoryOpen, setIsMemoryOpen] = useState(isLaptopOrSmartphone);
-    const [isStorageOpen, setIsStorageOpen] = useState(isLaptopOrSmartphone);
-    // CPU chỉ mở mặc định nếu category hiện tại là Laptop (vì CPU_OPTIONS_NESTED chỉ có data cho Laptop)
-    const [isCpuOpen, setIsCpuOpen] = useState(lowerCaseCurrentCategory === 'laptop');
-    const [isRefreshRateOpen, setIsRefreshRateOpen] = useState(isLaptopOrSmartphone);
+    // Mở mặc định các section chỉ khi category là Laptop hoặc Smartphone (hoặc đang load)
+    // Điều này giúp UX tốt hơn, không phải cuộn tìm filter
+    const [isBrandOpen, setIsBrandOpen] = useState(isLaptopOrSmartphone || isLoading);
+    const [isMemoryOpen, setIsMemoryOpen] = useState(isLaptopOrSmartphone || isLoading);
+    const [isStorageOpen, setIsStorageOpen] = useState(isLaptopOrSmartphone || isLoading);
+    // CPU chỉ mở mặc định nếu category hiện tại là Laptop (vì CPU_OPTIONS_NESTED chỉ có data cho Laptop) hoặc đang load
+    const [isCpuOpen, setIsCpuOpen] = useState(lowerCaseCurrentCategory === 'laptop' || isLoading);
+    const [isRefreshRateOpen, setIsRefreshRateOpen] = useState(isLaptopOrSmartphone || isLoading);
 
 
     // --- State quản lý trạng thái mở/đóng của từng hãng chip con ---
     // Sử dụng Set để lưu trữ tên các hãng đang mở
     const [openCpuManufacturers, setOpenCpuManufacturers] = useState(new Set());
 
-    // --- Trích xuất các giá trị lọc hiện tại từ props ---
+    // --- Trích xuất các giá trị lọc hiện tại từ props (URL) ---
     // Sử dụng default value là {} để tránh lỗi khi currentFilters undefined
+    // LƯU Ý: Lấy brand name từ key 'brand' theo URL mới
     const {
         category: currentCategoryFilter = '', // Sử dụng tên biến khác để tránh trùng currentCategory prop
         sort = '',
-        brandName = '',
+        brand = '', // <<< LẤY TỪ KEY 'brand' CỦA currentFilters (đã được ProductListPage đọc từ URL param 'brand')
         price_gte = '',
         price_lte = '',
         memory = [], // array
@@ -94,6 +96,9 @@ const FilterSortPanel = ({
         cpu = [], // array (các giá trị CPU được chọn) - vd: ["Intel Core i5", "Apple M1"]
         refreshRate = [],
     } = currentFilters || {}; // Đảm bảo currentFilters là object
+
+    // Sử dụng brand name lấy từ props làm giá trị checked cho radio button
+    const currentBrandName = brand;
 
 
     // --- Calculate valid min/max price for the slider ---
@@ -104,18 +109,29 @@ const FilterSortPanel = ({
         // Đảm bảo max luôn lớn hơn min cho thanh trượt
         const effectiveMax = max <= min ? min + 100000 : max; // Đảm bảo có khoảng cách tối thiểu
         // Bước nhảy: ít nhất 10k (hoặc giá trị nhỏ hơn phù hợp), hoặc 1% của khoảng giá
-        const calculatedStep = Math.max(10000, Math.round((effectiveMax - min) / 100)); // Bước nhảy min 10k
+        // Đảm bảo bước nhảy không làm tròn về 0 nếu khoảng giá nhỏ
+         const range = effectiveMax - min;
+         const calculatedStep = Math.max(10000, range > 0 ? Math.round(range / 100) : 1); // Bước nhảy min 10k, min là 1 nếu khoảng giá cực nhỏ
+
         return { validMinPrice: min, validMaxPrice: effectiveMax, step: calculatedStep };
     }, [minPrice, maxPrice]); // Tính lại khi minPrice hoặc maxPrice từ ProductListPage thay đổi
 
 
     // --- State quản lý giá trị của thanh trượt giá (cục bộ khi đang kéo) ---
-    const [priceRange, setPriceRange] = useState([
-        parseInt(price_gte, 10) || validMinPrice, // Lấy từ URL, nếu không hợp lệ dùng giá trị min
-        parseInt(price_lte, 10) || validMaxPrice // Lấy từ URL, nếu không hợp lệ dùng giá trị max
-    ]);
+    // Khởi tạo state cục bộ từ giá trị URL price_gte/lte, nhưng kẹp trong bounds validMinPrice/validMaxPrice
+    const [priceRange, setPriceRange] = useState(() => {
+        const initialMin = parseInt(price_gte, 10);
+        const initialMax = parseInt(price_lte, 10);
+        // Sử dụng validMinPrice/validMaxPrice làm fallback và bounds
+        let min = !isNaN(initialMin) ? Math.max(validMinPrice, Math.min(initialMin, validMaxPrice)) : validMinPrice;
+        let max = !isNaN(initialMax) ? Math.max(validMinPrice, Math.min(initialMax, validMaxPrice)) : validMaxPrice;
+        if (min > max) [min, max] = [max, min]; // Swap if range is invalid
+        return [min, max];
+    });
+
 
     // Effect cập nhật thanh trượt giá khi bộ lọc giá thay đổi từ bên ngoài (qua URL)
+    // HOẶC khi minPrice/maxPrice tổng thể thay đổi (do fetch data mới)
     useEffect(() => {
          const initialMin = parseInt(price_gte, 10);
          const initialMax = parseInt(price_lte, 10);
@@ -138,7 +154,8 @@ const FilterSortPanel = ({
         } else {
              // console.log(`[FilterSortPanel] State priceRange đã khớp với props [${newMin}, ${newMax}]`);
         }
-    }, [price_gte, price_lte, validMinPrice, validMaxPrice]); // Phụ thuộc vào tham số URL và bounds giá
+        // Effect này phụ thuộc vào các tham số giá từ URL (price_gte, price_lte) và bounds giá tổng thể (validMinPrice, validMaxPrice)
+    }, [price_gte, price_lte, validMinPrice, validMaxPrice]);
 
 
     // --- Tạo danh sách tùy chọn CPU lồng nhau CHỈ KHI CATEGORY LÀ LAPTOP ---
@@ -148,7 +165,7 @@ const FilterSortPanel = ({
         const optionsForCategory = lowerCaseCurrentCategory === 'laptop' ? CPU_OPTIONS_NESTED['LAPTOP'] : null;
 
         if (!optionsForCategory) {
-             console.log(`[FilterSortPanel] Category không phải Laptop (${lowerCaseCurrentCategory}). Không tạo danh sách tùy chọn CPU.`);
+             // console.log(`[FilterSortPanel] Category không phải Laptop (${lowerCaseCurrentCategory}). Không tạo danh sách tùy chọn CPU.`);
             return null;
         }
 
@@ -191,14 +208,15 @@ const FilterSortPanel = ({
 
          const filtersToUpdate = {
              category: newCategory,
-             // Khi category thay đổi, LUÔN reset các bộ lọc con
+             // Khi category thay đổi, LUÔN reset các bộ lọc con và giá
              // vì chúng có thể không liên quan đến category mới.
-             // Điều này ĐẢM BẢO lọc CPU bị xóa khi chuyển khỏi Laptop.
-             brandName: '', // Reset Brand filter theo yêu cầu mới
+             brand: '', // Reset Brand filter (sử dụng key 'brand')
              cpu: [], // Reset CPU filter
              storage: [], // Reset Storage filter
              memory: [], // Reset Memory filter
-             refreshRate: [] // Reset RefreshRate filter
+             refreshRate: [], // Reset RefreshRate filter
+             price_gte: '', // Reset giá về rỗng để ProductListPage xóa param
+             price_lte: '' // Reset giá về rỗng để ProductListPage xóa param
          };
          // TODO: Thêm các bộ lọc spec khác vào đây để reset khi đổi category (ví dụ: screen size, camera)
 
@@ -222,26 +240,38 @@ const FilterSortPanel = ({
 
 
     const handleBrandChange = useCallback((e) => {
-        console.log(`[FilterSortPanel] Thay đổi brand: "${brandName}" -> "${e.target.value}"`);
-        onFilterChange({ brandName: e.target.value });
-    }, [onFilterChange, brandName]);
+        const newBrandName = e.target.value;
+        console.log(`[FilterSortPanel] Thay đổi brand: "${currentBrandName}" -> "${newBrandName}"`);
+
+        const filtersToUpdate = {
+            brand: newBrandName, // <<< GỬI KEY 'brand' ĐỂ MATCH VỚI URL PARAM VÀ ProductListPage.handleFilterChange
+            // Khi brand thay đổi, reset các bộ lọc con và giá
+            // vì chúng có thể không liên quan đến brand mới hoặc đã được chọn cho category/brand khác.
+            // KHÔNG reset Category và Sort.
+            cpu: [],
+            storage: [],
+            memory: [],
+            refreshRate: [],
+            price_gte: '', // Reset giá về rỗng để ProductListPage xóa param
+            price_lte: '' // Reset giá về rỗng để ProductListPage xóa param
+        };
+        // TODO: Thêm các bộ lọc spec khác vào đây nếu có
+
+        onFilterChange(filtersToUpdate);
+    }, [onFilterChange, currentBrandName]); // Depend on currentBrandName prop (from URL 'brand')
 
 
     // Hàm được gọi khi người dùng thả thanh trượt giá
     const handlePriceChangeFinal = useCallback((values) => {
         console.log(`[FilterSortPanel] onFinalChange triggered with [${values[0]}, ${values[1]}].`);
         // Kiểm tra xem giá trị mới có khác với giá trị hiện tại trên URL không
-        // Parse giá trị từ URL về số để so sánh an toàn
-        const currentGteNum = parseInt(price_gte, 10);
-        const currentLteNum = parseInt(price_lte, 10);
+        // Lấy giá trị URL ban đầu từ currentFilters prop
+        const currentGteUrlValue = currentFilters?.price_gte || '';
+        const currentLteUrlValue = currentFilters?.price_lte || '';
 
-        // Lấy giá trị mặc định nếu parse thất bại
-        const compareGte = isNaN(currentGteNum) ? validMinPrice : currentGteNum;
-        const compareLte = isNaN(currentLteNum) ? validMaxPrice : currentLteNum;
+        // So sánh giá trị từ slider (dưới dạng chuỗi) với giá trị từ URL
+        const isPriceChanged = String(values[0]) !== currentGteUrlValue || String(values[1]) !== currentLteUrlValue;
 
-
-        // So sánh giá trị từ slider với giá trị số đã parse/mặc định từ URL
-        const isPriceChanged = values[0] !== compareGte || values[1] !== compareLte;
 
         if (isPriceChanged) {
              console.log(`[FilterSortPanel] Giá trị thay đổi. Calling onFilterChange.`);
@@ -250,7 +280,7 @@ const FilterSortPanel = ({
          } else {
              console.log(`[FilterSortPanel] Giá trị không thay đổi so với URL. Không gọi onFilterChange.`);
          }
-    }, [price_gte, price_lte, validMinPrice, validMaxPrice, onFilterChange]); // Phụ thuộc vào giá trị URL, bounds và handler
+    }, [currentFilters, onFilterChange]); // Phụ thuộc vào currentFilters (để lấy giá trị URL ban đầu) và handler
 
 
     // --- Hàm xử lý thay đổi bộ lọc cho các checkbox (Chung) ---
@@ -294,7 +324,7 @@ const FilterSortPanel = ({
                         <div id="category-content" className={`${styles.groupContent} ${styles.scrollableList}`}>
                             {/* Hiển thị loading message nếu đang tải và chưa có data */}
                             {isLoading && (!availableCategories || availableCategories.length === 0) ? (
-                                // Giả định sharedStyles.loadingMessage tồn tại từ file CSS chung bạn có
+                                // Giả định styles.loadingMessage tồn tại từ file CSS chung bạn có
                                 <p className={styles.loadingMessage}>Đang tải danh mục...</p>
                              ) : availableCategories && availableCategories.length > 0 ? (
                                 <>
@@ -324,7 +354,7 @@ const FilterSortPanel = ({
                                 </>
                              ) : (
                                  // Trường hợp fetch xong nhưng danh sách rỗng
-                                 // Giả định sharedStyles.noOptionsMessage tồn tại
+                                 // Giả định styles.noOptionsMessage tồn tại
                                  <p className={styles.noOptionsMessage}>Không có danh mục</p>
                              )}
                         </div>
@@ -442,7 +472,7 @@ const FilterSortPanel = ({
                                 </>
                             ) : (
                                  // Trường hợp fetch xong nhưng khoảng giá không hợp lý
-                                 // Giả định sharedStyles.noOptionsMessage tồn tại
+                                 // Giả định styles.noOptionsMessage tồn tại
                                  <p className={styles.noOptionsMessage}>Không có dữ liệu giá phù hợp để lọc.</p>
                             )}
                         </div>
@@ -451,7 +481,7 @@ const FilterSortPanel = ({
             ) : null /* Không render section nếu không có data giá và không loading */ }
 
 
-            {/* --- Bộ lọc Thương hiệu (API: brandName) - CHỈ HIỂN THỊ KHI CATEGORY LÀ LAPTOP HOẶC SMARTPHONE --- */}
+            {/* --- Bộ lọc Thương hiệu (API: brand) - CHỈ HIỂN THỊ KHI CATEGORY LÀ LAPTOP HOẶC SMARTPHONE --- */}
              { isLaptopOrSmartphone && ((availableBrands && availableBrands.length > 0) || isLoading) ? (
                 <div className={styles.filterGroup}>
                     <button className={styles.groupHeader} onClick={() => toggleSection(setIsBrandOpen)} aria-expanded={isBrandOpen} aria-controls="brand-content">
@@ -472,7 +502,7 @@ const FilterSortPanel = ({
                                     <label className={styles.radioLabel}>
                                         <input
                                             type="radio" name="brandFilter" value=""
-                                            checked={!brandName}
+                                            checked={!currentBrandName} // Dùng currentBrandName prop (từ URL 'brand')
                                             onChange={handleBrandChange}
                                             className={styles.radioInput}
                                         />
@@ -483,7 +513,7 @@ const FilterSortPanel = ({
                                         <label key={b.brandId || b.brandName} className={styles.radioLabel}>
                                             <input
                                                 type="radio" name="brandFilter" value={b.brandName}
-                                                checked={brandName === b.brandName}
+                                                checked={currentBrandName === b.brandName} // Dùng currentBrandName prop
                                                 onChange={handleBrandChange}
                                                 className={styles.radioInput}
                                             />
@@ -493,7 +523,7 @@ const FilterSortPanel = ({
                                 </>
                              ) : (
                                  // Trường hợp fetch xong nhưng danh sách rỗng
-                                 // Giả định sharedStyles.noOptionsMessage tồn tại
+                                 // Giả định styles.noOptionsMessage tồn tại
                                  <p className={styles.noOptionsMessage}>Không có thương hiệu</p>
                              )}
                         </div>
@@ -563,7 +593,7 @@ const FilterSortPanel = ({
                      </button>
                       {isCpuOpen && ( // Vẫn kiểm tra isCpuOpen để quyết định hiển thị loading message hay không
                          <div id="cpu-content" className={styles.groupContent}>
-                              {/* Giả định sharedStyles.loadingMessage tồn tại */}
+                              {/* Giả định styles.loadingMessage tồn tại */}
                              <p className={styles.loadingMessage}>Đang tải tùy chọn CPU...</p>
                          </div>
                       )}

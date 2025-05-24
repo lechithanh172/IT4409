@@ -212,6 +212,8 @@ const apiService = {
   updateBrand: (data) => apiInstance.put("/brand/update", data),
 
   // PRODUCT
+  getProductsbyBrandName: (data) => apiInstance.get(`product/brand=${data}`),
+  getProductsbyCategory: (data) => apiInstance.get(`product/category=${data}`),
   addProduct: (data) => apiInstance.post("/product/add", data),
   updateProduct: (data) => apiInstance.put("/product/update", data),
   deleteProduct: (productId) => apiInstance.delete(`/product/delete?productId=${productId}`),
@@ -252,9 +254,9 @@ const apiService = {
   getOrdersByStatus: (status) => apiInstance.get(`/order/status/${status}`), // Cho admin
   approveOrder: (orderId) => apiInstance.post(`/order/approve/${orderId}`), // Cho admin
   getAllOrders: () => apiInstance.get('/order/view/all'),
+applyOrderStatus: (data) => apiInstance.post('/order/apply-status', data),
 
-
-  // SHIPPER
+ // SHIPPER
   getUnassignedOrders: () => apiInstance.get("/order/unassigned"),
   getShipperOrders: (shipperId) => apiInstance.get(`/order/shipper/${shipperId}`),
   assignOrder: (orderId, shipperId) => apiInstance.post(`/order/assign/${orderId}`, null, {

@@ -47,7 +47,7 @@ public class OrderController {
     public ResponseEntity<?> viewOrderHistory(@PathVariable String username, @RequestHeader("Authorization") String token) {
         Optional<User> u = userService.getInfo(token);
         if(u.isPresent()) {
-            if(u.get().getUsername().equals(username) || jwtService.extractRole(token).equals(Role.ADMIN)) {
+            if(u.get().getUsername().equals(username) || jwtService.extractRole(token).equals(Role.ADMIN) || jwtService.extractRole(token).equals(Role.SHIPPER)) {
                 return ResponseEntity.status(200).body(orderService.getOrderHistory(u.get().getUserId()));
             }
             else return ResponseEntity.status(403).body(new StatusResponse("Access Denied"));
@@ -63,7 +63,7 @@ public class OrderController {
         Optional<User> u = userService.getInfo(token);
         Optional<Order> order = orderService.getOrderById(orderId);
         if(u.isPresent() && order.isPresent()) {
-            if(u.get().getUserId().equals(order.get().getUserId()) || jwtService.extractRole(token).equals(Role.ADMIN)) {
+            if(u.get().getUserId().equals(order.get().getUserId()) || jwtService.extractRole(token).equals(Role.ADMIN) || jwtService.extractRole(token).equals(Role.SHIPPER)) {
                 return ResponseEntity.status(200).body(order.get());
             }
             else return ResponseEntity.status(403).body(new StatusResponse("Access Denied"));

@@ -9,7 +9,7 @@ import {
   Tag,
   Select,
   Dropdown,
-  Menu,
+  Menu, 
   Typography,
   Spin,
   Tooltip,
@@ -17,57 +17,78 @@ import {
   Row,
   Col,
   Statistic,
-  Image,
+  Image, 
   Divider,
-  Alert,
+  Alert, 
 } from "antd";
+
 import {
   SearchOutlined,
   EditOutlined,
   EyeOutlined,
   DollarOutlined,
   CalendarOutlined,
+  UserOutlined,
 } from "@ant-design/icons";
+
 import Highlighter from "react-highlight-words";
-import OrderDetails from "./OrderDetails";
+
+import OrderDetails from "./OrderDetails"; 
 import apiService from "../../../services/api";
 
 const { Text } = Typography;
-
+const { Option } = Select;
 
 const STATUS_DETAILS = {
-  PENDING: { label: "Chờ xử lý", color: "gold" },
+  PENDING: { label: "Chờ xử lý", color: "gold" }, 
   APPROVED: { label: "Đã duyệt", color: "blue" },
   REJECTED: { label: "Bị từ chối", color: "error" },
-  SHIPPING: { label: "Đang giao", color: "processing" },
-  DELIVERED: { label: "Đã giao", color: "success" },
-  FAILED_DELIVERY: { label: "Giao thất bại", color: "volcano" }, 
+  SHIPPING: { label: "Đang giao", color: "processing" }, 
+  DELIVERED: { label: "Đã giao", color: "success" }, 
+  COMPLETED: { label: "Hoàn thành", color: "success" }, 
+  FAILED_DELIVERY: { label: "Giao thất bại", color: "volcano" },
 };
 
 const OrderStatusTag = ({ status }) => {
-  const statusUpper = status?.toUpperCase();
+  const statusUpper = status?.toUpperCase(); 
   const details = STATUS_DETAILS[statusUpper] || {
-    label: status || "N/A",
-    color: "default",
+    label: status || "N/A", 
+    color: "default", 
   };
   return <Tag color={details.color}>{details.label}</Tag>;
 };
 
-
 const VALID_STATUS_TRANSITIONS = {
-  PENDING: ["APPROVED", "REJECTED"],
+  PENDING: ["APPROVED", "REJECTED"], 
   APPROVED: ["SHIPPING"],
   REJECTED: [], 
   SHIPPING: ["DELIVERED", "FAILED_DELIVERY"], 
-  DELIVERED: [], 
-  FAILED_DELIVERY: ["SHIPPING", "REJECTED"], 
+  DELIVERED: ["COMPLETED"],
+  COMPLETED: [], 
+  FAILED_DELIVERY: ["SHIPPING", "REJECTED"],
 };
 
 function formatDate(isoString) {
   if (!isoString) return "N/A";
   try {
     const date = new Date(isoString);
-    if (isNaN(date.getTime())) return "N/A";
+    if (isNaN(date.getTime())) {
+       const parts = isoString.split(' ');
+       if(parts.length === 2) {
+           const [timePart, datePart] = parts;
+           const [day, month, year] = datePart.split('/').map(Number);
+           const [hour, minute, second] = timePart.split(':').map(Number);
+
+           const customDate = new Date(year, month - 1, day, hour, minute, second);
+           if (!isNaN(customDate.getTime())) {
+               date = customDate;
+           } else {
+                return "Invalid Date Format"; 
+           }
+       } else {
+            return "Invalid Date Format"; 
+       }
+    }
     return date.toLocaleString("vi-VN", {
       hour: "2-digit",
       minute: "2-digit",
@@ -77,13 +98,14 @@ function formatDate(isoString) {
       year: "numeric",
       hour12: false,
     });
-  } catch {
-    return "Invalid Date";
+  } catch (e) {
+      console.error("Error formatting date:", e); 
+      return "Error Formatting Date";
   }
 }
 
 const formatCurrency = (value) => {
-  if (typeof value !== "number" || isNaN(value)) return "N/A";
+  if (typeof value !== "number" || isNaN(value)) return "N/A"; 
   return new Intl.NumberFormat("vi-VN", {
     style: "currency",
     currency: "VND",
@@ -107,64 +129,83 @@ const AdminOrder = () => {
   const [confirmModalState, setConfirmModalState] = useState({
     visible: false,
     record: null,
-    targetStatus: null,
-    isLoading: false,
+    targetStatus: null, 
+    isLoading: false, 
   });
 
+ 
   const [monthlyRevenue, setMonthlyRevenue] = useState(0);
   const [yearlyRevenue, setYearlyRevenue] = useState(0);
 
+ 
   const [shipperModalState, setShipperModalState] = useState({
     visible: false,
     orderId: null,
-    targetStatus: null, 
-    shipperId: null,
-    shipperList: [],
-    loading: false
+    targetStatus: null,
+    shipperId: null, 
+    shipperList: [], 
+    loading: false,
   });
 
+
+  
   const fetchData = useCallback(
     async (showSuccessMessage = false) => {
-      setLoading(true);
+      setLoading(true); 
       if (!loadingAction) {
         setProcessedOrders([]);
         setDisplayedOrders([]);
       }
+
       try {
+      
         const [orderResponse, userResponse] = await Promise.all([
-          apiService.getAllOrders(),
-          apiService.getUsersByRole("CUSTOMER"),
+          apiService.getAllOrders(), 
+          apiService.getUsersByRole("CUSTOMER"), 
         ]);
+
         const fetchedOrders = orderResponse?.data || [];
         const fetchedUsers = userResponse?.data || [];
 
+
+
         if (!Array.isArray(fetchedOrders))
           throw new Error("Dữ liệu đơn hàng trả về không hợp lệ.");
+         if (!Array.isArray(fetchedUsers))
+             console.warn("Dữ liệu người dùng trả về không hợp lệ.");
+
 
         const userMap = new Map(
           fetchedUsers.map((user) => [user.userId, user])
         );
 
+
+
         const finalProcessedData = fetchedOrders.map((order) => {
-          
-          
-          const calculatedGrandTotal = order.totalAmount ?? 0;
+
+
+
 
           return {
             key: order.orderId,
             orderId: order.orderId,
             userId: order.userId,
             userName: userMap.get(order.userId)?.username || "N/A",
+             shipperId: order.shipperId,
+
+
+             shipperName: order.shipperId ? 'Đã gán shipper' : 'Chưa gán',
             formattedCreatedAt: formatDate(order.createdAt),
             paymentMethod: order.paymentMethod || "N/A",
-            status: order.status?.toUpperCase() || "PENDING", 
-            totalAmount: calculatedGrandTotal,
+            status: order.status?.toUpperCase() || "PENDING",
+            totalAmount: order.totalAmount ?? 0,
           };
         });
 
         setProcessedOrders(finalProcessedData);
 
-        
+
+
         const ordersToDisplay =
           statusFilter === "all"
             ? finalProcessedData
@@ -173,12 +214,15 @@ const AdminOrder = () => {
               );
         setDisplayedOrders(ordersToDisplay);
 
+
         if (showSuccessMessage) {
           message.success(
             `Tải lại danh sách ${finalProcessedData.length} đơn hàng thành công.`
           );
         }
       } catch (error) {
+
+        console.error("Error fetching data:", error);
         message.error(
           `Lỗi tải dữ liệu: ${error.message || "Lỗi không xác định"}`
         );
@@ -186,18 +230,23 @@ const AdminOrder = () => {
         setDisplayedOrders([]);
       } finally {
         setLoading(false);
+         setLoadingAction(null);
       }
     },
-    [statusFilter, loadingAction] 
+    [statusFilter, loadingAction]
   );
+
 
   useEffect(() => {
     fetchData();
-  }, [fetchData]); 
+  }, [fetchData]);
+
+
+
 
   useEffect(() => {
-      
-      if (!loading) { 
+
+      if (!loading) {
           const ordersToDisplay =
             statusFilter === "all"
               ? processedOrders
@@ -207,18 +256,91 @@ const AdminOrder = () => {
                 );
           setDisplayedOrders(ordersToDisplay);
         }
-  }, [statusFilter, processedOrders, loading]); 
+  }, [statusFilter, processedOrders, loading]);
+
 
   const onRefresh = useCallback(() => {
-    
-    fetchData(true); 
-  }, [fetchData]); 
+    fetchData(true);
+  }, [fetchData]);
+
+
+  const calculateRevenue = useCallback((orders) => {
+    const now = new Date();
+    const currentMonth = now.getMonth();
+    const currentYear = now.getFullYear();
+
+    let monthlyTotal = 0;
+    let yearlyTotal = 0;
+
+
+    orders.forEach(order => {
+
+        if (order.status === 'DELIVERED' || order.status === 'COMPLETED') {
+
+
+            let orderDate;
+            try {
+                 orderDate = new Date(order.formattedCreatedAt);
+                if (isNaN(orderDate.getTime())) {
+
+                    const parts = order.formattedCreatedAt.split(' ');
+                    if(parts.length === 2) {
+                        const datePart = parts[1];
+                        const [day, month, year] = datePart.split('/').map(Number);
+
+                        orderDate = new Date(year, month - 1, day);
+                    }
+                 }
+
+
+                if (!isNaN(orderDate.getTime())) {
+                    const orderMonth = orderDate.getMonth();
+                    const orderYear = orderDate.getFullYear();
+                    const amount = order.totalAmount || 0;
+
+
+                    if (orderMonth === currentMonth && orderYear === currentYear) {
+                        monthlyTotal += amount;
+                    }
+
+                    if (orderYear === currentYear) {
+                        yearlyTotal += amount;
+                    }
+                } else {
+
+                    console.warn("Could not parse date for revenue calculation for order:", order.orderId, order.formattedCreatedAt);
+                }
+            } catch (e) {
+                 console.error("Error processing date for revenue calculation:", order.orderId, order.formattedCreatedAt, e);
+            }
+        }
+    });
+
+
+    setMonthlyRevenue(monthlyTotal);
+    setYearlyRevenue(yearlyTotal);
+  }, []);
+
+
+  useEffect(() => {
+    if (processedOrders.length > 0) {
+      calculateRevenue(processedOrders);
+    } else {
+
+        setMonthlyRevenue(0);
+        setYearlyRevenue(0);
+    }
+  }, [processedOrders, calculateRevenue]);
+
+
 
   const handleApplyStatus = useCallback(
-    async (orderId, currentStatus, newStatus) => {
+    async (orderId, currentStatus, newStatus, extraData = {}) => {
+
       if (loadingAction === orderId) {
-        return; 
+        return;
       }
+
 
       if (!orderId || !currentStatus || !newStatus) {
          message.error("Thông tin trạng thái hoặc đơn hàng không đầy đủ.");
@@ -228,6 +350,7 @@ const AdminOrder = () => {
       const currentStatusUpper = currentStatus?.toUpperCase();
       const newStatusUpper = newStatus?.toUpperCase();
 
+
       const validTransitions = VALID_STATUS_TRANSITIONS[currentStatusUpper] || [];
 
       if (!validTransitions.includes(newStatusUpper)) {
@@ -235,39 +358,51 @@ const AdminOrder = () => {
           STATUS_DETAILS[currentStatusUpper]?.label || currentStatus
         }' sang '${STATUS_DETAILS[newStatusUpper]?.label || newStatus}'.`;
         message.warning(warningMsg);
-        setConfirmModalState(prev => ({ ...prev, isLoading: false })); 
+
+         setConfirmModalState(prev => ({ ...prev, isLoading: false }));
+         setShipperModalState(prev => ({...prev, loading: false}));
         return;
       }
 
-      setLoadingAction(orderId); 
-      
+      setLoadingAction(orderId);
 
-      
+
       const originalProcessedOrders = [...processedOrders];
-      const updatedProcessedOrders = processedOrders.map((order) =>
-        order.orderId === orderId ? { ...order, status: newStatusUpper } : order
-      );
-      setProcessedOrders(updatedProcessedOrders); 
+      const updatedProcessedOrders = processedOrders.map((order) => {
+           if (order.orderId === orderId) {
+               const updatedOrder = { ...order, status: newStatusUpper, ...extraData };
+
+               if (newStatusUpper === 'SHIPPING' && extraData.shipperId) {
+
+                   const selectedShipper = shipperModalState.shipperList.find(s => s.value === extraData.shipperId);
+                    updatedOrder.shipperName = selectedShipper ? selectedShipper.label : 'Đã gán shipper';
+               } 
+               return updatedOrder;
+           }
+           return order;
+      });
+      setProcessedOrders(updatedProcessedOrders);
 
       try {
+
         await apiService.applyOrderStatus({
           orderId: orderId,
-          status: newStatusUpper 
+          status: newStatusUpper,
+           ...extraData
         });
+
 
         message.success(
           `Đơn hàng #${orderId}: Trạng thái cập nhật thành công thành ${
             STATUS_DETAILS[newStatusUpper]?.label || newStatus
           }.`
         );
-        
-        
-        
-        
-        
+
+
          onRefresh();
 
       } catch (error) {
+
         console.error(`Error applying status ${newStatus} to order ${orderId}:`, error);
         if (error.response) {
           message.error(
@@ -281,134 +416,98 @@ const AdminOrder = () => {
           message.error(`Lỗi cập nhật trạng thái: ${error.message}`);
         }
 
-        
+
         setProcessedOrders(originalProcessedOrders);
-         
 
       } finally {
-        setLoadingAction(null); 
-        setConfirmModalState(prev => ({ ...prev, visible: false, record: null, targetStatus: null, isLoading: false })); 
+        setLoadingAction(null);
+
+        setConfirmModalState(prev => ({ ...prev, visible: false, record: null, targetStatus: null, isLoading: false }));
+         setShipperModalState(prev => ({ ...prev, visible: false, orderId: null, targetStatus: null, shipperId: null, loading: false }));
       }
     },
-    [processedOrders, loadingAction, onRefresh] 
+    [processedOrders, loadingAction, onRefresh, shipperModalState.shipperList]
   );
 
-  const fetchShippers = async () => {
-    try {
-      const response = await apiService.getUsersByRole('SHIPPER');
-      if (response?.data) {
-        setShipperModalState(prev => ({
-          ...prev,
-          shipperList: response.data.map(shipper => ({
-            value: shipper.userId,
-            label: `${shipper.username}${shipper.phoneNumber ? ` - ${shipper.phoneNumber}` : ''}` 
-          }))
-        }));
-      }
-    } catch (error) {
-      console.error("Error fetching shippers:", error);
-      message.error('Không thể tải danh sách shipper');
-      setShipperModalState(prev => ({ ...prev, shipperList: [] })); 
-    }
-  };
+
+
+
+  const fetchShipperListForModal = useCallback(async () => {
+     setShipperModalState(prev => ({...prev, loading: true, shipperList: []}));
+     try {
+
+         const response = await apiService.getUsersByRole('SHIPPER');
+         if (response?.data && Array.isArray(response.data)) {
+             setShipperModalState(prev => ({
+                 ...prev,
+                 shipperList: response.data.map(shipper => ({
+                     value: shipper.userId,
+                     label: `${shipper.fullName || shipper.username}${shipper.phoneNumber ? ` - ${shipper.phoneNumber}` : ''}`
+                 })).filter(shipper => shipper.value != null && shipper.value !== ''),
+                 loading: false,
+             }));
+         } else {
+              console.warn("Invalid data structure received for shippers:", response?.data);
+             message.warning('Không có dữ liệu shipper hợp lệ.');
+             setShipperModalState(prev => ({...prev, shipperList: [], loading: false}));
+         }
+     } catch (error) {
+         console.error("Error fetching shippers for modal:", error);
+         message.error('Không thể tải danh sách người giao hàng.');
+         setShipperModalState(prev => ({...prev, shipperList: [], loading: false}));
+     }
+  }, []);
+
+
+
 
   const showStatusChangeConfirm = useCallback((record, targetStatus) => {
+
     if (!record || !record.orderId || !record.status || !targetStatus) {
       message.error("Lỗi: Thiếu thông tin để hiển thị xác nhận.");
       return;
     }
 
+
     const fullRecord = processedOrders.find(o => o.orderId === record.orderId) || record;
     const targetStatusUpper = targetStatus.toUpperCase();
 
-    
+
+
+
     if (targetStatusUpper === 'SHIPPING') {
       setShipperModalState({
         visible: true,
         orderId: fullRecord.orderId,
-        targetStatus: targetStatusUpper, 
-        shipperId: null, 
-        shipperList: [], 
-        loading: true 
+        targetStatus: targetStatusUpper,
+        shipperId: fullRecord.shipperId,
+        shipperList: [],
+        loading: true
       });
-      fetchShippers().finally(() => setShipperModalState(prev => ({...prev, loading: false}))); 
+
+      fetchShipperListForModal();
     } else {
-      
+
       setConfirmModalState({
         visible: true,
         record: fullRecord,
-        targetStatus: targetStatusUpper, 
+        targetStatus: targetStatusUpper,
         isLoading: false,
       });
     }
-  }, [processedOrders]); 
-
-  const handleShipperModalOk = async () => {
-    const { orderId, targetStatus, shipperId } = shipperModalState;
-    if (!shipperId) {
-      message.warning('Vui lòng chọn shipper');
-      return;
-    }
-    if (!orderId || !targetStatus) {
-       message.error('Thiếu thông tin đơn hàng hoặc trạng thái đích.');
-       return;
-    }
-
-    setShipperModalState(prev => ({ ...prev, loading: true }));
-    setLoadingAction(orderId); 
-
-    try {
-      
-      await apiService.assignOrder(orderId, shipperId);
-      
-      await apiService.applyOrderStatus({
-        orderId: orderId,
-        status: targetStatus 
-      });
-
-      message.success('Đã gán shipper và cập nhật trạng thái đơn hàng thành công');
-      
-      setShipperModalState({
-        visible: false,
-        orderId: null,
-        targetStatus: null,
-        shipperId: null,
-        shipperList: [],
-        loading: false
-      });
-      
-      onRefresh();
-    } catch (error) {
-       console.error("Error assigning shipper or updating status:", error);
-       const msg = error.response?.data?.message || error.message || 'Không thể cập nhật đơn hàng';
-       message.error(msg);
-       
-    } finally {
-       setShipperModalState(prev => ({ ...prev, loading: false })); 
-       setLoadingAction(null); 
-    }
-  };
-
-  const handleShipperModalCancel = () => {
-    setShipperModalState({
-      visible: false,
-      orderId: null,
-      targetStatus: null,
-      shipperId: null,
-      shipperList: [],
-      loading: false
-    });
-  };
+  }, [processedOrders, fetchShipperListForModal]);
 
 
   const handleConfirmModalOk = useCallback(() => {
     const { record, targetStatus } = confirmModalState;
     if (record && targetStatus) {
-      
+       setConfirmModalState(prev => ({ ...prev, isLoading: true }));
+
       handleApplyStatus(record.orderId, record.status, targetStatus);
-      
+
     } else {
       message.error("Lỗi: Không tìm thấy thông tin đơn hàng để xác nhận.");
+
       setConfirmModalState({
         visible: false,
         record: null,
@@ -416,7 +515,7 @@ const AdminOrder = () => {
         isLoading: false,
       });
     }
-  }, [confirmModalState, handleApplyStatus]); 
+  }, [confirmModalState, handleApplyStatus]);
 
 
   const handleConfirmModalCancel = useCallback(() => {
@@ -426,7 +525,50 @@ const AdminOrder = () => {
       targetStatus: null,
       isLoading: false,
     });
-  }, []); 
+  }, []);
+
+
+  const handleShipperModalOk = useCallback(() => {
+      const { orderId, targetStatus, shipperId, loading: shipperListLoading } = shipperModalState;
+
+
+      if (shipperListLoading) return;
+
+
+      if (targetStatus === 'SHIPPING' && !shipperId) {
+          message.warning("Vui lòng chọn người giao hàng.");
+          return;
+      }
+
+       const order = processedOrders.find(o => o.orderId === orderId);
+       if (!order) {
+           message.error("Không tìm thấy thông tin đơn hàng.");
+
+            setShipperModalState(prev => ({ ...prev, visible: false, orderId: null, targetStatus: null, shipperId: null, loading: false }));
+           return;
+       }
+
+
+       setShipperModalState(prev => ({ ...prev, loading: true }));
+
+
+      handleApplyStatus(orderId, order.status, targetStatus, { shipperId: shipperId });
+
+  }, [shipperModalState, processedOrders, handleApplyStatus]);
+
+
+  const handleShipperModalCancel = useCallback(() => {
+    setShipperModalState({
+      visible: false,
+      orderId: null,
+      targetStatus: null,
+      shipperId: null,
+      shipperList: [],
+      loading: false,
+    });
+  }, []);
+
+
 
   const handleSearch = (selectedKeys, confirm, dataIndex) => {
     confirm();
@@ -437,12 +579,13 @@ const AdminOrder = () => {
   const handleReset = (clearFilters, confirm) => {
     clearFilters();
     setSearchText("");
+     setSearchedColumn("");
     confirm();
-    setSearchedColumn("");
   };
 
 
-  const getColumnSearchProps = (dataIndex) => ({
+
+  const getColumnSearchProps = useCallback((dataIndex) => ({
     filterDropdown: ({
       setSelectedKeys,
       selectedKeys,
@@ -450,7 +593,7 @@ const AdminOrder = () => {
       clearFilters,
       close,
     }) => (
-      <div style={{ padding: 8 }} onKeyDown={(e) => e.stopPropagation()}>
+      <div style={{ padding: 8 }} onKeyDown={(e) => e.stopPropagation()}> {/* Prevent modal close on keydown */}
         <Input
           ref={searchInput}
           placeholder={`Tìm ${dataIndex}`}
@@ -487,19 +630,23 @@ const AdminOrder = () => {
     filterIcon: (filtered) => (
       <SearchOutlined style={{ color: filtered ? "#1677ff" : undefined }} />
     ),
+
     onFilter: (value, record) => {
         const recordValue = record[dataIndex];
         if (recordValue === null || typeof recordValue === 'undefined') {
             return false;
         }
-         
+
+
         return recordValue.toString().toLowerCase().includes(value.toLowerCase());
     },
     onFilterDropdownOpenChange: (visible) => {
+
       if (visible) {
         setTimeout(() => searchInput.current?.select(), 100);
       }
     },
+
     render: (text) =>
       searchedColumn === dataIndex ? (
         <Highlighter
@@ -511,16 +658,19 @@ const AdminOrder = () => {
       ) : (
         text
       ),
-  });
+  }, [searchText, searchedColumn]));
 
-  
+
   const statusOptions = useMemo(() => [
     { value: "all", label: "Tất cả trạng thái" },
+
     ...Object.entries(STATUS_DETAILS).map(([key, { label }]) => ({
       value: key.toLowerCase(),
       label,
     })),
-  ], []); 
+  ], []);
+
+
 
   const columns = useMemo(() => [
     {
@@ -541,11 +691,29 @@ const AdminOrder = () => {
       ellipsis: true,
       ...getColumnSearchProps("userName"),
     },
+     {
+        title: "Người giao hàng",
+        dataIndex: "shipperName",
+        key: "shipperName",
+        width: 150,
+        ellipsis: true,
+        render: (text) => text || 'Chưa gán',
+        ...getColumnSearchProps("shipperName"),
+     },
     {
       title: "Ngày đặt",
       dataIndex: "formattedCreatedAt",
       key: "formattedCreatedAt",
       width: 160,
+       sorter: (a, b) => {
+           try {
+               const dateA = new Date(a.formattedCreatedAt);
+               const dateB = new Date(b.formattedCreatedAt);
+               return dateA.getTime() - dateB.getTime();
+           } catch {
+               return 0;
+           }
+       },
     },
     {
       title: "Tổng tiền",
@@ -561,10 +729,12 @@ const AdminOrder = () => {
       dataIndex: "paymentMethod",
       key: "paymentMethod",
       width: 120,
+
       filters: [
         { text: "Tiền mặt (CASH)", value: "CASH" },
         { text: "VNPAY", value: "VNPAY" },
       ],
+
       onFilter: (value, record) =>
         record.paymentMethod?.toUpperCase() === value.toUpperCase(),
     },
@@ -574,12 +744,14 @@ const AdminOrder = () => {
       key: "status",
       width: 120,
       render: (status) => <OrderStatusTag status={status} />,
+
       filters: Object.entries(STATUS_DETAILS).map(([key, { label }]) => ({
            text: label,
-           value: key.toUpperCase(), 
+           value: key.toUpperCase(),
       })),
+
       onFilter: (value, record) => record.status === value,
-       filterMultiple: true, 
+      filterMultiple: true,
     },
     {
       title: "Hành động",
@@ -587,156 +759,107 @@ const AdminOrder = () => {
       width: 100,
       align: "center",
       fixed: "right",
+
       render: (_, record) => {
-        
+
         const currentRecord = processedOrders.find(o => o.key === record.key) || record;
         const currentStatusUpper = currentRecord.status;
+
+
         const isLoadingThisRow = loadingAction === currentRecord.orderId;
 
-         
+        const isAnyOtherRowLoading = !!loadingAction && loadingAction !== currentRecord.orderId;
+
+
         const possibleNextStatuses =
           VALID_STATUS_TRANSITIONS[currentStatusUpper] || [];
 
-         
-         
-         
-        if (possibleNextStatuses.length === 0) {
-          return (
-            <Tooltip title="Xem chi tiết đơn hàng">
-              <Button
-                icon={<EyeOutlined />}
-                size="small"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setDetailsModalContent({
-                    visible: true,
-                    orderId: currentRecord.orderId,
-                  });
-                }}
-                
-                disabled={!!loadingAction && loadingAction !== currentRecord.orderId}
-              />
-            </Tooltip>
-          );
-        }
 
-         
-        const menuItems = possibleNextStatuses.map((targetStatusKey) => ({
-          key: targetStatusKey,
-          label: `Chuyển sang "${
-            STATUS_DETAILS[targetStatusKey]?.label || targetStatusKey
-          }"`,
-          danger: ["REJECTED", "FAILED_DELIVERY"].includes(targetStatusKey), 
-          onClick: (e) => {
-            e.domEvent.stopPropagation(); 
-            showStatusChangeConfirm(currentRecord, targetStatusKey); 
-          },
-        }));
+        const showStatusChangeDropdown = currentStatusUpper === 'PENDING';
 
+
+
+
+        const menuItems = possibleNextStatuses
+
+           .map((targetStatusKey) => ({
+             key: targetStatusKey,
+             label: `Chuyển sang "${
+               STATUS_DETAILS[targetStatusKey]?.label || targetStatusKey
+             }"`,
+             danger: ["REJECTED", "FAILED_DELIVERY"].includes(targetStatusKey),
+             onClick: (e) => {
+               e.domEvent.stopPropagation();
+               showStatusChangeConfirm(currentRecord, targetStatusKey);
+             },
+           }));
         return (
           <Space size="small">
+              {/* Button to view order details */}
               <Tooltip title="Xem chi tiết đơn hàng">
                  <Button
                     icon={<EyeOutlined />}
                     size="small"
+
                      onClick={(e) => {
                         e.stopPropagation();
+
                         setDetailsModalContent({
                            visible: true,
                            orderId: currentRecord.orderId,
                         });
                      }}
-                    disabled={!!loadingAction} 
+
+                    disabled={!!loadingAction}
                  />
               </Tooltip>
-               <Dropdown menu={{ items: menuItems }} trigger={["click"]} disabled={isLoadingThisRow || (!!loadingAction && loadingAction !== currentRecord.orderId)}>
-                 {/* Use Space to keep button and dropdown trigger together if needed,
-                     or just use Button as the trigger as before */}
-                 <Tooltip title="Thay đổi trạng thái">
-                   <Button
-                     icon={<EditOutlined />}
-                     size="small"
-                     onClick={(e) => e.stopPropagation()} 
-                     loading={isLoadingThisRow} 
-                     disabled={!!loadingAction && loadingAction !== currentRecord.orderId} 
-                   />
-                 </Tooltip>
-               </Dropdown>
+
+               {/* Status Change Dropdown - Only show if allowed by Requirement 1 */}
+               {/* This dropdown is primarily for PENDING state transitions (APPROVED, REJECTED)
+                   or potentially APPROVED state transitions (like SHIPPING) if implemented here */}
+               {showStatusChangeDropdown && (
+                  <Tooltip title="Thay đổi trạng thái">
+                     <Dropdown
+
+                        menu={{ items: menuItems }}
+
+                        trigger={["click"]}
+
+                        disabled={isLoadingThisRow || isAnyOtherRowLoading || menuItems.length === 0}
+                     >
+                       {/* Button that triggers the dropdown */}
+                       <Button
+                         icon={<EditOutlined />}
+                         size="small"
+
+                         onClick={(e) => e.stopPropagation()}
+
+                         loading={isLoadingThisRow}
+
+                         disabled={isLoadingThisRow || isAnyOtherRowLoading}
+                       />
+                     </Dropdown>
+                  </Tooltip>
+               )}
           </Space>
         );
       },
     },
-  ], [processedOrders, loadingAction, getColumnSearchProps, showStatusChangeConfirm]); 
-
-  
-   const calculateRevenue = useCallback((orders) => {
-    const now = new Date();
-    const currentMonth = now.getMonth(); 
-    const currentYear = now.getFullYear();
-
-    let monthlyTotal = 0;
-    let yearlyTotal = 0;
-
-    orders.forEach(order => {
-        
-        const parts = order.formattedCreatedAt.split(' ');
-        if (parts.length >= 2) {
-            const [, dateStr] = parts;
-            const dateParts = dateStr.split('/');
-            if (dateParts.length === 3) {
-                const [day, month, year] = dateParts.map(Number);
-                 
-                const orderDate = new Date(year, month - 1, day);
-
-                
-                if (!isNaN(orderDate.getTime())) {
-                    const orderMonth = orderDate.getMonth(); 
-                    const orderYear = orderDate.getFullYear();
-                    const amount = order.totalAmount || 0; 
-
-                    if (orderMonth === currentMonth && orderYear === currentYear) {
-                        monthlyTotal += amount;
-                    }
-                    if (orderYear === currentYear) {
-                        yearlyTotal += amount;
-                    }
-                } else {
-                    console.warn("Could not parse date for order:", order.orderId, order.formattedCreatedAt);
-                }
-            } else {
-                 console.warn("Unexpected date format for order:", order.orderId, order.formattedCreatedAt);
-            }
-        } else {
-             console.warn("Unexpected formattedCreatedAt format for order:", order.orderId, order.formattedCreatedAt);
-        }
-    });
+  ], [processedOrders, loadingAction, getColumnSearchProps, showStatusChangeConfirm]);
 
 
-    setMonthlyRevenue(monthlyTotal);
-    setYearlyRevenue(yearlyTotal);
-  }, []);
-
-
-  useEffect(() => {
-    if (processedOrders.length > 0) {
-      calculateRevenue(processedOrders);
-    } else {
-        
-        setMonthlyRevenue(0);
-        setYearlyRevenue(0);
-    }
-  }, [processedOrders, calculateRevenue]); 
 
   return (
     <div>
+        {/* --- Dashboard Revenue Cards --- */}
       <Row gutter={[16, 16]} style={{ marginBottom: 24 }}>
-        <Col xs={24} sm={12}> 
-          <Card bordered={false} style={{ background: '#f0f5ff' }}>
+        <Col xs={24} sm={12}> {/* Responsive column width */}
+          <Card bordered={false} style={{ background: '#f0f5ff' }}> {/* Custom background color */}
             <Statistic
               title={
                 <Space>
-                  <CalendarOutlined />
-                  <span>Doanh thu tháng {new Date().getMonth() + 1}/{new Date().getFullYear()}</span>
+                  <CalendarOutlined /> {/* Icon */}
+                  <span>Doanh thu tháng {new Date().getMonth() + 1}/{new Date().getFullYear()}</span> {/* Display current month/year */}
                 </Space>
               }
               value={monthlyRevenue}
@@ -746,13 +869,13 @@ const AdminOrder = () => {
             />
           </Card>
         </Col>
-        <Col xs={24} sm={12}>
-          <Card bordered={false} style={{ background: '#f6ffed' }}>
+        <Col xs={24} sm={12}> {/* Responsive column width */}
+          <Card bordered={false} style={{ background: '#f6ffed' }}> {/* Custom background color */}
             <Statistic
               title={
                 <Space>
-                  <CalendarOutlined />
-                  <span>Doanh thu năm {new Date().getFullYear()}</span>
+                  <CalendarOutlined /> {/* Icon */}
+                  <span>Doanh thu năm {new Date().getFullYear()}</span> {/* Display current year */}
                 </Space>
               }
               value={yearlyRevenue}
@@ -764,41 +887,47 @@ const AdminOrder = () => {
         </Col>
       </Row>
 
-      <Space style={{ marginBottom: 16, display: "flex", justifyContent: "space-between", flexWrap: 'wrap' }}> {/* Add flexWrap */}
+        {/* --- Filter and Refresh Controls --- */}
+      <Space style={{ marginBottom: 16, display: "flex", justifyContent: "space-between", flexWrap: 'wrap' }}> {/* Use flexbox for layout, allow wrapping */}
+        {/* Status filter dropdown */}
         <Select
           value={statusFilter}
           style={{ width: 200 }}
           onChange={(value) => setStatusFilter(value)}
           options={statusOptions}
-          disabled={loading} 
+          disabled={loading}
         />
+         {/* Global search input could go here if needed, but column search is implemented */}
+        {/* Button to refresh data */}
         <Button
           onClick={onRefresh}
-          loading={loading && !loadingAction} 
-          disabled={!!loadingAction} 
+          loading={loading && !loadingAction}
+          disabled={!!loadingAction}
         >
-          {loading && !loadingAction ? "Đang tải..." : "Tải Lại DS"}
+          {loading && !loadingAction ? "Đang tải..." : "Tải Lại DS"} {/* Button text */}
         </Button>
       </Space>
 
+      {/* --- Order Details Modal --- */}
       <Modal
         title={`Chi Tiết Đơn Hàng #${detailsModalContent.orderId || ""}`}
         open={detailsModalContent.visible}
         onCancel={() => setDetailsModalContent({ visible: false, orderId: null })}
         maskClosable={true}
         footer={null}
-        destroyOnClose={true} 
+        destroyOnClose={true}
         width="80vw"
         style={{ top: 20 }}
         bodyStyle={{ maxHeight: "85vh", overflowY: "auto" }}
       >
+        {/* Render OrderDetails component only when modal is visible and orderId is set */}
         {detailsModalContent.visible && detailsModalContent.orderId && (
           <OrderDetails
             orderId={detailsModalContent.orderId}
-            handleRefreshParent={onRefresh} 
+            handleRefreshParent={onRefresh}
           />
         )}
-        
+         {/* Fallback loading spinner if modal is visible but orderId is missing */}
         {!detailsModalContent.orderId && detailsModalContent.visible && (
              <div style={{ textAlign: "center", padding: "50px" }}>
                <Spin size="large" />
@@ -807,6 +936,7 @@ const AdminOrder = () => {
          )}
       </Modal>
 
+      {/* --- Standard Status Confirmation Modal (for non-SHIPPING changes or changes NOT handled by shipper modal) --- */}
       <Modal
         title="Xác nhận thay đổi trạng thái?"
         open={confirmModalState.visible}
@@ -815,70 +945,101 @@ const AdminOrder = () => {
         okText="Xác nhận"
         cancelText="Hủy"
         confirmLoading={confirmModalState.isLoading}
-        maskClosable={false} 
-         destroyOnClose={true} 
+        maskClosable={false}
+         destroyOnClose={true}
       >
+        {/* Display confirmation message if record and target status are available */}
         {confirmModalState.record && confirmModalState.targetStatus ? (
           <div>
              <p>
               Bạn có chắc chắn muốn chuyển trạng thái của Đơn hàng{" "}
               <Text strong>#{confirmModalState.record.orderId}</Text> từ{" "}
               <Text strong>
-                <OrderStatusTag status={confirmModalState.record.status} />
+                <OrderStatusTag status={confirmModalState.record.status} /> {/* Display current status */}
               </Text>{" "}
               sang{" "}
               <Text strong>
-                <OrderStatusTag status={confirmModalState.targetStatus} />
+                <OrderStatusTag status={confirmModalState.targetStatus} /> {/* Display target status */}
               </Text>
               ?
             </p>
           </div>
         ) : (
-          <p>Đang tải thông tin xác nhận...</p> 
+
+          <p>Đang tải thông tin xác nhận...</p>
         )}
       </Modal>
 
-      <Modal
-        title="Chọn shipper giao hàng"
-        open={shipperModalState.visible}
-        onOk={handleShipperModalOk}
-        onCancel={handleShipperModalCancel}
-        confirmLoading={shipperModalState.loading}
-        okText="Xác nhận"
-        cancelText="Hủy"
-        maskClosable={!shipperModalState.loading}
-        destroyOnClose={true} 
-      >
-         <Spin spinning={shipperModalState.loading && shipperModalState.shipperList.length === 0}>
-            <div style={{ marginBottom: 16 }}>
-              <p>Vui lòng chọn shipper để giao đơn hàng <Text strong>#{shipperModalState.orderId}</Text>:</p>
-              <Select
-                style={{ width: '100%' }}
-                placeholder={shipperModalState.loading && shipperModalState.shipperList.length === 0 ? 'Đang tải danh sách shipper...' : "Chọn shipper"}
-                options={shipperModalState.shipperList}
-                value={shipperModalState.shipperId}
-                onChange={(value) => setShipperModalState(prev => ({ ...prev, shipperId: value }))}
-                disabled={shipperModalState.loading} 
-                showSearch 
-                optionFilterProp="children"
-                 filterOption={(input, option) =>
-                    (option?.label ?? '').toLowerCase().includes(input.toLowerCase())
-                 }
-              />
-              {shipperModalState.loading && shipperModalState.shipperList.length > 0 && (
-                 <Alert message="Đang xử lý yêu cầu..." type="info" showIcon style={{ marginTop: 16 }} />
-              )}
-               {!shipperModalState.loading && shipperModalState.shipperList.length === 0 && (
-                    <Alert message="Không tìm thấy shipper nào." type="warning" showIcon style={{ marginTop: 16 }} />
-               )}
-            </div>
-         </Spin>
-      </Modal>
+        {/* --- Shipper Assignment Modal (for SHIPPING status) --- */}
+        <Modal
+            title="Chọn Người Giao Hàng"
+            open={shipperModalState.visible}
+            onOk={handleShipperModalOk}
+            onCancel={handleShipperModalCancel}
+            okText="Xác nhận"
+            cancelText="Hủy"
+            confirmLoading={shipperModalState.loading && shipperModalState.targetStatus === 'SHIPPING'}
+            maskClosable={!shipperModalState.loading}
+            destroyOnClose={true}
+        >
+            {/* Display message/content based on state */}
+            {shipperModalState.loading && shipperModalState.shipperList.length === 0 ? (
+                <div style={{ textAlign: 'center', padding: '20px' }}>
+                    <Spin />
+                    <p>Đang tải danh sách người giao hàng...</p>
+                </div>
+            ) : shipperModalState.targetStatus === 'SHIPPING' && shipperModalState.orderId ? (
+                <Space direction="vertical" style={{ width: '100%' }}>
+                     <Alert
+                         message="Xác nhận gán người giao hàng"
+                         description={`Chọn người giao hàng cho Đơn hàng #${shipperModalState.orderId} để chuyển trạng thái sang "${STATUS_DETAILS['SHIPPING'].label}".`}
+                         type="info"
+                         showIcon
+
+                     />
+                     <Text strong>Chọn Người Giao Hàng:</Text>
+                     <Select
+                         showSearch
+                         placeholder="Tìm và chọn người giao hàng"
+                         optionFilterProp="children"
+                         filterOption={(input, option) =>
+                             (option?.label ?? '').toLowerCase().includes(input.toLowerCase())
+                         }
+                         value={shipperModalState.shipperId}
+                         onChange={(value) => setShipperModalState(prev => ({...prev, shipperId: value}))}
+                         style={{ width: '100%' }}
+                         loading={shipperModalState.loading && shipperModalState.shipperList.length === 0}
+                         disabled={shipperModalState.loading && shipperModalState.shipperList.length === 0}
+                     >
+                         {/* Map shipperList to Select Options */}
+                         {shipperModalState.shipperList.map(shipper => (
+                             <Option key={shipper.value} value={shipper.value} label={shipper.label}>
+                                 <Space>
+                                     <UserOutlined /> {/* Icon */}
+                                     {shipper.label} {/* Display shipper label */}
+                                 </Space>
+                             </Option>
+                         ))}
+                     </Select>
+                     {/* Optional: Show message if no shippers found after loading */}
+                      {shipperModalState.shipperList.length === 0 && !shipperModalState.loading && (
+                           <Alert message="Không tìm thấy người giao hàng nào khả dụng." type="warning" showIcon />
+                      )}
+                </Space>
+            ) : (
+
+                <p>Lỗi hiển thị thông tin người giao hàng.</p>
+            )}
+        </Modal>
+
+
+      {/* --- Main Order Table --- */}
       <Table
         columns={columns}
         dataSource={displayedOrders}
-        rowKey="key" 
-        loading={loading || !!loadingAction} 
+        rowKey="key"
+        loading={loading || !!loadingAction}
+
         pagination={{
           pageSize: 10,
           showSizeChanger: true,
@@ -887,27 +1048,37 @@ const AdminOrder = () => {
           showTotal: (total, range) =>
             `${range[0]}-${range[1]} trên ${total} mục`,
         }}
-        scroll={{ x: 1200 }} 
+        scroll={{ x: 1200 }}
         bordered
         size="middle"
+
         onRow={(record) => ({
           onClick: (event) => {
+
              const currentRecord = processedOrders.find(o => o.key === record.key) || record;
-            const isInteractiveElement = event.target.closest('button, a, input, select, .ant-dropdown-trigger, .ant-dropdown-menu-item');
+
+
+            const isInteractiveElement = event.target.closest('button, a, input, select, .ant-dropdown-trigger, .ant-dropdown-menu-item, .ant-select-selector');
+
+
             if (!isInteractiveElement && loadingAction !== currentRecord.orderId) {
+
               setDetailsModalContent({
                 visible: true,
                 orderId: currentRecord.orderId,
               });
             }
           },
+
           style: {
+
             cursor:
               loadingAction === record.orderId
                 ? "progress"
-                : (loadingAction ? "not-allowed" : "pointer"), 
+                : (loadingAction ? "not-allowed" : "pointer"),
           },
         })}
+
         rowClassName={(record) => (loadingAction === record.orderId ? "table-row-action-loading" : "")}
       />
     </div>

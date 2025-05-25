@@ -234,7 +234,7 @@ const apiService = {
   addToCart: (data) => apiInstance.post("/cart-item/add", data),
   updateCartItem: (data) => apiInstance.put("/cart-item/update", data),
   removeCartItem: (data) => apiInstance.post(`/cart-item/remove`, data),
-  clearCart: () => apiInstance.delete("/cart-item/clear"),
+  clearCart: () => apiInstance.post("/cart-item/remove-all"),
 
 
   getProvinces: () => apiInstance.get("/location/province"),
@@ -252,7 +252,7 @@ const apiService = {
   approveOrder: (orderId) => apiInstance.post(`/order/approve/${orderId}`),
   getAllOrders: () => apiInstance.get('/order/view/all'),
 applyOrderStatus: (data) => apiInstance.post('/order/apply-status', data),
-
+  getShipperDeliveryOrder: (data) => apiInstance.get(`/order/shipper-info?orderId=${data}`),
 
   getUnassignedOrders: () => apiInstance.get("/order/unassigned"),
   getShipperOrders: (shipperId) => apiInstance.get(`/order/shipper/${shipperId}`),

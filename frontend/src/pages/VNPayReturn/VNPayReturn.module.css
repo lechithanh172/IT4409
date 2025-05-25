@@ -1,216 +1,284 @@
+/* src/pages/VNPayReturn/VNPayReturn.module.css */
 
+/* General Variables (Keep consistent with other modules) */
+:root {
+  --primary-accent: #00bcd4; /* Cyan */
+  --secondary-color: #607d8b; /* Blue Grey */
+  --success-color: #4caf50; /* Green */
+  --danger-color: #ef5350; /* Soft Red */
+  --warning-color: #ff9800; /* Orange */
+  --info-color: #2196f3; /* Blue */
+  --background-light: #f8f9fa;
+  --surface-background: #ffffff;
+  --text-dark: #212121;
+  --text-medium: #757575;
+  --border-light: #e0f0f4; /* Very light blue/grey */
+  --border-medium: #b2ebf2; /* Slightly darker blue */
+  --shadow-soft: 0 2px 8px rgba(0, 0, 0, 0.1);
+  --shadow-medium: 0 4px 12px rgba(0, 0, 0, 0.1);
+  --border-radius-base: 12px;
+  --border-radius-sm: 8px;
+  --spacing-xs: 8px;
+  --spacing-sm: 12px;
+  --spacing-md: 24px;
+  --spacing-lg: 32px;
+}
 
+/* Main Page Container */
 .vnPayReturnPage {
-    max-width: 700px; 
-    margin: 40px auto; 
-    padding: 30px;
-    background-color: #ffffff; 
-    border-radius: 12px; 
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1); 
-    text-align: center; 
-    min-height: 450px; 
-    display: flex; 
-    align-items: center;
-    justify-content: center;
-    font-family: 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; 
-    color: #333; 
+  display: flex;
+  justify-content: center; /* Center content horizontally */
+  align-items: center; /* Center content vertically (if container height allows) */
+  min-height: calc(100vh - 64px - var(--spacing-md) * 2); /* Adjust based on header/footer */
+  padding: var(--spacing-md);
+  background-color: var(--background-light);
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  box-sizing: border-box;
 }
 
-.loadingContainer,
-.resultContainer {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    padding: 20px;
-    width: 100%; 
+/* Container for Result States (Success, Failed, Unknown, Processing) */
+.resultContainer,
+.loadingContainer {
+  background: var(--surface-background);
+  border-radius: var(--border-radius-base);
+  box-shadow: var(--shadow-medium);
+  padding: var(--spacing-lg); /* Generous padding */
+  text-align: center; /* Center text content */
+  max-width: 600px; /* Max width for readability */
+  width: 100%; /* Ensure it takes available width up to max-width */
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* Center flex items vertically */
+  gap: var(--spacing-sm); /* Space between elements */
 }
 
+/* State-Specific Styling */
+.resultContainer.success {
+  border-top: 6px solid var(--success-color); /* Green border top */
+}
+
+.resultContainer.failed {
+  border-top: 6px solid var(--danger-color); /* Red border top */
+}
+
+/* Icon Styling */
+.icon {
+  font-size: 50px; /* Large icon */
+  margin-bottom: var(--spacing-sm); /* Space below icon */
+}
+
+.resultContainer.success .icon {
+  color: var(--success-color); /* Green icon for success */
+}
+
+.resultContainer.failed .icon {
+  color: var(--danger-color); /* Red icon for failed */
+}
+/* Default/Unknown state icon */
+.resultContainer .icon[data-icon="exclamation-triangle"] {
+    color: var(--warning-color); /* Orange for warning icon */
+}
+
+
+/* Headings */
+.resultContainer h2,
+.loadingContainer h2 {
+  font-size: 24px;
+  font-weight: 600;
+  color: var(--text-dark);
+  margin: 0 0 var(--spacing-xs) 0; /* Space below title */
+}
+
+/* Paragraphs */
+.resultContainer p,
 .loadingContainer p {
-    margin-top: 20px;
-    font-size: 1.15em;
-    color: #555;
+  font-size: 16px;
+  color: var(--text-medium); /* Medium grey text */
+  margin: var(--spacing-xs) 0;
+  line-height: 1.5;
+}
+
+/* Specific Error Message within Failed State */
+.errorMessage {
+    color: var(--danger-color); /* Make specific error message red */
     font-weight: 500;
 }
 
-.resultContainer .icon {
-    font-size: 70px; 
-    margin-bottom: 25px; 
-}
 
-.resultContainer h2 {
-    margin-top: 0; 
-    margin-bottom: 15px;
-    font-size: 2em; 
-    font-weight: 700;
-}
-
-.resultContainer p {
-    margin-bottom: 12px;
-    font-size: 1.05em;
-    line-height: 1.6; 
-    color: #555;
-}
-
-
-.success .icon { color: #28a745;  }
-.success h2 { color: #28a745; }
-
-.failed .icon { color: #dc3545;  }
-.failed h2 { color: #dc3545; }
-.failed .errorMessage {
-    color: #dc3545;
-    font-weight: 600;
-    margin-top: 15px;
-    margin-bottom: 20px;
-    padding: 15px;
-    background-color: #f8d7da; 
-    border: 1px solid #f5c6cb;
-    border-radius: 8px;
-    width: 90%; 
-    margin-left: auto;
-    margin-right: auto;
-}
-
-.warning .icon { color: #ffc107;  }
-.warning h2 { color: #ffc107; }
-.warning p { color: #6c757d; } 
-
-
-
+/* Transaction Details Block (in Success State) */
 .transactionDetails {
-    margin-top: 30px;
-    padding: 20px;
-    background-color: #f8f9fa; 
-    border-radius: 8px;
-    border: 1px solid #e9ecef;
-    width: 100%;
-    text-align: left; 
+    background-color: #e0f2f7; /* Light blue background */
+    border: 1px dashed var(--primary-accent); /* Dashed accent border */
+    border-radius: var(--border-radius-sm);
+    padding: var(--spacing-sm);
+    margin-top: var(--spacing-sm);
+    width: 100%; /* Take full width of container */
+    text-align: left; /* Align text left within details block */
 }
 
 .transactionDetails h4 {
-    margin-top: 0;
-    margin-bottom: 15px;
-    font-size: 1.2em;
+    font-size: 16px;
     font-weight: 600;
-    color: #495057;
-    border-bottom: 1px solid #dee2e6;
-    padding-bottom: 10px;
+    color: var(--text-dark);
+    margin: 0 0 var(--spacing-xs) 0;
+    padding-bottom: var(--spacing-xs);
+    border-bottom: 1px solid var(--border-light);
 }
 
 .transactionDetails p {
-    margin-bottom: 8px; 
-    font-size: 1em;
-    color: #495057;
+    font-size: 14px;
+    color: var(--text-dark);
+    margin: 6px 0;
+    line-height: 1.4;
 }
-
 .transactionDetails strong {
-    color: #007bff; 
-    font-weight: 600;
+    color: var(--text-dark); /* Bold text darker */
 }
 
 
-
+/* Action Buttons Container */
 .actions {
-    margin-top: 40px; 
-    display: flex;
-    gap: 20px; 
-    flex-wrap: wrap; 
+  display: flex;
+  gap: var(--spacing-sm); /* Space between buttons */
+  margin-top: var(--spacing-md); /* Space above buttons */
+  flex-wrap: wrap; /* Wrap buttons if needed */
+  justify-content: center; /* Center buttons */
+}
+
+/* Button Component Styling */
+.actions a .ant-btn { /* Assuming Link contains your Button component wrapping Ant Design Button */
+   /* Rely on your Button component's styling for variant="primary" and "secondary" */
+   /* Add any specific overrides here if needed, e.g., padding */
+    padding: 8px 16px !important; /* Example padding */
+    font-size: 15px !important;
+    display: inline-flex !important;
+    align-items: center !important;
     justify-content: center;
+    gap: var(--spacing-xs);
+    border-radius: 20px !important; /* Rounded buttons */
 }
 
 
-.actions a {
-    text-decoration: none; 
+/* Spinner in loading state */
+.loadingContainer .ant-spin {
+    margin-bottom: var(--spacing-sm);
 }
 
-
-
-/*
-.actions button {
-    padding: 12px 25px;
-    font-size: 1.1em;
-    border: none;
-    border-radius: 6px;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-}
-
-.actions button.primary {
-    background-color: #007bff;
-    color: white;
-}
-.actions button.primary:hover {
-    background-color: #0056b3;
-}
-
-.actions button.secondary {
-    background-color: #6c757d;
-    color: white;
-}
-.actions button.secondary:hover {
-    background-color: #5a6268;
-}
-*/
-
-
-
-@media (max-width: 768px) {
+/* Responsive Design */
+@media (max-width: 768px) { /* Tablets and smaller phones */
     .vnPayReturnPage {
-        margin: 20px 15px;
-        padding: 20px;
+        padding: var(--spacing-sm);
+        /* Disable align-items: center vertically if content is tall */
+        align-items: flex-start;
+        min-height: auto; /* Let height be determined by content */
     }
-    .resultContainer .icon {
-        font-size: 60px;
-        margin-bottom: 20px;
+
+    .resultContainer,
+    .loadingContainer {
+        padding: var(--spacing-md) var(--spacing-sm); /* Adjust padding */
+        gap: var(--spacing-sm);
     }
-    .resultContainer h2 {
-        font-size: 1.8em;
+
+    .icon {
+        font-size: 40px;
+        margin-bottom: var(--spacing-xs);
     }
-    .resultContainer p {
-        font-size: 1em;
+
+    .resultContainer h2,
+    .loadingContainer h2 {
+        font-size: 20px;
     }
+
+    .resultContainer p,
+    .loadingContainer p {
+        font-size: 14px;
+        margin: 4px 0;
+    }
+    .errorMessage {
+        font-size: 14px;
+    }
+
+
+    .transactionDetails {
+         padding: var(--spacing-xs);
+         margin-top: var(--spacing-sm);
+    }
+
+    .transactionDetails h4 {
+        font-size: 15px;
+        margin-bottom: var(--spacing-xs);
+        padding-bottom: 6px;
+    }
+
+    .transactionDetails p {
+        font-size: 13px;
+        margin: 4px 0;
+    }
+
+
     .actions {
-        flex-direction: column; 
-        gap: 15px;
+        flex-direction: column; /* Stack buttons */
+        gap: var(--spacing-xs);
+        margin-top: var(--spacing-md);
+        width: 100%; /* Make action container full width */
     }
-    
-    .actions button,
-    .actions a button {
-        width: 100%;
+
+    .actions a {
+        width: 100%; /* Make button links full width */
     }
-     .failed .errorMessage {
-          width: 100%;
-          padding: 10px;
-     }
+    .actions a .ant-btn {
+         width: 100% !important; /* Ensure button takes full width */
+         padding: 10px 16px !important; /* Adjust button padding */
+         font-size: 14px !important;
+    }
 }
 
-@media (max-width: 480px) {
+@media (max-width: 480px) { /* Smaller phones */
      .vnPayReturnPage {
-         margin: 15px 10px;
-         padding: 15px;
+         padding: var(--spacing-xs);
      }
-     .resultContainer .icon {
-         font-size: 50px;
-         margin-bottom: 15px;
+
+     .resultContainer,
+     .loadingContainer {
+         padding: var(--spacing-sm) var(--spacing-xs);
+         gap: var(--spacing-xs);
      }
-     .resultContainer h2 {
-         font-size: 1.5em;
+     .icon {
+         font-size: 35px;
+         margin-bottom: var(--spacing-xs);
      }
-     .resultContainer p {
-         font-size: 0.95em;
+     .resultContainer h2,
+     .loadingContainer h2 {
+         font-size: 18px;
+     }
+     .resultContainer p,
+     .loadingContainer p {
+         font-size: 13px;
+         margin: 3px 0;
+     }
+     .errorMessage {
+         font-size: 13px;
      }
      .transactionDetails {
-         padding: 15px;
+         padding: var(--spacing-xs);
+         margin-top: var(--spacing-sm);
      }
-      .transactionDetails h4 {
-          font-size: 1.1em;
-      }
-      .transactionDetails p {
-          font-size: 0.9em;
-      }
+     .transactionDetails h4 {
+         font-size: 14px;
+         margin-bottom: var(--spacing-xs);
+     }
+     .transactionDetails p {
+         font-size: 12px;
+         margin: 3px 0;
+     }
+
      .actions {
-         gap: 10px;
-         margin-top: 30px;
+         gap: var(--spacing-xs);
+         margin-top: var(--spacing-md);
+     }
+
+     .actions a .ant-btn {
+         padding: 8px 12px !important;
+         font-size: 13px !important;
      }
 }

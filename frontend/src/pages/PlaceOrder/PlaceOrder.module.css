@@ -1,125 +1,131 @@
+/* src/pages/PlaceOrder/PlaceOrder.module.css */
 
-
-
+/* General Variables (Optional, but good for consistency) */
 :root {
-  --primary-color: #0d6efd;
-  --primary-color-dark: #0b5ed7;
-  --primary-color-light: #cfe2ff;
-  --secondary-color: #6c757d;
-  --secondary-color-dark: #5c636a;
-  --success-color: #198754;
-  --success-color-dark: #146c43;
-  --danger-color: #dc3545;
-  --danger-color-dark: #bb2d3b;
-  --danger-color-light: #f8d7da;
-  --warning-color: #ffc107;
-  --info-color: #0dcaf0;
-  --text-color: #212529;
-  --text-muted: #6c757d;
-  --border-color: #dee2e6;
-  --bg-light: #f8f9fa;
-  --bg-white: #ffffff;
-  --border-radius: 0.5rem;
-  --box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.1);
-  --box-shadow-light: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
-  --transition-speed: 0.25s;
+  --primary-accent: #00bcd4; /* Cyan */
+  --secondary-color: #607d8b; /* Blue Grey */
+  --success-color: #4caf50; /* Green */
+  --danger-color: #ef5350; /* Soft Red */
+  --warning-color: #ff9800; /* Orange */
+  --info-color: #2196f3; /* Blue */
+  --background-light: #f8f9fa;
+  --surface-background: #ffffff;
+  --text-dark: #212121;
+  --text-medium: #757575;
+  --border-light: #e0f0f4; /* Very light blue/grey */
+  --border-medium: #b2ebf2; /* Slightly darker blue */
+  --shadow-soft: 0 2px 8px rgba(0, 0, 0, 0.1);
+  --shadow-medium: 0 4px 12px rgba(0, 0, 0, 0.1);
+  --border-radius-base: 12px;
+  --border-radius-sm: 8px;
+  --spacing-xs: 8px;
+  --spacing-sm: 12px;
+  --spacing-md: 24px;
+  --spacing-lg: 32px;
 }
 
-
+/* Main Container */
 .placeOrderContainer {
-  max-width: 1100px;
-  margin: 2.5rem auto;
-  padding: 2rem 1.5rem;
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
-  color: var(--text-color);
-  background-color: var(--bg-light);
+  max-width: 1200px;
+  margin: var(--spacing-md) auto; /* Add some margin top/bottom */
+  padding: var(--spacing-md);
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-color: var(--background-light);
+  min-height: calc(100vh - 64px - var(--spacing-md) * 2); /* Adjust based on header/footer */
+  box-sizing: border-box;
+  color: var(--text-dark); /* Default text color */
 }
 
+/* Page Title */
 .placeOrderContainer h1 {
-  font-size: 1.8rem;
+  font-size: 28px;
   font-weight: 600;
-  color: var(--text-color);
-  margin-bottom: 2rem;
-  text-align: center;
-  border-bottom: 1px solid var(--border-color);
-  padding-bottom: 1rem;
+  color: var(--text-dark);
+  margin-bottom: var(--spacing-lg);
+  padding-bottom: var(--spacing-sm);
+  border-bottom: 3px solid var(--primary-accent);
+  text-align: center; /* Center the main title */
 }
 
-
+/* Layout Wrapper for Columns */
 .layoutWrapper {
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
+  display: grid;
+  grid-template-columns: 2fr 1fr; /* Shipping Info (2/3) | Order Summary (1/3) */
+  gap: var(--spacing-md); /* Space between columns */
 }
 
-@media (min-width: 992px) {
-  .layoutWrapper {
-    flex-direction: row;
-    gap: 2rem;
-    align-items: flex-start;
-  }
-}
-
-
+/* Card-like Containers for Sections */
 .shippingInfoContainer,
 .orderSummaryContainer {
-  background-color: var(--bg-white);
-  padding: 1.75rem;
-  border-radius: var(--border-radius);
-  border: 1px solid var(--border-color);
-  box-shadow: var(--box-shadow-light);
+  background: var(--surface-background);
+  border-radius: var(--border-radius-base);
+  box-shadow: var(--shadow-soft);
+  padding: var(--spacing-md);
 }
 
-@media (min-width: 992px) {
-  .shippingInfoContainer {
-    flex: 1.8;
-  }
-  .orderSummaryContainer {
-    flex: 1;
-    position: sticky;
-    top: 1.5rem;
-    align-self: start;
-    max-height: calc(100vh - 3rem);
-    overflow-y: auto;
-  }
-   
-  .orderSummaryContainer::-webkit-scrollbar { width: 5px; }
-  .orderSummaryContainer::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 3px; }
-  .orderSummaryContainer::-webkit-scrollbar-thumb { background: #ccc; border-radius: 3px; }
-  .orderSummaryContainer::-webkit-scrollbar-thumb:hover { background: #aaa; }
-}
-
-
-.shippingInfoContainer h2 {
-  font-size: 1.3rem;
+.shippingInfoContainer h2,
+.orderSummaryContainer h2 {
+  font-size: 20px;
   font-weight: 600;
+  color: var(--text-dark);
   margin-top: 0;
-  margin-bottom: 1.5rem;
-  padding-bottom: 0.75rem;
-  border-bottom: 1px solid var(--border-color);
-  color: var(--text-color);
+  margin-bottom: var(--spacing-md);
+  padding-bottom: var(--spacing-sm);
+  border-bottom: 1px solid var(--border-light); /* Subtle separator */
 }
 
+/* Error Messages */
+.errorMessageCommon,
+.errorMessageAddress,
+.finalErrorMessage {
+    background-color: #ffebee; /* Very light red */
+    border: 1px solid #ef9a9a; /* Slightly darker red */
+    color: #c62828; /* Dark red text */
+    padding: var(--spacing-sm);
+    border-radius: var(--border-radius-sm);
+    margin-bottom: var(--spacing-md);
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-xs);
+    font-size: 14px;
+}
+.errorMessageCommon svg,
+.errorMessageAddress svg,
+.finalErrorMessage svg {
+    color: var(--danger-color); /* Red icon */
+    flex-shrink: 0; /* Prevent icon from shrinking */
+}
+
+.finalErrorMessage {
+    margin-top: var(--spacing-sm); /* Space above message below button */
+    margin-bottom: 0;
+    text-align: center; /* Center text if desired */
+    justify-content: center; /* Center icon and text if desired */
+}
+
+
+/* Shipping Form */
 .shippingForm {
   display: flex;
   flex-direction: column;
-  gap: 1rem;
+  gap: var(--spacing-sm); /* Space between form groups */
 }
 
 .formGroup {
   display: flex;
-  flex-direction: column;
+  flex-direction: column; /* Stack label and input */
+  gap: var(--spacing-xs); /* Space between label and input */
 }
 
 .formGroup label {
-  margin-bottom: 0.4rem;
-  font-size: 0.875rem;
   font-weight: 500;
-  color: var(--text-muted);
+  color: var(--text-dark);
+  font-size: 15px;
 }
-.formGroup label .required {
-  color: var(--danger-color);
-  margin-left: 3px;
+
+.required {
+  color: var(--danger-color); /* Red asterisk */
+  margin-left: 4px;
 }
 
 .formGroup input[type="text"],
@@ -127,286 +133,495 @@
 .formGroup input[type="email"],
 .formGroup select,
 .formGroup textarea {
-  
-  box-sizing: border-box;
-  
-  width: 100%;
-  padding: 0.65rem 0.9rem;
-  font-size: 0.95rem;
+  padding: var(--spacing-xs) var(--spacing-sm);
+  border: 1px solid #b0bec5; /* Muted grey border */
+  border-radius: var(--border-radius-sm);
+  font-size: 15px;
   line-height: 1.5;
-  color: var(--text-color);
-  background-color: var(--bg-white);
-  background-clip: padding-box;
-  border: 1px solid var(--border-color);
-  border-radius: calc(var(--border-radius) * 0.8);
-  transition: border-color var(--transition-speed) ease-in-out, box-shadow var(--transition-speed) ease-in-out;
-  box-shadow: inset 0 1px 2px rgba(0,0,0,.075);
-}
-.formGroup input::placeholder,
-.formGroup textarea::placeholder {
-    color: #adb5bd;
-    opacity: 1;
+  color: var(--text-dark);
+  background-color: var(--surface-background);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  width: 100%; /* Full width within parent */
+  box-sizing: border-box; /* Include padding/border in width */
 }
 
 .formGroup input:focus,
 .formGroup select:focus,
 .formGroup textarea:focus {
-  border-color: #86b7fe;
-  outline: 0;
-  box-shadow: inset 0 1px 2px rgba(0,0,0,.075), 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
+  outline: none;
+  border-color: var(--primary-accent);
+  box-shadow: 0 0 0 3px rgba(0, 188, 212, 0.2); /* Accent glow */
 }
+
+.formGroup input:disabled,
+.formGroup select:disabled,
+.formGroup textarea:disabled {
+    background-color: #eeeeee; /* Light grey background */
+    cursor: not-allowed;
+    opacity: 0.8;
+}
+
 .formGroup select {
-  appearance: none;
-  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%236c757d' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/%3e%3c/svg%3e");
-  background-repeat: no-repeat;
-  background-position: right 0.9rem center;
-  background-size: 14px 10px;
-  padding-right: 2.5rem;
-}
-.formGroup select:disabled {
-    background-color: #e9ecef;
-    opacity: 0.7;
-    cursor: not-allowed;
+    /* Custom arrow styles if needed, depends on browser/reset */
+    -webkit-appearance: none; /* Remove default arrow */
+    -moz-appearance: none;
+    appearance: none;
+    /* Add a custom arrow background image or pseudo-element */
 }
 
-.formGroup textarea {
-  resize: vertical;
-  min-height: 80px;
+/* Spinner next to select */
+.formGroup > *:last-child:not(:only-child)[aria-busy="true"] {
+    display: inline-block; /* Ensure spinner is visible */
+    margin-left: var(--spacing-xs);
+    vertical-align: middle; /* Align with select/input */
 }
 
 
+/* Save Shipping Button */
 .saveShippingButton {
-    margin-top: 1rem;
-    padding: 0.7rem 1.25rem !important;
-    font-size: 0.9rem !important;
-    font-weight: 500;
-    border-radius: calc(var(--border-radius) * 0.8) !important;
-    transition: all var(--transition-speed) ease !important;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.5rem;
-    align-self: flex-start;
-}
-.saveShippingButton[variant="secondary"] {
-    background-color: var(--bg-white) !important;
-    color: var(--secondary-color) !important;
-    border: 1px solid var(--border-color) !important;
-}
-.saveShippingButton[variant="secondary"]:hover:not(:disabled) {
-    background-color: var(--bg-light) !important;
-    border-color: var(--secondary-color) !important;
-    color: var(--secondary-color-dark) !important;
-}
-.saveShippingButton[variant="success"] {
-    background-color: var(--success-color) !important;
-    border-color: var(--success-color) !important;
-    color: white !important;
-    cursor: default;
-}
-.saveShippingButton[variant="success"] svg { } 
-.saveShippingButton:disabled {
-    opacity: 0.65;
-    cursor: not-allowed;
+  margin-top: var(--spacing-sm); /* Space above button */
+  width: fit-content; /* Button only takes necessary width */
+   display: flex;
+   align-items: center;
+   gap: var(--spacing-xs); /* Space between icon and text */
+   /* relies on Button component for base styling (padding, color, etc.) */
 }
 
-
-
-.orderSummaryContainer h2 {
-  font-size: 1.3rem;
-  font-weight: 600;
-  margin-top: 0;
-  margin-bottom: 1rem;
-  padding-bottom: 0.8rem;
-  border-bottom: 1px solid var(--border-color);
-  color: var(--text-color);
-}
-
+/* Order Items List */
 .orderItemsList {
-  max-height: 300px;
-  overflow-y: auto;
-  margin: 0 -10px 1.25rem -10px;
-  padding: 0 10px;
+  border-top: 1px solid var(--border-light); /* Top border to separate from title */
+  padding-top: var(--spacing-md);
+  margin-bottom: var(--spacing-md);
+   display: flex;
+   flex-direction: column;
+   gap: var(--spacing-sm); /* Space between items */
 }
-
-.orderItemsList::-webkit-scrollbar { width: 5px; }
-.orderItemsList::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 3px; }
-.orderItemsList::-webkit-scrollbar-thumb { background: #ccc; border-radius: 3px; }
-.orderItemsList::-webkit-scrollbar-thumb:hover { background: #aaa; }
 
 .orderItem {
   display: flex;
-  align-items: flex-start;
-  gap: 0.8rem;
-  padding-bottom: 0.8rem;
-  margin-bottom: 0.8rem;
-  border-bottom: 1px solid #e9ecef;
+  align-items: flex-start; /* Align items to the top */
+  gap: var(--spacing-sm);
+  padding-bottom: var(--spacing-sm);
+  border-bottom: 1px dashed var(--border-light); /* Dashed separator */
 }
-.orderItem:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+.orderItemsList .orderItem:last-child {
+    border-bottom: none; /* No border on last item */
+    padding-bottom: 0;
+}
 
 .itemImage {
-  width: 55px;
-  height: 55px;
-  object-fit: contain;
-  border-radius: 4px;
-  border: 1px solid var(--border-color);
-  flex-shrink: 0;
-  margin-top: 2px;
+  width: 60px;
+  height: 60px;
+  object-fit: cover;
+  border-radius: var(--border-radius-sm);
+  border: 1px solid #cfd8dc; /* Light grey border */
+  flex-shrink: 0; /* Prevent image from shrinking */
 }
 
 .itemDetails {
-  flex-grow: 1;
+  flex-grow: 1; /* Take available space */
   display: flex;
   flex-direction: column;
-  gap: 0.1rem;
+  gap: 4px; /* Space between name, variant, qty */
 }
 
 .itemName {
-  font-size: 0.9rem;
-  font-weight: 500;
-  color: var(--text-color);
+  font-weight: 600;
+  color: var(--text-dark);
+  font-size: 14px;
   line-height: 1.4;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-  margin-bottom: 0.1rem;
 }
 
-.itemColor, .itemQuantity {
-  font-size: 0.8rem;
-  color: var(--text-muted);
+.itemVariantInfo {
+    font-size: 12px;
+    color: var(--text-medium); /* Medium grey */
+}
+
+.itemQuantity {
+    font-size: 12px;
+    color: var(--text-medium);
+    font-weight: 500;
 }
 
 .itemPrice {
-  font-size: 0.9rem;
-  font-weight: 600;
-  color: var(--text-color);
-  white-space: nowrap;
-  margin-left: auto;
-  padding-left: 0.8rem;
+  font-weight: 700;
+  color: var(--primary-accent); /* Accent color for item price */
+  font-size: 14px;
+  min-width: 100px; /* Minimum width to keep prices aligned */
   text-align: right;
+  flex-shrink: 0; /* Prevent price from shrinking */
 }
 
+
+/* Order Summary Totals */
 .orderSummary {
-  border-top: 1px solid var(--border-color);
-  padding-top: 1.25rem;
-  display: flex;
-  flex-direction: column;
-  gap: 0.6rem;
+    /* No specific styles needed here, just container */
 }
 
 .summaryRow {
   display: flex;
   justify-content: space-between;
-  font-size: 0.9rem;
-  color: var(--text-muted);
+  margin-bottom: var(--spacing-xs); /* Space between rows */
+  font-size: 15px;
+  color: var(--text-dark);
 }
+
 .summaryRow span:first-child {
-    margin-right: 1rem;
+    /* Styles for labels (e.g., "Tạm tính:", "Phí vận chuyển:") */
+    font-weight: 500;
 }
+
 .summaryRow span:last-child {
-  font-weight: 500;
-  color: var(--text-color);
-  text-align: right;
+     /* Styles for values (e.g., currency amounts) */
+     font-weight: 600;
 }
+
 
 .grandTotal {
-  padding-top: 0.8rem;
-  border-top: 1px dashed #adb5bd;
-  margin-top: 0.6rem;
-}
-.grandTotal span {
-  font-size: 1.05rem;
+  margin-top: var(--spacing-sm); /* Space above total */
+  padding-top: var(--spacing-sm);
+  border-top: 1px solid var(--border-light); /* Border above total */
+  font-size: 18px; /* Larger font for total */
   font-weight: 700;
-  color: var(--text-color);
+  color: var(--text-dark);
 }
+
 .totalAmountValue {
-  color: var(--danger-color) !important;
-  font-size: 1.3rem !important;
-  font-weight: 700 !important;
-}
-.vatNote {
-    font-size: 0.8rem;
-    color: var(--text-muted);
-    text-align: right;
-    margin-top: 0.75rem;
-    margin-bottom: 1rem;
+  color: var(--danger-color); /* Use danger color for final total */
+  font-size: 20px; /* Even larger font for value */
+  font-weight: 700;
 }
 
 
-.confirmOrderButton {
-    margin-top: 1.25rem;
-    width: 100%;
-    padding: 0.9rem 1.5rem !important;
-    font-size: 1rem !important;
+/* Payment Method Selector */
+.paymentMethodSelector {
+    margin-top: var(--spacing-md);
+    padding-top: var(--spacing-sm);
+    border-top: 1px solid var(--border-light);
+}
+
+.paymentMethodTitle {
+    font-size: 16px;
     font-weight: 600;
-    border-radius: calc(var(--border-radius) * 0.8) !important;
-}
-.confirmOrderButton:disabled {
-    background-color: #79b6ff !important;
-    border-color: #79b6ff !important;
-    box-shadow: none !important;
-    opacity: 0.65;
-    cursor: not-allowed;
-}
-.confirmOrderButton:hover:not(:disabled) {
-   background-color: var(--primary-color-dark) !important;
-   transform: translateY(-1px);
-   box-shadow: 0 4px 8px rgba(0, 123, 255, 0.2);
+    color: var(--text-dark);
+    margin-top: 0;
+    margin-bottom: var(--spacing-sm);
 }
 
-
-
-.errorMessage, .finalErrorMessage {
-    color: var(--danger-color);
-    background-color: var(--danger-color-light);
-    border: 1px solid var(--danger-color);
-    border-radius: calc(var(--border-radius) * 0.8);
-    padding: 0.75rem 1rem;
-    margin-top: 0.5rem;
-    font-size: 0.875rem;
-    text-align: center;
-}
-.errorMessage { 
-    margin-top: -0.5rem;
-    margin-bottom: 0.5rem;
-}
-.finalErrorMessage { 
-     margin-bottom: 1rem;
-     margin-top: 0; 
+.paymentOption {
+    display: flex;
+    align-items: center;
+    margin-bottom: var(--spacing-xs);
+    font-size: 15px;
 }
 
-
-
-@media (max-width: 991px) {
-  .layoutWrapper { flex-direction: column; }
-  .orderSummaryContainer { order: -1; position: static; max-height: none; overflow-y: visible;}
+.paymentOption input[type="radio"] {
+    margin-right: var(--spacing-xs);
+    cursor: pointer;
+    /* Custom radio styling if needed */
 }
 
-@media (max-width: 767px) {
-  .placeOrderContainer { padding: 1.5rem 1rem; margin: 1.5rem auto; }
-  .shippingInfoContainer, .orderSummaryContainer { padding: 1.25rem; }
-  .leftColumn h2, .rightColumn h2 { font-size: 1.2rem; }
-  .formGroup input, .formGroup select, .formGroup textarea { padding: 0.6rem 0.8rem; font-size: 0.9rem;}
-  .orderItemsList { max-height: none; overflow-y: visible; margin-left: 0; margin-right: 0; padding-right: 0;}
-  .itemImage { width: 50px; height: 50px; }
-  .totalAmountValue { font-size: 1.2rem !important; }
-  .confirmOrderButton { font-size: 0.95rem !important; padding: 0.7rem 1rem !important; }
+.paymentOption label {
+    cursor: pointer;
+    color: var(--text-dark);
 }
 
-@media (max-width: 576px) {
-   .placeOrderContainer { padding: 1rem; margin: 1rem auto; }
-   .placeOrderContainer h1 { font-size: 1.4rem; }
-   .shippingInfoContainer, .orderSummaryContainer { padding: 1rem; }
-   .formGroup label { font-size: 0.8rem; }
-   .formGroup input, .formGroup select, .formGroup textarea { font-size: 0.9rem;}
-   .itemDetails { gap: 0; }
-   .itemName { font-size: 0.85rem; -webkit-line-clamp: 1; }
-   .itemColor, .itemQuantity { font-size: 0.75rem; }
-   .itemPrice { font-size: 0.85rem; padding-left: 0.5rem;}
-   .summaryRow { font-size: 0.85rem; }
-   .grandTotal span { font-size: 1rem; }
-   .totalAmountValue { font-size: 1.15rem !important; }
-   .saveShippingButton, .confirmOrderButton { font-size: 0.85rem !important; padding: 0.6rem 1rem !important; }
+/* Confirm Order Button */
+.confirmOrderButton {
+  margin-top: var(--spacing-md);
+  width: 100%; /* Full width */
+  text-align: center;
+  /* relies on Button component for base styling and variant="primary" */
+   display: flex;
+   align-items: center;
+   justify-content: center;
+   gap: var(--spacing-xs);
+}
+
+
+/* Responsive Design */
+@media (max-width: 992px) { /* Tablets and smaller desktops */
+    .placeOrderContainer {
+        padding: var(--spacing-md);
+        margin: var(--spacing-md) auto;
+    }
+
+    .placeOrderContainer h1 {
+        font-size: 26px;
+        margin-bottom: var(--spacing-md);
+    }
+
+    .layoutWrapper {
+        grid-template-columns: 1fr; /* Stack columns vertically */
+        gap: var(--spacing-md);
+    }
+
+    .shippingInfoContainer,
+    .orderSummaryContainer {
+        padding: var(--spacing-md);
+        border-radius: var(--border-radius-base);
+    }
+
+    .shippingInfoContainer h2,
+    .orderSummaryContainer h2 {
+        font-size: 18px;
+        margin-bottom: var(--spacing-sm);
+    }
+
+    .formGroup label {
+        font-size: 14px;
+    }
+
+    .formGroup input,
+    .formGroup select,
+    .formGroup textarea {
+        font-size: 14px;
+        padding: var(--spacing-xs);
+    }
+
+    .saveShippingButton {
+        width: 100%; /* Make save button full width */
+        justify-content: center;
+    }
+
+    .orderItemsList {
+        padding-top: var(--spacing-sm);
+        margin-bottom: var(--spacing-md);
+        gap: var(--spacing-xs);
+    }
+
+    .orderItem {
+         gap: var(--spacing-xs);
+         padding-bottom: var(--spacing-xs);
+    }
+
+    .itemImage {
+        width: 50px;
+        height: 50px;
+    }
+
+    .itemName {
+        font-size: 13px;
+    }
+    .itemVariantInfo,
+    .itemQuantity {
+        font-size: 11px;
+    }
+
+    .itemPrice {
+        font-size: 13px;
+        min-width: 80px;
+    }
+
+    .summaryRow {
+        font-size: 14px;
+        margin-bottom: var(--spacing-xs);
+    }
+
+    .grandTotal {
+        font-size: 16px;
+    }
+     .totalAmountValue {
+        font-size: 18px;
+     }
+
+    .paymentMethodTitle {
+        font-size: 15px;
+    }
+    .paymentOption {
+        font-size: 14px;
+    }
+
+    .confirmOrderButton {
+        /* Already full width */
+    }
+}
+
+@media (max-width: 768px) { /* Larger phones */
+    .placeOrderContainer {
+        padding: var(--spacing-sm);
+        margin: var(--spacing-sm) auto;
+    }
+
+    .placeOrderContainer h1 {
+        font-size: 24px;
+        margin-bottom: var(--spacing-md);
+        padding-bottom: var(--spacing-xs);
+    }
+
+    .shippingInfoContainer,
+    .orderSummaryContainer {
+        padding: var(--spacing-md) var(--spacing-sm); /* More vertical, less horizontal padding */
+    }
+
+     .shippingInfoContainer h2,
+     .orderSummaryContainer h2 {
+         font-size: 17px;
+         margin-bottom: var(--spacing-sm);
+     }
+
+    .formGroup label {
+        font-size: 13px;
+    }
+     .formGroup input,
+     .formGroup select,
+     .formGroup textarea {
+         font-size: 13px;
+         padding: 8px; /* Smaller padding */
+     }
+
+    .orderItemsList {
+         padding-top: var(--spacing-sm);
+         margin-bottom: var(--spacing-sm);
+         gap: var(--spacing-xs);
+     }
+
+     .orderItem {
+          gap: var(--spacing-xs);
+          padding-bottom: var(--spacing-xs);
+          flex-direction: column; /* Stack image and details on very small screens? Maybe not needed yet. */
+          align-items: flex-start;
+     }
+
+     .itemImage {
+         width: 40px;
+         height: 40px;
+     }
+
+     .itemDetails {
+         gap: 2px;
+     }
+
+     .itemName {
+         font-size: 12px;
+     }
+     .itemVariantInfo,
+     .itemQuantity {
+         font-size: 10px;
+     }
+
+     .itemPrice {
+         font-size: 12px;
+         min-width: 70px;
+         align-self: flex-end; /* Align price to the right when stacked */
+     }
+
+    .summaryRow {
+        font-size: 13px;
+    }
+
+    .grandTotal {
+        font-size: 15px;
+    }
+     .totalAmountValue {
+        font-size: 16px;
+     }
+
+    .paymentMethodTitle {
+        font-size: 14px;
+    }
+    .paymentOption {
+        font-size: 13px;
+    }
+}
+
+@media (max-width: 480px) { /* Smaller phones */
+     .placeOrderContainer {
+         padding: var(--spacing-xs);
+         margin: var(--spacing-sm) auto;
+     }
+
+     .placeOrderContainer h1 {
+         font-size: 20px;
+         margin-bottom: var(--spacing-md);
+     }
+
+     .shippingInfoContainer,
+     .orderSummaryContainer {
+         padding: var(--spacing-sm);
+     }
+
+      .shippingInfoContainer h2,
+      .orderSummaryContainer h2 {
+          font-size: 16px;
+          margin-bottom: var(--spacing-sm);
+          padding-bottom: var(--spacing-xs);
+      }
+
+     .formGroup label {
+         font-size: 12px;
+     }
+      .formGroup input,
+      .formGroup select,
+      .formGroup textarea {
+          font-size: 12px;
+          padding: 6px;
+      }
+
+      .saveShippingButton {
+          font-size: 12px;
+          padding: 6px 12px; /* Adjust button padding */
+      }
+
+
+     .orderItemsList {
+          padding-top: var(--spacing-sm);
+          margin-bottom: var(--spacing-sm);
+          gap: var(--spacing-xs);
+      }
+
+      .orderItem {
+           gap: var(--spacing-xs);
+           padding-bottom: var(--spacing-xs);
+      }
+
+      .itemImage {
+          width: 35px;
+          height: 35px;
+      }
+
+
+      .itemName {
+          font-size: 11px;
+      }
+      .itemVariantInfo,
+      .itemQuantity {
+          font-size: 9px;
+      }
+
+      .itemPrice {
+          font-size: 11px;
+          min-width: 60px;
+      }
+
+      .summaryRow {
+          font-size: 12px;
+          margin-bottom: 4px;
+      }
+
+      .grandTotal {
+          font-size: 14px;
+          margin-top: var(--spacing-xs);
+          padding-top: var(--spacing-xs);
+      }
+       .totalAmountValue {
+          font-size: 15px;
+       }
+
+      .paymentMethodTitle {
+          font-size: 13px;
+          margin-bottom: var(--spacing-xs);
+      }
+       .paymentOption {
+           font-size: 12px;
+       }
+
+       .paymentOption input[type="radio"] {
+            margin-right: 4px;
+       }
+
+       .confirmOrderButton {
+           font-size: 13px;
+           padding: 8px 16px; /* Adjust button padding */
+       }
 }

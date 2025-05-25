@@ -17,7 +17,7 @@ import {
   Alert,
 } from "antd";
 import { EditOutlined } from "@ant-design/icons";
-import apiService from "../../../services/api"; 
+import apiService from "../../../services/api";
 
 const { Text, Paragraph, Title } = Typography;
 
@@ -44,7 +44,7 @@ function formatDate(isoString) {
       year: "numeric",
       hour12: false,
     });
-  } catch {
+  } catch  {
     return "Invalid Date";
   }
 }
@@ -107,11 +107,11 @@ const VALID_STATUS_TRANSITIONS = {
 const OrderDetails = ({ orderId, handleRefreshParent }) => {
   const [orderData, setOrderData] = useState(null);
   const [customerInfo, setCustomerInfo] = useState(null);
-  const [shipperInfo, setShipperInfo] = useState(null); 
+  const [shipperInfo, setShipperInfo] = useState(null);
   const [orderItems, setOrderItems] = useState([]);
   const [loadingOrderDetails, setLoadingOrderDetails] = useState(true);
   const [loadingUserInfo, setLoadingUserInfo] = useState(false);
-  const [loadingShipperInfo, setLoadingShipperInfo] = useState(false); 
+  const [loadingShipperInfo, setLoadingShipperInfo] = useState(false);
   const [loadingItems, setLoadingItems] = useState(true);
   const [fetchError, setFetchError] = useState(null);
   const [currentOrderStatus, setCurrentOrderStatus] = useState(null);
@@ -119,54 +119,54 @@ const OrderDetails = ({ orderId, handleRefreshParent }) => {
   const [newStatusToConfirm, setNewStatusToConfirm] = useState(null);
   const [loadingStatusUpdate, setLoadingStatusUpdate] = useState(false);
 
-   
+
    const fetchCustomerInfo = useCallback(async (userId) => {
       setLoadingUserInfo(true);
       setCustomerInfo(null);
       try {
-        
+
         const customerResponse = await apiService.getUsersByRole("CUSTOMER");
         const customerList = customerResponse?.data;
         if (!Array.isArray(customerList)) {
-          setCustomerInfo({ username: "Lỗi dữ liệu user" }); 
+          setCustomerInfo({ username: "Lỗi dữ liệu user" });
           return;
         }
         const foundUser = customerList.find((user) => user.userId === userId);
-        setCustomerInfo(foundUser || { username: `User ID ${userId} không tìm thấy` }); 
+        setCustomerInfo(foundUser || { username: `User ID ${userId} không tìm thấy` });
       } catch (error) {
         console.error("Lỗi tải thông tin customer:", error);
-        setCustomerInfo({ username: "Lỗi tải user" }); 
+        setCustomerInfo({ username: "Lỗi tải user" });
       } finally {
         setLoadingUserInfo(false);
       }
-    }, []); 
+    }, []);
 
 
-   
+
    const fetchShipperInfo = useCallback(async (shipperId) => {
         setLoadingShipperInfo(true);
         setShipperInfo(null);
         try {
-            
-            
+
+
             const shipperResponse = await apiService.getUsersByRole("SHIPPER");
-             
+
             if (shipperResponse && shipperResponse.data) {
                 const shipperList = shipperResponse?.data;
                 const foundShipper = shipperList.find((user) => user.userId === shipperId);
                  setShipperInfo(foundShipper);
             } else {
-                 
+
                  console.warn(`Shipper with ID ${shipperId} not found.`);
-                 setShipperInfo({ username: `Shipper ID ${shipperId} không tìm thấy` }); 
+                 setShipperInfo({ username: `Shipper ID ${shipperId} không tìm thấy` });
             }
         } catch (error) {
             console.error(`Lỗi tải thông tin shipper ID ${shipperId}:`, error);
-            setShipperInfo({ username: "Lỗi tải shipper" }); 
+            setShipperInfo({ username: "Lỗi tải shipper" });
         } finally {
             setLoadingShipperInfo(false);
         }
-   }, []); 
+   }, []);
 
 
   useEffect(() => {
@@ -174,21 +174,21 @@ const OrderDetails = ({ orderId, handleRefreshParent }) => {
       setFetchError("ID đơn hàng không hợp lệ.");
       setLoadingOrderDetails(false);
       setLoadingItems(false);
-      setLoadingUserInfo(false); 
-      setLoadingShipperInfo(false); 
+      setLoadingUserInfo(false);
+      setLoadingShipperInfo(false);
       return;
     }
 
     const fetchOrderAndItems = async () => {
       setLoadingOrderDetails(true);
       setLoadingItems(true);
-      setLoadingUserInfo(true); 
+      setLoadingUserInfo(true);
       setLoadingShipperInfo(true);
 
-      setFetchError(null); 
+      setFetchError(null);
       setOrderData(null);
-      setCustomerInfo(null); 
-      setShipperInfo(null); 
+      setCustomerInfo(null);
+      setShipperInfo(null);
       setCurrentOrderStatus(null);
       setOrderItems([]);
 
@@ -198,63 +198,63 @@ const OrderDetails = ({ orderId, handleRefreshParent }) => {
         if (orderResponse && orderResponse.data) {
           const fetchedOrder = orderResponse.data;
           setOrderData(fetchedOrder);
-          
+
           setCurrentOrderStatus(fetchedOrder.status?.toUpperCase() || "PENDING");
 
-          
+
           if (fetchedOrder.userId) {
             fetchCustomerInfo(fetchedOrder.userId);
           } else {
             setCustomerInfo({ username: "Khách vãng lai (không có ID)" });
-            setLoadingUserInfo(false); 
+            setLoadingUserInfo(false);
           }
 
-           
+
            if (fetchedOrder.shipperId) {
               fetchShipperInfo(fetchedOrder.shipperId);
            } else {
-               setShipperInfo({ username: "(Chưa có shipper)" }); 
-               setLoadingShipperInfo(false); 
+               setShipperInfo({ username: "(Chưa có shipper)" });
+               setLoadingShipperInfo(false);
            }
 
         } else {
           throw new Error("Không nhận được dữ liệu đơn hàng hợp lệ.");
         }
 
-        
+
         const itemsResponse = await apiService.getOrderItems(orderId);
         if (itemsResponse && Array.isArray(itemsResponse.data)) {
             setOrderItems(itemsResponse.data);
         } else {
             console.warn("API sản phẩm không trả về mảng dữ liệu:", itemsResponse);
-            setOrderItems([]); 
+            setOrderItems([]);
         }
 
       } catch (error) {
         console.error("Lỗi khi tải chi tiết đơn hàng, sản phẩm, user hoặc shipper:", error);
         const errorMsg = error.response?.data?.message || error.message || "Không thể tải dữ liệu.";
         setFetchError(errorMsg);
-        setOrderData(null); 
+        setOrderData(null);
         setOrderItems([]);
         setCustomerInfo(null);
         setShipperInfo(null);
       } finally {
-        
+
         setLoadingOrderDetails(false);
         setLoadingItems(false);
-         
+
          if (!orderData?.userId) setLoadingUserInfo(false);
          if (!orderData?.shipperId) setLoadingShipperInfo(false);
-         
+
       }
     };
 
     fetchOrderAndItems();
 
-     
-     
 
-  }, [orderId, fetchCustomerInfo, fetchShipperInfo, orderData?.userId, orderData?.shipperId]); 
+
+
+  }, [orderId, fetchCustomerInfo, fetchShipperInfo]);
 
   const itemsColumns = [
     {
@@ -283,7 +283,7 @@ const OrderDetails = ({ orderId, handleRefreshParent }) => {
           {(record.color || record.size) && (
               <div style={{ fontSize: '12px', color: '#888' }}>
                   {record.color && `Màu: ${record.color}`}
-                  {record.color && record.size && ', '} 
+                  {record.color && record.size && ', '} {/* Add separator if both exist */}
                   {record.size && `Size: ${record.size}`}
               </div>
           )}
@@ -319,7 +319,7 @@ const OrderDetails = ({ orderId, handleRefreshParent }) => {
     },
   ];
 
-   
+
    const handleApplyStatusInModal = useCallback(
     async (orderIdToUpdate, currentStatus, newStatus) => {
       const currentStatusUpper = currentStatus?.toUpperCase();
@@ -333,27 +333,27 @@ const OrderDetails = ({ orderId, handleRefreshParent }) => {
       }
 
       setLoadingStatusUpdate(true);
-      setIsStatusModalVisible(false); 
+      setIsStatusModalVisible(false);
 
       try {
         const updatePayload = {
           orderId: orderIdToUpdate,
           status: newStatus.toUpperCase()
         };
-        
+
         if (newStatusUpper === 'DELIVERED') {
-            updatePayload.deliveredAt = new Date().toISOString(); 
+            updatePayload.deliveredAt = new Date().toISOString();
         }
 
         await apiService.applyOrderStatus(updatePayload);
 
-        
+
         setCurrentOrderStatus(newStatusUpper);
-         
+
         setOrderData(prev => prev ? {
              ...prev,
              status: newStatusUpper,
-             deliveredAt: newStatusUpper === 'DELIVERED' ? new Date().toISOString() : prev?.deliveredAt 
+             deliveredAt: newStatusUpper === 'DELIVERED' ? new Date().toISOString() : prev?.deliveredAt
             } : null);
 
 
@@ -363,7 +363,7 @@ const OrderDetails = ({ orderId, handleRefreshParent }) => {
           }.`
         );
 
-        
+
         if (handleRefreshParent) {
           handleRefreshParent();
         }
@@ -374,10 +374,10 @@ const OrderDetails = ({ orderId, handleRefreshParent }) => {
         );
       } finally {
         setLoadingStatusUpdate(false);
-        setNewStatusToConfirm(null); 
+        setNewStatusToConfirm(null);
       }
     },
-    [handleRefreshParent] 
+    [handleRefreshParent]
   );
 
 
@@ -387,16 +387,16 @@ const OrderDetails = ({ orderId, handleRefreshParent }) => {
   };
 
   const handleStatusOk = () => {
-    if (orderData && newStatusToConfirm && currentOrderStatus !== null) { 
+    if (orderData && newStatusToConfirm && currentOrderStatus !== null) {
       handleApplyStatusInModal(
         orderData.orderId,
-        currentOrderStatus, 
+        currentOrderStatus,
         newStatusToConfirm
       );
     } else {
          console.warn("Attempted status update without orderData, newStatusToConfirm, or valid currentStatus.");
          message.error("Không thể cập nhật trạng thái. Vui lòng tải lại trang.");
-         handleStatusCancel(); 
+         handleStatusCancel();
     }
   };
 
@@ -406,9 +406,9 @@ const OrderDetails = ({ orderId, handleRefreshParent }) => {
   };
 
 
-  
 
-  
+
+
   const isInitialLoading = loadingOrderDetails || loadingItems;
 
   if (isInitialLoading) {
@@ -444,7 +444,7 @@ const OrderDetails = ({ orderId, handleRefreshParent }) => {
   const currentStatusUpperForCheck = currentOrderStatus?.toUpperCase();
   const possibleNextStatuses =
     VALID_STATUS_TRANSITIONS[currentStatusUpperForCheck] || [];
-  const canChangeStatusManually = possibleNextStatuses.length > 0 && !loadingStatusUpdate; 
+  const canChangeStatusManually = currentOrderStatus === "PENDING";
 
 
   const statusMenu = (
@@ -473,12 +473,14 @@ const OrderDetails = ({ orderId, handleRefreshParent }) => {
              <DetailRow label="Ngày đặt" value={formatDate(orderData.createdAt)} />
              <DetailRow label="Phương thức TT" value={orderData.paymentMethod} />
              <DetailRow label="Trạng thái ĐH" value={<DeliveryStatusComponent deliveryStatus={currentOrderStatus} />} />
+             {/* Display Delivered At if available */}
               {orderData.deliveredAt && (
                   <DetailRow label="Ngày giao" value={formatDate(orderData.deliveredAt)} />
               )}
              <DetailRow label="Phí vận chuyển" value={formatCurrency(shippingFee)} />
              <DetailRow label="Ghi chú KH" value={orderData.note || "(Không có)"} />
 
+             {/* Shipper Info - NEW */}
              <Divider style={{ margin: "15px 0 10px 0" }} />
              <Title level={5} style={{ marginBottom: 15, borderBottom: "1px solid #f0f0f0", paddingBottom: 8, fontSize: '16px' }}>
                Thông tin Shipper
@@ -488,12 +490,16 @@ const OrderDetails = ({ orderId, handleRefreshParent }) => {
                <>
                  <DetailRow label="Tên Shipper" value={shipperInfo.username} />
                  <DetailRow label="Email Shipper" value={shipperInfo.email || "N/A"} />
+                 {/* Add other shipper details if needed, like phone */}
+                 {/* <DetailRow label="SĐT Shipper" value={shipperInfo.phoneNumber || "N/A"} /> */}
                </>
              ) : (
                <Paragraph type="secondary">Không tải được thông tin shipper.</Paragraph>
              )}
+             {/* End Shipper Info */}
+
              {canChangeStatusManually && (
-              <Row gutter={[16, 8]} style={{ marginTop: 20, alignItems: "center" }}> 
+              <Row gutter={[16, 8]} style={{ marginTop: 20, alignItems: "center" }}> {/* Increased margin */}
                 <Col span={6} style={{ color: "#555", textAlign: "right" }}>
                   <Text strong>Hành động:</Text>
                 </Col>
@@ -518,7 +524,7 @@ const OrderDetails = ({ orderId, handleRefreshParent }) => {
                  <DetailRow label="Tên KH" value={customerInfo.username} />
                  <DetailRow label="Email" value={customerInfo.email || "N/A"} />
                  <DetailRow label="Điện thoại" value={customerInfo.phoneNumber || "N/A"} />
-                 <DetailRow label="Địa chỉ GH" value={orderData.shippingAddress || customerInfo.address || "(Không có)"} /> 
+                 <DetailRow label="Địa chỉ GH" value={orderData.shippingAddress || customerInfo.address || "(Không có)"} /> {/* Prefer shippingAddress from order */}
                </>
              ) : (
                <Paragraph type="secondary">Không tải được thông tin người dùng.</Paragraph>
@@ -531,11 +537,12 @@ const OrderDetails = ({ orderId, handleRefreshParent }) => {
         <Title level={5} style={{ marginBottom: 15 }}>
           Sản phẩm trong đơn ({orderItems.length})
         </Title>
+         {/* Check if orderItems is empty before rendering table */}
          {orderItems.length > 0 ? (
             <Table
                 dataSource={orderItems}
                 columns={itemsColumns}
-                rowKey={(item) => `${item.productId}-${item.variantId || 'no-variant'}`} 
+                rowKey={(item) => `${item.productId}-${item.variantId || 'no-variant'}`}
                 pagination={false}
                 bordered
                 size="small"
@@ -584,11 +591,11 @@ const OrderDetails = ({ orderId, handleRefreshParent }) => {
         confirmLoading={loadingStatusUpdate}
         okText="Xác nhận"
         cancelText="Hủy"
-        destroyOnClose 
-        maskClosable={!loadingStatusUpdate} 
+        destroyOnClose
+        maskClosable={!loadingStatusUpdate}
         closable={!loadingStatusUpdate}
       >
-        {newStatusToConfirm && orderData && ( 
+        {newStatusToConfirm && orderData && (
             <Paragraph>
                 Bạn có chắc chắn muốn đổi trạng thái đơn hàng <Text strong>#{orderData.orderId}</Text> từ <DeliveryStatusComponent deliveryStatus={currentOrderStatus} /> thành <DeliveryStatusComponent deliveryStatus={newStatusToConfirm} /> không?
             </Paragraph>

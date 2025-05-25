@@ -172,9 +172,10 @@ const OrderSuccessPage = () => {
 
 
 
-    const renderContent = () => {
+        const renderContent = () => {
         if (isLoading) {
             return (
+
                 <div className={styles.loadingContainer}>
                     <Spinner size="large" />
                     <p>Đang xử lý đơn hàng của bạn...</p>
@@ -184,26 +185,18 @@ const OrderSuccessPage = () => {
 
 
         if (createdOrder && createdOrder.orderId !== undefined) {
-
-
-
-
-
-
-
             return (
-                <div className={`${styles.resultContainer} ${styles.success}`}>
-                    <FaCheckCircle size={50} className={styles.icon} />
+                <div className={`${styles.resultContainer} ${styles.success}`}> {/* Apply resultContainer and success classes */}
+                    <FaCheckCircle size={50} className={styles.icon} /> {/* Apply icon class */}
                     <h2>Đặt hàng thành công!</h2>
                     <p>Cảm ơn bạn đã mua hàng. Đơn hàng COD của bạn đã được tạo.</p>
                     <p>Mã đơn hàng của bạn: <strong>{createdOrder.orderId}</strong></p>
                     {/* Optionally display total or other details if returned by API */}
-                    {/* createdOrder.totalAmount might be available from API response */}
                      {createdOrder.totalAmount !== undefined && (
                          <p>Tổng tiền (ước tính): <strong>{formatCurrency(createdOrder.totalAmount)}</strong></p>
                      )}
 
-                    <div className={styles.actions}>
+                    <div className={styles.actions}> {/* Apply actions class */}
                         <Link to="/"><Button variant="primary">Về trang chủ</Button></Link>
                          <Link to={`/profile/orders`}><Button variant="secondary">Xem chi tiết đơn hàng</Button></Link>
                     </div>
@@ -214,12 +207,12 @@ const OrderSuccessPage = () => {
 
         if (error) {
             return (
-                <div className={`${styles.resultContainer} ${styles.failed}`}>
-                    <FaTimesCircle size={50} className={styles.icon} />
+                <div className={`${styles.resultContainer} ${styles.failed}`}> {/* Apply resultContainer and failed classes */}
+                    <FaTimesCircle size={50} className={styles.icon} /> {/* Apply icon class */}
                     <h2>Đặt hàng không thành công</h2>
-                    <p className={styles.errorMessage}>{error}</p>
+                    <p className={styles.errorMessage}>{error}</p> {/* Apply errorMessage class */}
                      <p>Vui lòng thử lại hoặc liên hệ bộ phận hỗ trợ nếu vấn đề tái diễn.</p>
-                    <div className={styles.actions}>
+                    <div className={styles.actions}> {/* Apply actions class */}
                         <Link to="/cart"><Button variant="secondary">Quay lại giỏ hàng</Button></Link>
                         <Link to="/"><Button variant="primary">Về trang chủ</Button></Link>
                     </div>
@@ -229,11 +222,11 @@ const OrderSuccessPage = () => {
 
 
          return (
-              <div className={`${styles.resultContainer} ${styles.warning}`}>
-                  <FaExclamationTriangle size={50} className={styles.icon} />
+              <div className={`${styles.resultContainer} ${styles.warning}`}> {/* Apply resultContainer and warning classes */}
+                  <FaExclamationTriangle size={50} className={styles.icon} /> {/* Apply icon class */}
                   <h2>Trạng thái đơn hàng không xác định</h2>
                   <p>Không thể xác định trạng thái đơn hàng cuối cùng. Vui lòng kiểm tra lại lịch sử đơn hàng của bạn.</p>
-                   <div className={styles.actions}>
+                   <div className={styles.actions}> {/* Apply actions class */}
                        <Link to="/profile/orders"><Button variant="secondary">Kiểm tra đơn hàng</Button></Link>
                        <Link to="/"><Button variant="primary">Về trang chủ</Button></Link>
                    </div>

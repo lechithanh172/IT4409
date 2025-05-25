@@ -13,17 +13,14 @@
   --border-radius-sm: 6px;
   --border-radius-md: 8px;
 
-  /* Dark mode variables */
-  --background-color-light: #ffffff; /* Used for overlays/cards in light mode */
-  --background-color-dark: #1a202c; /* Main background */
-  --card-background: #ffffff; /* Card/Modal background */
+  --background-color-light: #ffffff;
+  --background-color-dark: #1a202c;
+  --card-background: #ffffff;
 
-  /* Added for button hover/active feedback */
-  --button-hover-bg: rgba(0, 0, 0, 0.05); /* Light hover for buttons */
+  --button-hover-bg: rgba(0, 0, 0, 0.05);
 
-  /* Define mobile horizontal padding for calculating dropdown width/position */
-  --container-padding-mobile-sm: var(--spacing-sm); /* For <= 768px */
-  --container-padding-mobile-xs: var(--spacing-xs); /* For <= 480px */
+  --container-padding-mobile-sm: var(--spacing-sm);
+  --container-padding-mobile-xs: var(--spacing-xs);
 }
 
 @media (prefers-color-scheme: dark) {
@@ -40,7 +37,7 @@
         --background-color-dark: #1a202c;
         --card-background: #2d3748;
 
-        --button-hover-bg: rgba(255, 255, 255, 0.1); /* Dark hover for buttons */
+        --button-hover-bg: rgba(255, 255, 255, 0.1);
     }
 }
 
@@ -53,13 +50,11 @@ body {
 
 .header {
   background-color: var(--card-background);
-  padding: var(--spacing-sm) 0; /* Desktop padding */
+  padding: var(--spacing-sm) 0;
   box-shadow: var(--shadow-base);
   position: sticky;
   top: 0;
-  z-index: 1000; /* High z-index to stay on top */
-  transition: background-color 0.3s ease, box-shadow 0.2s ease;
-  /* Use flex on header to vertically center the container if header padding changes */
+  z-index: 1000;
    display: flex;
    align-items: center;
 }
@@ -68,13 +63,13 @@ body {
 .container {
   max-width: 1300px;
   margin: 0 auto;
-  padding: 0 var(--spacing-md); /* Desktop padding */
+  padding: 0 var(--spacing-md);
   display: flex;
-  justify-content: space-between; /* Default desktop spacing */
+  justify-content: space-between;
   align-items: center;
-  gap: var(--spacing-sm); /* Desktop gap */
-  position: relative; /* REQUIRED for absolute positioning of search results relative to container */
-  z-index: 1; /* Ensure container content is above dropdowns attached to it */
+  gap: var(--spacing-sm);
+  position: relative;
+  z-index: 1;
 }
 
 
@@ -83,7 +78,7 @@ body {
    flex-shrink: 0;
    display: flex;
    align-items: center;
-   order: 0; /* Default order */
+   order: 0;
 }
 
 .logo img {
@@ -96,12 +91,12 @@ body {
 
 
 .desktopNav {
-  display: flex; /* Shown by default */
+  display: flex;
   align-items: center;
   gap: var(--spacing-xs);
-  flex-grow: 1; /* Takes available space on desktop */
+  flex-grow: 1;
   justify-content: flex-start;
-  order: 1; /* Desktop order */
+  order: 1;
 }
 
 .navLink, .dropdownToggle {
@@ -165,7 +160,7 @@ body {
 }
 
 
-.dropdownContainer { /* For Categories and User */
+.dropdownContainer {
   position: relative;
   display: inline-block;
   z-index: 900;
@@ -185,16 +180,16 @@ body {
   transform: rotate(180deg);
 }
 
-.dropdownMenu { /* Base styles for all dropdowns */
+.dropdownMenu {
   position: absolute;
-  top: calc(100% + 10px); /* Position below the toggle button */
+  top: calc(100% + 10px);
   left: 0;
   background-color: var(--card-background);
   border-radius: var(--border-radius-sm);
   box-shadow: var(--shadow-lg);
   padding: 8px 0;
-  min-width: 220px; /* Default min-width */
-  z-index: 1001; /* Above dropdown containers */
+  min-width: 220px;
+  z-index: 1001;
   border: 1px solid var(--border-color);
   opacity: 0;
   visibility: hidden;
@@ -262,24 +257,20 @@ body {
 
 .userDropdown { left: auto; right: 0; min-width: 200px; }
 .dropdownHeader {
-    /* Use Flexbox to align icon and text horizontally */
     display: flex;
-    align-items: center; /* Vertically center items */
-    gap: var(--spacing-xs); /* Space between icon and text/elements */
+    align-items: center;
+    gap: var(--spacing-xs);
 
-    padding: 10px var(--spacing-sm); /* Keep padding */
+    padding: 10px var(--spacing-sm);
 
-    font-weight: 600; /* Bold text */
-    color: var(--text-color-dark); /* Main text color */
-    font-size: 0.9rem; /* Font size */
-    /* font-family: inherit; // Inherited by default */
+    font-weight: 600;
+    color: var(--text-color-dark);
+    font-size: 0.9rem;
 
-    border-bottom: 1px solid var(--border-color); /* Separator line */
-    margin-bottom: 5px; /* Space after the header */
-    flex-shrink: 0; /* Prevent shrinking in flex container */
-    white-space: nowrap; /* Prevent text wrap */
-
-     /* Inherits background color from .dropdownMenu */
+    border-bottom: 1px solid var(--border-color);
+    margin-bottom: 5px;
+    flex-shrink: 0;
+    white-space: nowrap;
 }
 .logoutButton { color: #e53e3e; }
 @media (prefers-color-scheme: dark) {
@@ -298,37 +289,34 @@ body {
 .actions {
     display: flex;
     align-items: center;
-    gap: var(--spacing-sm); /* Gap between action buttons */
-    flex-shrink: 0; /* Prevent shrinking on desktop */
-    flex-grow: 0; /* Do not grow on desktop */
+    gap: var(--spacing-sm);
+    flex-shrink: 0;
+    flex-grow: 0;
     justify-content: flex-end;
-    order: 3; /* Desktop order */
+    order: 3;
 }
 
 
-/* Container for Search Input and Dropdown */
-/* This container is relative, its absolute children (like the desktop dropdown) position relative to it */
 .searchContainer {
-    position: relative; /* REQUIRED for absolute positioning of search results dropdown */
-    flex-grow: 0; /* Do not grow on desktop */
-    width: 250px; /* Default width on desktop */
-    max-width: 300px; /* Max width on desktop */
-    z-index: 900; /* Ensure search is layered correctly */
-    order: 2; /* Desktop order */
-    /* Removed margin-right */
+    position: relative;
+    flex-grow: 0;
+    width: 250px;
+    max-width: 300px;
+    z-index: 900;
+    order: 2;
 }
 
 .searchBar {
     display: flex;
     align-items: center;
-    background-color: var(--card-background); /* Inherits from header on mobile */
+    background-color: var(--card-background);
     border: 1px solid var(--border-color);
-    border-radius: 20px; /* Desktop rounded corners */
+    border-radius: 20px;
     padding: 2px 5px 2px var(--spacing-sm);
     transition: all 0.2s ease;
-    width: 100%; /* Take full width of searchContainer */
+    width: 100%;
     box-sizing: border-box;
-    height: 40px; /* Set explicit height for consistent look */
+    height: 40px;
 }
 .searchBar:focus-within {
     border-color: var(--primary-color);
@@ -345,7 +333,7 @@ body {
     border: none;
     outline: none;
     background: none;
-    padding: 0; /* Removed vertical padding here */
+    padding: 0;
     font-size: 0.9rem;
     flex-grow: 1;
     width: 100%;
@@ -372,26 +360,24 @@ body {
 
 
 
-/* Action Buttons (Cart, User Toggle, Mobile Menu Toggle) */
 .actionButton,
 .mobileMenuToggle {
     position: relative;
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 10px; /* Generous padding for tap area */
+    padding: 10px;
     background: none;
     border: none;
     border-radius: 50%;
     color: var(--text-color-dark);
     cursor: pointer;
     transition: background-color 0.2s ease, color 0.2s ease;
-    font-size: 1.25rem; /* Large enough icon */
+    font-size: 1.25rem;
     text-decoration: none;
-    flex-shrink: 0; /* Prevent shrinking */
+    flex-shrink: 0;
     outline: none;
 }
-/* Add hover/active feedback */
 .actionButton:hover,
 .mobileMenuToggle:hover,
 .actionButton:active,
@@ -402,7 +388,7 @@ body {
 
 
 .cartButton {
-    /* Specific cart styles if needed */
+
 }
 
 .userButton {
@@ -410,7 +396,7 @@ body {
     padding: 6px var(--spacing-xs);
     color: var(--text-color-dark);
     background-color: transparent;
-    border-radius: var(--border-radius-sm); /* Rectangular button */
+    border-radius: var(--border-radius-sm);
     transition: background-color 0.2s ease, color 0.2s ease;
 }
 .userButton:hover {
@@ -421,22 +407,19 @@ body {
 
 
 .userNameDesktop {
-    /* Appearance */
-    font-size: 0.9rem; /* Keep consistent size */
-    font-weight: 600; /* Make it bold like authButton text */
-    color: var(--text-color-dark); /* Use theme color for consistency */
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--text-color-dark);
 
-    /* Layout and Display */
-    margin: 0 4px 0 2px; /* Space around text */
-    display: inline-block; /* Ensures alignment in flex */
-    white-space: nowrap; /* Prevent text wrapping */
-    max-width: 100px; /* Limit width if name is very long */
-    overflow: hidden; /* Hide overflowing text */
-    text-overflow: ellipsis; /* Add ellipsis for overflow */
-    vertical-align: middle; /* Vertical alignment fallback/assist */
+    margin: 0 4px 0 2px;
+    display: inline-block;
+    white-space: nowrap;
+    max-width: 100px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    vertical-align: middle;
 
-    /* Transition */
-    transition: color 0.2s ease; /* Smooth color changes */
+    transition: color 0.2s ease;
 }
 .userButton:hover .userNameDesktop {
     color: var(--text-color-dark);
@@ -451,7 +434,7 @@ body {
 
 
 .desktopAuth {
-    display: flex; /* Shown by default */
+    display: flex;
     align-items: center;
     gap: var(--spacing-xs);
     text-decoration: none;
@@ -460,58 +443,48 @@ body {
   font-family: inherit;
 }
 .authButton {
-    display: inline-flex; /* Use flex to align icon and text */
+    display: inline-flex;
     align-items: center;
     justify-content: center;
-    gap: 6px; /* Space between icon and text */
+    gap: 6px;
 
-    /* Appearance */
-    padding: 8px var(--spacing-sm); /* Comfortable padding */
-    border-radius: var(--border-radius-sm); /* Standard roundness */
+    padding: 8px var(--spacing-sm);
+    border-radius: var(--border-radius-sm);
     cursor: pointer;
-    text-decoration: none; /* Explicitly none */
-    font-weight: 600; /* Slightly bolder weight for buttons */
-    font-size: 0.9rem; /* Consistent font size with desktop nav */
-    font-family: inherit; /* Use inherited font */
-    line-height: 1.2; /* Ensure good text vertical alignment */
-    transition: all 0.2s ease; /* Smooth transitions for hover/active */
-    outline: none; /* Remove default focus outline */
-    flex-shrink: 0; /* Prevent shrinking */
-    white-space: nowrap; /* Keep text on one line */
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 0.9rem;
+    font-family: inherit;
+    line-height: 1.2;
+    transition: all 0.2s ease;
+    outline: none;
+    flex-shrink: 0;
+    white-space: nowrap;
 
-    /* Colors are largely handled by the Button component's variant="primary/secondary" props.
-       We will primarily define borders and background/color transitions for a better hover state */
-
-    /* Ensure basic button reset */
     background: none;
-    border: 1px solid transparent; /* Start with transparent border */
+    border: 1px solid transparent;
 }
-/* Mobile Specific Elements */
-/* Mobile menu toggle is a direct child of container */
 .mobileMenuToggle {
-    display: none; /* Hidden on desktop by default */
-     /* Inherits styles from .actionButton for size/padding etc */
+    display: none;
 }
 
-/* Search Results Dropdown */
-/* By default, positioned relative to its parent (.searchContainer) */
 .searchResultsDropdown {
     position: absolute;
     top: calc(100% + 8px);
     left: 0;
-    width: 100%; /* Match searchContainer width on desktop */
+    width: 100%;
 
     background-color: var(--card-background);
     border-radius: var(--border-radius-sm);
     box-shadow: var(--shadow-lg);
     padding: 8px 0;
     min-width: 220px;
-    z-index: 950; /* Below other dropdowns (1001), above main content */
+    z-index: 950;
     opacity: 0;
     visibility: hidden;
     transform: translateY(5px);
     transition: opacity 0.25s ease, visibility 0.25s ease, transform 0.25s ease;
-    max-height: 300px; /* Max height for scroll on desktop */
+    max-height: 300px;
     overflow-y: auto;
     border: 1px solid var(--border-color);
     box-sizing: border-box;
@@ -523,7 +496,6 @@ body {
     transform: translateY(0);
 }
 
-/* Search results content styles (same as before) */
 .searchLoading, .searchEmpty {
      padding: var(--spacing-sm);
     text-align: center;
@@ -533,7 +505,7 @@ body {
 .searchLoading { display: flex; align-items: center; justify-content: center; gap: 8px;}
 .searchLoading .spinner > div { width: 16px !important; height: 16px !important; border-width: 2px !important; border-left-color: currentColor !important; }
 
-.searchResultsList { /* Add flex or block if needed */ }
+.searchResultsList { }
 
 .searchResultItem {
     display: flex;
@@ -571,20 +543,17 @@ body {
     display: block;
     padding: var(--spacing-xs) var(--spacing-sm);
     text-align: center;
-    color: white; /* Default/Light mode color (usually blue/primary) */
+    color: white;
     text-decoration: none;
-    font-weight: 500; /* Keep weight 500 or change to 600 if you prefer bolder */
-    transition: background-color 0.2s ease, color 0.2s ease; /* Smooth transitions */
-    font-size: 0.9rem; /* Consistent size, or adjust if needed */
-     /* Inherits font-family */
-     /* Inherits background from parent (.searchResultsDropdown) */
+    font-weight: 500;
+    transition: background-color 0.2s ease, color 0.2s ease;
+    font-size: 0.9rem;
 }
 .searchViewAllLink:hover {
-     background-color: white; /* Gives feedback */
-     /* Color might need explicit definition on hover depending on contrast */
+     background-color: white;
+
 }
 
-/* MOBILE MENU AND OVERLAY */
 .mobileMenu {
     position: fixed; top: 0; right: -280px; width: 280px; max-width: 80%;
     height: 100vh; background-color: var(--card-background); box-shadow: -4px 0 20px rgba(0, 0, 0, 0.1);
@@ -599,7 +568,6 @@ body {
 }
 .mobileMenuTitle { font-size: 1.1rem; font-weight: 600; color: var(--text-color-dark); }
 
-/* Close Button - Used in Mobile Menu Header */
 .closeButton {
     background: none; border: none; font-size: 1.5rem;
     color: var(--text-color-light); cursor: pointer; padding: 8px;
@@ -643,54 +611,36 @@ body {
 }
 
 
-/* Overlay for Mobile Menu */
 .overlay {
     position: fixed; top: 0; left: 0; width: 100%; height: 100%;
     background-color: rgba(0, 0, 0, 0.5); z-index: 1050;
     opacity: 1; visibility: visible;
 }
 
-
-/* MEDIA QUERIES FOR RESPONSIVENESS */
-
-/* Tablet/Small Desktop (<= 1024px) */
 @media (max-width: 1024px) {
     .desktopNav { display: none; }
     .desktopAuth { display: none; }
-    .mobileMenuToggle { display: flex; } /* Show menu toggle */
+    .mobileMenuToggle { display: flex; }
 
     .container {
-        padding: 0 var(--spacing-md); /* Keep desktop padding */
+        padding: 0 var(--spacing-md);
         gap: var(--spacing-md);
     }
 
-    /* Adjust desktop search bar width and max-width */
     .searchContainer {
         width: 220px;
-        max-width: 280px; /* Adjust max width */
-        order: 2; /* Tablet order: Logo(0/auto) -> DesktopNav(1/grow) -> Search(2) -> Actions(3) */
-         /* Need to adjust desktop order based on the new element arrangement */
-         order: 3; /* Logo, DesktopNav, Actions(contains Search) */
-         /* Okay, the container now has Logo, MobileToggle, SearchContainer, DesktopNav, Actions */
-         /* Let's redefine desktop vs mobile layout logic slightly clearer */
-         /* Desktop: Logo Nav Search Actions | Mobile: Logo Toggle Search Actions */
-         order: 2; /* On desktop, search is typically after nav */
+        max-width: 280px;
+        order: 3;
     }
-     /* Search results dropdown is absolute relative to searchContainer here */
+
      .searchResultsDropdown {
-        position: absolute; /* Relative to .searchContainer */
+        position: absolute;
         left: 0;
-        width: 100%; /* Match searchContainer width */
+        width: 100%;
         top: calc(100% + 8px);
      }
 
-     .actions { order: 3; } /* Desktop order for actions */
-     .logo { order: 1; } /* Desktop order for logo */
-     .desktopNav { order: 2; flex-grow: 1; } /* Desktop order for nav */
-     .searchContainer { order: 3; } /* Desktop order for search (after nav, before actions) */
-      .actions { order: 4;} /* Desktop order for actions */
-
-      /* Re-evaluate desktop order based on image/common patterns: Logo | Nav | Search | Actions */
+     .actions { order: 4;}
        .logo { order: 1; }
        .desktopNav { order: 2; flex-grow: 1;}
        .searchContainer { order: 3; }
@@ -700,98 +650,80 @@ body {
 }
 
 
-/* Mobile (<= 768px) - Search bar is in the main row, dropdown aligns below header */
 @media (max-width: 768px) {
     .container {
-        padding: 0 var(--container-padding-mobile-sm); /* Mobile horizontal padding */
-        gap: var(--spacing-xs); /* Tighter gap on mobile */
-        flex-wrap: nowrap; /* Prevent wrapping elements onto a new line */
-        justify-content: flex-start; /* Align items to the start */
+        padding: 0 var(--container-padding-mobile-sm);
+        gap: var(--spacing-xs);
+        flex-wrap: nowrap;
+        justify-content: flex-start;
     }
 
-    /* Hide desktop elements */
     .desktopNav { display: none; }
     .desktopAuth { display: none; }
 
-    /* Mobile Layout Order: Logo | Toggle | Search | Cart */
     .logo {
         order: 1;
-        flex-shrink: 0; /* Ensure logo doesn't shrink */
-        margin-right: var(--spacing-xs); /* Space after logo */
+        flex-shrink: 0;
+        margin-right: var(--spacing-xs);
     }
 
     .mobileMenuToggle {
-        display: flex; /* Show menu toggle */
-        order: 3; /* Place after search container */
-        margin-left: var(--spacing-xs); /* Space after search bar */
-        /* Height handled by .actionButton padding */
+        display: flex;
+        order: 3;
+        margin-left: var(--spacing-xs);
     }
 
-    /* Mobile Search Container */
     .searchContainer {
-        position: static; /* Remove absolute positioning */
-        flex-grow: 1; /* Allow search bar to take remaining space */
-        width: auto; /* Override desktop fixed width */
-        max-width: none; /* Override desktop max-width */
-        order: 2; /* Place after toggle */
-        margin: 0; /* Remove margins */
-        height: auto; /* Let content define height */
+        position: static;
+        flex-grow: 1;
+        width: auto;
+        max-width: none;
+        order: 2;
+        margin: 0;
+        height: auto;
     }
      .searchBar {
          padding: 4px var(--spacing-sm);
          border-radius: var(--border-radius-sm);
-         /* Inherits border from base style */
-          height: 38px; /* Adjust search bar height on mobile */
+          height: 38px;
      }
       .searchInput {
           font-size: 0.9rem;
-           /* Vertically align input */
-          min-height: 1.2em; /* Ensure text area */
+          min-height: 1.2em;
           line-height: 1.2em;
-           padding-top: 0; /* Ensure no extra padding */
-           padding-bottom: 0; /* Ensure no extra padding */
+           padding-top: 0;
+           padding-bottom: 0;
      }
 
 
-    /* Actions (now only Cart icon on mobile) */
     .actions {
-         flex-grow: 0; /* Do not grow */
-         gap: 0; /* No gap needed within actions now (just one icon or maybe user-mobile) */
-         justify-content: center; /* Center cart icon within its minimal space */
-         order: 4; /* Place actions block at the end */
+         flex-grow: 0;
+         gap: 0;
+         justify-content: center;
+         order: 4;
          width: auto;
-         flex-shrink: 0; /* Don't shrink */
-         margin-left: var(--spacing-xs); /* Space between toggle and actions */
-         /* Removed explicit width/flex-basis if any */
+         flex-shrink: 0;
+         margin-left: var(--spacing-xs);
     }
     .cartButton {
-         padding: 8px; /* Adjust padding for the icon */
-         font-size: 1.25rem; /* Adjust icon size */
+         padding: 8px;
+         font-size: 1.25rem;
     }
 
 
-    /* Search Results Dropdown on Mobile */
-    /* Position absolute relative to the .container */
     .searchResultsDropdown {
-        position: absolute; /* Position relative to the .container */
-        /* Position below the container */
+        position: absolute;
         top: 100%;
-        /* Align left edge with container padding */
         left: var(--container-padding-mobile-sm);
-        /* Set width to span the content area */
         width: calc(100% - (2 * var(--container-padding-mobile-sm)));
-         /* Calc max height relative to the container's bottom, adding back a small buffer for scroll space */
-        max-height: calc(100vh - 100% - 10px); /* 100% is container height, 10px is buffer */
+        max-height: calc(100vh - 100% - 10px);
         border-top: 1px solid var(--border-color);
         border-radius: var(--border-radius-sm);
         box-shadow: var(--shadow-lg);
         overflow-y: auto;
-        z-index: 990; /* Below mobile menu (1100) and its overlay (1050), above main content */
-        /* Inherits background and border from base style */
-         /* Refine padding if needed */
+        z-index: 990;
         padding: 8px 0;
     }
-    /* Ensure last item has no border */
     .searchResultsDropdown .searchResultsList .searchResultItem:last-child {
         border-bottom: none;
     }
@@ -800,9 +732,8 @@ body {
     .searchLoading, .searchEmpty { padding: var(--spacing-sm); }
 
 
-     /* Adjust Mobile Menu Padding */
-    .mobileMenu { padding-top: 0; /* Adjust padding if needed */ }
-    .mobileMenuHeader { padding: var(--spacing-sm) var(--spacing-md); /* Keep header padding */ }
+    .mobileMenu { padding-top: 0; }
+    .mobileMenuHeader { padding: var(--spacing-sm) var(--spacing-md); }
      .mobileUserInfo { padding: var(--spacing-md); }
      .mobileNavLink { padding: var(--spacing-xs) var(--spacing-md); }
      .mobileNavLink:hover { padding-left: calc(var(--spacing-md) + 4px); }
@@ -811,46 +742,40 @@ body {
 
 }
 
-/* Small Mobile (<= 480px) */
 @media (max-width: 480px) {
     .container {
-        padding: 0 var(--container-padding-mobile-xs); /* Small mobile horizontal padding */
+        padding: 0 var(--container-padding-mobile-xs);
         gap: var(--spacing-xs);
     }
 
     .logo img { height: 30px; }
-     .logo { margin-right: var(--spacing-xs); } /* Space after logo */
+     .logo { margin-right: var(--spacing-xs); }
 
      .mobileMenuToggle {
-         margin-left: var(--spacing-xs); /* Space after search bar */
+         margin-left: var(--spacing-xs);
      }
 
      .searchContainer {
-         /* Inherits flex-grow, width, max-width, order */
+
      }
-     .searchBar { height: 36px; /* Adjust search bar height */ padding: 2px 5px 2px var(--spacing-sm);}
+     .searchBar { height: 36px; padding: 2px 5px 2px var(--spacing-sm);}
       .searchInput { font-size: 0.8rem; }
 
-     /* Actions (Cart icon) */
-     .actions { margin-left: var(--spacing-xs); /* Space after toggle */ }
+     .actions { margin-left: var(--spacing-xs); }
      .cartButton { padding: 7px; font-size: 1.2rem; }
     .cartCount { font-size: 0.6rem; min-width: 14px; padding: 0px 3px; top: 0px; right: -3px; }
 
 
-    /* Search Results Dropdown on Small Mobile */
     .searchResultsDropdown {
-         /* Position absolute relative to the .container */
-         left: var(--container-padding-mobile-xs); /* Align left edge with container padding */
-         width: calc(100% - (2 * var(--container-padding-mobile-xs))); /* Set width to span the content area */
-         max-height: calc(100vh - 100% - var(--spacing-xs)); /* Max height below header */
+         left: var(--container-padding-mobile-xs);
+         width: calc(100% - (2 * var(--container-padding-mobile-xs)));
+         max-height: calc(100vh - 100% - var(--spacing-xs));
     }
-     /* Refine padding */
     .searchResultItem { padding: var(--spacing-xs); }
      .searchViewAllLink { padding: var(--spacing-xs); }
      .searchLoading, .searchEmpty { padding: var(--spacing-xs); font-size: 0.85rem; }
 
 
-     /* Mobile menu adjustments */
      .mobileMenu { width: 240px; max-width: 95%; }
      .mobileMenuHeader { padding: var(--spacing-xs) var(--spacing-sm); }
      .mobileMenuTitle { font-size: 1.05rem; }

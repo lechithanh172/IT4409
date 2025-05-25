@@ -340,7 +340,7 @@ const Header = () => {
              <NavLink to="/" className={({ isActive }) => isActive ? `${styles.navLink} ${styles.active}` : styles.navLink} end onClick={handleDropdownLinkClick}>Trang Chủ</NavLink>
               <div className={styles.dropdownContainer} ref={categoryDropdownRef}>
                 <button onClick={toggleCategoryDropdown} className={`${styles.navLink} ${styles.dropdownToggle}`} disabled={isCategoryLoading} aria-haspopup="true" aria-expanded={isCategoryDropdownOpen}>
-                  Danh Mục {isCategoryLoading ? <Spinner size="small" color="currentColor"/> : <FiChevronDown className={`${styles.chevronIcon} ${isCategoryDropdownOpen ? styles.chevronOpen : ''}`} />}
+                  Danh Mục {<FiChevronDown className={`${styles.chevronIcon} ${isCategoryDropdownOpen ? styles.chevronOpen : ''}`} />}
                 </button>
                 <div className={` ${styles.dropdownMenu} ${styles.categoryDropdown} ${isCategoryDropdownOpen ? styles.show : ''} `} role="menu">
                     {isCategoryLoading ? (

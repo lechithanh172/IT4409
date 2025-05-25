@@ -227,10 +227,12 @@
 .orderRow td {
   padding: 16px 12px;
   vertical-align: middle;
+  color:#2c3e50;
 }
 
 .orderRow td:first-child {
   padding-left: 24px;
+  font-weight: bold;
 }
 
 .orderRow td:last-child {

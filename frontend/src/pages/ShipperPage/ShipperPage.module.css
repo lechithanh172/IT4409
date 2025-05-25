@@ -164,11 +164,14 @@
 .orderTable tbody tr {
   transition: all 0.2s ease;
   border-bottom: 1px solid #e9ecef; /* Light border */
+  color:#2c3e50;
 }
 
 .orderTable tbody tr:last-child {
     border-bottom: none; /* No border on last row */
 }
+
+
 
 .orderTable tbody tr:hover {
   background-color: #f8f9fa; /* Hover background */
@@ -181,6 +184,7 @@
 
 .orderTable td:first-child {
   padding-left: 24px;
+  font-weight: bold;
 }
 
 .orderTable td:last-child {

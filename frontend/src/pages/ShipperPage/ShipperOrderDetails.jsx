@@ -7,6 +7,7 @@ const { Text, Title } = Typography;
 const STATUS_DETAILS = {
     PENDING: { label: "Chờ xử lý", color: "gold" },
     SHIPPING: { label: "Đang giao", color: "processing" },
+    APPROVED: {label: "Đã phê duyệt", color: "gold"},
     DELIVERED: { label: "Đã giao", color: "success" },
     FAILED_DELIVERY: { label: "Giao thất bại", color: "error" },
     REJECTED: { label: "Bị từ chối", color: "error" },
@@ -39,10 +40,11 @@ const DetailRow = ({ label, value }) => (
 );
 
 const ShipperOrderDetails = ({ orderId }) => {
-    
+
     useEffect(() => {
             document.title = "Shipper | HustShop";
         }, []);
+
     const [orderData, setOrderData] = useState(null);
     const [orderItems, setOrderItems] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -59,11 +61,15 @@ const ShipperOrderDetails = ({ orderId }) => {
                 if (orderResponse?.data) {
                     setOrderData(orderResponse.data);
                 }
-                console.log(orderResponse.data);    
+
                 if (itemsResponse?.data) {
-                    setOrderItems(itemsResponse.data);
+                    const itemsWithDefaults = itemsResponse.data.map(item => ({
+                        ...item,
+                        imageUrl: item.imageUrl || '/placeholder.png'
+                    }));
+                    setOrderItems(itemsWithDefaults);
                 }
-                console.log(itemsResponse.data);
+
             } catch (err) {
                 console.error('Error fetching order details:', err);
                 setError('Không thể tải thông tin đơn hàng');
@@ -87,14 +93,14 @@ const ShipperOrderDetails = ({ orderId }) => {
                     <Image
                         src={record.imageUrl || '/placeholder.png'}
                         alt={text}
-                        width={50}  
+                        width={50}
                         height={50}
                         style={{ objectFit: 'cover' }}
                         preview={false}
                     />
                     <div>
                         <div>{text}</div>
-                        {record.color && <Text type="secondary">Màu: {record.color}</Text>}
+                        {record.attributes?.color && <Text type="secondary">Màu: {record.attributes.color}</Text>}
                     </div>
                 </div>
             ),
@@ -153,6 +159,11 @@ const ShipperOrderDetails = ({ orderId }) => {
     }
 
     const totalAmount = orderItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+    const vatRate = 0.10;
+    const vatAmount = totalAmount * vatRate;
+    const shippingFee = orderData.shippingFee || 0;
+    const grandTotal = totalAmount + vatAmount + shippingFee;
+
 
     return (
         <Card bordered={false}>
@@ -166,6 +177,8 @@ const ShipperOrderDetails = ({ orderId }) => {
                             {STATUS_DETAILS[orderData.status]?.label || orderData.status}
                         </Tag>
                     } />
+                    <DetailRow label="Tên khách hàng" value={orderData.customerName} />
+                    <DetailRow label="Số điện thoại" value={orderData.customerPhone} />
                     <DetailRow label="Địa chỉ giao hàng" value={orderData.shippingAddress} />
                     <DetailRow label="Ghi chú" value={orderData.note || 'Không có'} />
                 </Col>
@@ -189,21 +202,32 @@ const ShipperOrderDetails = ({ orderId }) => {
                                 <Text strong>{formatCurrency(totalAmount)}</Text>
                             </Table.Summary.Cell>
                         </Table.Summary.Row>
+
+                        <Table.Summary.Row>
+                            <Table.Summary.Cell index={0} colSpan={3}>
+                                <Text strong>Thuế VAT ({vatRate * 100}%):</Text>
+                            </Table.Summary.Cell>
+                            <Table.Summary.Cell index={1} align="right">
+                                <Text strong>{formatCurrency(vatAmount)}</Text>
+                            </Table.Summary.Cell>
+                        </Table.Summary.Row>
+
                         <Table.Summary.Row>
                             <Table.Summary.Cell index={0} colSpan={3}>
                                 <Text strong>Phí vận chuyển:</Text>
                             </Table.Summary.Cell>
                             <Table.Summary.Cell index={1} align="right">
-                                <Text strong>{formatCurrency(orderData.shippingFee || 0)}</Text>
+                                <Text strong>{formatCurrency(shippingFee)}</Text>
                             </Table.Summary.Cell>
                         </Table.Summary.Row>
+
                         <Table.Summary.Row style={{ backgroundColor: '#fafafa' }}>
                             <Table.Summary.Cell index={0} colSpan={3}>
                                 <Text strong style={{ fontSize: '16px' }}>Tổng cộng:</Text>
                             </Table.Summary.Cell>
                             <Table.Summary.Cell index={1} align="right">
                                 <Text strong style={{ fontSize: '16px', color: '#d32f2f' }}>
-                                    {formatCurrency(totalAmount + (orderData.shippingFee || 0))}
+                                    {formatCurrency(grandTotal)}
                                 </Text>
                             </Table.Summary.Cell>
                         </Table.Summary.Row>

@@ -36,7 +36,7 @@ const AdminCategories = () => {
           message.error('Dữ liệu danh mục không hợp lệ.');
           setCategories([]);
         }
-      } catch (error) {
+      } catch  {
         message.error('Không thể lấy dữ liệu danh mục.');
         setCategories([]);
       } finally {
@@ -54,7 +54,7 @@ const AdminCategories = () => {
     setSearchedColumn(dataIndex);
   };
 
-  const handleReset = (clearFilters, confirm, dataIndex) => {
+  const handleReset = (clearFilters, confirm) => {
     clearFilters && clearFilters();
     setSearchText("");
     confirm();

@@ -1,76 +1,127 @@
-import React, { useRef } from 'react';
-import { Swiper, SwiperSlide } from 'swiper/react'; // Import Swiper components
-import { Navigation, A11y } from 'swiper/modules'; // Import Navigation module
-import ProductCard from '../ProductCard/ProductCard'; // Import ProductCard
-import styles from './ProductSlider.module.css';      // CSS Module cho Slider
-import { FiChevronLeft, FiChevronRight } from 'react-icons/fi'; // Icons
+import React, { useRef, useEffect } from 'react';
+import { Swiper, SwiperSlide } from 'swiper/react';
+import { Navigation, A11y, Autoplay } from 'swiper/modules';
+import ProductCard from '../ProductCard/ProductCard';
+import styles from './ProductSlider.module.css';
+import { FiChevronLeft, FiChevronRight } from 'react-icons/fi';
 
-// Import Swiper styles (QUAN TRỌNG)
 import 'swiper/css';
 import 'swiper/css/navigation';
 
 const ProductSlider = ({ products = [], title }) => {
-  // Refs cho các nút điều hướng tùy chỉnh
+
   const navigationPrevRef = useRef(null);
   const navigationNextRef = useRef(null);
 
+
+  const swiperInstanceRef = useRef(null);
+
+
+  useEffect(() => {
+    console.log("[ProductSlider] useEffect for navigation setup running.");
+
+
+
+    if (swiperInstanceRef.current && navigationPrevRef.current && navigationNextRef.current) {
+      console.log("[ProductSlider] Swiper instance and navigation refs are ready. Wiring custom navigation.");
+
+
+
+      swiperInstanceRef.current.params.navigation.prevEl = navigationPrevRef.current;
+      swiperInstanceRef.current.params.navigation.nextEl = navigationNextRef.current;
+
+
+
+      swiperInstanceRef.current.navigation.init();
+      swiperInstanceRef.current.navigation.update();
+
+      console.log("[ProductSlider] Custom navigation wiring complete.");
+    } else {
+       console.log("[ProductSlider] Swiper instance or navigation elements not yet available for wiring.");
+
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+  }, []);
+
+
   if (!products || products.length === 0) {
-    return null; // Không render gì nếu không có sản phẩm
+    console.log("[ProductSlider] No products, returning null.");
+    return null;
   }
+
 
   return (
     <div className={styles.sliderContainer}>
-      {/* Tiêu đề của slider (nếu có) */}
       {title && <h3 className={styles.sliderTitle}>{title}</h3>}
 
       <div className={styles.swiperWrapper}>
         <Swiper
-          modules={[Navigation, A11y]} // Kích hoạt các module cần thiết
-          spaceBetween={20} // Khoảng cách giữa các slide
-          slidesPerView={'auto'} // Hiển thị số lượng slide tự động dựa trên kích thước
-          // Responsive breakpoints (điều chỉnh số lượng slide trên các màn hình)
+          modules={[Navigation, Autoplay]}
+          spaceBetween={20}
+          slidesPerView={'auto'}
+
+
           breakpoints={{
-            // >= 480px
-            480: { slidesPerView: 2, spaceBetween: 15 },
-            // >= 768px
-            768: { slidesPerView: 3, spaceBetween: 20 },
-            // >= 1024px
-            1024: { slidesPerView: 4, spaceBetween: 20 },
-             // >= 1200px
-             1200: { slidesPerView: 5, spaceBetween: 25 }, // Hiển thị 5 SP trên màn hình lớn
+             0: { slidesPerView: 1.2, spaceBetween: 15 },
+            480: { slidesPerView: 2.2, spaceBetween: 20 },
+            768: { slidesPerView: 3, spaceBetween: 25 },
+            1024: { slidesPerView: 4, spaceBetween: 30 },
+            1200: { slidesPerView: 5, spaceBetween: 35 },
+            1400: { slidesPerView: 5, spaceBetween: 40 },
           }}
-          navigation={{ // Sử dụng refs cho nút tùy chỉnh
-            prevEl: navigationPrevRef.current,
-            nextEl: navigationNextRef.current,
+
+          autoplay={{
+            delay: 4000,
+            disableOnInteraction: false,
+            pauseOnMouseEnter: true,
           }}
-          // Đảm bảo các nút được render và gắn ref trước khi Swiper init
-          onBeforeInit={(swiper) => {
-             swiper.params.navigation.prevEl = navigationPrevRef.current;
-             swiper.params.navigation.nextEl = navigationNextRef.current;
-             swiper.navigation.update(); // Cập nhật lại navigation
+
+
+
+
+
+
+
+          navigation={{}}
+
+
+
+          onSwiper={(swiper) => {
+             swiperInstanceRef.current = swiper;
+             console.log("[ProductSlider] Swiper instance created and stored in ref via onSwiper.");
+
+
            }}
-          className={styles.mySwiper} // Class tùy chỉnh cho Swiper
-          a11y={{ // Cải thiện accessibility
-              prevSlideMessage: 'Sản phẩm trước',
-              nextSlideMessage: 'Sản phẩm kế tiếp',
-          }}
-          watchOverflow={true} // Tự động ẩn nút nav nếu không đủ slide
+
+          className={styles.mySwiper}
+          watchOverflow={true}
+          loop={true}
+
         >
           {products.map((product) => (
-            <SwiperSlide key={product.productId} className={styles.swiperSlide}>
-              {/* Đặt ProductCard vào trong mỗi Slide */}
+
+            <SwiperSlide key={product.productId || product.id} className={styles.swiperSlide}>
               <ProductCard product={product} />
             </SwiperSlide>
           ))}
         </Swiper>
 
         {/* Nút điều hướng tùy chỉnh */}
-        <button ref={navigationPrevRef} className={`${styles.navButton} ${styles.prevButton}`} aria-label="Trước">
-          <FiChevronLeft />
-        </button>
-        <button ref={navigationNextRef} className={`${styles.navButton} ${styles.nextButton}`} aria-label="Sau">
-          <FiChevronRight />
-        </button>
+        {/* Refs được gán vào các nút này */}
+        {/* Các nút này cần nằm trong .swiperWrapper và .swiperWrapper có position: relative */}
+       <button ref={navigationPrevRef} className={`${styles.navButton} ${styles.prevButton}`} aria-label="Trước"><FiChevronLeft></FiChevronLeft></button>
+        <button ref={navigationNextRef} className={`${styles.navButton} ${styles.nextButton}`} aria-label="Sau"><FiChevronRight></FiChevronRight></button>
       </div>
     </div>
   );

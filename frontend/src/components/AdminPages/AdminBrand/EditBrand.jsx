@@ -14,7 +14,7 @@ const EditBrand = ({ brand, setModalChild, handleRefresh }) => {
         });
     }, [brand, form]);
 
-    const onFinishFailed = (errorInfo) => {
+    const onFinishFailed = () => {
         message.error('Vui lòng điền đầy đủ thông tin bắt buộc.');
     };
 

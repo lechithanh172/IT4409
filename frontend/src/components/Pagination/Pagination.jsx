@@ -4,30 +4,30 @@ import { FiChevronLeft, FiChevronRight } from 'react-icons/fi';
 
 const Pagination = ({ currentPage, totalPages, onPageChange }) => {
   if (totalPages <= 1) {
-    return null; // Không hiển thị nếu chỉ có 1 trang hoặc không có trang nào
+    return null;
   }
 
   const handlePageClick = (pageNumber) => {
     if (pageNumber >= 1 && pageNumber <= totalPages && pageNumber !== currentPage) {
-      onPageChange(pageNumber); // Gọi hàm callback với số trang mới
+      onPageChange(pageNumber);
     }
   };
 
-  // Logic tạo các nút trang (có thể phức tạp hơn với dấu "...")
-  const pageNumbers = [];
-  const maxPagesToShow = 5; // Số lượng nút trang tối đa hiển thị cùng lúc
 
-  if (totalPages <= maxPagesToShow + 2) { // Hiển thị tất cả nếu ít trang
+  const pageNumbers = [];
+  const maxPagesToShow = 5;
+
+  if (totalPages <= maxPagesToShow + 2) {
     for (let i = 1; i <= totalPages; i++) {
       pageNumbers.push(i);
     }
   } else {
-    // Logic hiển thị rút gọn với "..." (ví dụ đơn giản)
-    pageNumbers.push(1); // Luôn hiển thị trang 1
+
+    pageNumbers.push(1);
     let startPage = Math.max(2, currentPage - Math.floor((maxPagesToShow - 2) / 2));
     let endPage = Math.min(totalPages - 1, currentPage + Math.floor((maxPagesToShow - 1) / 2));
 
-     // Điều chỉnh nếu khoảng cách quá gần đầu/cuối
+
      if (currentPage - startPage < Math.floor((maxPagesToShow - 2) / 2)) {
          endPage = Math.min(totalPages - 1, startPage + maxPagesToShow - 3);
      }
@@ -37,15 +37,15 @@ const Pagination = ({ currentPage, totalPages, onPageChange }) => {
 
 
     if (startPage > 2) {
-      pageNumbers.push('...'); // Dấu ... ở đầu
+      pageNumbers.push('...');
     }
     for (let i = startPage; i <= endPage; i++) {
       pageNumbers.push(i);
     }
     if (endPage < totalPages - 1) {
-      pageNumbers.push('...'); // Dấu ... ở cuối
+      pageNumbers.push('...');
     }
-    pageNumbers.push(totalPages); // Luôn hiển thị trang cuối
+    pageNumbers.push(totalPages);
   }
 
 

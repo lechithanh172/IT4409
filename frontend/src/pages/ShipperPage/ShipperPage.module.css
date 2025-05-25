@@ -1,0 +1,408 @@
+/* ShipperPage.module.css */
+
+/* Container and Main Layout */
+.container {
+  max-width: 1200px; /* Use a max-width similar to the reference */
+  margin: 0 auto;
+  padding: 24px;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; /* Use the specified font */
+  background-color: #f8f9fa; /* Light background */
+  min-height: calc(100vh - 64px); /* Adjust based on header height if any */
+  box-sizing: border-box; /* Include padding in element's total width and height */
+}
+
+/* Main Title */
+.container h2 { /* Targeting h2 as used in your code */
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 28px; /* Similar font size to reference h1 */
+  font-weight: 600;
+  color: #2c3e50; /* Dark grey color */
+  margin-bottom: 32px;
+  padding-bottom: 16px;
+  border-bottom: 3px solid #3498db; /* Blue border */
+}
+
+/* Loading and Error States */
+.loadingContainer,
+.errorContainer,
+.emptyState { /* Combining styles for these similar blocks */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center; /* Center vertically if needed */
+  min-height: 300px; /* Give them some minimum height */
+  gap: 16px;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1); /* Soft shadow */
+  margin: 32px 0; /* Margin top/bottom */
+  padding: 40px;
+  text-align: center; /* Center text */
+}
+
+.loadingContainer p,
+.errorContainer p,
+.emptyState p {
+  font-size: 16px;
+  color: #6c757d; /* Grey text */
+  margin: 0;
+}
+
+.errorContainer h2 {
+  color: #dc3545; /* Red for errors */
+  margin: 0;
+  font-size: 24px;
+}
+
+.emptyState h2 { /* If you add an h2 in emptyState */
+   color: #2c3e50;
+   margin: 16px 0 8px;
+   font-size: 24px;
+}
+
+.emptyState p:last-child { /* Style for the suggestion text */
+    margin-top: 16px;
+    font-style: italic;
+}
+
+
+/* Tab Navigation */
+.tabContainer {
+    display: flex;
+    margin-bottom: 24px;
+    border-bottom: 2px solid #e9ecef; /* Subtle bottom border */
+    background-color: white;
+    border-top-left-radius: 8px;
+    border-top-right-radius: 8px;
+    overflow: hidden; /* Contain border-radius */
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05); /* Soft shadow */
+}
+
+.tab {
+    flex: 1; /* Distribute space equally */
+    padding: 12px 20px;
+    text-align: center;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: 500;
+    color: #6c757d; /* Default color */
+    transition: all 0.3s ease;
+    border-bottom: 3px solid transparent; /* Active indicator space */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.tab:hover {
+    color: #3498db; /* Hover color */
+    background-color: #f8f9fa; /* Slight background on hover */
+}
+
+.tab.active {
+    color: #3498db; /* Active color */
+    border-bottom-color: #3498db; /* Active indicator color */
+    background-color: white; /* Active background */
+    font-weight: 600;
+}
+
+
+/* Table Container */
+.tableContainer {
+  background: white;
+  border-radius: 12px; /* Match container radius */
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); /* Stronger shadow for the table block */
+  overflow: hidden; /* Ensures rounded corners on table */
+  margin-top: 24px; /* Space below tabs */
+  position: relative; /* For loading overlay */
+}
+
+.loadingOverlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(255, 255, 255, 0.8); /* Semi-transparent white */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 10; /* Above table content */
+}
+
+
+.orderTable {
+  width: 100%;
+  border-collapse: collapse; /* No space between borders */
+  font-size: 14px;
+}
+
+.orderTable thead {
+  background: linear-gradient(135deg, #3498db, #2980b9); /* Blue gradient */
+  color: white;
+}
+
+.orderTable th {
+  padding: 16px 12px; /* Padding consistent with reference */
+  text-align: left;
+  font-weight: 600;
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.orderTable th:first-child {
+  padding-left: 24px; /* Extra padding on first column */
+}
+
+.orderTable th:last-child {
+  padding-right: 24px; /* Extra padding on last column */
+}
+
+.orderTable tbody tr {
+  transition: all 0.2s ease;
+  border-bottom: 1px solid #e9ecef; /* Light border */
+}
+
+.orderTable tbody tr:last-child {
+    border-bottom: none; /* No border on last row */
+}
+
+.orderTable tbody tr:hover {
+  background-color: #f8f9fa; /* Hover background */
+}
+
+.orderTable td {
+  padding: 16px 12px;
+  vertical-align: middle; /* Align content nicely */
+}
+
+.orderTable td:first-child {
+  padding-left: 24px;
+}
+
+.orderTable td:last-child {
+  padding-right: 24px;
+}
+
+/* Ant Design Tag styling - Adjusting default appearance */
+.ant-tag {
+    /* Inherit colors from Ant Design prop, just adjust shape/size */
+    border-radius: 20px !important; /* Make them rounded */
+    padding: 5px 10px !important; /* Adjust padding */
+    font-size: 12px !important; /* Smaller font size */
+    font-weight: 600 !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.5px !important;
+    border: none !important; /* Remove default border if any */
+    line-height: 1.4 !important; /* Improve vertical alignment */
+    height: auto !important; /* Allow height to adjust based on padding/line-height */
+    display: inline-flex !important; /* Use flex to center content */
+    align-items: center !important;
+}
+
+/* Specific status colors based on Ant Design's defaults or define custom if needed */
+/* Ant Design's Tag color prop handles background/text, so we only adjust shape/font */
+
+
+/* Action Buttons */
+.actionButtons {
+    display: flex; /* Arrange buttons in a row */
+    gap: 8px; /* Space between buttons */
+    flex-wrap: wrap; /* Wrap buttons if container is too narrow */
+}
+
+/* Ant Design Button styling within actionButtons */
+.actionButtons .ant-btn {
+    border-radius: 20px !important; /* Make buttons rounded */
+    padding: 4px 12px !important; /* Adjust button padding */
+    font-size: 13px !important; /* Adjust button font size */
+    height: auto !important; /* Allow height to adjust */
+     display: inline-flex !important; /* Use flex to align icon and text */
+     align-items: center !important;
+     gap: 4px; /* Space between icon and text */
+}
+
+/* Ensure specific button colors are used as intended */
+/* e.g., green background for success buttons */
+.actionButtons .ant-btn[style*="background-color: green"] {
+    /* Already handled by inline style, or could target ant-btn-success if using type="success" */
+}
+
+
+/* Empty State Specifics (using the combined style block) */
+.emptyState svg { /* Style for icons in empty state */
+   color: #ced4da; /* Light grey icon */
+   margin-bottom: 16px;
+}
+
+
+/* Responsive Design */
+@media (max-width: 992px) { /* Adjusting for medium screens */
+    .container {
+        padding: 20px;
+    }
+
+    .container h2 {
+        font-size: 26px;
+    }
+
+    .tab {
+        padding: 10px 15px;
+        font-size: 15px;
+        gap: 6px;
+    }
+
+    .orderTable th,
+    .orderTable td {
+        padding: 14px 10px;
+    }
+
+     .orderTable th:first-child,
+     .orderTable td:first-child {
+        padding-left: 20px;
+     }
+
+     .orderTable th:last-child,
+     .orderTable td:last-child {
+        padding-right: 20px;
+     }
+
+    .actionButtons .ant-btn {
+         padding: 3px 10px !important;
+         font-size: 12px !important;
+    }
+}
+
+
+@media (max-width: 768px) { /* Adjusting for smaller screens */
+  .container {
+    padding: 16px;
+  }
+
+  .container h2 {
+    font-size: 22px;
+    margin-bottom: 20px;
+    gap: 8px;
+  }
+
+  .tabContainer {
+      flex-direction: column; /* Stack tabs vertically */
+      border-bottom: none; /* Remove bottom border when stacked */
+      box-shadow: none;
+      border-radius: 0;
+  }
+
+  .tab {
+    border-bottom: 1px solid #e9ecef; /* Add border between stacked tabs */
+    border-right: none;
+    justify-content: flex-start; /* Align text to the left */
+    padding: 10px 16px;
+    font-size: 15px;
+  }
+
+   .tab:last-child {
+       border-bottom: none;
+   }
+
+   .tab.active {
+       border-bottom-color: transparent; /* Remove individual bottom border */
+       border-left: 3px solid #3498db; /* Use left border for active indicator when stacked */
+       background-color: #e3f2fd; /* Light blue background for active */
+       font-weight: 600;
+       color: #2c3e50; /* Darker text for active */
+   }
+
+
+  .tableContainer {
+    overflow-x: auto; /* Enable horizontal scrolling for the table */
+    border-radius: 8px;
+  }
+
+  .orderTable {
+    min-width: 700px; /* Ensure table doesn't shrink too much */
+    font-size: 13px;
+  }
+
+  .orderTable th,
+  .orderTable td {
+    padding: 12px 8px;
+  }
+
+  .orderTable th:first-child,
+  .orderTable td:first-child {
+    padding-left: 16px;
+  }
+
+  .orderTable th:last-child,
+  .orderTable td:last-child {
+    padding-right: 16px;
+  }
+
+  .ant-tag {
+      padding: 4px 8px !important;
+      font-size: 11px !important;
+  }
+
+   .actionButtons .ant-btn {
+        padding: 2px 8px !important;
+        font-size: 11px !important;
+        gap: 3px;
+        border-radius: 15px !important;
+   }
+}
+
+@media (max-width: 480px) { /* Adjusting for extra small screens */
+  .container {
+    padding: 12px;
+  }
+
+   .container h2 {
+       font-size: 20px;
+       margin-bottom: 16px;
+   }
+
+   .tab {
+       padding: 8px 12px;
+       font-size: 14px;
+   }
+
+   .orderTable {
+       font-size: 12px;
+       min-width: 600px; /* Further reduce min-width if necessary */
+   }
+
+   .orderTable th,
+   .orderTable td {
+       padding: 10px 6px;
+   }
+
+    .orderTable th:first-child,
+    .orderTable td:first-child {
+       padding-left: 12px;
+    }
+
+    .orderTable th:last-child,
+    .orderTable td:last-child {
+       padding-right: 12px;
+    }
+
+    .ant-tag {
+        padding: 3px 6px !important;
+        font-size: 10px !important;
+    }
+
+     .actionButtons .ant-btn {
+         padding: 1px 6px !important;
+         font-size: 10px !important;
+         gap: 2px;
+         border-radius: 12px !important;
+     }
+}
+
+/* Styles for Modal content (ShipperOrderDetails) would go in its own CSS module */
+/* Example: ShipperOrderDetails.module.css could use styles similar to */
+/* .orderMeta, .shipperDetails, .itemsTitle, .itemsList, .orderItem etc. */
+/* as seen in the reference CSS. */

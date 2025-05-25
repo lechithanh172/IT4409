@@ -1,19 +1,19 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-// import { useCart } from '../../contexts/CartContext'; // Import Cart Context (nếu dùng để update UI)
-import { useAuth } from '../../contexts/AuthContext';   // Import Auth Context
-import apiService from '../../services/api';   // Import apiService
-import Button from '../Button/Button';               // Import Button component
-import styles from './ProductDisplay.module.css';     // Import CSS Module
-import { toast } from 'react-toastify';               // Import toast để hiển thị thông báo
-import Spinner from '../Spinner/Spinner';             // Import Spinner
+
+import { useAuth } from '../../contexts/AuthContext';
+import apiService from '../../services/api';
+import Button from '../Button/Button';
+import styles from './ProductDisplay.module.css';
+import { toast } from 'react-toastify';
+import Spinner from '../Spinner/Spinner';
 import {
   FaStar, FaRegStar, FaStarHalfAlt, FaCartPlus, FaCheck, FaBolt, FaExclamationCircle, FaTag
 } from 'react-icons/fa';
-// Import các icon Feather (Fi...) từ /fi
+
 import { FiLogIn } from 'react-icons/fi';
 
-// --- Hàm tiện ích ---
+
 const formatCurrency = (amount) => {
   if (typeof amount !== 'number' || isNaN(amount)) return 'Liên hệ';
   return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(amount);
@@ -33,26 +33,26 @@ const formatDateTime = (isoString) => {
       minute: '2-digit',
       hour12: false
     };
-    // Format và loại bỏ dấu phẩy nếu có
-    return date.toLocaleString('vi-VN', options).replace(',', ' '); // Thay dấu phẩy bằng khoảng trắng
+
+    return date.toLocaleString('vi-VN', options).replace(',', ' ');
   } catch (error) {
     console.error("Error formatting date:", error);
     return isoString;
   }
 };
 
-// Ngưỡng ký tự để hiển thị nút "Xem thêm"
+
 const COMMENT_TRUNCATE_LIMIT = 200;
 
 
-// --- Component con: Hiển thị sao đánh giá ---
+
 const RatingStars = ({ rating = 0, reviewCount = null, isIndividualReview = false }) => {
-    const clampedRating = Math.max(0, Math.min(5, rating)); // Đảm bảo rating nằm trong khoảng 0-5
+    const clampedRating = Math.max(0, Math.min(5, rating));
     const fullStars = Math.floor(clampedRating);
     const hasHalfStar = clampedRating > 0 && (clampedRating % 1) >= 0.25 && (clampedRating % 1) < 0.75;
     const emptyStars = 5 - fullStars - (hasHalfStar ? 1 : 0);
 
-     // Nếu là đánh giá cá nhân và rating <= 0, hiển thị 5 sao rỗng
+
      if (isIndividualReview && rating <= 0) {
          return (
              <div className={styles.reviewRatingStars}>
@@ -62,7 +62,7 @@ const RatingStars = ({ rating = 0, reviewCount = null, isIndividualReview = fals
              </div>
          );
      }
-     // Nếu là đánh giá cá nhân và rating hợp lệ > 0, hiển thị sao tương ứng
+
      if (isIndividualReview && rating > 0) {
          return (
               <div className={styles.reviewRatingStars}>
@@ -76,13 +76,13 @@ const RatingStars = ({ rating = 0, reviewCount = null, isIndividualReview = fals
      }
 
 
-    // Nếu là rating tổng và chưa có đánh giá (reviewCount <= 0 hoặc null/undefined)
-    // Chỉ hiển thị "Chưa có đánh giá" nếu KHÔNG có lượt đánh giá
+
+
     if (!isIndividualReview && (reviewCount === null || reviewCount <= 0)) {
         return <div className={styles.rating}><span className={styles.reviewCount}>Chưa có đánh giá</span></div>;
     }
 
-    // Render sao và số lượt đánh giá cho rating tổng (> 0 reviews)
+
     return (
       <div className={styles.rating}> {/* Chỉ component rating tổng dùng styles.rating */}
         <div className={styles.stars}>
@@ -94,24 +94,24 @@ const RatingStars = ({ rating = 0, reviewCount = null, isIndividualReview = fals
         {/* reviewCount có thể là số 0 ngay cả khi averageRating > 0 nếu API trả về như vậy */}
         {/* Hiển thị count chỉ khi nó > 0 để phù hợp với "Chưa có đánh giá" */}
         {reviewCount > 0 && (
-             // Sử dụng link đến phần đánh giá chi tiết bên dưới
+
              <a href="#reviews" className={styles.reviewCountLink}>({reviewCount} đánh giá)</a>
         )}
       </div>
     );
 };
 
-// --- Component con: Hiển thị một đánh giá cụ thể ---
+
 const ReviewItem = ({ review }) => {
-    // State để quản lý trạng thái mở rộng của comment
+
     const [isCommentExpanded, setIsCommentExpanded] = useState(false);
 
     if (!review) return null;
 
     const comment = review.rateComment || '';
-    // Kiểm tra xem comment có dài hơn ngưỡng không
+
     const isCommentTooLong = comment.length > COMMENT_TRUNCATE_LIMIT;
-    // Nội dung comment sẽ hiển thị (rút gọn hoặc đầy đủ)
+
     const displayedComment = isCommentTooLong && !isCommentExpanded
         ? comment.substring(0, COMMENT_TRUNCATE_LIMIT) + '...'
         : comment;
@@ -129,7 +129,7 @@ const ReviewItem = ({ review }) => {
             {isCommentTooLong && !isCommentExpanded && (
                 <button
                     className={styles.viewMoreButton}
-                    onClick={() => setIsCommentExpanded(true)} // Mở rộng comment
+                    onClick={() => setIsCommentExpanded(true)}
                 >
                     Xem thêm
                 </button>
@@ -137,8 +137,8 @@ const ReviewItem = ({ review }) => {
              {/* Tùy chọn: Nút "Thu gọn" nếu comment đã được mở rộng và dài */}
              {/* {isCommentTooLong && isCommentExpanded && (
                  <button
-                     className={styles.viewMoreButton} // Có thể dùng class khác cho "Thu gọn"
-                     onClick={() => setIsCommentExpanded(false)} // Thu gọn comment
+                     className={styles.viewMoreButton}
+                     onClick={() => setIsCommentExpanded(false)}
                  >
                      Thu gọn
                  </button>
@@ -147,7 +147,7 @@ const ReviewItem = ({ review }) => {
     );
 };
 
-// --- Component con: Hiển thị mô tả sản phẩm ---
+
 const ProductDescription = ({ description }) => {
     if (!description) return null;
 
@@ -161,9 +161,9 @@ const ProductDescription = ({ description }) => {
     );
 };
 
-// --- Component con: Hiển thị thông số kỹ thuật ---
+
 const TechnicalSpecs = ({ specs }) => {
-     // Giả định specs là một mảng các object { name: string, value: string }
+
     if (!specs || !Array.isArray(specs) || specs.length === 0) return null;
 
     return (
@@ -184,34 +184,34 @@ const TechnicalSpecs = ({ specs }) => {
 };
 
 
-// --- Component chính: ProductDisplay ---
+
 const ProductDisplay = ({ product }) => {
-  // Hooks
+
   const { isAuthenticated, user } = useAuth();
   const navigate = useNavigate();
 
-  // State cho Product Display (đã có)
+
   const [selectedVariantIndex, setSelectedVariantIndex] = useState(0);
   const [isAddingToCart, setIsAddingToCart] = useState(false);
   const [addToCartError, setAddToCartError] = useState('');
 
-  // State cho Reviews List và Average Rating
+
   const [reviews, setReviews] = useState([]);
   const [isLoadingReviews, setIsLoadingReviews] = useState(true);
   const [reviewsError, setReviewsError] = useState('');
 
-  // State cho Average Rating (FETCHED FROM API)
+
   const [averageRating, setAverageRating] = useState(0);
-  const [averageReviewCount, setAverageReviewCount] = useState(0); // Lấy count từ API list review
+  const [averageReviewCount, setAverageReviewCount] = useState(0);
 
 
-  // State cho form gửi đánh giá
+
   const [newRating, setNewRating] = useState(0);
   const [newComment, setNewComment] = useState('');
   const [isSubmittingReview, setIsSubmittingReview] = useState(false);
   const [submitReviewError, setSubmitReviewError] = useState('');
 
-  // Hàm riêng để fetch BOTH reviews list AND average rating
+
   const fetchProductReviewsData = async (productId) => {
       if (!productId) {
           setReviews([]);
@@ -223,15 +223,15 @@ const ProductDisplay = ({ product }) => {
       }
 
       setIsLoadingReviews(true);
-      setReviewsError(''); // Clear lỗi trước khi fetch
+      setReviewsError('');
 
       try {
-          // Fetch danh sách đánh giá (API trả về mảng trực tiếp)
+
           const reviewsResponse = await apiService.getListRateOfProduct(productId);
           console.log("API Get Reviews List Response:", reviewsResponse);
           if (Array.isArray(reviewsResponse.data)) {
                setReviews(reviewsResponse.data);
-               // Lấy số lượng đánh giá từ độ dài mảng danh sách
+
                setAverageReviewCount(reviewsResponse.data.length);
           } else {
                console.warn("API Get Reviews List returned non-array data:", reviewsResponse.data);
@@ -239,27 +239,27 @@ const ProductDisplay = ({ product }) => {
                setAverageReviewCount(0);
           }
 
-          // Fetch đánh giá trung bình (API trả về chỉ số 4.0)
+
           const averageResponse = await apiService.getAverageRateOfProduct(productId);
           console.log("API Get Average Rating Response:", averageResponse);
 
-          // Giả định API trả về chỉ một số (ví dụ: 4.0)
+
           if (typeof averageResponse.data === 'number') {
               setAverageRating(averageResponse.data);
-              // averageReviewCount đã được set từ danh sách reviews
+
           }
-          // Giả định API có thể trả về object { averageRating: number, totalReviews: number } theo docs cũ
-          // Nếu API thực tế TRẢ VỀ OBJECT CÓ count, có thể ưu tiên count từ đây
+
+
           else if (averageResponse.data && typeof averageResponse.data === 'object' && typeof averageResponse.data.averageRating === 'number') {
               setAverageRating(averageResponse.data.averageRating);
-               // Nếu object có totalReviews và nó là số, có thể cập nhật count từ đây
+
               if (typeof averageResponse.data.totalReviews === 'number') {
                   setAverageReviewCount(averageResponse.data.totalReviews);
               }
           }
           else {
                console.warn("API Get Average Rating returned unexpected data format:", averageResponse.data);
-               // Giữ nguyên averageRating và averageReviewCount đã set từ danh sách hoặc 0
+
           }
 
 
@@ -276,21 +276,21 @@ const ProductDisplay = ({ product }) => {
             errorMessage = err.message;
             console.error("API Request Setup Error (Fetch Reviews):", err.message);
           }
-        setReviewsError(errorMessage); // Lưu lỗi chung
-        setReviews([]); // Clear danh sách
-        setAverageRating(0); // Reset trung bình
-        setAverageReviewCount(0); // Reset count
+        setReviewsError(errorMessage);
+        setReviews([]);
+        setAverageRating(0);
+        setAverageReviewCount(0);
       } finally {
-        setIsLoadingReviews(false); // Tắt loading chung
+        setIsLoadingReviews(false);
       }
   };
 
 
-  // Effect để fetch reviews & average rating và chọn variant
+
   useEffect(() => {
     fetchProductReviewsData(product?.productId);
 
-    // Logic chọn variant (giữ nguyên)
+
     if (product?.variants?.length > 0) {
         const firstAvailableIndex = product.variants.findIndex(v => v.stockQuantity > 0);
         setSelectedVariantIndex(firstAvailableIndex >= 0 ? firstAvailableIndex : 0);
@@ -298,7 +298,7 @@ const ProductDisplay = ({ product }) => {
         setSelectedVariantIndex(0);
     }
 
-    // Reset review form state when product changes
+
     setNewRating(0);
     setNewComment('');
     setSubmitReviewError('');
@@ -306,14 +306,14 @@ const ProductDisplay = ({ product }) => {
   }, [product?.productId, product?.variants]);
 
 
-  // Lấy effective variant
+
   const selectedVariant = (product?.variants && product.variants.length > selectedVariantIndex) ? product.variants[selectedVariantIndex] : null;
   const effectiveVariant = selectedVariant || (product?.variants?.length > 0 ? product.variants[0] : null);
 
 
-  // --- Handlers (giữ nguyên) ---
+
    const handleSelectVariant = (index) => { setSelectedVariantIndex(index); setAddToCartError(''); };
-   // Logic handleAddToCart và handleOrderNow giữ nguyên như code trước
+
    const handleAddToCart = async () => { /* ... logic ... */
        if (!isAuthenticated) { toast.warn('Vui lòng đăng nhập để thêm sản phẩm!', { position: "bottom-right" }); navigate('/login'); return; }
        if (!user?.userId) { console.error("Add to cart failed: User ID not found."); toast.error("Lỗi: Không thể xác định người dùng.", { position: "bottom-right" }); return; }
@@ -337,7 +337,7 @@ const ProductDisplay = ({ product }) => {
        } catch(err) { console.error("Lỗi khi thêm vào giỏ (trong Đặt hàng):", err); let errorMessage = "Không thể xử lý đặt hàng."; if (err.response) { console.error("API Error Response (Order Now):", err.response.data); errorMessage = err.response.data?.message || err.response.data || `Lỗi ${err.response.status}`; } else if (err.request) { errorMessage = "Không nhận được phản hồi từ máy chủ."; console.error("API No Response (Order Now):", err.request); } else { errorMessage = err.message; console.error("API Request Setup Error (Order Now):", err.message); } setAddToCartError(errorMessage); toast.error(`Đặt hàng thất bại: ${errorMessage}`, { position: "bottom-right" }); setIsAddingToCart(false); }
    };
 
-  // --- Handlers cho Form Đánh giá (giữ nguyên logic, cập nhật fetch sau submit) ---
+
    const handleRatingClick = (rating) => { setNewRating(rating); };
    const handleCommentChange = (event) => { setNewComment(event.target.value); };
    const handleSubmitReview = async () => {
@@ -353,7 +353,7 @@ const ProductDisplay = ({ product }) => {
            await apiService.postRate(reviewData);
            toast.success('Đánh giá của bạn đã được gửi thành công!', { position: "bottom-right" });
            setNewRating(0); setNewComment('');
-           // Refetch CẢ danh sách và average rating sau khi gửi thành công
+
            fetchProductReviewsData(product.productId);
        } catch (err) {
            console.error("Lỗi khi gửi đánh giá:", err);
@@ -364,10 +364,10 @@ const ProductDisplay = ({ product }) => {
    };
 
 
-  // --- Render Conditions ---
-  // Hiển thị loading ban đầu nếu chưa có product hoặc effectiveVariant hợp lệ
+
+
   if (!product || !product.variants || product.variants.length === 0 || !effectiveVariant) {
-     // Nếu đang load review list/average, hiển thị spinner chung
+
     if (isLoadingReviews) {
         return (
             <div className={styles.productDisplayWrapper}>
@@ -377,7 +377,7 @@ const ProductDisplay = ({ product }) => {
             </div>
         );
     }
-    // Nếu không load và không có product/variants/effectiveVariant hợp lệ
+
      return (
         <div className={styles.productDisplayWrapper}>
             <p className={styles.errorMessage}>Không tìm thấy thông tin sản phẩm hoặc sản phẩm không có biến thể hợp lệ.</p>
@@ -386,7 +386,7 @@ const ProductDisplay = ({ product }) => {
   }
 
 
-  // --- JSX Output ---
+
   return (
     <div className={styles.productDisplayWrapper}> {/* Wrapper cho toàn bộ nội dung */}
 
@@ -496,7 +496,7 @@ const ProductDisplay = ({ product }) => {
                         onClick={handleOrderNow}
                         disabled={effectiveVariant.stockQuantity <= 0 || isAddingToCart || !isAuthenticated}
                     >
-                         {isAddingToCart ? <Spinner size="small" color="#fff"/> : <strong>ĐẶT HÀNG</strong> }
+                         {isAddingToCart ? <Spinner size="small" color="#fff"/> : 'ĐẶT HÀNG' }
                          {!isAddingToCart && <span>Giao hàng tận nơi</span>}
                     </Button>
 
@@ -577,13 +577,6 @@ const ProductDisplay = ({ product }) => {
                   </Button>
               </div>
           )}
-           {/* Prompt đăng nhập nếu chưa đăng nhập */}
-           {!isAuthenticated && (
-               <p className={styles.loginToReviewPrompt}>
-                  <FiLogIn /> Vui lòng <a href="/login">đăng nhập</a> để gửi đánh giá về sản phẩm này.
-               </p>
-           )}
-
           {/* Danh sách các đánh giá đã có */}
           {isLoadingReviews && (
               <div className={styles.loadingReviews}>
@@ -602,14 +595,14 @@ const ProductDisplay = ({ product }) => {
           {!isLoadingReviews && !reviewsError && reviews.length > 0 && (
               <div className={styles.reviewsList}>
                   {reviews.map((review, index) => (
-                      // Sử dụng key duy nhất, kết hợp user/date/index nếu API không có ID
+
                       <ReviewItem key={`${review.userId}-${review.ratingDate}-${index}`} review={review} />
                   ))}
               </div>
           )}
       </div> {/* End of .reviewsSection */}
 
-    </div> // End of .productDisplayWrapper
+    </div>
   );
 };
 

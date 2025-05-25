@@ -1,4 +1,4 @@
-/* --- Container bao ngoài trang --- */
+
 .pageContainer {
     display: flex;
     justify-content: center;
@@ -6,12 +6,12 @@
     min-height: 100vh;
     padding: 1.5rem;
     background-image: linear-gradient(135deg, #a1c4fd 0%, #c2e9fb 100%);
-    /* Gradient nhẹ nhàng, khác LoginPage */
+    
     box-sizing: border-box;
     overflow: hidden;
 }
 
-/* --- Card đăng ký --- */
+
 .signupCard {
     display: flex;
     width: 100%;
@@ -36,11 +36,11 @@
     }
 }
 
-/* --- Cột trang trí bên trái --- */
+
 .decorativeSide {
     flex-basis: 45%;
     background: linear-gradient(to bottom, #a1c4fd 0%, #c2e9fb 100%);
-    /* Gradient đồng bộ với pageContainer */
+    
     padding: 3rem 2rem;
     color: #fff;
     display: flex;
@@ -72,7 +72,7 @@
     opacity: 0.9;
 }
 
-/* --- Cột Form bên phải --- */
+
 .formSide {
     flex-basis: 55%;
     padding: 3rem 2.5rem;
@@ -81,7 +81,7 @@
     justify-content: center;
 }
 
-/* --- Form --- */
+
 .signupForm {
     width: 100%;
     max-width: 380px;
@@ -90,7 +90,7 @@
     flex-direction: column;
 }
 
-/* --- Tiêu đề và phụ đề trong Form --- */
+
 .title {
     text-align: left;
     color: #1a3b5d;
@@ -106,7 +106,7 @@
     font-size: 0.95rem;
 }
 
-/* --- Input Group --- */
+
 .inputGroup {
     margin-bottom: 1.2rem;
     position: relative;
@@ -135,7 +135,7 @@
     z-index: 1;
 }
 
-/* --- Input Fields --- */
+
 .input {
     width: 100%;
     padding: 0.9rem 0.9rem 0.9rem 3rem;
@@ -159,7 +159,7 @@
     box-shadow: 0 0 0 3px rgba(99, 179, 237, 0.2);
 }
 
-/* --- Error Message --- */
+
 .error {
     color: #e53e3e;
     background-color: #fed7d7;
@@ -179,12 +179,12 @@
     font-size: 1.1rem;
 }
 
-/* --- Submit Button --- */
+
 .submitButton {
     width: 100%;
     padding: 0.9rem 1rem !important;
     background-image: linear-gradient(to right, #48bb78 0%, #38a169 100%);
-    /* Gradient xanh lá */
+    
     color: white !important;
     border: none !important;
     border-radius: 8px !important;
@@ -223,7 +223,7 @@
     border-left-color: #a0aec0 !important;
 }
 
-/* --- Login Link Container --- */
+
 .loginLinkContainer {
     margin-top: 2rem;
     text-align: center;
@@ -248,7 +248,7 @@
     margin-left: 0.4rem;
 }
 
-/* --- Responsive --- */
+
 @media (max-width: 850px) {
     .decorativeSide {
         display: none;

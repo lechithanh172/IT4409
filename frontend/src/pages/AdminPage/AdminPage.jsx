@@ -1,16 +1,17 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   UserOutlined,
   BellOutlined,
   InfoCircleOutlined,
   TruckOutlined,
-  HddOutlined,
+  HomeOutlined,
   LogoutOutlined,
   MenuFoldOutlined,
   MenuUnfoldOutlined,
   AppstoreOutlined,
 } from "@ant-design/icons";
 import { Badge, Button, Menu, Layout, Space, Avatar, Dropdown, Typography } from "antd";
+import { useNavigate } from "react-router-dom";
 import AdminUser from "../../Components/AdminPages/AdminUser/AdminUser";
 import AdminProduct from "../../components/AdminPages/AdminProduct/AdminProduct";
 import AdminOrder from "../../components/AdminPages/AdminOrder/AdminOrder";
@@ -43,13 +44,17 @@ const items = [
 ];
 
 const Admin = () => {
+  useEffect(() => {
+        document.title = "Admin | HustShop";
+    }, []);
+  const navigate = useNavigate();
   const [keySelected, setKeySelected] = useState("products");
   const [collapsed, setCollapsed] = useState(false);
-  const [isTooltipVisible, setTooltipVisible] = useState(false);
-  const [tooltipPosition, setTooltipPosition] = useState({ top: 0, left: 0 });
-  const [isRead, setIsRead] = useState(true);
+  const [, setTooltipVisible] = useState(false);
+  const [, setTooltipPosition] = useState({ top: 0, left: 0 });
+  const [isRead] = useState(true);
 
-  // localStorage.setItem("accessToken", "eyJhbGciOiJIUzI1NiJ9.eyJyb2xlIjoiQURNSU4iLCJzdWIiOiJ0cmFuZHVjdGhwdDEiLCJpYXQiOjE3NDY0MDQxMTYsImV4cCI6MTc0NjQwNzcxNn0.AJ8iLWWX6cJMArDhrM3FwD8p1Xn0XzPBL-e9IP4fu6I");
+
 
   const toggleCollapsed = () => {
     setCollapsed(!collapsed);
@@ -84,11 +89,19 @@ const Admin = () => {
   const userMenuItems = [
     {
       key: 'profileLink',
-      label: 'Xem hồ sơ',
+      label: 'Xem hồ sơ', 
       icon: <UserOutlined />,
       onClick: () => {
           setKeySelected('profile');
           setTooltipVisible(false);
+      }
+    },
+    {
+      key: 'home',
+      label: 'Về trang chủ',
+      icon: <HomeOutlined />,
+      onClick: () => {
+        navigate('/');
       }
     },
     {

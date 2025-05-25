@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import styles from './changePasswordPage.module.css';
 import { FiLock, FiRepeat, FiCheckCircle, FiAlertCircle, FiEye, FiEyeOff } from 'react-icons/fi';
@@ -7,6 +7,9 @@ import Spinner from '../../components/Spinner/Spinner';
 import { useAuth } from '../../contexts/AuthContext';
 
 function ChangePasswordPage() {
+    useEffect(() => {
+            document.title = "Đổi mật khẩu | HustShop";
+        }, []);
     const { changePassword } = useAuth();
     const [formData, setFormData] = useState({
         currentPassword: '',
@@ -31,7 +34,7 @@ function ChangePasswordPage() {
         setError('');
         setSuccessMessage('');
 
-        // Kiểm tra dữ liệu
+
         if (!formData.currentPassword || !formData.newPassword || !formData.confirmPassword) {
             setError('Vui lòng điền đầy đủ thông tin.');
             return;
@@ -65,7 +68,7 @@ function ChangePasswordPage() {
             <div className={styles.changePasswordCard}>
                 {/* Phần trang trí bên trái */}
                 <div className={styles.decorativeSide}>
-                    <div className={styles.logoPlaceholder}>MyEshop</div>
+                    <div className={styles.logoPlaceholder}>HustShop</div>
                     <h3>Đổi mật khẩu</h3>
                     <p>Đảm bảo mật khẩu mới đủ mạnh để bảo vệ tài khoản của bạn.</p>
                 </div>

@@ -28,7 +28,7 @@ const formatPrice = (price) => {
 };
 const getSoLuong = (products) => {
   return products.variants?.reduce(
-    (total, variant) => total + variant.quantity, 0) || 0;  // Nếu không có variants thì trả về 0
+    (total, variant) => total + variant.quantity, 0) || 0;
 }; 
 
 const ProductDetails = ({ products, setModalChild, handleRefresh }) => {
@@ -146,11 +146,11 @@ const ProductDetails = ({ products, setModalChild, handleRefresh }) => {
                   key={`${option.value}-${index}`}
                   value={option.value}
                   style={{
-                    backgroundColor: option.value,  // Hiển thị màu nền theo màu của biến thể
-                    color: '#fff',  // Màu chữ trắng trên nền
-                    borderColor: option.value,  // Để viền giống màu nền
-                    padding: '8px 16px',  // Điều chỉnh padding cho nút Radio
-                    margin: '0 8px',  // Khoảng cách giữa các nút Radio
+                    backgroundColor: option.value,
+                    color: '#fff',
+                    borderColor: option.value,
+                    padding: '8px 16px',
+                    margin: '0 8px',
                   }}
                 >
                   {option.label} - {option.sale}% Giảm giá
@@ -168,7 +168,7 @@ const ProductDetails = ({ products, setModalChild, handleRefresh }) => {
               style={{
                 fontSize: 18,
                 color: "#d0011b",
-                textDecoration: "line-through", // Hiển thị giá gốc bị gạch ngang
+                textDecoration: "line-through",
               }}
             >
               {formatPrice(products.price)} VNĐ {/* Hiển thị giá gốc */}

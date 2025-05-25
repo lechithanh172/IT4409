@@ -1,10 +1,10 @@
-import React from 'react';
-import { Routes, Route, Outlet } from 'react-router-dom'; // Import Outlet
-// Layouts
-import MainLayout from './layouts/MainLayout';
-// Import other layouts if needed
 
-// Pages
+import React from 'react';
+import { Routes, Route, Outlet } from 'react-router-dom';
+
+
+import MainLayout from './layouts/MainLayout';
+
 import HomePage from './pages/HomePage/HomePage';
 import SearchProductListPage from './pages/SearchProductListPage/SearchProductListPage';
 import ProductDetailPage from './pages/ProductDetailPage/ProductDetailPage';
@@ -16,76 +16,90 @@ import ChangePassword from './pages/AuthPage/changePasswordPage';
 import ForgetPasswordPage from './pages/AuthPage/forgetPassword';
 import SignupNoOtpPage from './pages/AuthPage/signupNoOtp';
 import ResetPasswordPage from './pages/AuthPage/resetPassword';
-import ProductListPage from './components/ProductListPage/ProductListPage'; // Assuming this is also a page
+import ProductListPage from './components/ProductListPage/ProductListPage';
 import PlaceOrder from './pages/PlaceOrder/PlaceOrder';
 import VNPayReturn from './pages/VNPayReturn/VNPayReturn';
-import OrderHistoryPage from './pages/OrderHistoryPage/OrderHistoryPage'; // Import OrderHistoryPage
+import OrderHistoryPage from './pages/OrderHistoryPage/OrderHistoryPage';
 import AdminPage from './pages/AdminPage/AdminPage';
-// Protected Route Component
+import ProductMangerPage from './pages/ProductManagerPage/ProductManagerPage';
+import UserInfoEdit from './pages/UserInfoEdit/UserInfoEdit';
+import OrderSuccessPage from './pages/OrderSuccessPage/OrderSuccessPage';
+import ShipperPage from './pages/ShipperPage/ShipperPage';
+
 import ProtectedRoute from './components/Auth/ProtectedRoute';
+
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import './layouts/MainLayout.module.css';
 
 function App() {
   return (
-    <Routes>
-      {/* --- Main Layout Routes --- */}
-      <Route path="/" element={<MainLayout />}>
-        {/* Public Pages */}
-        <Route index element={<HomePage />} />
-        <Route path="products" element={<ProductListPage />} />
-        <Route path="products/:productId" element={<ProductDetailPage />} />
-        <Route path="search" element={<SearchProductListPage />} />
+   
+    <>
+      
+      <ToastContainer
+         
+          className="custom-toast-container" 
 
-        {/* Authentication Pages (within MainLayout) */}
-        <Route path="login" element={<LoginPage />} />
-         <Route path="pre-signup" element={<SignupNoOtpPage />} />
-                <Route path="signup" element={<SignupPage />} />
-       <Route path="forget-password" element={<ForgetPasswordPage />} />
-               <Route path="reset-password" element={<ResetPasswordPage />} />
-               <Route path="change-password" element={<ChangePassword />} />
+          position="top-right" 
+          autoClose={3000} 
+          hideProgressBar={false} 
+          newestOnTop={false} 
+          closeOnClick 
+          rtl={false}
+          pauseOnFocusLoss 
+          draggable
+          pauseOnHover 
+      />
 
-        {/* Payment Callback Route (Publicly accessible but likely processes sensitive info) */}
-        <Route path="/vnpay_jsp/vnpay_return.jsp" element={<VNPayReturn />} />
-
-        {/* --- Protected Routes (Require Login) --- */}
+     
+      <Routes>
+        <Route path="/" element={<MainLayout />}>
+          <Route index element={<HomePage />} /> {/* Route for the homepage */}
+          <Route path="products" element={<ProductListPage />} /> {/* Route for all products */}
+          <Route path="products/:productId" element={<ProductDetailPage />} /> {/* Route for product details */}
+          <Route path="search" element={<SearchProductListPage />} /> {/* Route for search results */}
+          <Route path="login" element={<LoginPage />} />
+          <Route path="pre-signup" element={<SignupNoOtpPage />} />
+          <Route path="signup" element={<SignupPage />} />
+          <Route path="forget-password" element={<ForgetPasswordPage />} />
+          <Route path="reset-password" element={<ResetPasswordPage />} />
+          <Route path="change-password" element={<ChangePassword />} />
+          <Route path="/vnpay_jsp/vnpay_return.jsp" element={<VNPayReturn />} />
+          <Route
+            element={
+              <ProtectedRoute>
+                <Outlet /> 
+              </ProtectedRoute>
+            }
+          >
+            <Route path="cart" element={<CartPage />} />
+            <Route path="place-order" element={<PlaceOrder />} />
+            <Route path="profile" element={<UserProfilePage />} />
+            <Route path="profile/edit" element={<UserInfoEdit />} />
+            <Route path="order-success-cod" element={<OrderSuccessPage />} />
+            <Route path="shipper" element={<ShipperPage />} /> {/* Assuming shipper page is also protected */}
+            <Route path="profile/orders" element={<OrderHistoryPage />} />
+          </Route>
+        </Route> 
         <Route
-          element={ // Group protected routes under a single ProtectedRoute element
-            <ProtectedRoute>
-              <Outlet /> {/* Outlet renders the matched child route */}
+          path="/admin/*" 
+          element={
+            <ProtectedRoute requiredRole="admin">
+              <AdminPage />
             </ProtectedRoute>
           }
-        >
-          {/* These routes will only be accessible if ProtectedRoute allows */}
-          <Route path="cart" element={<CartPage />} />
-          <Route path="place-order" element={<PlaceOrder />} />
-          <Route path="profile" element={<UserProfilePage />} />
-          {/* Corrected route for Order History */}
-          <Route path="profile/orders" element={<OrderHistoryPage />} />
-          {/* Add other protected routes here */}
-        </Route>
-      </Route>
-      <Route
-        path="/admin"
-        element={
-          <ProtectedRoute requiredRole="admin"> {/* Yêu cầu đăng nhập VÀ role 'admin' */}
-            {/* Nếu muốn có Admin Layout riêng thì thay AdminPage bằng AdminLayout */}
-            {/* <AdminLayout> */}
-              <AdminPage />
-            {/* </AdminLayout> */}
-          </ProtectedRoute>
-        }
-      > </Route>
-      {/* --- Routes Outside MainLayout (e.g., Admin, Fullscreen Auth) --- */}
-      {/* Example:
-      <Route path="/admin" element={<AdminLayout />}>
-          <Route index element={<AdminDashboard />} />
-          ... admin routes
-      </Route>
-      */}
-
-      {/* Global 404 Not Found Route (if no other route matches) */}
-      {/* <Route path="*" element={<NotFoundPage />} /> */}
-
-    </Routes>
+        />
+         <Route
+             path="/pm/*" 
+             element={
+                 <ProtectedRoute requiredRole="product_manager">
+                     <ProductMangerPage />
+                 </ProtectedRoute>
+             }
+         />
+      </Routes>
+    </>
   );
 }
 

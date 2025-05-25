@@ -16,7 +16,7 @@ const Footer = () => {
       <div className={styles.container}>
         <div className={styles.footerContent}>
           <div className={styles.footerColumn}>
-            <h4 className={styles.columnTitle}>MyEshop</h4>
+            <h4 className={styles.columnTitle}>HustShop</h4>
             <p className={styles.footerText}>
               Cửa hàng công nghệ hàng đầu, cung cấp sản phẩm công nghệ chính hãng.
             </p>
@@ -57,7 +57,7 @@ const Footer = () => {
           </div>
         </div>
         <div className={styles.footerBottom}>
-          <p>© {currentYear} MyEshop. All rights reserved.</p>
+          <p>© {currentYear} HustShop. All rights reserved.</p>
         </div>
       </div>
     </footer>

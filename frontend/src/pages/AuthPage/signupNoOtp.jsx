@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import styles from './signupNoOtp.module.css';
 import { FiUser, FiMail, FiAlertCircle, FiUserPlus } from 'react-icons/fi';
@@ -7,6 +7,9 @@ import Button from '../../components/Button/Button';
 import Spinner from '../../components/Spinner/Spinner';
 import { Link } from 'react-router-dom'
 function SignupNoOtpPage() {
+    useEffect(() => {
+            document.title = "Đăng ký | HustShop";
+        }, []);
     const [formData, setFormData] = useState({ username: '', email: '' });
     const [error, setError] = useState('');
     const [isLoading, setIsLoading] = useState(false);
@@ -23,7 +26,7 @@ function SignupNoOtpPage() {
         e.preventDefault();
         setError('');
 
-        // Kiểm tra dữ liệu
+
         if (!formData.username.trim() || !formData.email.trim()) {
             setError('Vui lòng nhập đầy đủ thông tin.');
             return;
@@ -50,7 +53,7 @@ function SignupNoOtpPage() {
             <div className={styles.signupCard}>
                 {/* Phần trang trí bên trái */}
                 <div className={styles.decorativeSide}>
-                    <div className={styles.logoPlaceholder}>MyEshop</div>
+                    <div className={styles.logoPlaceholder}>HustShop</div>
                     <h3>Tham gia ngay!</h3>
                     <p>Tạo tài khoản để nhận nhiều ưu đãi hấp dẫn.</p>
                 </div>

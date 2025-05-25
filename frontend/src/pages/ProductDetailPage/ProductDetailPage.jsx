@@ -1,19 +1,19 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import ProductDisplay from '../../components/ProductDisplay/ProductDisplay';
-// Dòng này bị comment ra vì logic transform sẽ nằm trong component cha
-// import SpecificationTable from '../../components/SpecificationTable/SpecificationTable';
-import Dialog from '../../components/Dialog/Dialog'; // Giữ lại nếu bạn vẫn dùng Dialog
+
+
+import Dialog from '../../components/Dialog/Dialog';
 import Spinner from '../../components/Spinner/Spinner';
 import styles from './ProductDetailPage.module.css';
 import { FaClipboardList } from 'react-icons/fa';
-import apiService from '../../services/api'; // Đảm bảo đường dẫn đúng
-// import { transformSpecifications } from '../../utils/transformSpecifications'; // * Sẽ không dùng ở đây nữa *
-import Button from '../../components/Button/Button';
-import SpecificationTable from '../../components/SpecificationTable/SpecificationTable'; // * Import lại SpecificationTable *
+import apiService from '../../services/api';
 
-// --- HÀM CHUYỂN ĐỔI SPECS (Ví dụ, nếu bạn vẫn muốn dùng nó ở chỗ khác) ---
-// const transformSpecifications = (flatSpecs) => { ... };
+import Button from '../../components/Button/Button';
+import SpecificationTable from '../../components/SpecificationTable/SpecificationTable';
+
+
+
 
 const ProductDetailPage = () => {
   const { productId } = useParams();
@@ -21,7 +21,9 @@ const ProductDetailPage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [isSpecDialogOpen, setIsSpecDialogOpen] = useState(false);
-
+  useEffect(() => {
+          document.title = "Chi tiết sản phẩm | HustShop";
+      }, []);
   useEffect(() => {
     setLoading(true);
     setError(null);
@@ -40,24 +42,24 @@ const ProductDetailPage = () => {
         console.log("[ProductDetailPage] API Product Data Response:", productResponse);
 
         if (productResponse?.data && typeof productResponse.data === 'object') {
-          let productData = { ...productResponse.data }; // Clone data để chỉnh sửa
+          let productData = { ...productResponse.data };
 
-          // *** QUAN TRỌNG: Giữ nguyên 'specifications' từ API ***
-          // Không cần parse hay transform ở đây nữa.
-          // Component SpecificationTable sẽ tự xử lý.
-          console.log("[ProductDetailPage] Received specifications:", productData.specifications); // Log dữ liệu gốc
 
-          // Tính toán giá finalPrice/basePrice cho variants (Giữ nguyên logic này)
+
+
+          console.log("[ProductDetailPage] Received specifications:", productData.specifications);
+
+
           if (productData.variants && Array.isArray(productData.variants) && typeof productData.price === 'number') {
               productData.variants = productData.variants.map(variant => {
                   const discountMultiplier = (100 - (variant.discount || 0)) / 100;
-                  // Sử dụng giá gốc của sản phẩm làm basePrice cho variant nếu variant ko có basePrice riêng
+
                   const basePriceForVariant = variant.basePrice ?? productData.price;
                   const finalPrice = basePriceForVariant * discountMultiplier;
                   return {
                       ...variant,
                       finalPrice: Math.round(finalPrice),
-                      basePrice: basePriceForVariant // Gán giá gốc
+                      basePrice: basePriceForVariant
                   };
               });
           } else {
@@ -66,7 +68,7 @@ const ProductDetailPage = () => {
           }
 
           console.log("[ProductDetailPage] Final product data set to state:", productData);
-          setProduct(productData); // Cập nhật state với dữ liệu gốc
+          setProduct(productData);
 
         } else {
            console.error("[ProductDetailPage] Invalid product data structure from API:", productResponse);
@@ -88,11 +90,11 @@ const ProductDetailPage = () => {
     loadProductDetails();
   }, [productId]);
 
-  // --- Hàm mở/đóng dialog ---
+
   const openSpecDialog = () => setIsSpecDialogOpen(true);
   const closeSpecDialog = () => setIsSpecDialogOpen(false);
 
-  // --- Render trạng thái Loading ---
+
   if (loading) {
     return (
       <div className={styles.pageContainer} style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '70vh' }}>
@@ -101,7 +103,7 @@ const ProductDetailPage = () => {
     );
   }
 
-  // --- Render trạng thái Lỗi hoặc Không tìm thấy ---
+
   if (error || !product) {
      return (
        <div className={`${styles.pageContainer} ${styles.errorContainer}`}>
@@ -113,8 +115,8 @@ const ProductDetailPage = () => {
      );
   }
 
-  // --- Render nội dung chính khi có dữ liệu ---
-  // Kiểm tra xem có dữ liệu specifications không (không cần kiểm tra sâu vào full/summary nữa)
+
+
   const hasSpecsData = product.specifications && (typeof product.specifications === 'string' || (Array.isArray(product.specifications) && product.specifications.length > 0));
 
   return (

@@ -1,99 +1,408 @@
-/* src/components/ProductSlider/ProductSlider.module.css */
 
-.sliderContainer {
-    margin-bottom: 30px; /* Khoảng cách dưới mỗi slider */
+
+
+:root {
+    --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    --secondary-gradient: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+    --background-color-light: #f0f2f5; 
+    --card-background: #ffffff;
+    --text-color-dark: #2d3748;
+    --text-color-light: #4a5568;
+    --shadow-base: 0 4px 10px rgba(0, 0, 0, 0.08);
+    --shadow-hover: 0 8px 20px rgba(0, 0, 0, 0.15);
+    --border-radius-base: 12px;
+    --border-radius-sm: 8px;
+    --spacing-xs: 10px;
+    --spacing-sm: 15px;
+    --spacing-md: 20px;
+    --spacing-lg: 40px;
 }
 
-.sliderTitle { /* Style cho tiêu đề slider (nếu dùng) */
-    font-size: 1.6rem;
-    font-weight: 600;
-    color: #222;
-    margin-bottom: 20px;
-    /* Thêm border hoặc style khác nếu muốn */
+
+@media (prefers-color-scheme: dark) {
+    :root {
+        --background-color-light: #1a202c;
+        --card-background: #2d3748;
+        --text-color-dark: #f7fafc;
+        --text-color-light: #a0aec0;
+        --shadow-base: 0 4px 15px rgba(0, 0, 0, 0.3);
+        --shadow-hover: 0 8px 25px rgba(0, 0, 0, 0.5);
+    }
+}
+
+.sliderContainer {
+  width: 100%;
+  margin: 0 auto; 
+  padding: var(--spacing-md) 0; 
+  background: var(--secondary-gradient); 
+  border-radius: var(--border-radius-base);
+  box-shadow: var(--shadow-base);
+  overflow: hidden; 
+  position: relative;
+  animation: slideIn 0.6s ease-out; 
+}
+
+
+@media (prefers-color-scheme: dark) {
+  .sliderContainer {
+    background: linear-gradient(135deg, #1a202c 0%, #2d3748 100%); 
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  }
+}
+
+
+.sliderTitle {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: var(--text-color-dark); 
+  text-align: center;
+  margin: 0 0 var(--spacing-md) 0; 
+  padding: 0 var(--spacing-md); 
+  position: relative;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+
+@media (prefers-color-scheme: dark) {
+  .sliderTitle {
+    color: var(--text-color-dark); 
+  }
+}
+
+.sliderTitle::after {
+  content: '';
+  position: absolute;
+  bottom: -10px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 60px;
+  height: 3px;
+  background: var(--primary-gradient); 
+  border-radius: 2px;
 }
 
 .swiperWrapper {
-    position: relative; /* Cho phép định vị nút tuyệt đối */
-    padding: 0 5px; /* Padding nhỏ để nút không bị che khuất hoàn toàn ở cạnh */
+  position: relative;
+  /* Padding 2 bên để tạo không gian cho navigation buttons.
+     Chiều rộng của nút là 50px, cộng thêm khoảng cách 10px.
+     Tổng cộng mỗi bên cần ít nhất ~60px.
+  */
+  padding: 0 calc(50px + var(--spacing-xs)); 
+  margin: 0 auto;
+  overflow: visible; 
 }
 
 .mySwiper {
-    width: 100%;
-    padding-top: 10px; /* Khoảng cách trên để không bị che bởi title */
-    padding-bottom: 15px; /* Khoảng cách dưới để không bị che */
+  padding: var(--spacing-md) 0; 
+  overflow: visible;
+  --swiper-theme-color: #667eea; 
 }
 
 .swiperSlide {
-    width: auto; /* Để slidesPerView: 'auto' hoạt động đúng */
-    height: auto; /* Chiều cao tự động theo ProductCard */
-    box-sizing: border-box;
-    display: flex; /* Đảm bảo ProductCard chiếm hết slide */
+  height: auto; 
+  display: flex;
+  justify-content: center;
+  align-items: stretch; 
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  
+  
+  
 }
 
-/* --- Nút điều hướng tùy chỉnh --- */
+
+/*
+.swiperSlide.swiper-slide-active,
+.swiperSlide.swiper-slide-next,
+.swiperSlide.swiper-slide-prev {
+  transform: scale(1);
+  opacity: 1;
+}
+*/
+
+
+
 .navButton {
-    position: absolute;
-    top: 50%;
-    transform: translateY(-50%); /* Căn giữa theo chiều dọc */
-    z-index: 10; /* Nằm trên các slide */
-    width: 40px; /* Kích thước nút */
-    height: 40px;
-    background-color: rgba(255, 255, 255, 0.9); /* Nền trắng mờ */
-    color: #333; /* Màu icon */
-    border: 1px solid #e5e7eb; /* Viền nhẹ */
-    border-radius: 50%; /* Nút tròn */
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1); /* Đổ bóng nhẹ */
-    transition: background-color 0.2s ease, color 0.2s ease, opacity 0.3s ease, transform 0.2s ease;
-    opacity: 0; /* Ẩn ban đầu */
-}
-
-.swiperWrapper:hover .navButton {
-    opacity: 1; /* Hiện nút khi hover vào khu vực slider */
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 50px;
+  height: 50px;
+  border: none;
+  border-radius: 50%;
+  
+  background: var(--primary-gradient);
+  color: white; 
+  font-size: 20px;
+  cursor: pointer;
+  z-index: 10; 
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  
+  box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  backdrop-filter: blur(10px); 
 }
 
 .navButton:hover {
-    background-color: #007bff; /* Màu nền khi hover */
-    color: #fff; /* Màu icon khi hover */
-    transform: translateY(-50%) scale(1.05); /* Phóng to nhẹ */
+  transform: translateY(-50%) scale(1.1); 
+  box-shadow: 0 12px 30px rgba(102, 126, 234, 0.4); 
+  background: linear-gradient(135deg, #5a67d8 0%, #6b46c1 100%); 
+}
+
+.navButton:active {
+  transform: translateY(-50%) scale(0.95); 
+}
+
+.navButton:disabled {
+  opacity: 0.3; 
+  cursor: not-allowed;
+  transform: translateY(-50%) scale(0.9);
 }
 
 .prevButton {
-    left: -15px; /* Đặt nút ra ngoài lề trái một chút */
+  left: var(--spacing-xs); 
 }
 
 .nextButton {
-    right: -15px; /* Đặt nút ra ngoài lề phải một chút */
+  right: var(--spacing-xs); 
 }
 
-/* Style khi nút bị vô hiệu hóa (khi ở đầu/cuối slider hoặc không đủ slide) */
-/* Swiper tự động thêm class swiper-button-disabled */
-.navButton.swiper-button-disabled {
-    opacity: 0.3 !important; /* Làm mờ đi (dùng !important để ghi đè opacity hover) */
-    cursor: not-allowed;
-    transform: translateY(-50%); /* Reset transform */
-    background-color: rgba(229, 231, 235, 0.8); /* Màu xám nhạt hơn */
-    color: #9ca3af;
-    box-shadow: none;
+
+
+.swiperWrapper :global(.swiper-button-prev),
+.swiperWrapper :global(.swiper-button-next) {
+  
+  display: none !important;
+  visibility: hidden !important; 
 }
 
-/* Responsive cho nút */
-@media (max-width: 768px) {
+
+
+
+
+@media screen and (max-width: 479px) {
+  .sliderContainer {
+    margin: 0 var(--spacing-xs);
+    padding: var(--spacing-sm) 0;
+    border-radius: var(--border-radius-base);
+  }
+
+  .sliderTitle {
+    font-size: 1.4rem;
+    margin-bottom: var(--spacing-sm);
+    padding: 0 var(--spacing-sm);
+  }
+
+   
+  .swiperWrapper {
+    padding: 0 calc(40px + var(--spacing-xs)); 
+  }
+
+  
+  .navButton {
+    width: 40px;
+    height: 40px;
+    font-size: 16px;
+    box-shadow: 0 6px 20px rgba(102, 126, 234, 0.25);
+  }
+  .navButton:hover {
+     box-shadow: 0 9px 25px rgba(102, 126, 234, 0.35);
+  }
+  .prevButton {
+    left: var(--spacing-xs);
+  }
+  .nextButton {
+    right: var(--spacing-xs);
+  }
+
+  .mySwiper {
+    padding: var(--spacing-sm) 0;
+  }
+}
+
+
+@media screen and (min-width: 480px) and (max-width: 767px) {
+  .sliderContainer {
+    margin: 0 var(--spacing-sm);
+    padding: var(--spacing-md) 0;
+  }
+
+  .sliderTitle {
+    font-size: 1.6rem;
+    margin-bottom: var(--spacing-md);
+  }
+
+   
+  .swiperWrapper {
+    padding: 0 calc(45px + var(--spacing-xs)); 
+  }
+
+  
+  .navButton {
+    width: 45px;
+    height: 45px;
+    font-size: 18px;
+     box-shadow: 0 7px 22px rgba(102, 126, 234, 0.28);
+  }
+   .navButton:hover {
+     box-shadow: 0 10px 28px rgba(102, 126, 234, 0.38);
+  }
+  .prevButton {
+    left: var(--spacing-sm);
+  }
+  .nextButton {
+    right: var(--spacing-sm);
+  }
+}
+
+
+@media screen and (min-width: 768px) and (max-width: 1023px) {
+  .sliderContainer {
+    margin: 0 var(--spacing-md);
+    padding: var(--spacing-md) 0;
+  }
+
+  .sliderTitle {
+    font-size: 1.8rem;
+    margin-bottom: var(--spacing-md);
+  }
+
+   
+  .swiperWrapper {
+    padding: 0 calc(50px + var(--spacing-sm));
+  }
+}
+
+
+@media screen and (min-width: 1024px) {
+  .sliderContainer {
+    max-width: 1200px; 
+    margin: 0 auto; 
+    padding: var(--spacing-lg) 0;
+  }
+
+  .sliderTitle {
+    font-size: 2rem;
+    margin-bottom: var(--spacing-lg);
+  }
+
+  
+  .swiperWrapper {
+     padding: 0 calc(50px + var(--spacing-md));
+  }
+}
+
+
+@media screen and (min-width: 1200px) {
+  .sliderContainer {
+    max-width: 1400px; 
+    padding: var(--spacing-lg) 0;
+  }
+
+  .sliderTitle {
+    font-size: 2.2rem;
+    margin-bottom: var(--spacing-lg);
+  }
+
+  
+  .swiperWrapper {
+    padding: 0 calc(55px + var(--spacing-md)); 
+  }
+
+  
+  .navButton {
+    width: 55px;
+    height: 55px;
+    font-size: 22px;
+    box-shadow: 0 10px 30px rgba(102, 126, 234, 0.35);
+  }
+  .navButton:hover {
+      box-shadow: 0 14px 35px rgba(102, 126, 234, 0.45);
+  }
+}
+
+
+
+@media screen and (max-device-width: 767px) and (-webkit-min-device-pixel-ratio: 1) {
+  .sliderContainer {
+    -webkit-overflow-scrolling: touch;
+    touch-action: pan-y; 
+  }
+
+  .mySwiper {
+    -webkit-overflow-scrolling: touch;
+    touch-action: pan-y; 
+  }
+
+  .swiperSlide {
+    
+    -webkit-transform: translateZ(0);
+    transform: translateZ(0);
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+  }
+
+  .navButton {
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+  }
+}
+
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+
+
+@media (hover: hover) {
+  .swiperWrapper:hover .navButton {
+    
+    opacity: 1;
+  }
+
+  .navButton {
+    
+    opacity: 0; 
+    transition: all 0.3s ease; 
+  }
+   
+   .navButton:focus {
+       opacity: 1;
+   }
+}
+
+
+@media (hover: none) {
     .navButton {
-        width: 35px;
-        height: 35px;
-        font-size: 1.1rem; /* Icon nhỏ hơn */
+        opacity: 1; 
     }
-    .prevButton { left: -10px; }
-    .nextButton { right: -10px; }
 }
 
-@media (max-width: 480px) {
-    /* Có thể ẩn nút hoàn toàn trên mobile nếu muốn */
-    /* .navButton { display: none; } */
-    .prevButton { left: -5px; }
-    .nextButton { right: -5px; }
+
+
+.navButton:focus {
+  outline: 3px solid rgba(102, 126, 234, 0.5);
+  outline-offset: 2px;
+}
+
+
+@media print {
+  .navButton {
+    display: none !important;
+  }
+
+  .sliderContainer {
+    box-shadow: none;
+    background: white;
+  }
 }

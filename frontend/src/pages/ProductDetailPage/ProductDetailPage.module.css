@@ -1,23 +1,23 @@
-/* src/pages/ProductDetailPage/ProductDetailPage.module.css */
+
 
 .pageContainer {
-    max-width: 1200px; /* Giới hạn chiều rộng trang */
-    margin: 25px auto; /* Căn giữa và tạo khoảng cách trên dưới */
-    padding: 0 15px; /* Padding trái phải */
-    box-sizing: border-box; /* Đảm bảo padding không làm tăng kích thước */
+    max-width: 1200px; 
+    margin: 25px auto; 
+    padding: 0 15px; 
+    box-sizing: border-box; 
 }
 
-/* --- Breadcrumbs --- */
+
 .breadcrumbs {
     margin-bottom: 20px;
     padding: 12px 0;
     font-size: 0.9rem;
-    color: #6b7280; /* Màu xám */
+    color: #6b7280; 
     display: flex;
     align-items: center;
-    flex-wrap: wrap; /* Xuống dòng nếu cần */
-    gap: 5px 8px; /* Khoảng cách dọc và ngang */
-    border-bottom: 1px solid #e5e7eb; /* Phân cách nhẹ */
+    flex-wrap: wrap; 
+    gap: 5px 8px; 
+    border-bottom: 1px solid #e5e7eb; 
 }
 .breadcrumbs a,
 .breadcrumbs span {
@@ -30,26 +30,26 @@
 .breadcrumbs a {
     transition: color 0.2s ease;
     font-weight: 500;
-    color: #4f46e5; /* Màu link (tím) */
+    color: #4f46e5; 
 }
 .breadcrumbs a:hover {
-    color: #3730a3; /* Đậm hơn khi hover */
+    color: #3730a3; 
     text-decoration: underline;
 }
-/* Dấu phân cách (nếu không dùng icon) */
-.breadcrumbs span:not(:last-child):not(:has(a)) { /* Chọn span không phải cuối và không chứa link */
+
+.breadcrumbs span:not(:last-child):not(:has(a)) { 
    color: #cbd5e0;
-   margin: 0 3px; /* Khoảng cách nhỏ */
+   margin: 0 3px; 
 }
-/* Trang hiện tại */
+
 .breadcrumbCurrent {
-    color: #1f2937; /* Đen đậm */
-    font-weight: 600; /* Đậm hơn */
+    color: #1f2937; 
+    font-weight: 600; 
     cursor: default;
 }
 
 
-/* --- Error Container --- */
+
 .errorContainer {
     text-align: center;
     padding: 60px 20px;
@@ -68,13 +68,13 @@
     margin-bottom: 25px;
     font-weight: 500;
 }
-/* Nút quay lại trong error state */
-.errorContainer a button { /* Style cụ thể hơn nếu cần */
+
+.errorContainer a button { 
     margin-top: 10px;
 }
 
 
-/* --- Khu vực Nội dung Chi tiết (2 cột) --- */
+
 .detailsColumns {
     display: flex;
     flex-wrap: wrap;
@@ -83,25 +83,25 @@
 }
 
 .descriptionColumn {
-    flex: 1 1 55%; /* Mô tả chiếm nhiều không gian hơn */
+    flex: 1 1 55%; 
     min-width: 300px;
-    order: 1; /* Mô tả bên trái */
+    order: 1; 
 }
 
 .specsColumn {
-    flex: 1 1 40%; /* Specs chiếm phần còn lại */
+    flex: 1 1 40%; 
     min-width: 300px;
-    order: 2; /* Specs bên phải */
+    order: 2; 
 }
 
 
-/* --- Style chung cho các Section Phụ (Mô tả, Specs) --- */
+
 .extraSection {
     padding: 30px;
     background-color: #fff;
     border-radius: 12px;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
-    height: 100%; /* Giúp các section trong cột bằng nhau */
+    height: 100%; 
     box-sizing: border-box;
 }
 
@@ -111,39 +111,39 @@
     color: #111827;
     margin: 0 0 20px 0;
     padding-bottom: 12px;
-    border-bottom: 2px solid #4f46e5; /* Gạch chân màu tím */
-    display: inline-block; /* Để gạch chân vừa với chữ */
+    border-bottom: 2px solid #4f46e5; 
+    display: inline-block; 
 }
 
 
-/* --- Style cho phần Preview Specs (Cột phải) --- */
+
 .specsPreviewContainer {
-    position: relative; /* Để định vị lớp phủ và nút */
-    max-height: 480px; /* Giới hạn chiều cao hiển thị (có thể điều chỉnh) */
-    overflow: hidden; /* Ẩn phần nội dung thừa */
-    padding-bottom: 50px; /* Tạo khoảng trống ở dưới cùng cho nút và fade */
-    box-sizing: content-box; /* Padding không ảnh hưởng max-height */
+    position: relative; 
+    max-height: 480px; 
+    overflow: hidden; 
+    padding-bottom: 50px; 
+    box-sizing: content-box; 
 }
 
 .fadeOverlay {
     position: absolute;
-    bottom: 0; /* Nằm sát đáy container */
+    bottom: 0; 
     left: 0;
     right: 0;
-    height: 120px; /* Chiều cao vùng mờ (tăng lên) */
-    background: linear-gradient(to bottom, rgba(255, 255, 255, 0), #ffffff 85%); /* Gradient mờ dần */
-    pointer-events: none; /* Click xuyên qua */
+    height: 120px; 
+    background: linear-gradient(to bottom, rgba(255, 255, 255, 0), #ffffff 85%); 
+    pointer-events: none; 
     z-index: 1;
-    border-bottom-left-radius: 12px; /* Bo góc theo container cha */
+    border-bottom-left-radius: 12px; 
     border-bottom-right-radius: 12px;
 }
 
 .viewFullSpecsButton {
     position: absolute;
-    bottom: 25px; /* Khoảng cách từ đáy */
+    bottom: 25px; 
     left: 50%;
-    transform: translateX(-50%); /* Căn giữa */
-    z-index: 2; /* Nằm trên lớp phủ */
+    transform: translateX(-50%); 
+    z-index: 2; 
     display: inline-flex;
     align-items: center;
     gap: 8px;
@@ -151,7 +151,7 @@
     font-size: 0.95rem;
     font-weight: 600;
     color: #fff;
-    background-color: #4f46e5; /* Màu tím */
+    background-color: #4f46e5; 
     border: none;
     border-radius: 8px;
     cursor: pointer;
@@ -159,31 +159,31 @@
     box-shadow: 0 3px 8px rgba(79, 70, 229, 0.3);
 }
 .viewFullSpecsButton:hover {
-    background-color: #4338ca; /* Tím đậm hơn */
+    background-color: #4338ca; 
     box-shadow: 0 5px 12px rgba(79, 70, 229, 0.4);
 }
 .viewFullSpecsButton svg {
     font-size: 1rem;
 }
 
-/* Đảm bảo bảng cuối trong preview không bị cắt đột ngột */
+
 .specsPreviewContainer .specGroup:last-child {
-     margin-bottom: 0; /* Bỏ margin nếu có */
-     padding-bottom: 10px; /* Thêm padding dưới nhẹ */
+     margin-bottom: 0; 
+     padding-bottom: 10px; 
 }
 .specsPreviewContainer .specGroup:last-child .specTable {
     margin-bottom: 0;
 }
 
 
-/* --- Style cho Mô tả --- */
+
 .descriptionContent {
-    line-height: 1.8; /* Giãn dòng */
-    color: #374151; /* Màu chữ */
-    font-size: 1rem; /* Cỡ chữ */
+    line-height: 1.8; 
+    color: #374151; 
+    font-size: 1rem; 
 }
 .descriptionContent p {
-    margin-bottom: 1.4em; /* Khoảng cách đoạn */
+    margin-bottom: 1.4em; 
 }
 .descriptionContent p:last-child {
     margin-bottom: 0;
@@ -204,23 +204,23 @@
     color: #2563eb;
 }
 
-/* --- Responsive --- */
+
 @media (max-width: 992px) {
     .descriptionColumn,
     .specsColumn {
-        flex-basis: 100%; /* Xếp chồng */
+        flex-basis: 100%; 
         order: unset;
     }
     .descriptionColumn {
-        margin-bottom: 30px; /* Khoảng cách khi xếp chồng */
+        margin-bottom: 30px; 
     }
     .detailsColumns {
         gap: 0;
         margin-top: 25px;
     }
-    /* Bỏ giới hạn chiều cao specs khi xếp chồng (tùy chọn) */
-    /* .specsPreviewContainer { max-height: none; overflow: visible; padding-bottom: 0;} */
-    /* .fadeOverlay, .viewFullSpecsButton { display: none; } */
+    
+    
+    
 }
 
 @media (max-width: 768px) {

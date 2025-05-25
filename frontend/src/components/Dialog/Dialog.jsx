@@ -1,19 +1,19 @@
 import React, { useEffect, useRef } from 'react';
 import styles from './Dialog.module.css';
 import { FaTimes } from 'react-icons/fa';
-import useClickOutside from '../../hooks/useClickOutside'; // Import hook đã tạo
+import useClickOutside from '../../hooks/useClickOutside';
 
 const Dialog = ({ isOpen, onClose, title, children }) => {
   const dialogRef = useRef(null);
 
-  // Đóng dialog khi click bên ngoài
+
   useClickOutside(dialogRef, () => {
-      if (isOpen) { // Chỉ đóng khi dialog đang mở
+      if (isOpen) {
           onClose();
       }
   });
 
-  // Đóng dialog khi nhấn phím Escape
+
   useEffect(() => {
     const handleEscape = (event) => {
       if (event.key === 'Escape' && isOpen) {
@@ -24,20 +24,20 @@ const Dialog = ({ isOpen, onClose, title, children }) => {
     return () => document.removeEventListener('keydown', handleEscape);
   }, [isOpen, onClose]);
 
-  // Ngăn scroll body khi dialog mở
+
   useEffect(() => {
     if (isOpen) {
       document.body.style.overflow = 'hidden';
     } else {
       document.body.style.overflow = 'unset';
     }
-    // Cleanup khi component unmount
+
     return () => {
       document.body.style.overflow = 'unset';
     };
   }, [isOpen]);
 
-  if (!isOpen) return null; // Không render gì nếu không mở
+  if (!isOpen) return null;
 
   return (
     <div className={styles.dialogOverlay}>

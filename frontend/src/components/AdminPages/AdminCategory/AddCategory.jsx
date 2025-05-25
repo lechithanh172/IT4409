@@ -6,7 +6,7 @@ const AddCategory = ({ setModalChild, handleRefresh }) => {
     const [form] = Form.useForm();
     const [categoryImage, setCategoryImage] = useState(null);
 
-    const onFinishFailed = (errorInfo) => {
+    const onFinishFailed = () => {
         message.error('Vui lòng điền đầy đủ thông tin bắt buộc.');
     };
 

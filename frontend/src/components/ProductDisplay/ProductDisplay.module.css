@@ -1,71 +1,76 @@
-/* src/components/ProductDisplay/ProductDisplay.module.css */
 
-/* Wrapper around the entire component */
-/* Provides outer padding, background, shadow, and centering */
+
+
+
 .productDisplayWrapper {
-    max-width: 1200px; /* Limit max width */
-    margin: 20px auto; /* Center the wrapper */
-    background-color: #fff; /* Background for the wrapper */
+     
+    max-width: 1200px; 
+    margin: 20px auto; 
+    background-color: #fff; 
     border-radius: 8px;
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-    padding: 20px; /* Padding moved to wrapper */
-    /* Sử dụng flexbox để các khối con (container, details, reviews) xếp dọc theo cột */
+    padding: 20px; 
+    
     display: flex;
     flex-direction: column;
-    /* gap: 30px; Bỏ gap ở đây, sử dụng margin-bottom trên các khối con */
-    width: 100%; /* Chiếm full width trong phần tử cha (ví dụ: trang chi tiết sản phẩm) */
-    box-sizing: border-box; /* Đảm bảo padding và border được tính vào width/height */
+    
+    width: 100%; 
+    box-sizing: border-box; 
 }
 
-/* Main flex container for the TOP SECTION (Image + Info) */
-/* Contains the leftColumn (image) and rightColumn (info/actions) */
+
+
 .productDisplayContainer {
     display: flex;
-    flex-wrap: wrap; /* Allow columns to wrap on smaller screens */
-    gap: 30px; /* Space between left and right columns */
-    width: 100%; /* Ensure it takes full width within the wrapper */
+    flex-wrap: wrap; 
+    gap: 30px; 
+    width: 100%; 
     box-sizing: border-box;
-    margin-bottom: 30px; /* Khoảng cách đẩy khối tiếp theo xuống */
+    margin-bottom: 30px; 
 }
 
 .leftColumn {
-    flex: 1 1 400px; /* Allow co-grow, co-shrink, base width 400px */
-    max-width: 50%; /* Limit width to 50% of container */
-    display: flex; /* Use flex to potentially center image */
-    justify-content: center; /* Center image horizontally */
-    align-items: flex-start; /* Align image to the top */
+    flex: 1 1 400px; 
+    max-width: 50%; 
+    display: flex; 
+    justify-content: center; 
+    align-items: flex-start; 
     box-sizing: border-box;
 }
 
 .rightColumn {
-    flex: 1 1 500px; /* Allow co-grow, co-shrink, base width 500px */
-    max-width: 50%; /* Limit width to 50% of container */
+    flex: 1 1 500px; 
+    max-width: 50%; 
     box-sizing: border-box;
 }
 
-/* Adjust flex-basis for smaller screens for the top section */
+
 @media (max-width: 992px) {
-    .leftColumn, .rightColumn {
-        flex: 1 1 100%; /* Each column takes 100% width */
+    .leftColumn,
+    .rightColumn {
+        flex: 1 1 100%; 
         max-width: 100%;
     }
-    /* Bỏ gap và chuyển sang flex-direction column trên màn hình nhỏ */
+    
     .productDisplayContainer {
-        gap: 0;
-        flex-direction: column;
-        margin-bottom: 20px; /* Giảm khoảng cách khi stacked */
+        
+        
+        gap: 20px; 
+        
+        margin-bottom: 20px; 
     }
+    
     .leftColumn {
-        margin-bottom: 20px; /* Add space between image and info when stacked */
+         
     }
 }
 
 
-/* Image styles */
+
 .imageWrapper {
     position: relative;
-    width: 100%; /* Image container takes full width of its column */
-    padding-top: 100%; /* Creates a 1:1 aspect ratio container */
+    width: 100%; 
+    padding-top: 100%; 
     overflow: hidden;
     border-radius: 8px;
 }
@@ -76,47 +81,50 @@
     left: 0;
     width: 100%;
     height: 100%;
-    object-fit: contain; /* Contain the image within the container */
-    transition: transform 0.3s ease; /* Smooth transition for hover */
+    object-fit: contain; 
+    transition: transform 0.3s ease; 
 }
 
-/* Optional: Add hover effect to image */
+
 .imageWrapper:hover .mainImage {
     transform: scale(1.05);
 }
 
-/* Discount badge styles */
+
 .imageDiscountBadge {
     position: absolute;
     top: 10px;
     left: 10px;
-    background-color: #ff4d4f; /* Red color */
+    background-color: #ff4d4f; 
     color: white;
     padding: 5px 10px;
     border-radius: 4px;
     font-weight: bold;
     font-size: 0.9em;
-    z-index: 1; /* Ensure it's above the image */
+    z-index: 1; 
     display: flex;
     align-items: center;
     gap: 4px;
 }
 
 
-/* Product info styles */
+
 .productName {
     font-size: 1.8em;
-    margin-bottom: 10px;
+     
     color: #333;
+    
+     margin-top: 0; 
+     margin-bottom: 10px; 
 }
 
-/* General rating stars container (for average rating below product name) */
+
 .rating {
     display: flex;
     align-items: center;
     margin-bottom: 15px;
-    color: #ffc107; /* Yellow color for stars */
-    font-size: 1.2em; /* Size for stars in the main rating */
+    color: #ffc107; 
+    font-size: 1.2em; 
 }
 
 .stars {
@@ -128,35 +136,39 @@
     margin-right: 2px;
 }
 
-/* Style for the review count link */
+
 .reviewCountLink {
     margin-left: 8px;
     color: #007bff;
     text-decoration: none;
-    font-size: 0.9em; /* Smaller font for count */
+    font-size: 0.9em; 
 }
 
 .reviewCountLink:hover {
     text-decoration: underline;
 }
 
-/* Style for "Chưa có đánh giá" text */
+
 .reviewCount {
     font-size: 0.9em;
     color: #555;
 }
 
-/* Badge styles (Giao nhanh, cân nặng) */
+
 .badge {
-    display: inline-flex; /* Use inline-flex to allow multiple badges on one line */
+    display: inline-flex;
+    
     align-items: center;
     padding: 5px 10px;
     border-radius: 4px;
     border: 1px solid;
     font-size: 0.9em;
-    margin-right: 8px; /* Space between badges */
-    margin-bottom: 8px; /* Space below badges */
-    gap: 5px; /* Space between icon and text */
+    margin-right: 8px;
+    
+    margin-bottom: 8px;
+    
+    gap: 5px;
+    
 }
 
 
@@ -167,17 +179,19 @@
     margin: 20px 0;
 }
 
-/* Price section styles */
+
 .priceSection {
     display: flex;
-    align-items: baseline; /* Align text to baseline */
+    align-items: baseline;
+    
     margin-bottom: 20px;
 }
 
 .currentPrice {
     font-size: 2em;
     font-weight: bold;
-    color: #dc3545; /* Red color for current price */
+    color: #dc3545;
+    
     margin-right: 10px;
 }
 
@@ -187,7 +201,7 @@
     text-decoration: line-through;
 }
 
-/* Variant selector styles */
+
 .variantSelector {
     margin-bottom: 20px;
 }
@@ -200,8 +214,10 @@
 
 .variantGrid {
     display: flex;
-    flex-wrap: wrap; /* Allow cards to wrap */
-    gap: 10px; /* Space between variant cards */
+    flex-wrap: wrap;
+    
+    gap: 10px;
+    
 }
 
 .variantCard {
@@ -213,13 +229,18 @@
     align-items: center;
     cursor: pointer;
     transition: all 0.2s ease-in-out;
-    position: relative; /* For overlay */
-    overflow: hidden; /* Hide overflow from overlay */
-    /* Flexible sizing for variant cards */
+    position: relative;
+    
+    overflow: hidden;
+    
+    
     flex-grow: 1;
-    flex-basis: 120px; /* Ideal base width */
-    min-width: 100px; /* Minimum width */
-    max-width: 150px; /* Maximum width to prevent stretching too much */
+    flex-basis: 120px;
+    
+    min-width: 100px;
+    
+    max-width: 150px;
+    
 }
 
 .variantCard:hover:not(.disabledVariant) {
@@ -229,14 +250,16 @@
 
 .selectedVariant {
     border-color: #007bff;
-    background-color: #e9f5ff; /* Light background when selected */
+    background-color: #e9f5ff;
+    
     box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
 }
 
 .disabledVariant {
     opacity: 0.6;
     cursor: not-allowed;
-    pointer-events: none; /* Disable click events */
+    pointer-events: none;
+    
     border-color: #ccc;
     background-color: #f0f0f0;
 }
@@ -247,11 +270,13 @@
     object-fit: cover;
     border-radius: 4px;
     margin-right: 10px;
-    flex-shrink: 0; /* Prevent thumbnail from shrinking */
+    flex-shrink: 0;
+    
 }
 
 .variantInfo {
-    flex-grow: 1; /* Allow info text to grow */
+    flex-grow: 1;
+    
     display: flex;
     flex-direction: column;
 }
@@ -271,7 +296,8 @@
     position: absolute;
     top: 5px;
     right: 5px;
-    color: #28a745; /* Green color */
+    color: #28a745;
+    
     font-size: 1.2em;
 }
 
@@ -281,22 +307,26 @@
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(255, 255, 255, 0.7); /* Semi-transparent white overlay */
+    background-color: rgba(255, 255, 255, 0.7);
+    
     display: flex;
     justify-content: center;
     align-items: center;
     font-weight: bold;
-    color: #dc3545; /* Red color */
+    color: #dc3545;
+    
     font-size: 1em;
-    pointer-events: none; /* Allow clicks to pass through overlay */
+    pointer-events: none;
+    
     text-align: center;
 }
 
 
-/* Error/Out of stock messages near buttons */
+
 .variantOutOfStockMsg,
 .addToCartError {
-    color: #dc3545; /* Red color */
+    color: #dc3545;
+    
     font-size: 0.9em;
     margin-top: 10px;
     display: flex;
@@ -305,172 +335,281 @@
 }
 
 
-/* Action buttons container */
+
 .actionButtons {
     display: flex;
-    gap: 15px; /* Space between buttons */
+    gap: 15px;
+    
     margin-top: 20px;
+    
+    flex-wrap: wrap;
 }
 
 .orderNowButton,
 .addToCartButton {
-    flex: 1; /* Make buttons share space equally */
+    flex: 1;
+    
     font-size: 1.1em;
-    padding: 12px 20px;
-    display: flex; /* For centering content (spinner/icon+text) */
+    
+    font-family: 'Roboto', sans-serif;
+    
+    padding: 15px 20px;
+    
+
+    display: flex;
+    
     align-items: center;
+    
     justify-content: center;
-    gap: 8px; /* Space between icon/spinner and text */
-    text-transform: uppercase; /* Uppercase text */
+    
+    gap: 8px;
+    
+
+    text-transform: uppercase;
+    
+    font-weight: bold;
+    
+
+    
+    border-radius: 8px;
+    
+
+    cursor: pointer;
+    
+    
+    transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease, opacity 0.3s ease;
 }
 
-/* Example custom styles for Buttons */
+
 .orderNowButton {
-     background: linear-gradient(to right, #007bff, #0056b3); /* Gradient background */
-     border: none;
-     color: white;
-     font-weight: bold;
+    
+    background: linear-gradient(to right, #5fa2e7, #3b82f6);
+    
+    border: none;
+    
+    color: white;
+    
+
+    
+    flex-direction: column;
+    line-height: 1.2;
+    
 }
+
+
+.orderNowButton span {
+    display: block;
+    
+    text-align: center;
+    
+}
+
+
+
 .orderNowButton:hover:not(:disabled) {
-     background: linear-gradient(to right, #0056b3, #004085);
+    
+    background: linear-gradient(to right, #3b82f6, #1d4ed8);
+    
 }
+
 
 .addToCartButton {
-     background-color: transparent;
-     border: 2px solid #007bff;
-     color: #007bff;
-     font-weight: bold;
-}
-.addToCartButton:hover:not(:disabled) {
-    background-color: #e9f5ff; /* Light blue background on hover */
+    background-color: transparent;
+    
+    border: 2px solid #3b82f6;
+    
+    color: #3b82f6;
+    
+
+    
+    flex-direction: row;
+    
 }
 
-/* Disabled state for buttons */
+
+.addToCartButton svg {
+    font-size: 1.2em;
+    
+    
+}
+
+
+
+.addToCartButton:hover:not(:disabled) {
+    background-color: #e0f2fe;
+    
+    border-color: #1d4ed8;
+    
+    color: #1d4ed8;
+    
+}
+
+
 .orderNowButton:disabled,
-.addToCartButton:disabled,
-.submitReviewButton:disabled {
+.addToCartButton:disabled { 
     opacity: 0.6;
     cursor: not-allowed;
+    
 }
 
-/* Login prompt button style */
+
+
 .loginPromptButton {
     margin-top: 20px;
-    width: 100%; /* Full width */
+    width: 100%;
+    
     font-size: 1.1em;
+    
+    font-family: 'Roboto', sans-serif;
     padding: 12px 20px;
     display: flex;
     align-items: center;
     justify-content: center;
     gap: 8px;
-    background-color: #6c757d; /* Secondary button color */
+    background-color: #6c757d;
+    
     color: white;
     border: none;
+    border-radius: 8px; 
+    font-weight: bold; 
+    cursor: pointer;
+     transition: background-color 0.3s ease, opacity 0.3s ease;
 }
 .loginPromptButton:hover:not(:disabled) {
      background-color: #5a6268;
 }
+.loginPromptButton:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
 
 
-/* --- Description and Specs Section Styles --- */
-/* This section is a block element placed after the top flex container */
+
+
 .detailsSection {
-    width: 100%; /* Ensure it takes full width */
-    /* margin-top và padding-top được thay bằng gap trong wrapper và border-top */
+    width: 100%;
+    
+    
     padding-top: 20px;
     border-top: 1px solid #eee;
     box-sizing: border-box;
-    display: flex; /* Use flex for Description and Specs columns */
-    flex-wrap: wrap; /* Allow columns to wrap on smaller screens */
-    gap: 30px; /* Space between description and specs columns */
-    margin-bottom: 30px; /* Khoảng cách đẩy khối tiếp theo (reviews) xuống */
+    display: flex;
+    
+    flex-wrap: wrap;
+    
+    gap: 30px;
+    
+    margin-bottom: 30px;
+    
 }
 
-/* Styles for description and specs columns */
+
 .descriptionColumn {
-    flex: 1 1 400px; /* Base width for description */
-    max-width: 100%; /* Allow description to take full width if needed */
+    flex: 1 1 400px;
+    
+    max-width: 100%;
+    
     box-sizing: border-box;
 }
 
 .specsColumn {
-    flex: 1 1 400px; /* Base width for specs */
-    max-width: 100%; /* Allow specs to take full width if needed */
+    flex: 1 1 400px;
+    
+    max-width: 100%;
+    
     box-sizing: border-box;
 }
 
-/* Adjust column widths for smaller screens to stack them */
+
 @media (max-width: 768px) {
+
     .descriptionColumn,
     .specsColumn {
-        flex-basis: 100%; /* Stack description and specs on small screens */
-        max-width: 100%; /* Ensure they don't exceed container width */
+        flex-basis: 100%;
+        
+        max-width: 100%;
+        
     }
-     .detailsSection {
-         flex-direction: column; /* Explicitly stack */
-         gap: 20px; /* Add some space between stacked sections */
-         margin-bottom: 20px; /* Reduce margin when stacked */
-     }
+
+    .detailsSection {
+        flex-direction: column;
+        
+        gap: 20px;
+        
+        margin-bottom: 20px;
+        
+    }
 }
 
 
-/* Heading style for description and specs */
+
 .detailsHeading {
     font-size: 1.4em;
     margin-bottom: 15px;
     color: #333;
-    border-bottom: 2px solid #007bff; /* Simple blue underline */
+    border-bottom: 2px solid #007bff;
+    
     padding-bottom: 5px;
-    display: inline-block; /* Ensure border only covers text width */
+    display: inline-block;
+    
 }
 
-/* Styles for the specs table */
+
 .specsTable {
     width: 100%;
-    border-collapse: collapse; /* Remove space between cell borders */
+    border-collapse: collapse;
+    
     margin-top: 10px;
 }
 
 .specsTable tr {
-    border-bottom: 1px solid #eee; /* Bottom border for each row */
+    border-bottom: 1px solid #eee;
+    
 }
 
 .specsTable tr:last-child {
-    border-bottom: none; /* No border on the last row */
+    border-bottom: none;
+    
 }
 
 .specsTable td {
-    padding: 10px 0; /* Vertical padding for table cells */
-    vertical-align: top; /* Align content to top */
+    padding: 10px 0;
+    
+    vertical-align: top;
+    
 }
 
 .specName {
     font-weight: bold;
     color: #555;
-    width: 40%; /* Allocate width for the spec name (adjust as needed) */
-    padding-right: 15px; /* Space between name and value */
+    width: 40%;
+    
+    padding-right: 15px;
+    
 }
 
 .specValue {
     color: #333;
-    width: 60%; /* Allocate width for the spec value (adjust as needed) */
+    width: 60%;
+    
 }
 
-/* Style for the view more specs button if used */
+
 /* .viewMoreSpecsButton {
     margin-top: 15px;
 } */
 
 
-/* --- Review Section Styles --- */
-/* This section is a block element placed after the details section */
+
+
 .reviewsSection {
-    width: 100%; /* Ensure it takes full width */
-    /* margin-top, padding-top được thay bằng gap trong wrapper và border-top */
+    width: 100%;
+    
+    
     padding-top: 20px;
     border-top: 1px solid #eee;
     box-sizing: border-box;
-    /* Không cần margin-bottom nếu nó là khối cuối cùng trong wrapper */
+    
 }
 
 .reviewsHeading {
@@ -479,26 +618,28 @@
     color: #333;
 }
 
-/* Login prompt for review form */
-.loginToReviewPrompt {
-    margin-top: 20px;
-    padding: 15px;
-    background-color: #fff3cd; /* Light yellow background */
-    border: 1px solid #ffeeba;
-    color: #856404; /* Dark yellow text */
-    border-radius: 4px;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-.loginToReviewPrompt a {
-    color: #856404;
-    font-weight: bold;
+
+@media (max-width: 576px) {
+    .loginToReviewPrompt {
+        
+        padding: 12px 15px;
+        
+        font-size: 0.9em; 
+        
+        gap: 8px;
+    }
+
+    
+     .loginToReviewPrompt svg {
+         font-size: 1em;
+     }
 }
 
-/* Review submission form styles */
+
+
 .reviewForm {
-    background-color: #f8f9fa; /* Light gray background */
+    background-color: #f8f9fa;
+    
     padding: 20px;
     border-radius: 8px;
     margin-bottom: 30px;
@@ -514,23 +655,27 @@
 .starPicker {
     display: flex;
     margin-bottom: 15px;
-    font-size: 1.8em; /* Size of stars in picker */
+    font-size: 1.8em;
+    
 }
 
 .starPickerIcon {
-    color: #ccc; /* Default star color */
+    color: #ccc;
+    
     cursor: pointer;
     margin-right: 5px;
     transition: color 0.2s ease;
 }
 
 .starPickerIcon:last-child {
-    margin-right: 0; /* No margin on the last star */
+    margin-right: 0;
+    
 }
 
 .starPickerIcon:hover,
 .starSelected {
-    color: #ffc107; /* Selected/hover star color */
+    color: #ffc107;
+    
 }
 
 .commentInput {
@@ -540,24 +685,33 @@
     border-radius: 4px;
     font-size: 1em;
     margin-bottom: 15px;
-    box-sizing: border-box; /* Include padding/border in width */
-    resize: vertical; /* Allow vertical resizing */
+    box-sizing: border-box;
+    
+    resize: vertical;
+    
 }
 
 .submitReviewButton {
-    /* Inherits styles from other buttons based on variant */
+    
     font-size: 1em;
     padding: 10px 15px;
-    /* Ensure it's block or inline-block to allow margin-bottom if needed */
+    
     display: inline-block;
+    
+    font-family: 'Roboto', sans-serif;
+    border-radius: 8px; 
+    font-weight: bold; 
+    cursor: pointer;
+     transition: background-color 0.3s ease, opacity 0.3s ease;
 }
 
-.submitReviewError {
-    margin-top: -10px; /* Adjust spacing above button */
-    margin-bottom: 15px; /* Space below error message */
+.submitReviewButton:disabled {
+     opacity: 0.6;
+     cursor: not-allowed;
 }
 
-/* Loading/error/no reviews messages */
+
+
 .loadingReviews {
     display: flex;
     justify-content: center;
@@ -568,7 +722,8 @@
 }
 
 .reviewsErrorMessage {
-    color: #dc3545; /* Red error color */
+    color: #dc3545;
+    
     padding: 20px;
     text-align: center;
     display: flex;
@@ -580,28 +735,34 @@
 .noReviewsMessage {
     text-align: center;
     padding: 20px;
-    color: #777; /* Gray text */
+    color: #777;
+    
 }
 
-/* Reviews list container */
+
 .reviewsList {
     display: flex;
-    flex-direction: column; /* Stack review items vertically */
-    gap: 20px; /* Space between review items */
+    flex-direction: column;
+    
+    gap: 20px;
+    
 }
 
-/* Individual review item styles */
+
 .reviewItem {
-    background-color: #fff; /* White background */
+    background-color: #fff;
+    
     border: 1px solid #eee;
     border-radius: 8px;
     padding: 15px;
-    box-shadow: 0 1px 5px rgba(0, 0, 0, 0.05); /* Subtle shadow */
+    box-shadow: 0 1px 5px rgba(0, 0, 0, 0.05);
+    
 }
 
 .reviewerInfo {
     display: flex;
-    justify-content: space-between; /* Space out name and date */
+    justify-content: space-between;
+    
     align-items: center;
     margin-bottom: 8px;
     font-size: 0.9em;
@@ -613,45 +774,59 @@
 }
 
 .reviewDate {
-    color: #777; /* Gray text for date */
+    color: #777;
+    
 }
 
-/* Style for RatingStars component when used inside ReviewItem */
+
 .reviewRatingStars {
-     color: #ffc107; /* Yellow for stars */
-     margin-bottom: 8px;
-     font-size: 1em; /* Smaller size for stars in reviews */
+    color: #ffc107;
+    
+    margin-bottom: 8px;
+    font-size: 1em;
+    
 }
+
 .reviewRatingStars .stars .starIcon {
-     font-size: 1em; /* Ensure icon size matches parent */
-     margin-right: 1px; /* Smaller margin between stars */
+    font-size: 1em;
+    
+    margin-right: 1px;
+    
 }
 
 
 .reviewComment {
     color: #555;
-    line-height: 1.5; /* Improve readability */
-    /* Word break to prevent long words from overflowing */
+    line-height: 1.5;
+    
+    
     word-break: break-word;
-    white-space: pre-wrap; /* Preserve whitespace and wrap text */
+    white-space: pre-wrap;
+    
 }
 
-/* Style for the "View More" button */
+
 .viewMoreButton {
-    background: none; /* No background */
-    border: none; /* No border */
-    color: #007bff; /* Blue text */
+    background: none;
+    
+    border: none;
+    
+    color: #007bff;
+    
     cursor: pointer;
-    padding: 0; /* Remove padding */
+    padding: 0;
+    
     font-size: 0.9em;
-    margin-top: 5px; /* Space above button */
-    display: inline-block; /* Ensure it's treated as an inline element */
-    text-decoration: underline; /* Underline the text */
+    margin-top: 5px;
+    
+    display: inline-block;
+    
+    text-decoration: underline;
+    
 }
 
 .viewMoreButton:hover {
-    text-decoration: none; /* Remove underline on hover */
+    text-decoration: none;
+    
 }
 
-
-/* ... (any other styles you might have below this line) ... */

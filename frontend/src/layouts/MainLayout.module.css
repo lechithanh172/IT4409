@@ -1,95 +1,145 @@
-/* src/layouts/MainLayout.module.css */
+
+
+:root {
+  --content-bg: #f0f2f5;
+  --layout-bg-default: #ffffff;
+  --layout-bg-homepage: #1a202c;
+  --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  --card-background: #ffffff;
+  --text-color-dark: #2d3748;
+  --text-color-light: #4a5568;
+  --shadow-base: 0 4px 10px rgba(0, 0, 0, 0.08);
+  --shadow-hover: 0 8px 20px rgba(0, 0, 0, 0.15);
+  --border-radius-base: 12px;
+  --border-radius-sm: 8px;
+  --spacing-xs: 10px;
+  --spacing-sm: 15px;
+  --spacing-md: 20px;
+  --spacing-lg: 40px;
+}
 
 .layoutContainer {
   display: flex;
-  flex-direction: column;
+  flex-direction: column; 
   min-height: 100vh;
-  background-color: #f4f4f4;
-  position: relative; /* Đảm bảo container có position để con absolute/fixed tham chiếu (dù không chắc có tác dụng với Toastify) */
+  background-color: var(--layout-bg-default);
+  position: relative;
+  transition: background-color 0.3s ease;
+}
+
+.homepageActive {
+   background-color: var(--layout-bg-homepage);
 }
 
 .mainContent {
   flex-grow: 1;
   width: 100%;
+  background-color: var(--content-bg);
+  padding: 0;
 }
 
-/* --- STYLE CHO TOAST CONTAINER (Thử nghiệm) --- */
-
-/* Nhắm mục tiêu container bằng class bạn đã thêm */
-/* Lưu ý: Việc ghi đè position, top, right có thể bị CSS của react-toastify ghi đè lại! */
-.customToastContainer {
-  /* Thử đặt vị trí - CÓ THỂ KHÔNG HOẠT ĐỘNG NHƯ MONG ĐỢI */
-  /* position: fixed !important;  Thử !important nếu cần */
-  top: 1rem !important;
-  /* right: 1rem !important; */
-  /* left: unset !important; */
-  bottom: unset !important; 
-  width: auto !important; 
-  /* Các style khác bạn có thể tùy chỉnh (thường hoạt động tốt hơn) */
-  /* Ví dụ: thay đổi độ rộng tối đa */
-  /* max-width: 400px; */
+:global(.custom-toast-container.Toastify__toast-container) {
+  
 }
 
-/* Style cho từng toast (nếu dùng toastClassName) */
-/* Ghi đè class mặc định của react-toastify hoặc dùng class tùy chỉnh */
-/* Ví dụ ghi đè */
-:global(.Toastify__toast) { /* Dùng :global để nhắm class bên ngoài module */
-  border-radius: 8px !important; /* Bo góc nhiều hơn */
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
-  font-family: inherit !important; /* Dùng font của trang */
-  /* background-color: #your-color !important; */
+:global(.custom-toast-container) {
+   height: fit-content;
+   position: fixed !important;
+   top: 20px !important;
+   right: 20px !important;
 }
-
-/* Ví dụ dùng class tùy chỉnh */
-.customToast {
-  background-color: #fff;
-  color: #333;
-  border-radius: 8px;
+:global(.Toastify__toast) {
+  border-radius: var(--border-radius-sm); 
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
   font-family: inherit;
-  padding: 12px 18px !important; /* Tăng padding */
+  padding: 12px 16px !important;
+  margin-bottom: var(--spacing-sm); 
+  background-color: var(--card-background);
+  color: var(--text-color-dark);
+  transition: background-color 0.3s ease, color 0.3s ease;
+  max-width: 100% !important;
+  word-wrap: break-word !important; 
 }
-.customToastBody {
-  font-size: 0.95rem; /* Cỡ chữ nội dung */
-  line-height: 1.5;
-}
-/* Style cho các loại toast khác nhau (nếu dùng class tùy chỉnh) */
-.customToast.Toastify__toast--success { /* Ghép class tùy chỉnh với class mặc định */
+
+:global(.Toastify__toast--success) {
   background-color: #e6f7f1;
   color: #0b825a;
-  border-left: 5px solid #10b981; /* Thêm viền trái màu */
+  border-left: 5px solid #10b981;
 }
-.customToast.Toastify__toast--error {
+:global(.Toastify__toast--error) {
   background-color: #fff5f5;
   color: #c53030;
    border-left: 5px solid #e53e3e;
 }
-.customToast.Toastify__toast--warning {
+:global(.Toastify__toast--warning) {
    background-color: #fffbeb;
    color: #b45309;
    border-left: 5px solid #f59e0b;
 }
-.customToast.Toastify__toast--info {
+:global(.Toastify__toast--info) {
    background-color: #e0f2fe;
    color: #0284c7;
     border-left: 5px solid #3b82f6;
 }
 
-
-/* Style thanh progress (nếu dùng progressClassName) */
-.customProgressBar {
-  background: linear-gradient(to right, #6366f1, #8b5cf6) !important; /* Gradient cho thanh progress */
-  height: 4px !important;
+:global(.Toastify__toast-body) {
+    font-size: 0.9rem !important; 
+    line-height: 1.4 !important;
+    color: inherit;
+    margin: 0 !important;
+    padding: 0 !important;
 }
 
-/* Ghi đè style nút đóng (ví dụ) */
+:global(.Toastify__progress-bar) {
+  background: var(--primary-gradient);
+  height: 4px;
+}
+
 :global(.Toastify__close-button) {
-  color: #6b7280 !important;
-  opacity: 0.8 !important;
+  color: var(--text-color-light);
+  opacity: 0.8;
 }
 :global(.Toastify__close-button:hover) {
-  color: #1f2937 !important;
-  opacity: 1 !important;
+  color: var(--text-color-dark);
+  opacity: 1;
 }
 
-/* --- KẾT THÚC STYLE TOAST --- */
+
+/* Responsive Adjustments for Toast Container */
+@media (max-width: 768px) {
+    :global(.custom-toast-container.Toastify__toast-container) {
+        /* Adjust padding using CSS variables */
+         --Toastify--toast-container-vertical-padding: var(--spacing-md);
+         --Toastify--toast-container-horizontal-padding: var(--spacing-md);
+
+        /* Adjust width for mobile */
+        max-width: 320px !important; /* Smaller on tablets */
+        width: 320px !important;
+        right: 15px !important; /* Closer to edge on mobile */
+    }
+     :global(.Toastify__toast) {
+         padding: 10px 14px !important; /* Even more compact on mobile */
+     }
+}
+
+@media (max-width: 480px) {
+     :global(.custom-toast-container.Toastify__toast-container) {
+        /* Adjust padding using CSS variables */
+         --Toastify--toast-container-vertical-padding: var(--spacing-sm);
+         --Toastify--toast-container-horizontal-padding: var(--spacing-sm);
+
+        /* Adjust width for small phones */
+         max-width: 280px !important;
+         width: 280px !important;
+         right: 10px !important;
+         top: 15px !important;
+     }
+      :global(.Toastify__toast) {
+          padding: 8px 12px !important; /* Most compact for small screens */
+          font-size: 0.85rem !important;
+      }
+      :global(.Toastify__toast-body) {
+          font-size: 0.85rem !important;
+          line-height: 1.3 !important;
+      }
+}

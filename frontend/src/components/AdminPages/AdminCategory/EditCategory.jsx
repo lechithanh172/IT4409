@@ -15,7 +15,7 @@ const EditCategory = ({ category, setModalChild, handleRefresh }) => {
         });
     }, [category, form]);
 
-    const onFinishFailed = (errorInfo) => {
+    const onFinishFailed = () => {
         message.error('Vui lòng điền đầy đủ thông tin bắt buộc.');
     };
 

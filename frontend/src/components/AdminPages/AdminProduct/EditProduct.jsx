@@ -58,7 +58,7 @@ const EditProduct = ({ product, setModalChild, handleRefresh, categoriesList = [
           if (!Array.isArray(parsedSpecifications)) {
             parsedSpecifications = [];
           }
-        } catch (error) {
+        } catch  {
           parsedSpecifications = [];
           message.error("Lỗi định dạng dữ liệu thông số kỹ thuật nhận được.");
         }
@@ -66,7 +66,7 @@ const EditProduct = ({ product, setModalChild, handleRefresh, categoriesList = [
          parsedSpecifications = product.specifications;
       }
 
-      // Chuyển đổi dữ liệu specifications thành định dạng nhóm
+
       const specificationGroups = [];
       const groupMap = new Map();
 
@@ -125,7 +125,7 @@ const EditProduct = ({ product, setModalChild, handleRefresh, categoriesList = [
     }
   };
 
-  const onFinishFailed = (errorInfo) => {
+  const onFinishFailed = () => {
     message.error("Vui lòng kiểm tra lại các trường thông tin còn thiếu hoặc không hợp lệ.");
   };
 

@@ -1,29 +1,29 @@
-/* src/pages/OrderHistoryPage/OrderHistoryPage.module.css */
 
-/* --- General Container --- */
+
+
 .container {
-    max-width: 1150px; /* Adjust as needed for your layout */
-    margin: 30px auto; /* Center the container with top/bottom margin */
-    padding: 25px 30px; /* Padding inside the main container */
+    max-width: 1150px; 
+    margin: 30px auto; 
+    padding: 25px 30px; 
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
     background-color: #f9f9f9;
     border-radius: 8px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08); /* Subtle shadow for depth */
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08); 
 }
 
 .container h1 {
     display: flex;
     align-items: center;
     gap: 12px;
-    font-size: 1.9em; /* Slightly larger title */
+    font-size: 1.9em; 
     margin-bottom: 30px;
-    color: #2c3e50; /* Darker blue */
+    color: #2c3e50; 
     border-bottom: 2px solid #e0e0e0;
     padding-bottom: 15px;
-    font-weight: 600; /* Slightly bolder */
+    font-weight: 600; 
 }
 
-/* --- Loading/Error/Empty States --- */
+
 .loadingContainer,
 .errorContainer,
 .noResults {
@@ -38,20 +38,20 @@
     background-color: #fff;
     border-radius: 8px;
     box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-    margin-top: 20px; /* Add margin if needed */
+    margin-top: 20px; 
 }
 .errorContainer h2 { color: #e74c3c; margin-top: 15px; margin-bottom: 10px; }
 .errorContainer p { margin-bottom: 20px; font-size: 1.05em; line-height: 1.6; }
 .noResults p { font-size: 1.1em; margin-bottom: 25px; }
 .loadingContainer p { font-size: 1.1em; margin-top: 15px;}
-.noResults a button, .errorContainer button { margin-top: 10px; } /* Ensure buttons have margin */
+.noResults a button, .errorContainer button { margin-top: 10px; } 
 
 
-/* --- Search Bar --- */
+
 .searchContainer {
     margin-bottom: 25px;
     display: flex;
-    justify-content: flex-end; /* Align search to the right */
+    justify-content: flex-end; 
 }
 
 .searchInputWrapper {
@@ -59,7 +59,7 @@
     display: flex;
     align-items: center;
     width: 100%;
-    max-width: 380px; /* Adjust width as needed */
+    max-width: 380px; 
 }
 
 .searchIcon {
@@ -73,14 +73,14 @@
 
 .searchInput {
     width: 100%;
-    padding: 10px 40px 10px 40px; /* Padding: top/bottom, right (for clear), left (for search icon) */
+    padding: 10px 40px 10px 40px; 
     border: 1px solid #ccc;
     border-radius: 25px;
     font-size: 1em;
     outline: none;
     transition: border-color 0.2s ease, box-shadow 0.2s ease;
     background-color: #fff;
-    box-sizing: border-box; /* Include padding in width */
+    box-sizing: border-box; 
 }
 
 .searchInput:focus {
@@ -102,17 +102,17 @@
     align-items: center;
     justify-content: center;
     transition: color 0.2s ease;
-    line-height: 1; /* Prevent button height issues */
+    line-height: 1; 
 }
 .clearSearchButton:hover {
     color: #555;
 }
 
 
-/* --- Order Table --- */
+
 .tableContainer {
     width: 100%;
-    overflow-x: auto; /* Horizontal scroll on small screens */
+    overflow-x: auto; 
     background-color: #fff;
     border: 1px solid #e0e0e0;
     border-radius: 8px;
@@ -122,30 +122,30 @@
 .orderTable {
     width: 100%;
     border-collapse: collapse;
-    min-width: 700px; /* Prevent excessive squashing on small screens before scroll */
+    min-width: 700px; 
 }
 
 .orderTable th,
 .orderTable td {
-    padding: 14px 16px; /* Slightly more padding */
+    padding: 14px 16px; 
     text-align: left;
     vertical-align: middle;
     border-bottom: 1px solid #eee;
-    white-space: nowrap; /* Prevent text wrapping in header/summary row */
+    white-space: nowrap; 
 }
 
 .orderTable th {
     background-color: #f8f9fa;
     font-weight: 600;
-    font-size: 0.85em; /* Slightly smaller header font */
+    font-size: 0.85em; 
     color: #495057;
     text-transform: uppercase;
     letter-spacing: 0.6px;
 }
 
 .orderTable tbody tr:last-child td {
-    /* Remove bottom border only if it's NOT an expanded row's content */
-    /* border-bottom: none; This might remove border needed before expanded row */
+    
+    
 }
 
 .orderRow {
@@ -157,20 +157,20 @@
     background-color: #f1f3f5;
 }
 
-/* Style for the main row when its details are expanded */
+
 .expandedHeader {
     background-color: #e9ecef !important;
     border-bottom: 1px solid #dee2e6;
 }
 
 
-/* Column specific styles */
-.colExpand { width: 45px; text-align: center !important; padding: 14px 10px; } /* Centered expand icon */
+
+.colExpand { width: 45px; text-align: center !important; padding: 14px 10px; } 
 .colId { width: 110px; font-weight: 500; color: #333;}
 .colDate { width: 170px; font-size: 0.9em; color: #555; }
 .colStatus { width: 150px; text-align: center !important; }
 .colPayment { width: 130px; }
-.colTotal { width: 160px; font-weight: bold; font-size: 1.05em; } /* Slightly larger total */
+.colTotal { width: 160px; font-weight: bold; font-size: 1.05em; } 
 .alignRight { text-align: right !important; }
 
 .orderStatus { padding: 5px 12px; border-radius: 15px; font-size: 0.75em; font-weight: 700; color: #fff; white-space: nowrap; text-transform: uppercase; letter-spacing: 0.5px; }
@@ -207,30 +207,30 @@
     line-height: 1.7;
     color: #444;
     border-bottom: 1px dashed #ddd;
-    padding-bottom: 20px; /* Space above the dividing line */
+    padding-bottom: 20px; 
     /* Optional: Add specific horizontal padding if needed,
        but often the padding on .expandedContent is enough.
        If it still looks too close, uncomment and adjust below: */
-    /* padding-left: 10px; */
-    /* padding-right: 10px; */
+    
+    
 }
 .orderMeta p {
-    margin-bottom: 10px; /* Space between lines */
-    display: flex; /* Use flexbox for better alignment */
-    gap: 8px; /* Space between label and value */
+    margin-bottom: 10px; 
+    display: flex; 
+    gap: 8px; 
 }
 .orderMeta strong {
     color: #111;
-    flex-shrink: 0; /* Prevent label from shrinking */
-    /* Remove fixed min-width if using flex gap */
-    /* min-width: 150px; */
-    font-weight: 600; /* Make label slightly bolder */
+    flex-shrink: 0; 
+    
+    
+    font-weight: 600; 
 }
 
 .itemsTitle {
     font-size: 1.15em;
     font-weight: 600;
-    margin-top: 20px; /* Space above title */
+    margin-top: 20px; 
     margin-bottom: 18px;
     color: #333;
 }
@@ -244,7 +244,7 @@
 
 .itemImage { width: 60px; height: 60px; object-fit: contain; border-radius: 4px; border: 1px solid #eee; flex-shrink: 0; background-color: #fff;}
 .itemInfo { flex-grow: 1; display: flex; flex-direction: column; gap: 4px; }
-.itemName { font-weight: 500; color: #2c3e50; font-size: 1em; line-height: 1.3; } /* Slightly larger item name */
+.itemName { font-weight: 500; color: #2c3e50; font-size: 1em; line-height: 1.3; } 
 .itemColor { font-size: 0.88em; color: #666; }
 .itemQuantity { font-size: 0.9em; color: #555; min-width: 50px; text-align: center; font-weight: 500;}
 .itemPrice { font-size: 0.95em; font-weight: 500; color: #333; min-width: 110px; text-align: right; white-space: nowrap;}

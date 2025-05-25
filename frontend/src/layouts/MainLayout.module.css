@@ -1,21 +1,21 @@
-/* src/layouts/MainLayout.module.css */
 
-/* --- Biến CSS (Đồng bộ với Theme chung) --- */
-/* Nên đặt các biến này ở file CSS toàn cục và import vào đây */
-/* Nếu không có file global, có thể copy biến từ HomePage.module.css */
+
+
+
+
 :root {
-  /* Nền của các khu vực nội dung (main, sections) */
+  
   --content-bg: #f0f2f5;
-  /* Nền mặc định của layout container (TRẮNG) */
-  --layout-bg-default: #ffffff; /* Đặt mặc định là TRẮNG */
-  /* Nền layout container chỉ áp dụng cho trang chủ (MÀU TỐI) */
-  --layout-bg-homepage: #1a202c; /* Màu tối bạn muốn ở homepage layout */
+  
+  --layout-bg-default: #ffffff; 
+  
+  --layout-bg-homepage: #1a202c; 
 
-  /* Các biến khác từ theme chung */
+  
   --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  --card-background: #ffffff; /* Nền card chung */
-  --text-color-dark: #2d3748; /* Màu chữ đậm */
-  --text-color-light: #4a5568; /* Màu chữ nhạt */
+  --card-background: #ffffff; 
+  --text-color-dark: #2d3748; 
+  --text-color-light: #4a5568; 
   --shadow-base: 0 4px 10px rgba(0, 0, 0, 0.08);
   --shadow-hover: 0 8px 20px rgba(0, 0, 0, 0.15);
   --border-radius-base: 12px;
@@ -27,112 +27,112 @@
 }
 
 
-/* --- Cấu trúc Layout chính --- */
+
 .layoutContainer {
   display: flex;
-  flex-direction: column; /* Sắp xếp Header, Main, Footer theo cột dọc */
-  min-height: 100vh; /* Đảm bảo layout ít nhất bằng chiều cao viewport */
-  /* Nền mặc định là màu sáng (var(--layout-bg-default)) */
+  flex-direction: column; 
+  min-height: 100vh; 
+  
   background-color: #ffffff;
-  position: relative; /* Đảm bảo container có position cho các con absolute/fixed (như ToastContainer) tham chiếu */
-  /* Thêm transition cho nền để chuyển màu mượt mà khi chuyển trang */
+  position: relative; 
+  
   transition: background-color 0.3s ease;
 }
 
-/* Class chỉ áp dụng khi ở Homepage (thêm trong JSX) */
+
 .homepageActive {
-   /* Ghi đè nền thành màu tối chỉ khi có class này */
+   
    background-color: var(--layout-bg-homepage);
 }
 
 
 .mainContent {
-  flex-grow: 1; /* Quan trọng: Làm cho MainContent chiếm hết không gian còn lại */
+  flex-grow: 1; 
   width: 100%;
-  /* Đặt màu nền cho MainContent để che phủ nền của body/html hiển thị qua các khoảng trống (margin) của nội dung trang. Màu này là màu nền chung của nội dung (sáng trong light mode, tối trong dark mode). */
+  
   background-color: var(--content-bg);
-  /* Đảm bảo không có padding mặc định không mong muốn */
+  
   padding: 0;
-  /* overflow-x: hidden;  Tùy chọn: ngăn scrollbar ngang nếu nội dung tràn ra */
+  
 }
 
-/* --- STYLE CHO TOAST CONTAINER ( giữ nguyên từ câu trả lời trước ) --- */
 
-/* Nhắm mục tiêu container tổng của react-toastify */
-/* Vị trí (position, top, right, etc.) chủ yếu được điều khiển bởi prop `position` trong JSX. */
-/* Style ở đây dùng để tùy chỉnh kích thước, margin, padding, và responsive placement. */
+
+
+
+
 :global(.Toastify__toast-container) {
-  /* Thêm padding 2 bên để toast không sát mép màn hình trên mobile */
+  
    padding: 0 var(--spacing-md);
-   z-index: 10000; /* Đảm bảo toast luôn nằm trên các nội dung khác */
+   z-index: 10000; 
 }
 
 
 :global(.Toastify__toast) {
-  border-radius: var(--border-radius-sm) !important; /* Bo góc nhiều hơn */
+  border-radius: var(--border-radius-sm) !important; 
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
-  font-family: inherit !important; /* Dùng font của trang */
-  padding: 12px 18px !important; /* Tăng padding mặc định của toast */
-  margin-bottom: var(--spacing-sm) !important; /* Thêm khoảng cách giữa các toast */
-   /* Màu nền và màu chữ mặc định cho toast nếu không dùng variant */
+  font-family: inherit !important; 
+  padding: 12px 18px !important; 
+  margin-bottom: var(--spacing-sm) !important; 
+   
    background-color: var(--card-background) !important;
    color: var(--text-color-dark) !important;
-   /* Thêm transition cho màu nền và chữ nếu muốn hiệu ứng mượt mà khi chuyển mode */
+   
    transition: background-color 0.3s ease, color 0.3s ease;
 }
 
-/* Style cho các loại toast khác nhau (success, error, etc.) */
-/* Kết hợp global classes với biến màu sắc */
+
+
 :global(.Toastify__toast--success) {
-  background-color: #e6f7f1 !important; /* Nền xanh nhạt */
-  color: #0b825a !important; /* Chữ xanh đậm */
-  border-left: 5px solid #10b981 !important; /* Viền trái màu xanh */
+  background-color: #e6f7f1 !important; 
+  color: #0b825a !important; 
+  border-left: 5px solid #10b981 !important; 
 }
 :global(.Toastify__toast--error) {
-  background-color: #fff5f5 !important; /* Nền đỏ nhạt */
-  color: #c53030 !important; /* Chữ đỏ đậm */
-   border-left: 5px solid #e53e3e !important; /* Viền trái màu đỏ */
+  background-color: #fff5f5 !important; 
+  color: #c53030 !important; 
+   border-left: 5px solid #e53e3e !important; 
 }
 :global(.Toastify__toast--warning) {
-   background-color: #fffbeb !important; /* Nền vàng nhạt */
-   color: #b45309 !important; /* Chữ vàng đậm */
-   border-left: 5px solid #f59e0b !important; /* Viền trái màu vàng */
+   background-color: #fffbeb !important; 
+   color: #b45309 !important; 
+   border-left: 5px solid #f59e0b !important; 
 }
 :global(.Toastify__toast--info) {
-   background-color: #e0f2fe !important; /* Nền xanh dương nhạt */
-   color: #0284c7 !important; /* Chữ xanh dương đậm */
-    border-left: 5px solid #3b82f6 !important; /* Viền trái màu xanh dương */
+   background-color: #e0f2fe !important; 
+   color: #0284c7 !important; 
+    border-left: 5px solid #3b82f6 !important; 
 }
 
 
-/* Style cho nội dung toast (nếu dùng bodyClassName) */
-/* Global override cho nội dung toast */
+
+
 :global(.Toastify__toast-body) {
-    font-size: 0.95rem; /* Cỡ chữ nội dung */
+    font-size: 0.95rem; 
     line-height: 1.5;
-    color: inherit; /* Thừa hưởng màu chữ từ toast container */
+    color: inherit; 
 }
 
 
-/* Style thanh progress (nếu dùng progressClassName) */
+
 :global(.Toastify__progress-bar) {
-  background: var(--primary-gradient) !important; /* Gradient cho thanh progress */
+  background: var(--primary-gradient) !important; 
   height: 4px !important;
 }
 
-/* Ghi đè style nút đóng */
+
 :global(.Toastify__close-button) {
-  color: var(--text-color-light) !important; /* Màu từ biến */
+  color: var(--text-color-light) !important; 
   opacity: 0.8 !important;
 }
 :global(.Toastify__close-button:hover) {
-  color: var(--text-color-dark) !important; /* Màu từ biến */
+  color: var(--text-color-dark) !important; 
   opacity: 1 !important;
 }
 
 
-/* --- Responsive Adjustments cho Layout và Toast --- */
-/* Điều chỉnh padding container toast trên các màn hình */
+
+
 @media (max-width: 1024px) {
      :global(.Toastify__toast-container) {
          padding: 0 var(--spacing-md);
@@ -140,32 +140,32 @@
 }
 
 @media (max-width: 768px) {
-    /* Điều chỉnh vị trí toast container trên mobile (căn giữa ngang, có thể ở dưới) */
+    
      :global(.Toastify__toast-container) {
-        top: unset !important; /* Bỏ vị trí top */
-        bottom: var(--spacing-md) !important; /* Đặt ở dưới màn hình */
-        left: 50% !important; /* Đặt ở giữa ngang */
-        transform: translateX(-50%) !important; /* Dịch chuyển về giữa */
-        width: calc(100% - var(--spacing-md) * 2) !important; /* Chiếm gần hết chiều rộng */
-        max-width: 400px !important; /* Vẫn giới hạn chiều rộng tối đa */
-        padding: 0; /* Bỏ padding 2 bên container, padding sẽ nằm trong từng toast */
+        top: unset !important; 
+        bottom: var(--spacing-md) !important; 
+        left: 50% !important; 
+        transform: translateX(-50%) !important; 
+        width: calc(100% - var(--spacing-md) * 2) !important; 
+        max-width: 400px !important; 
+        padding: 0; 
      }
-     /* Điều chỉnh margin giữa các toast khi ở vị trí mới */
+     
       :global(.Toastify__toast) {
-          margin: 0 auto var(--spacing-sm) auto !important; /* Thêm margin dưới và căn giữa toast */
+          margin: 0 auto var(--spacing-sm) auto !important; 
       }
 }
 
 @media (max-width: 480px) {
      :global(.Toastify__toast-container) {
-         bottom: var(--spacing-sm) !important; /* Giảm khoảng cách dưới */
-         width: calc(100% - var(--spacing-sm) * 2) !important; /* Giảm chiều rộng */
+         bottom: var(--spacing-sm) !important; 
+         width: calc(100% - var(--spacing-sm) * 2) !important; 
          left: 50% !important;
          transform: translateX(-50%) !important;
          padding: 0;
      }
       :global(.Toastify__toast) {
-          margin: 0 auto var(--spacing-xs) auto !important; /* Giảm margin dưới */
-           padding: 10px 15px !important; /* Giảm padding toast */
+          margin: 0 auto var(--spacing-xs) auto !important; 
+           padding: 10px 15px !important; 
       }
 }

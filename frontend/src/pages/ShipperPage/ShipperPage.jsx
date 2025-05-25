@@ -1,16 +1,16 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import styles from './ShipperPage.module.css';
-import apiService from '../../services/api'; // Assuming apiService is correctly configured
+import apiService from '../../services/api';
 import { useAuth } from '../../contexts/AuthContext';
-import Spinner from '../../components/Spinner/Spinner'; // Assuming Spinner component exists
+import Spinner from '../../components/Spinner/Spinner';
 import { FaTruck, FaBox, FaExclamationTriangle, FaFilter, FaEye, FaEdit, FaCheck, FaTimes, FaSpinner } from 'react-icons/fa';
 import { Modal, Button, Tooltip, message, Typography, Table, Image, Tag, Card, Row, Col, Divider, Spin, Alert } from 'antd';
-import ShipperOrderDetails from './ShipperOrderDetails'; // Assuming ShipperOrderDetails component exists
+import ShipperOrderDetails from './ShipperOrderDetails';
 
 const { Text, Paragraph, Title } = Typography;
 
-// --- Helper Functions & Constants ---
+
 const STATUS_DETAILS = {
     PENDING: { label: "Chờ xử lý", color: "gold" },
     APPROVED: { label: "Đã duyệt", color: "blue" },
@@ -46,7 +46,7 @@ const formatDate = (dateString) => {
     } catch (e) { console.error("Error formatting date:", e, "Input:", dateString); return 'N/A'; }
 };
 
-// --- Component Starts ---
+
 
 const ShipperPage = () => {
     useEffect(() => {
@@ -55,7 +55,7 @@ const ShipperPage = () => {
     const { user } = useAuth();
     const [activeTab, setActiveTab] = useState('available');
     const [allOrders, setAllOrders] = useState([]);
-    const [isLoading, setIsLoading] = useState(true); // Initial loading state
+    const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState(null);
 
     const [detailsModalContent, setDetailsModalContent] = useState({
@@ -74,7 +74,7 @@ const ShipperPage = () => {
         isLoading: false,
     });
 
-    // Function to fetch data - Wrapped in useCallback
+
     const loadData = useCallback(async () => {
         if (!user || !user.userId) {
              setError("Thông tin người dùng không có sẵn.");
@@ -83,18 +83,18 @@ const ShipperPage = () => {
         }
 
         setIsLoading(true);
-        setError(null); // Clear previous errors
+        setError(null);
         try {
-            // Fetch unassigned orders
+
             const unassignedResponse = await apiService.getUnassignedOrders();
             const unassignedOrders = unassignedResponse.data || [];
 
-            // Fetch orders assigned to the current shipper
+
             const assignedResponse = await apiService.getShipperOrders(user.userId);
             const assignedOrders = assignedResponse.data || [];
 
-            // Combine and update state
-            // Filter out any potential duplicates if an order could appear in both lists
+
+
              const combinedOrders = [...unassignedOrders];
              assignedOrders.forEach(assignedOrder => {
                  if (!combinedOrders.some(order => order.orderId === assignedOrder.orderId)) {
@@ -107,13 +107,13 @@ const ShipperPage = () => {
         } catch (err) {
             console.error("Error loading data:", err.response ? err.response.data : err.message);
             setError("Có lỗi xảy ra khi tải dữ liệu đơn hàng. Vui lòng thử lại.");
-            setAllOrders([]); // Clear orders on error
+            setAllOrders([]);
         } finally {
             setIsLoading(false);
         }
-    }, [user]); // Depend on user to refetch if user object changes
+    }, [user]);
 
-    // Initial data load on component mount
+
     useEffect(() => {
         if (user && user.userId) {
             loadData();
@@ -121,10 +121,10 @@ const ShipperPage = () => {
              setIsLoading(false);
              setError("Bạn cần đăng nhập để xem trang này.");
         }
-    }, [user, loadData]); // Depend on user and the memoized loadData
+    }, [user, loadData]);
 
 
-    // Filter orders based on the active tab - Memoized
+
     const filteredOrders = useMemo(() => {
         if (!user || !user.userId) {
              return [];
@@ -133,21 +133,21 @@ const ShipperPage = () => {
         let orders = allOrders;
 
         if (activeTab === 'available') {
-            // Filter orders that have no shipper assigned
+
             orders = orders.filter(order => !order.shipperId);
-        } else { // activeTab === 'assigned'
-            // Filter orders assigned to the current shipper
+        } else {
+
             orders = orders.filter(order => order.shipperId === user.userId);
         }
 
-        // Sort orders (e.g., by creation date descending)
+
         orders.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
 
         return orders;
-    }, [allOrders, activeTab, user]); // Depend on allOrders, activeTab, and user (for userId)
+    }, [allOrders, activeTab, user]);
 
 
-    // --- Action Handlers ---
+
 
     const showAcceptOrderConfirm = (orderId) => {
         setAcceptOrderModal({
@@ -162,12 +162,12 @@ const ShipperPage = () => {
         if (orderId && user && user.userId) {
             setAcceptOrderModal(prev => ({ ...prev, isLoading: true }));
             try {
-                // Call API to assign the order
+
                 await apiService.assignOrder(orderId, user.userId);
 
-                // --- REFRESH DATA AFTER SUCCESS ---
+
                 await loadData();
-                // ---------------------------------
+
 
                 message.success(`Đã nhận đơn hàng #${orderId} thành công.`);
                 setAcceptOrderModal({
@@ -175,7 +175,7 @@ const ShipperPage = () => {
                     orderId: null,
                     isLoading: false,
                 });
-                // Automatically switch to the 'assigned' tab after accepting
+
                 setActiveTab('assigned');
 
             } catch (err) {
@@ -186,7 +186,7 @@ const ShipperPage = () => {
         } else {
              console.error("Attempted to accept order without orderId or user info.");
              message.error("Lỗi hệ thống: Không đủ thông tin để nhận đơn hàng.");
-             setAcceptOrderModal({ visible: false, orderId: null, isLoading: false }); // Close modal on info missing
+             setAcceptOrderModal({ visible: false, orderId: null, isLoading: false });
         }
     };
 
@@ -198,7 +198,7 @@ const ShipperPage = () => {
         });
     };
 
-    // Function to perform the status update API call and handle refresh
+
     const performStatusUpdate = async (orderId, newStatus) => {
         try {
             await apiService.applyOrderStatus({
@@ -206,26 +206,26 @@ const ShipperPage = () => {
                 status: newStatus
             });
 
-            // --- REFRESH DATA AFTER SUCCESS ---
+
             await loadData();
-            // ---------------------------------
+
 
             message.success(`Cập nhật trạng thái đơn hàng #${orderId} thành công.`);
 
         } catch (err) {
             console.error("Error updating order status:", err.response ? err.response.data : err.message);
             message.error(err.response?.data?.message || "Không thể cập nhật trạng thái đơn hàng. Vui lòng thử lại.");
-            throw err; // Re-throw to allow modal handler to catch and manage loading state
+            throw err;
         }
     };
 
     const showStatusChangeConfirm = (record, targetStatus) => {
-         // Optional: Add checks if the transition is valid
-         // const allowedTransitions = VALID_SHIPPER_STATUS_TRANSITIONS[record.status] || [];
-         // if (!allowedTransitions.includes(targetStatus)) {
-         //     message.warning(`Không thể chuyển trạng thái từ "${STATUS_DETAILS[record.status]?.label || record.status}" sang "${STATUS_DETAILS[targetStatus]?.label || targetStatus}".`);
-         //     return;
-         // }
+
+
+
+
+
+
 
         setConfirmModalState({
             visible: true,
@@ -240,9 +240,9 @@ const ShipperPage = () => {
         if (record && targetStatus) {
             setConfirmModalState(prev => ({ ...prev, isLoading: true }));
             try {
-                // performStatusUpdate now includes loadData call
+
                 await performStatusUpdate(record.orderId, targetStatus);
-                // Close modal and reset state on success
+
                 setConfirmModalState({
                     visible: false,
                     record: null,
@@ -250,15 +250,15 @@ const ShipperPage = () => {
                     isLoading: false,
                 });
             } catch (err) {
-                // Error message is shown in performStatusUpdate,
-                // just ensure modal loading state is reset
-                 console.error("Modal OK catch:", err); // Log error that was re-thrown
+
+
+                 console.error("Modal OK catch:", err);
                 setConfirmModalState(prev => ({ ...prev, isLoading: false }));
             }
         } else {
              console.error("Attempted status update without record or targetStatus.");
              message.error("Lỗi hệ thống: Không đủ thông tin để cập nhật trạng thái.");
-             setConfirmModalState({ visible: false, record: null, targetStatus: null, isLoading: false }); // Close modal
+             setConfirmModalState({ visible: false, record: null, targetStatus: null, isLoading: false });
         }
     };
 
@@ -271,7 +271,7 @@ const ShipperPage = () => {
         });
     };
 
-    // Handler for viewing details
+
     const handleViewDetails = (orderId) => {
          setDetailsModalContent({
             visible: true,
@@ -280,9 +280,9 @@ const ShipperPage = () => {
     };
 
 
-    // --- Render Logic ---
 
-    // Show a full-page spinner while initial data is loading
+
+
     if (isLoading && allOrders.length === 0 && !error) {
          return (
              <div className={styles.loadingContainer}>
@@ -292,7 +292,7 @@ const ShipperPage = () => {
          );
     }
 
-    // Show a global error message if loading failed
+
     if (error) {
         return (
             <div className={styles.errorContainer}>
@@ -307,7 +307,7 @@ const ShipperPage = () => {
         );
     }
 
-     // Handle case where user is not logged in (should ideally be protected by routing)
+
      if (!user || !user.userId) {
          return (
              <div className={styles.errorContainer}>
@@ -343,7 +343,7 @@ const ShipperPage = () => {
 
             {/* Table */}
             <div className={styles.tableContainer}>
-                 {isLoading && allOrders.length > 0 && ( // Show a smaller spinner on table if already have data but refreshing
+                 {isLoading && allOrders.length > 0 && (
                      <div className={styles.loadingOverlay}>
                          <Spin size="large" indicator={<FaSpinner className="fa-spin" />} />
                      </div>
@@ -383,7 +383,7 @@ const ShipperPage = () => {
                                                         size="small"
                                                         onClick={() => showAcceptOrderConfirm(order.orderId)}
                                                         icon={<FaCheck />}
-                                                         // Disable button while modal is loading or global loading happens
+
                                                         disabled={acceptOrderModal.isLoading || isLoading}
                                                     >
                                                         Nhận đơn
@@ -405,7 +405,7 @@ const ShipperPage = () => {
                                                                     onClick={() => showStatusChangeConfirm(order, 'APPROVED')}
                                                                     icon={<FaCheck />}
                                                                     style={{ backgroundColor: 'green', borderColor: 'green' }}
-                                                                     // Disable button while modal is loading or global loading happens
+
                                                                     disabled={confirmModalState.isLoading || isLoading}
                                                                 >
                                                                     Duyệt
@@ -456,7 +456,7 @@ const ShipperPage = () => {
                                                                      type="danger"
                                                                      size="small"
                                                                      onClick={() => showStatusChangeConfirm(order, 'FAILED_DELIVERY')}
-                                                                     style={{ backgroundColor: 'orange', borderColor: 'orange' }} // Changed to orange for failed
+                                                                     style={{ backgroundColor: 'orange', borderColor: 'orange' }}
                                                                      icon={<FaExclamationTriangle />}
                                                                       disabled={confirmModalState.isLoading || isLoading}
                                                                  >
@@ -487,9 +487,9 @@ const ShipperPage = () => {
                                             <Tooltip title="Xem chi tiết đơn hàng">
                                                 <Button
                                                     size="small"
-                                                    onClick={() => handleViewDetails(order.orderId)} // Use the handler
+                                                    onClick={() => handleViewDetails(order.orderId)}
                                                     icon={<FaEye />}
-                                                     // Disable button while modal is loading or global loading happens
+
                                                     disabled={detailsModalContent.visible || confirmModalState.isLoading || acceptOrderModal.isLoading || isLoading}
                                                 >
                                                     Xem
@@ -502,7 +502,7 @@ const ShipperPage = () => {
                         </tbody>
                     </table>
                  ) : (
-                    // Empty State Message
+
                     <div className={styles.emptyState}>
                         <FaBox size={50} color="#ccc"/>
                         <p>Không có đơn hàng nào {activeTab === 'available' ? 'có sẵn' : 'đã nhận'} vào lúc này.</p>
@@ -520,10 +520,10 @@ const ShipperPage = () => {
                 open={acceptOrderModal.visible}
                 onOk={handleAcceptOrderConfirm}
                 onCancel={handleAcceptOrderCancel}
-                confirmLoading={acceptOrderModal.isLoading} // Ant Design uses confirmLoading for button spinner
+                confirmLoading={acceptOrderModal.isLoading}
                 okText="Xác nhận"
                 cancelText="Hủy"
-                 // Disable closing by clicking outside or pressing Esc while loading
+
                 closable={!acceptOrderModal.isLoading}
                 maskClosable={!acceptOrderModal.isLoading}
             >
@@ -543,10 +543,10 @@ const ShipperPage = () => {
                 open={confirmModalState.visible}
                 onOk={handleConfirmModalOk}
                 onCancel={handleConfirmModalCancel}
-                confirmLoading={confirmModalState.isLoading} // Ant Design uses confirmLoading
+                confirmLoading={confirmModalState.isLoading}
                  okText="Xác nhận"
                  cancelText="Hủy"
-                 // Disable closing while loading
+
                  closable={!confirmModalState.isLoading}
                  maskClosable={!confirmModalState.isLoading}
             >

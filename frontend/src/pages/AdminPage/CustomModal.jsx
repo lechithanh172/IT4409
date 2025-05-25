@@ -5,7 +5,7 @@ import { Modal, Input, Button } from 'antd';
 const CustomModal = ({ isVisible, onClose, selectedUser }) => {
   const [message, setMessage] = useState('');
 
-  // Nếu `selectedUser.mes` là một chuỗi đơn giản, hiển thị trực tiếp
+
   const messages = selectedUser?.mes ? selectedUser.mes.split('\n') : [];
 
   return ReactDOM.createPortal(

@@ -34,7 +34,7 @@ function ChangePasswordPage() {
         setError('');
         setSuccessMessage('');
 
-        // Kiểm tra dữ liệu
+
         if (!formData.currentPassword || !formData.newPassword || !formData.confirmPassword) {
             setError('Vui lòng điền đầy đủ thông tin.');
             return;

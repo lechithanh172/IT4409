@@ -1,24 +1,24 @@
-// src/pages/CartPage/CartPage.js
+
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { useAuth } from '../../contexts/AuthContext'; // Import hook để lấy thông tin user
-import apiService from '../../services/api';        // Import service gọi API
-import CartItem from '../../components/CartItem/CartItem'; // Import component hiển thị từng item
-import Button from '../../components/Button/Button';         // Import component Button tùy chỉnh
-import Spinner from '../../components/Spinner/Spinner';       // Import component Spinner loading
-import ConfirmModal from '../../components/ConfirmModal/ConfirmModal'; // Import component Modal xác nhận
-import styles from './CartPage.module.css';                 // Import CSS Module
-import { FaShoppingCart, FaTrash, FaExclamationTriangle, FaInfoCircle } from 'react-icons/fa'; // Import icons
+import { useAuth } from '../../contexts/AuthContext';
+import apiService from '../../services/api';
+import CartItem from '../../components/CartItem/CartItem';
+import Button from '../../components/Button/Button';
+import Spinner from '../../components/Spinner/Spinner';
+import ConfirmModal from '../../components/ConfirmModal/ConfirmModal';
+import styles from './CartPage.module.css';
+import { FaShoppingCart, FaTrash, FaExclamationTriangle, FaInfoCircle } from 'react-icons/fa';
 
-// --- Hàm tiện ích: Định dạng tiền tệ ---
+
 const formatCurrency = (amount) => {
-  if (typeof amount !== 'number' || isNaN(amount) || amount < 0) return 'N/A'; // Handle non-numbers and negative
+  if (typeof amount !== 'number' || isNaN(amount) || amount < 0) return 'N/A';
   return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(amount);
 };
 
-// --- Hàm tiện ích: Lấy giá cuối cùng của Variant (ĐÃ SỬA THEO API MỚI) ---
+
 const getVariantFinalPrice = (variantDetail, mainProductPrice) => {
-    // console.log(`Calculating price for variant ${variantDetail?.variantId}. Main price: ${mainProductPrice}, Discount: ${variantDetail?.discount}%`);
+
     if (typeof mainProductPrice !== 'number' || isNaN(mainProductPrice) || mainProductPrice <= 0) {
         console.error(`Invalid mainProductPrice (${mainProductPrice}) for variant ${variantDetail?.variantId}. Returning 0.`);
         return 0;
@@ -26,57 +26,57 @@ const getVariantFinalPrice = (variantDetail, mainProductPrice) => {
     if (variantDetail && typeof variantDetail.discount === 'number' && variantDetail.discount > 0 && variantDetail.discount < 100) {
         const discountMultiplier = 1 - (variantDetail.discount / 100);
         const finalPrice = mainProductPrice * discountMultiplier;
-        // console.log(`Applied discount ${variantDetail.discount}%. Final price: ${finalPrice}`);
-        return Math.round(finalPrice); // Rounding might be appropriate for display
+
+        return Math.round(finalPrice);
     } else {
-        // console.log(`No valid discount. Using main product price: ${mainProductPrice}`);
+
         return mainProductPrice;
     }
 };
-// -------------------------------------------------------------------
+
 
 const CartPage = () => {
   useEffect(() => {
           document.title = "Giỏ hàng | HustShop";
       }, []);
-  // --- State Quản lý Component ---
+
   const [cartItems, setCartItems] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [isUpdating, setIsUpdating] = useState(false); // For item-specific updates (qty, select, remove)
+  const [isUpdating, setIsUpdating] = useState(false);
   const { user, isAuthenticated } = useAuth();
   const navigate = useNavigate();
 
-  // --- State cho Modal Xác Nhận ---
+
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [itemToRemove, setItemToRemove] = useState(null);
 
-  // --- Hàm Fetch và Làm Giàu Dữ liệu Giỏ Hàng ---
+
   const fetchAndEnrichCart = useCallback(async () => {
-    // Reset state for each fetch attempt
+
     setCartItems([]);
     setError(null);
-    setIsLoading(true); // Start loading
+    setIsLoading(true);
 
     if (!isAuthenticated) {
       console.log("User not authenticated. Skipping cart fetch.");
-      setIsLoading(false); return; // Stop loading, keep cart empty
+      setIsLoading(false); return;
     }
 
     console.log("Starting cart fetch process...");
 
     try {
-      // 1. Fetch base cart items
+
       console.log("Fetching basic cart items...");
       const baseCartResponse = await apiService.getCartItems();
       console.log("API getCartItems Response:", baseCartResponse);
 
       if (!baseCartResponse || !Array.isArray(baseCartResponse.data)) {
         console.warn("API getCartItems did not return a valid array:", baseCartResponse?.data);
-        // Keep cart empty, loading finished
+
         setIsLoading(false);
-        // Optionally set an error if empty array isn't expected
-        // setError("Không thể tải dữ liệu giỏ hàng.");
+
+
         return;
       }
 
@@ -87,24 +87,24 @@ const CartPage = () => {
         setCartItems([]); setIsLoading(false); return;
       }
 
-      // 2. Get unique product IDs
+
       const uniqueProductIds = [...new Set(baseCartData.map(item => item.productId))];
-      if (uniqueProductIds.length === 0) { // Handle case where cart has items but no valid productIds
+      if (uniqueProductIds.length === 0) {
         console.warn("Cart data contains items but no valid product IDs.");
         setCartItems([]); setIsLoading(false); return;
       }
       console.log("Fetching details for product IDs:", uniqueProductIds);
 
-      // 3. Fetch product details concurrently
+
       const productDetailPromises = uniqueProductIds.map(id =>
         apiService.getProductById(id).catch(err => {
-            console.error(`Error fetching product ID ${id}:`, err); // Log individual fetch errors
-            return { error: err, productId: id }; // Return error object to identify failed fetches
+            console.error(`Error fetching product ID ${id}:`, err);
+            return { error: err, productId: id };
         })
       );
       const productDetailResults = await Promise.allSettled(productDetailPromises);
 
-      // 4. Create product details map
+
       const productDetailsMap = new Map();
       productDetailResults.forEach(result => {
         if (result.status === 'fulfilled' && result.value?.data?.productId && !result.value.error) {
@@ -116,23 +116,23 @@ const CartPage = () => {
       });
       console.log("Product details map created:", productDetailsMap);
 
-      // 5. Enrich cart items
+
       const enrichedItems = baseCartData.map(cartItem => {
         const productDetail = productDetailsMap.get(cartItem.productId);
 
-        // Handle case where product detail fetch failed
+
         if (!productDetail) {
           console.warn(`Product details missing for productId: ${cartItem.productId}. Creating placeholder.`);
           return {
-            cartItemId: cartItem.cartItemId, // Use cartItemId from original data
+            cartItemId: cartItem.cartItemId,
             productId: cartItem.productId,
             variantId: cartItem.variantId,
             userId: cartItem.userId,
-            uniqueId: cartItem.cartItemId || `${cartItem.productId}-${cartItem.variantId || 'err'}`, // Ensure uniqueId
+            uniqueId: cartItem.cartItemId || `${cartItem.productId}-${cartItem.variantId || 'err'}`,
             name: `Sản phẩm ID ${cartItem.productId} (Lỗi)`,
             color: cartItem.variantId ? `Variant ID ${cartItem.variantId}` : 'N/A',
             imageUrl: '/images/placeholder-image.png',
-            price: 0, // Price unknown
+            price: 0,
             stockQuantity: 0,
             is_selected: cartItem.selected ?? true,
             quantity: Math.max(1, parseInt(cartItem.quantity || 1, 10)),
@@ -140,21 +140,21 @@ const CartPage = () => {
           };
         }
 
-        // Find the corresponding variant detail
+
         const variantDetail = productDetail.variants?.find(
           v => v.variantId === cartItem.variantId
         );
 
-        // Handle case where variant detail is missing within the product
+
         if (!variantDetail) {
           console.warn(`Variant details not found for productId: ${cartItem.productId}, variantId: ${cartItem.variantId}. Creating placeholder.`);
           return {
-            ...cartItem, // Keep original cartItem data like userId, cartItemId
+            ...cartItem,
             uniqueId: cartItem.cartItemId || `${cartItem.productId}-${cartItem.variantId}`,
             name: `${productDetail.productName} (Lỗi phiên bản)`,
             color: `Variant ID ${cartItem.variantId} (Lỗi)`,
             imageUrl: productDetail.variants?.[0]?.imageUrl || '/images/placeholder-image.png',
-            price: productDetail.price || 0, // Fallback price (no discount)
+            price: productDetail.price || 0,
             stockQuantity: 0,
             is_selected: cartItem.selected ?? true,
             quantity: Math.max(1, parseInt(cartItem.quantity || 1, 10)),
@@ -162,24 +162,24 @@ const CartPage = () => {
           };
         }
 
-        // --- SUCCESS CASE ---
+
         const finalPrice = getVariantFinalPrice(variantDetail, productDetail.price);
 
         return {
-          ...cartItem, // Keep original cartItem data like userId, cartItemId
-          uniqueId: cartItem.cartItemId || `${cartItem.productId}-${cartItem.variantId}`, // Unique key for React list
+          ...cartItem,
+          uniqueId: cartItem.cartItemId || `${cartItem.productId}-${cartItem.variantId}`,
           productId: productDetail.productId,
           variantId: variantDetail.variantId,
           name: productDetail.productName,
           color: variantDetail.color,
           imageUrl: variantDetail.imageUrl || '/images/placeholder-image.png',
-          price: finalPrice, // Use calculated final price
+          price: finalPrice,
           stockQuantity: parseInt(variantDetail.stockQuantity || 0, 10),
           is_selected: cartItem.selected ?? true,
           quantity: Math.max(1, parseInt(cartItem.quantity || 1, 10)),
-          error: null // No error
+          error: null
         };
-      }).filter(item => item); // Filter out potential nulls if placeholders aren't returned fully
+      }).filter(item => item);
 
       console.log("Final enriched cart items:", enrichedItems);
       setCartItems(enrichedItems);
@@ -194,22 +194,22 @@ const CartPage = () => {
     }
   }, [isAuthenticated]);
 
-  // --- useEffect: Initial Fetch ---
+
   useEffect(() => { fetchAndEnrichCart(); }, [fetchAndEnrichCart]);
 
-  // --- Action Handlers ---
 
-  // 1. Prompt Remove Item
+
+
   const promptRemoveItem = (itemUniqueId) => {
     const item = cartItems.find(i => i.uniqueId === itemUniqueId);
     if (item) { setItemToRemove(item); setIsModalOpen(true); }
     else { console.warn("Cannot find item to remove:", itemUniqueId); }
   };
 
-  // 2. Close Modal
+
   const handleCloseModal = () => { setIsModalOpen(false); setItemToRemove(null); };
 
-  // 3. Confirm and Remove Item
+
   const handleConfirmRemove = async () => {
     if (!itemToRemove) { console.error("Confirm remove error: No item stored."); handleCloseModal(); return; }
     const { uniqueId, productId, variantId, name, color } = itemToRemove;
@@ -231,7 +231,7 @@ const CartPage = () => {
     }
   };
 
-  // 4. Handle Quantity Change
+
   const handleQuantityChange = async (itemUniqueId, changeAmount) => {
     console.log(`Quantity change for ${itemUniqueId}, amount: ${changeAmount}`);
     if (!isAuthenticated || !user?.userId) { alert("Vui lòng đăng nhập."); return; }
@@ -257,7 +257,7 @@ const CartPage = () => {
 
     const payload = {
         userId: user.userId, productId: currentItem.productId, variantId: currentItem.variantId,
-        isSelected: currentItem.is_selected, quantity: changeAmount, // Send the change amount (+1 / -1)
+        isSelected: currentItem.is_selected, quantity: changeAmount,
     };
     console.log("Sending qty update payload:", payload);
 
@@ -267,14 +267,14 @@ const CartPage = () => {
     } catch (err) {
         console.error(`Error updating quantity API for ${itemUniqueId}:`, err);
         alert(`Lỗi cập nhật số lượng "${currentItem.name}". Lỗi: ${err.response?.data?.message || err.message}`);
-        setCartItems(originalItems); // Rollback on error
+        setCartItems(originalItems);
         console.log("Rolled back optimistic qty update.");
     } finally {
         setIsUpdating(false);
     }
   };
 
-  // 5. Toggle Select Item
+
   const handleToggleSelect = async (itemUniqueId) => {
     console.log(`Toggle select for ${itemUniqueId}`);
     if (!isAuthenticated || !user?.userId) { alert("Vui lòng đăng nhập."); return; }
@@ -299,8 +299,8 @@ const CartPage = () => {
 
     const payload = {
         userId: user.userId, productId: itemToToggle.productId, variantId: itemToToggle.variantId,
-        isSelected: newSelectedState, // Send the NEW state
-        quantity: 0, // Send 0 as per backend requirement for selection change only
+        isSelected: newSelectedState,
+        quantity: 0,
     };
     console.log("Sending selection update payload:", payload);
 
@@ -310,14 +310,14 @@ const CartPage = () => {
     } catch (err) {
         console.error(`Error updating selection API for ${itemUniqueId}:`, err);
         alert(`Lỗi cập nhật lựa chọn "${itemToToggle.name}". Lỗi: ${err.response?.data?.message || err.message}`);
-        setCartItems(originalItems); // Rollback
+        setCartItems(originalItems);
         console.log("Rolled back optimistic selection update.");
     } finally {
         setIsUpdating(false);
     }
   };
 
-  // 6. Clear Entire Cart
+
   const handleClearCart = async () => {
     if (!isAuthenticated || !user?.userId) { alert("Vui lòng đăng nhập."); return; }
     const itemsWithoutErrors = cartItems.filter(item => !item.error);
@@ -327,7 +327,7 @@ const CartPage = () => {
       setIsUpdating(true);
       try {
         console.log("Attempting to clear cart...");
-        await apiService.clearCart(); // Assumes API uses user token implicitly
+        await apiService.clearCart();
         setCartItems([]);
         console.log("Cart cleared successfully.");
       } catch (err) {
@@ -339,7 +339,7 @@ const CartPage = () => {
     }
   };
 
-  // 7. Proceed to Place Order (MODIFIED TO CLEAR LOCALSTORAGE)
+
   const handlePlaceOrder = () => {
     console.log("[handlePlaceOrder] Initiated.");
 
@@ -350,7 +350,7 @@ const CartPage = () => {
     }
     console.log("[handlePlaceOrder] User authenticated.");
 
-    const currentCartItems = cartItems; // Use current state
+    const currentCartItems = cartItems;
     console.log("[handlePlaceOrder] Current cart items state:", currentCartItems);
 
     const itemsToOrder = currentCartItems.filter(item => item.is_selected && !item.error);
@@ -363,7 +363,7 @@ const CartPage = () => {
     }
     console.log("[handlePlaceOrder] Items selected. Proceeding to stock check.");
 
-    // Stock Check
+
     const outOfStockItems = itemsToOrder.filter(item => {
         const stock = typeof item.stockQuantity === 'number' ? item.stockQuantity : 0;
         const qty = typeof item.quantity === 'number' ? item.quantity : 0;
@@ -379,7 +379,7 @@ const CartPage = () => {
     }
     console.log("[handlePlaceOrder] Stock check passed.");
 
-    // Recalculate total strictly based on the items being ordered now
+
     let currentSelectedTotal = 0;
     try {
         currentSelectedTotal = itemsToOrder.reduce((sum, item) => {
@@ -393,49 +393,49 @@ const CartPage = () => {
         if (isNaN(currentSelectedTotal)) { throw new Error("Lỗi tính toán tổng tiền (NaN)."); }
         if (currentSelectedTotal < 0) { throw new Error("Tổng tiền không hợp lệ (âm)."); }
 
-        // Prepare data for localStorage (following previous modification)
+
         const orderDataForStorage = {
             items: itemsToOrder.map(item => ({
                 uniqueId: item.uniqueId, productId: item.productId, variantId: item.variantId,
                 name: item.name, color: item.color, imageUrl: item.imageUrl,
-                price: item.price, quantity: item.quantity, // Pass the final price
+                price: item.price, quantity: item.quantity,
             })),
-            total: currentSelectedTotal // Pass the calculated subtotal
+            total: currentSelectedTotal
         };
 
         const orderDataString = JSON.stringify(orderDataForStorage);
         console.log("[handlePlaceOrder] Serialized order data for storage:", orderDataString);
 
-        // *** WARNING ***
-        // This next line saves the data needed by /place-order
+
+
         localStorage.setItem('pendingOrderData', orderDataString);
         console.log("[handlePlaceOrder] Order data saved to localStorage successfully.");
 
-        // --- START: USER REQUESTED LOCALSTORAGE CLEAR ---
-        // *** This section implements the user's request to clear localStorage items here.
-        // *** BE AWARE: This will likely cause the /place-order page to fail
-        // *** because it expects 'pendingOrderData' and 'savedShippingInfo' to be
-        // *** present in localStorage when it loads after navigation.
-        // *** The correct place to clear this data is in /place-order or /vnpay-return
-        // *** AFTER the order is successfully created on the backend.
+
+
+
+
+
+
+
         console.warn("[handlePlaceOrder] Clearing localStorage as requested by user, but this WILL likely cause /place-order to fail.");
-        // --- END: USER REQUESTED LOCALSTORAGE CLEAR ---
 
 
-        // Navigate
+
+
         navigate('/place-order');
         console.log("[handlePlaceOrder] Navigating to /place-order");
 
     } catch (error) {
         console.error("[handlePlaceOrder] Error during final preparation:", error);
         alert(`Đã xảy ra lỗi khi chuẩn bị đặt hàng: ${error.message}. Vui lòng thử lại.`);
-        // If an error occurred *before* navigation/clearing, clean up potentially bad data
+
         localStorage.removeItem('pendingOrderData');
         localStorage.removeItem('savedShippingInfo');
     }
   };
 
-  // --- Memoized Calculations ---
+
   const validCartItems = useMemo(() => cartItems.filter(item => !item.error), [cartItems]);
   const selectedItems = useMemo(() => validCartItems.filter(item => item.is_selected), [validCartItems]);
   const selectedTotal = useMemo(() =>
@@ -450,24 +450,24 @@ const CartPage = () => {
   const isCartEmpty = cartItemCount === 0;
   const hasSelectedItems = selectedItems.length > 0;
 
-  // --- Render Logic ---
 
-  // 1. Loading State
+
+
   if (isLoading) {
     return ( <div className={styles.loadingContainer}><Spinner size="large" /><p>Đang tải giỏ hàng...</p></div> );
   }
 
-  // 2. Not Authenticated State
+
   if (!isAuthenticated) {
     return ( <div className={styles.cartPageContainer} style={{ textAlign: 'center', padding: '40px 20px' }}><FaShoppingCart size={60} style={{ color: '#ccc', marginBottom: '20px'}} /><h2>Vui lòng đăng nhập</h2><p>Bạn cần đăng nhập để xem giỏ hàng.</p><Link to="/login"><Button variant="primary" className={styles.loginButton}>Đăng nhập</Button></Link></div> );
   }
 
-  // 3. Major Error State (Empty Cart after Error)
+
   if (error && cartItems.length === 0) {
     return ( <div className={`${styles.cartPageContainer} ${styles.errorContainer}`}><FaExclamationTriangle size={50} /><h2>Đã xảy ra lỗi</h2><p>{error}</p><Button variant="secondary" onClick={fetchAndEnrichCart}>Thử tải lại</Button></div> );
   }
 
-  // 4. Main Cart View
+
   return (
     <div className={styles.cartPageContainer}>
       <h1 className={styles.pageTitle}>
@@ -508,7 +508,7 @@ const CartPage = () => {
                     onRemove={() => promptRemoveItem(item.uniqueId)}
                     onQuantityChange={handleQuantityChange}
                     onToggleSelect={handleToggleSelect}
-                    isUpdating={isUpdating} // Apply global updating state for simplicity
+                    isUpdating={isUpdating}
                   />
                 ))}
               </tbody>

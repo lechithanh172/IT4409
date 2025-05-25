@@ -1,10 +1,10 @@
-/* ProductSlider.module.css */
 
-/* --- Biến CSS (Tùy chọn, nên đồng bộ với HomePage.module.css) --- */
+
+
 :root {
     --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     --secondary-gradient: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
-    --background-color-light: #f0f2f5; /* Nền tổng thể nhẹ nhàng */
+    --background-color-light: #f0f2f5; 
     --card-background: #ffffff;
     --text-color-dark: #2d3748;
     --text-color-light: #4a5568;
@@ -18,7 +18,7 @@
     --spacing-lg: 40px;
 }
 
-/* Dark mode variables (đồng bộ với HomePage.module.css) */
+
 @media (prefers-color-scheme: dark) {
     :root {
         --background-color-light: #1a202c;
@@ -32,20 +32,20 @@
 
 .sliderContainer {
   width: 100%;
-  margin: 0 auto; /* Căn giữa container */
-  padding: var(--spacing-md) 0; /* Padding trên dưới */
-  background: var(--secondary-gradient); /* Nền từ biến */
+  margin: 0 auto; 
+  padding: var(--spacing-md) 0; 
+  background: var(--secondary-gradient); 
   border-radius: var(--border-radius-base);
   box-shadow: var(--shadow-base);
-  overflow: hidden; /* Quan trọng để bóng đổ và border-radius hoạt động đúng */
+  overflow: hidden; 
   position: relative;
-  animation: slideIn 0.6s ease-out; /* Animation từ trước */
+  animation: slideIn 0.6s ease-out; 
 }
 
-/* Dark mode support for container */
+
 @media (prefers-color-scheme: dark) {
   .sliderContainer {
-    background: linear-gradient(135deg, #1a202c 0%, #2d3748 100%); /* Nền tối */
+    background: linear-gradient(135deg, #1a202c 0%, #2d3748 100%); 
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
   }
 }
@@ -54,19 +54,19 @@
 .sliderTitle {
   font-size: 1.8rem;
   font-weight: 700;
-  color: var(--text-color-dark); /* Màu từ biến */
+  color: var(--text-color-dark); 
   text-align: center;
-  margin: 0 0 var(--spacing-md) 0; /* Margin dưới */
-  padding: 0 var(--spacing-md); /* Padding 2 bên */
+  margin: 0 0 var(--spacing-md) 0; 
+  padding: 0 var(--spacing-md); 
   position: relative;
   text-transform: uppercase;
   letter-spacing: 1px;
 }
 
-/* Dark mode support for title */
+
 @media (prefers-color-scheme: dark) {
   .sliderTitle {
-    color: var(--text-color-dark); /* Màu sáng trong dark mode */
+    color: var(--text-color-dark); 
   }
 }
 
@@ -78,7 +78,7 @@
   transform: translateX(-50%);
   width: 60px;
   height: 3px;
-  background: var(--primary-gradient); /* Gradient từ biến */
+  background: var(--primary-gradient); 
   border-radius: 2px;
 }
 
@@ -88,29 +88,29 @@
      Chiều rộng của nút là 50px, cộng thêm khoảng cách 10px.
      Tổng cộng mỗi bên cần ít nhất ~60px.
   */
-  padding: 0 calc(50px + var(--spacing-xs)); /* Ví dụ: 50px nút + 10px khoảng cách = 60px mỗi bên */
+  padding: 0 calc(50px + var(--spacing-xs)); 
   margin: 0 auto;
-  overflow: visible; /* Quan trọng để thẻ sản phẩm ở ngoài slider có thể hiển thị hiệu ứng scale */
+  overflow: visible; 
 }
 
 .mySwiper {
-  padding: var(--spacing-md) 0; /* Padding trên dưới cho swiper */
+  padding: var(--spacing-md) 0; 
   overflow: visible;
-  --swiper-theme-color: #667eea; /* Màu theme cho các yếu tố swiper mặc định (dots...) */
+  --swiper-theme-color: #667eea; 
 }
 
 .swiperSlide {
-  height: auto; /* Quan trọng để ProductCard xác định chiều cao */
+  height: auto; 
   display: flex;
   justify-content: center;
-  align-items: stretch; /* Quan trọng để ProductCard có chiều cao bằng nhau */
+  align-items: stretch; 
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  /* Hiệu ứng scale/opacity nhẹ cho slide không active (tùy chọn, có thể bỏ) */
-  /* transform: scale(0.95); */
-  /* opacity: 0.7; */
+  
+  
+  
 }
 
-/* Bỏ hiệu ứng transform/opacity trên slide active, next, prev nếu muốn tất cả slide đều hiển thị full */
+
 /*
 .swiperSlide.swiper-slide-active,
 .swiperSlide.swiper-slide-next,
@@ -121,7 +121,7 @@
 */
 
 
-/* --- Nút điều hướng tùy chỉnh --- */
+
 .navButton {
   position: absolute;
   top: 50%;
@@ -130,58 +130,58 @@
   height: 50px;
   border: none;
   border-radius: 50%;
-  /* Nền từ gradient */
+  
   background: var(--primary-gradient);
-  color: white; /* Màu icon */
+  color: white; 
   font-size: 20px;
   cursor: pointer;
-  z-index: 10; /* Đảm bảo nút nằm trên slider */
+  z-index: 10; 
   display: flex;
   align-items: center;
   justify-content: center;
-  /* Bóng đổ nổi bật */
+  
   box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  backdrop-filter: blur(10px); /* Hiệu ứng blur nhẹ phía sau nút (tùy chọn) */
+  backdrop-filter: blur(10px); 
 }
 
 .navButton:hover {
-  transform: translateY(-50%) scale(1.1); /* Phóng to nhẹ khi hover */
-  box-shadow: 0 12px 30px rgba(102, 126, 234, 0.4); /* Bóng đổ rõ hơn khi hover */
-  background: linear-gradient(135deg, #5a67d8 0%, #6b46c1 100%); /* Đổi màu gradient khi hover */
+  transform: translateY(-50%) scale(1.1); 
+  box-shadow: 0 12px 30px rgba(102, 126, 234, 0.4); 
+  background: linear-gradient(135deg, #5a67d8 0%, #6b46c1 100%); 
 }
 
 .navButton:active {
-  transform: translateY(-50%) scale(0.95); /* Thu nhỏ khi click */
+  transform: translateY(-50%) scale(0.95); 
 }
 
 .navButton:disabled {
-  opacity: 0.3; /* Giảm opacity khi disabled */
+  opacity: 0.3; 
   cursor: not-allowed;
   transform: translateY(-50%) scale(0.9);
 }
 
 .prevButton {
-  left: var(--spacing-xs); /* Cách mép trái khoảng cách nhỏ */
+  left: var(--spacing-xs); 
 }
 
 .nextButton {
-  right: var(--spacing-xs); /* Cách mép phải khoảng cách nhỏ */
+  right: var(--spacing-xs); 
 }
 
-/* --- ẨN NÚT ĐIỀU HƯỚNG MẶC ĐỊNH CỦA SWIPER --- */
-/* Target global classes within the swiper wrapper */
+
+
 .swiperWrapper :global(.swiper-button-prev),
 .swiperWrapper :global(.swiper-button-next) {
-  /* !important thường cần thiết để override style mặc định của thư viện */
+  
   display: none !important;
-  visibility: hidden !important; /* Tùy chọn thêm visibility để chắc chắn */
+  visibility: hidden !important; 
 }
 
 
-/* --- Responsive Design --- */
 
-/* Extra Small Devices (phones, 320px and up) */
+
+
 @media screen and (max-width: 479px) {
   .sliderContainer {
     margin: 0 var(--spacing-xs);
@@ -195,12 +195,12 @@
     padding: 0 var(--spacing-sm);
   }
 
-   /* Điều chỉnh padding wrapper cho màn hình nhỏ */
+   
   .swiperWrapper {
-    padding: 0 calc(40px + var(--spacing-xs)); /* Giảm không gian cho nút nhỏ hơn */
+    padding: 0 calc(40px + var(--spacing-xs)); 
   }
 
-  /* Điều chỉnh nút điều hướng cho màn hình nhỏ */
+  
   .navButton {
     width: 40px;
     height: 40px;
@@ -222,7 +222,7 @@
   }
 }
 
-/* Small Devices (phones, 480px and up) - Android Portrait */
+
 @media screen and (min-width: 480px) and (max-width: 767px) {
   .sliderContainer {
     margin: 0 var(--spacing-sm);
@@ -234,12 +234,12 @@
     margin-bottom: var(--spacing-md);
   }
 
-   /* Điều chỉnh padding wrapper */
+   
   .swiperWrapper {
-    padding: 0 calc(45px + var(--spacing-xs)); /* Không gian cho nút */
+    padding: 0 calc(45px + var(--spacing-xs)); 
   }
 
-  /* Điều chỉnh nút điều hướng */
+  
   .navButton {
     width: 45px;
     height: 45px;
@@ -257,7 +257,7 @@
   }
 }
 
-/* Medium Devices (tablets, 768px and up) */
+
 @media screen and (min-width: 768px) and (max-width: 1023px) {
   .sliderContainer {
     margin: 0 var(--spacing-md);
@@ -269,17 +269,17 @@
     margin-bottom: var(--spacing-md);
   }
 
-   /* Giữ nguyên padding wrapper hoặc điều chỉnh nhẹ */
+   
   .swiperWrapper {
     padding: 0 calc(50px + var(--spacing-sm));
   }
 }
 
-/* Large Devices (laptops/desktops, 1024px and up) */
+
 @media screen and (min-width: 1024px) {
   .sliderContainer {
-    max-width: 1200px; /* Giới hạn chiều rộng */
-    margin: 0 auto; /* Căn giữa */
+    max-width: 1200px; 
+    margin: 0 auto; 
     padding: var(--spacing-lg) 0;
   }
 
@@ -288,16 +288,16 @@
     margin-bottom: var(--spacing-lg);
   }
 
-  /* Giữ nguyên padding wrapper hoặc điều chỉnh nhẹ */
+  
   .swiperWrapper {
      padding: 0 calc(50px + var(--spacing-md));
   }
 }
 
-/* Extra Large Devices (large laptops and desktops, 1200px and up) */
+
 @media screen and (min-width: 1200px) {
   .sliderContainer {
-    max-width: 1400px; /* Tăng giới hạn chiều rộng */
+    max-width: 1400px; 
     padding: var(--spacing-lg) 0;
   }
 
@@ -306,12 +306,12 @@
     margin-bottom: var(--spacing-lg);
   }
 
-  /* Tăng padding wrapper cho màn hình lớn */
+  
   .swiperWrapper {
-    padding: 0 calc(55px + var(--spacing-md)); /* Không gian cho nút lớn hơn */
+    padding: 0 calc(55px + var(--spacing-md)); 
   }
 
-  /* Điều chỉnh nút điều hướng cho màn hình lớn */
+  
   .navButton {
     width: 55px;
     height: 55px;
@@ -324,20 +324,20 @@
 }
 
 
-/* Android Specific Optimizations */
+
 @media screen and (max-device-width: 767px) and (-webkit-min-device-pixel-ratio: 1) {
   .sliderContainer {
     -webkit-overflow-scrolling: touch;
-    touch-action: pan-y; /* Điều chỉnh touch-action nếu cần */
+    touch-action: pan-y; 
   }
 
   .mySwiper {
     -webkit-overflow-scrolling: touch;
-    touch-action: pan-y; /* Điều chỉnh touch-action nếu cần */
+    touch-action: pan-y; 
   }
 
   .swiperSlide {
-    /* Tối ưu hiệu năng render trên mobile */
+    
     -webkit-transform: translateZ(0);
     transform: translateZ(0);
     -webkit-backface-visibility: hidden;
@@ -350,7 +350,7 @@
   }
 }
 
-/* Loading Animation */
+
 @keyframes slideIn {
   from {
     opacity: 0;
@@ -363,39 +363,39 @@
 }
 
 
-/* Hover Effects for Desktop */
+
 @media (hover: hover) {
   .swiperWrapper:hover .navButton {
-    /* Opacity 1 khi hover wrapper, ẩn khi không hover */
+    
     opacity: 1;
   }
 
   .navButton {
-    /* Mặc định ẩn hoặc mờ nhạt khi không hover */
-    opacity: 0; /* Bắt đầu ẩn */
-    transition: all 0.3s ease; /* Transition cho opacity và transform */
+    
+    opacity: 0; 
+    transition: all 0.3s ease; 
   }
-   /* Luôn hiển thị khi nút được focus (accessibility) */
+   
    .navButton:focus {
        opacity: 1;
    }
 }
 
-/* Nếu không hỗ trợ hover (ví dụ: trên màn hình cảm ứng), luôn hiển thị nút */
+
 @media (hover: none) {
     .navButton {
-        opacity: 1; /* Luôn hiển thị */
+        opacity: 1; 
     }
 }
 
 
-/* Focus States for Accessibility */
+
 .navButton:focus {
   outline: 3px solid rgba(102, 126, 234, 0.5);
   outline-offset: 2px;
 }
 
-/* Print Styles */
+
 @media print {
   .navButton {
     display: none !important;

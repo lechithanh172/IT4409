@@ -1,5 +1,5 @@
-/* src/pages/SearchProductListPage/SearchProductListPage.module.css */
-/* Hoặc src/pages/ProductListPage/ProductListPage.module.css nếu dùng chung */
+
+
 
 .pageContainer {
     max-width: 1300px;
@@ -9,33 +9,33 @@
   }
   
   .pageTitle {
-    font-size: 2rem; /* Có thể điều chỉnh */
+    font-size: 2rem; 
     font-weight: 700;
-    color: #1a2b3c; /* Màu tối */
-    margin-bottom: 15px; /* Khoảng cách dưới */
+    color: #1a2b3c; 
+    margin-bottom: 15px; 
     text-align: center;
-    display: flex; /* Dùng flex để căn icon và text */
+    display: flex; 
     align-items: center;
-    justify-content: center; /* Căn giữa */
-    gap: 10px; /* Khoảng cách icon và text */
+    justify-content: center; 
+    gap: 10px; 
   }
-  .pageTitle svg { /* Style cho icon FiSearch */
-      color: #6366f1; /* Màu tím hoặc màu khác bạn thích */
-      font-size: 1.8rem; /* Kích thước icon */
-      margin-bottom: -2px; /* Căn chỉnh vị trí icon */
+  .pageTitle svg { 
+      color: #6366f1; 
+      font-size: 1.8rem; 
+      margin-bottom: -2px; 
   }
   
-  /* --- Breadcrumbs --- */
+  
 .breadcrumbs {
     margin-bottom: 20px;
     padding: 12px 0;
     font-size: 0.9rem;
-    color: #6b7280; /* Màu xám */
+    color: #6b7280; 
     display: flex;
     align-items: center;
-    flex-wrap: wrap; /* Xuống dòng nếu cần */
-    gap: 5px 8px; /* Khoảng cách dọc và ngang */
-    border-bottom: 1px solid #e5e7eb; /* Phân cách nhẹ */
+    flex-wrap: wrap; 
+    gap: 5px 8px; 
+    border-bottom: 1px solid #e5e7eb; 
 }
 .breadcrumbs a,
 .breadcrumbs span {
@@ -48,29 +48,29 @@
 .breadcrumbs a {
     transition: color 0.2s ease;
     font-weight: 500;
-    color: #4f46e5; /* Màu link (tím) */
+    color: #4f46e5; 
 }
 .breadcrumbs a:hover {
-    color: #3730a3; /* Đậm hơn khi hover */
+    color: #3730a3; 
     text-decoration: underline;
 }
-/* Dấu phân cách (nếu không dùng icon) */
-.breadcrumbs span:not(:last-child):not(:has(a)) { /* Chọn span không phải cuối và không chứa link */
+
+.breadcrumbs span:not(:last-child):not(:has(a)) { 
    color: #cbd5e0;
-   margin: 0 3px; /* Khoảng cách nhỏ */
+   margin: 0 3px; 
 }
-/* Trang hiện tại */
+
 .breadcrumbCurrent {
-    color: #1f2937; /* Đen đậm */
-    font-weight: 600; /* Đậm hơn */
+    color: #1f2937; 
+    font-weight: 600; 
     cursor: default;
 }
 
   
   
-  /* Nút mở filter trên mobile */
+  
   .mobileFilterButton {
-      display: none; /* Ẩn mặc định trên desktop */
+      display: none; 
       width: auto;
       padding: 9px 18px;
       margin-bottom: 20px;
@@ -81,7 +81,7 @@
       font-weight: 500;
       color: #374151;
       cursor: pointer;
-      /* display: inline-flex; */ /* Hiện lại ở media query */
+       
       align-items: center;
       justify-content: center;
       gap: 8px;
@@ -91,12 +91,12 @@
   .mobileFilterButton:hover { background-color: #f9fafb; box-shadow: 0 2px 5px rgba(0,0,0,0.08); }
   .mobileFilterButton svg { font-size: 1.1rem; color: #4f46e5; }
   
-  /* Nút đóng filter mobile (Mặc định ẩn) */
+  
   .closeMobileFilter {
       display: none;
   }
   
-  /* --- Layout chính: Filter Panel + Main Area --- */
+  
   .contentWrapper { display: flex; gap: 30px; align-items: flex-start; }
   .filterPanelContainer { width: 260px; flex-shrink: 0; position: relative; }
   .mainProductArea { flex-grow: 1; min-width: 0; }
@@ -106,13 +106,13 @@
   .fetchError { color: #ef4444; background-color: #fee2e2; border-color: #fca5a5; }
   .productListGrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 25px; margin-bottom: 40px; }
   
-  /* --- Responsive --- */
+  
   @media (max-width: 992px) {
       .contentWrapper { display: block; }
-      .filterPanelContainer { width: 280px; position: fixed; left: -100%; top: 0; bottom: 0; background-color: #fff; z-index: 1200; transition: left 0.3s ease-in-out; overflow-y: auto; box-shadow: 4px 0 15px rgba(0,0,0,0.1); padding: 20px; padding-top: 50px; /* Tăng padding top lại */ }
+      .filterPanelContainer { width: 280px; position: fixed; left: -100%; top: 0; bottom: 0; background-color: #fff; z-index: 1200; transition: left 0.3s ease-in-out; overflow-y: auto; box-shadow: 4px 0 15px rgba(0,0,0,0.1); padding: 20px; padding-top: 50px;  }
       .filterPanelContainer.mobileFilterOpen { left: 0; }
   
-      /* Hiện và style nút đóng trên mobile */
+      
       .closeMobileFilter {
           display: flex;
           position: absolute;
@@ -134,11 +134,11 @@
       .closeMobileFilter svg { font-size: 1.3rem; stroke-width: 2.5; }
       .closeMobileFilter:hover { background-color: #e5e7eb; color: #1f2937; }
   
-      /* Lớp phủ */
+      
       .mobileFilterOverlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.6); z-index: 1150; cursor: pointer; opacity: 0; visibility: hidden; transition: opacity 0.3s ease; }
       .filterPanelContainer.mobileFilterOpen + .mobileFilterOverlay { display: block; opacity: 1; visibility: visible; }
   
-      /* Hiện nút mở filter */
+      
       .mobileFilterButton { display: inline-flex; }
   
       .mainProductArea { width: 100%; margin-top: 0; }
@@ -160,12 +160,12 @@
       .pageTitle { font-size: 1.5rem; }
       .productListGrid { gap: 12px; }
       .filterPanelContainer { width: 90%; max-width: 320px; }
-       .promptContainer { padding: 40px 15px;} /* Style cho prompt trên mobile */
+       .promptContainer { padding: 40px 15px;} 
       .promptContainer h2 { font-size: 1.3rem;}
       .promptContainer p { font-size: 0.9rem;}
   }
   
-  /* Style cho phần prompt khi không có searchTerm */
+  
   .promptContainer {
       text-align: center;
       padding: 60px 20px;

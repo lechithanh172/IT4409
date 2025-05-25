@@ -1,6 +1,6 @@
-/* src/pages/PlaceOrder/PlaceOrder.module.css */
 
-/* --- Biến màu và kiểu chữ --- */
+
+
 :root {
   --primary-color: #0d6efd;
   --primary-color-dark: #0b5ed7;
@@ -25,7 +25,7 @@
   --transition-speed: 0.25s;
 }
 
-/* --- Container chính --- */
+
 .placeOrderContainer {
   max-width: 1100px;
   margin: 2.5rem auto;
@@ -45,7 +45,7 @@
   padding-bottom: 1rem;
 }
 
-/* --- Wrapper cho layout 2 cột --- */
+
 .layoutWrapper {
   display: flex;
   flex-direction: column;
@@ -60,7 +60,7 @@
   }
 }
 
-/* --- Container Chung cho Thông tin và Summary --- */
+
 .shippingInfoContainer,
 .orderSummaryContainer {
   background-color: var(--bg-white);
@@ -82,14 +82,14 @@
     max-height: calc(100vh - 3rem);
     overflow-y: auto;
   }
-   /* Style thanh cuộn cho summary container trên desktop */
+   
   .orderSummaryContainer::-webkit-scrollbar { width: 5px; }
   .orderSummaryContainer::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 3px; }
   .orderSummaryContainer::-webkit-scrollbar-thumb { background: #ccc; border-radius: 3px; }
   .orderSummaryContainer::-webkit-scrollbar-thumb:hover { background: #aaa; }
 }
 
-/* --- Container Thông tin giao hàng (Trái) --- */
+
 .shippingInfoContainer h2 {
   font-size: 1.3rem;
   font-weight: 600;
@@ -127,9 +127,9 @@
 .formGroup input[type="email"],
 .formGroup select,
 .formGroup textarea {
-  /* *** THÊM DÒNG NÀY *** */
+  
   box-sizing: border-box;
-  /* ******************* */
+  
   width: 100%;
   padding: 0.65rem 0.9rem;
   font-size: 0.95rem;
@@ -174,7 +174,7 @@
   min-height: 80px;
 }
 
-/* Nút Lưu Thông Tin */
+
 .saveShippingButton {
     margin-top: 1rem;
     padding: 0.7rem 1.25rem !important;
@@ -204,14 +204,14 @@
     color: white !important;
     cursor: default;
 }
-.saveShippingButton[variant="success"] svg { } /* Icon đã có gap */
+.saveShippingButton[variant="success"] svg { } 
 .saveShippingButton:disabled {
     opacity: 0.65;
     cursor: not-allowed;
 }
 
 
-/* --- Container Đơn hàng (Phải) --- */
+
 .orderSummaryContainer h2 {
   font-size: 1.3rem;
   font-weight: 600;
@@ -228,7 +228,7 @@
   margin: 0 -10px 1.25rem -10px;
   padding: 0 10px;
 }
-/* Style thanh cuộn */
+
 .orderItemsList::-webkit-scrollbar { width: 5px; }
 .orderItemsList::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 3px; }
 .orderItemsList::-webkit-scrollbar-thumb { background: #ccc; border-radius: 3px; }
@@ -334,7 +334,7 @@
     margin-bottom: 1rem;
 }
 
-/* Nút Xác nhận cuối cùng */
+
 .confirmOrderButton {
     margin-top: 1.25rem;
     width: 100%;
@@ -357,7 +357,7 @@
 }
 
 
-/* Thông báo lỗi chung/cuối cùng */
+
 .errorMessage, .finalErrorMessage {
     color: var(--danger-color);
     background-color: var(--danger-color-light);
@@ -368,17 +368,17 @@
     font-size: 0.875rem;
     text-align: center;
 }
-.errorMessage { /* Lỗi inline trong form */
+.errorMessage { 
     margin-top: -0.5rem;
     margin-bottom: 0.5rem;
 }
-.finalErrorMessage { /* Lỗi dưới nút đặt hàng */
+.finalErrorMessage { 
      margin-bottom: 1rem;
-     margin-top: 0; /* Bỏ margin top nếu đặt dưới nút */
+     margin-top: 0; 
 }
 
 
-/* --- Responsive --- */
+
 @media (max-width: 991px) {
   .layoutWrapper { flex-direction: column; }
   .orderSummaryContainer { order: -1; position: static; max-height: none; overflow-y: visible;}

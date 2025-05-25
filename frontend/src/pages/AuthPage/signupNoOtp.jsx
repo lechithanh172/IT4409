@@ -26,7 +26,7 @@ function SignupNoOtpPage() {
         e.preventDefault();
         setError('');
 
-        // Kiểm tra dữ liệu
+
         if (!formData.username.trim() || !formData.email.trim()) {
             setError('Vui lòng nhập đầy đủ thông tin.');
             return;

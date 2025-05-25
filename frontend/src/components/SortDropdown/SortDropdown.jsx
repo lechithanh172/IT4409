@@ -3,7 +3,7 @@ import styles from './SortDropdown.module.css';
 
 const SortDropdown = ({ currentSort, onSortChange }) => {
   const handleSelectChange = (e) => {
-    onSortChange(e.target.value); // Gọi hàm callback với giá trị mới
+    onSortChange(e.target.value);
   };
 
   return (
@@ -11,7 +11,7 @@ const SortDropdown = ({ currentSort, onSortChange }) => {
       <label htmlFor="sort-select" className={styles.sortLabel}>Sắp xếp theo:</label>
       <select
         id="sort-select"
-        value={currentSort} // Giá trị hiện tại từ state cha
+        value={currentSort}
         onChange={handleSelectChange}
         className={styles.sortSelect}
       >

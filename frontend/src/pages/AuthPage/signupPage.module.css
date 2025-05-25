@@ -1,29 +1,29 @@
-/* src/pages/AuthPage/signupPage.module.css */
 
-/* --- Container bao ngoài trang --- */
+
+
 .pageContainer {
   display: flex;
   justify-content: center;
   align-items: center;
   min-height: calc(100vh - 60px);
   padding: 2.5rem 1rem;
-  /* Gradient nền khác cho trang đăng ký */
+  
   background-image: linear-gradient(120deg, #f6f9fc 0%, #e9f1f8 100%);
   box-sizing: border-box;
   overflow-y: auto;
-  /* Cho phép cuộn nếu form quá dài trên màn hình nhỏ */
+  
 }
 
-/* --- Card chứa form đăng ký --- */
+
 .signupCard {
   display: flex;
   width: 100%;
   max-width: 950px;
-  /* Rộng hơn login vì nhiều trường hơn */
+  
   background-color: #ffffff;
   border-radius: 20px;
   box-shadow: 0 15px 45px rgba(0, 0, 0, 0.1);
-  /* Shadow nhẹ hơn login */
+  
   overflow: hidden;
   animation: fadeInScale 0.7s ease-out forwards;
   opacity: 0;
@@ -41,11 +41,11 @@
   }
 }
 
-/* --- Cột trang trí bên trái --- */
+
 .decorativeSide {
   flex-basis: 40%;
-  /* Chiếm ít hơn form */
-  /* Gradient khác */
+  
+  
   background: linear-gradient(to bottom, #84fab0 0%, #8fd3f4 100%);
   padding: 3rem 2rem;
   color: #fff;
@@ -60,7 +60,7 @@
 
 .decorativeSide .logoPlaceholder {
   font-size: 1.8rem;
-  /* Nhỏ hơn chút */
+  
   font-weight: bold;
   margin-bottom: 1.5rem;
   opacity: 0.9;
@@ -74,34 +74,34 @@
 
 .decorativeSide p {
   font-size: 0.95rem;
-  /* Nhỏ hơn */
+  
   line-height: 1.6;
   opacity: 0.85;
 }
 
-/* --- Cột Form bên phải --- */
+
 .formSide {
   flex-basis: 60%;
   padding: 2.5rem 3rem;
-  /* Padding lớn hơn */
+  
   display: flex;
   flex-direction: column;
   justify-content: center;
 }
 
-/* --- Form --- */
+
 .signupForm {
   width: 100%;
   max-width: 100%;
-  /* Form chiếm hết cột phải */
+  
   display: flex;
   flex-direction: column;
 }
 
-/* --- Tiêu đề và phụ đề trong Form --- */
+
 .title {
   text-align: center;
-  /* Căn giữa lại */
+  
   color: #1a3b5d;
   margin: 0 0 0.5rem 0;
   font-size: 1.8rem;
@@ -115,22 +115,22 @@
   font-size: 1rem;
 }
 
-/* --- Grid Layout cho Form --- */
+
 .formGrid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  /* Luôn 2 cột nếu đủ chỗ */
+  
   gap: 1rem 1.5rem;
-  /* Khoảng cách dọc và ngang */
+  
   margin-bottom: 0.8rem;
 }
 
-/* Input group chiếm cả dòng */
+
 .fullWidth {
   grid-column: span 2;
 }
 
-/* --- Input Group --- */
+
 .inputGroup {
   margin-bottom: 1rem;
   position: relative;
@@ -161,11 +161,11 @@
   z-index: 1;
 }
 
-/* --- Input Fields --- */
+
 .input {
   width: 100%;
   padding: 0.85rem 0.85rem 0.85rem 2.8rem;
-  /* Padding trái cho icon */
+  
   font-size: 1rem;
   border: 1px solid #e2e8f0;
   border-radius: 8px;
@@ -173,10 +173,10 @@
   transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
   color: #2d3748;
   background-color: #f8fafc;
-  /* Hơi khác login */
+  
 }
 
-/* Bỏ padding trái nếu không có icon */
+
 .noIconPadding {
   padding-left: 0.85rem !important;
 }
@@ -192,13 +192,13 @@
   box-shadow: 0 0 0 3px rgba(99, 179, 237, 0.2);
 }
 
-/* --- Password Fields --- */
+
 .passwordGrid {
-  /* Grid riêng cho password */
+  
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 1rem 1.5rem;
-  /* Đồng bộ gap */
+  
   margin-bottom: 0.5rem;
 }
 
@@ -210,7 +210,7 @@
   padding-right: 3rem;
 }
 
-/* Padding phải cho icon mắt */
+
 
 .passwordToggle {
   position: absolute;
@@ -239,7 +239,7 @@
 }
 
 
-/* --- Error Message --- */
+
 .error {
   color: #c53030;
   background-color: #fff5f5;
@@ -260,12 +260,12 @@
 }
 
 
-/* --- Signup Button --- */
+
 .signupButton {
-  /* Ghi đè Button component */
+  
   width: 100%;
   padding: 0.9rem 1rem !important;
-  /* Gradient Xanh lá */
+  
   background-image: linear-gradient(to right, #38ef7d, #11998e);
   color: white !important;
   border: none !important;
@@ -285,7 +285,7 @@
 
 .signupButton:hover:not(:disabled) {
   background-image: linear-gradient(to right, #11998e, #38ef7d);
-  /* Đảo chiều */
+  
   box-shadow: 0 7px 20px rgba(17, 153, 142, 0.3) !important;
   transform: translateY(-3px) !important;
 }
@@ -311,7 +311,7 @@
   font-size: 1.1rem;
 }
 
-/* --- Link quay lại Login --- */
+
 .loginLinkContainer {
   margin-top: 1.8rem;
   text-align: center;
@@ -323,7 +323,7 @@
   color: #4299e1;
   text-decoration: none;
   font-weight: 600;
-  /* Đậm hơn */
+  
   margin-left: 0.4rem;
   transition: color 0.2s ease;
 }
@@ -333,10 +333,10 @@
   text-decoration: underline;
 }
 
-/* --- Responsive --- */
+
 @media (max-width: 950px) {
 
-  /* Ẩn cột trang trí */
+  
   .decorativeSide {
     display: none;
   }
@@ -348,13 +348,13 @@
 
   .signupCard {
     max-width: 550px;
-    /* Giảm max-width khi chỉ còn form */
+    
   }
 }
 
 @media (max-width: 600px) {
 
-  /* Chuyển grid thành 1 cột */
+  
   .formGrid,
   .passwordGrid {
     grid-template-columns: 1fr;
@@ -365,7 +365,7 @@
     grid-column: span 1;
   }
 
-  /* Reset span */
+  
   .signupCard {
     padding: 0;
     border-radius: 15px;

@@ -1,5 +1,5 @@
 import React, { useState, useEffect} from 'react';
-import { useNavigate, Link, useLocation } from 'react-router-dom'; // Import useLocation
+import { useNavigate, Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import styles from './resetPassword.module.css';
 import { FiMail, FiKey, FiLock, FiCheckCircle, FiAlertCircle, FiEye, FiEyeOff } from 'react-icons/fi';
@@ -11,7 +11,7 @@ function ResetPasswordPage() {
             document.title = "Đặt lại mật khẩu | HustShop";
         }, []);
 
-    const location = useLocation(); // Get location object to access URL params
+    const location = useLocation();
 
     const [formData, setFormData] = useState({
         email: '',
@@ -24,37 +24,37 @@ function ResetPasswordPage() {
     const [error, setError] = useState('');
     const [success, setSuccess] = useState('');
     const [isLoading, setIsLoading] = useState(false);
-    // State to indicate if email field is disabled (because it came from URL)
+
     const [isEmailFieldDisabled, setIsEmailFieldDisabled] = useState(false);
 
-    const { resetPassword } = useAuth(); // Assuming useAuth provides a resetPassword function
+    const { resetPassword } = useAuth();
     const navigate = useNavigate();
 
-    // useEffect to read email from URL on component mount
+
     useEffect(() => {
         const params = new URLSearchParams(location.search);
         const emailFromUrl = params.get('email');
 
         if (emailFromUrl) {
-            // If email parameter exists in URL, pre-fill the state
+
             setFormData(prev => ({ ...prev, email: emailFromUrl }));
-            // And optionally disable the email field
+
             setIsEmailFieldDisabled(true);
         } else {
-            // If no email in URL, ensure field is not disabled
+
             setIsEmailFieldDisabled(false);
         }
-    }, [location.search]); // Dependency array: re-run if the query string changes
+    }, [location.search]);
 
 
     const handleChange = (e) => {
         const { name, value } = e.target;
-         // Prevent changing email if it was pre-filled/disabled
+
         if (name === 'email' && isEmailFieldDisabled) {
             return;
         }
         setFormData(prev => ({ ...prev, [name]: value }));
-        // Clear errors/success when user starts typing again (except for disabled email field)
+
         if (name !== 'email' || !isEmailFieldDisabled) {
              setError('');
              setSuccess('');
@@ -65,13 +65,13 @@ function ResetPasswordPage() {
         e.preventDefault();
         const { email, otp, newPassword, confirmPassword } = formData;
 
-        // --- Validation Checks ---
+
         if (!email || !otp || !newPassword || !confirmPassword) {
             setError('Vui lòng nhập đầy đủ thông tin.');
             return;
         }
-        // Check email format only if the field was NOT disabled (meaning user could type)
-        // Or you might want to validate it anyway just in case
+
+
          const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
          if (!emailRegex.test(email)) {
              setError('Email không hợp lệ.');
@@ -86,24 +86,24 @@ function ResetPasswordPage() {
             setError('Mật khẩu xác nhận không khớp.');
             return;
         }
-        // --- End Validation Checks ---
+
 
 
         setIsLoading(true);
-        setError(''); // Clear any previous errors before attempting API call
-        setSuccess(''); // Clear any previous success messages
+        setError('');
+        setSuccess('');
 
         try {
-            // Call the reset password API function
-            await resetPassword({ email, otp, newPassword }); // Use email from state
+
+            await resetPassword({ email, otp, newPassword });
 
             setSuccess('Đặt lại mật khẩu thành công. Vui lòng đăng nhập.');
 
-            // Redirect to login after a short delay
+
             setTimeout(() => navigate('/login'), 2000);
 
         } catch (err) {
-            // Handle API errors
+
             console.error("Reset Password Error:", err);
             setError(err.message || 'Đặt lại mật khẩu không thành công. Vui lòng kiểm tra lại thông tin và thử lại.');
         } finally {
@@ -123,21 +123,21 @@ function ResetPasswordPage() {
     return (
         <div className={styles.pageContainer}>
             <div className={styles.resetPasswordCard}>
-                {/* Decorative side */}
+                {}
                 <div className={styles.decorativeSide}>
-                     <div className={styles.logoPlaceholder}>HustShop</div> {/* Consider replacing with an actual logo */}
+                     <div className={styles.logoPlaceholder}>HustShop</div> {}
                     <h3>Đặt lại mật khẩu</h3>
                     <p>Nhập email, mã OTP và mật khẩu mới để khôi phục tài khoản.</p>
-                     {/* Maybe add an image or illustration here */}
+                     {}
                 </div>
 
-                {/* Form side */}
+                {}
                 <div className={styles.formSide}>
                     <form onSubmit={handleSubmit} className={styles.resetPasswordForm} noValidate>
                         <h2 className={styles.title}>Đặt lại mật khẩu</h2>
                         <p className={styles.subtitle}>Vui lòng nhập email, mã OTP và mật khẩu mới</p>
 
-                        {/* Email Input */}
+                        {}
                         <div className={styles.inputGroup}>
                             <label htmlFor="email" className={styles.label}>Email</label>
                             <div className={styles.inputWrapper}>
@@ -151,7 +151,7 @@ function ResetPasswordPage() {
                                     placeholder="Email của bạn"
                                     required
                                     className={styles.input}
-                                    // Disable if loading OR if it was pre-filled from URL
+
                                     disabled={isLoading || isEmailFieldDisabled}
                                     aria-invalid={!!error}
                                     aria-describedby={error ? "reset-password-error" : undefined}
@@ -159,7 +159,7 @@ function ResetPasswordPage() {
                             </div>
                         </div>
 
-                        {/* OTP Input */}
+                        {}
                         <div className={styles.inputGroup}>
                             <label htmlFor="otp" className={styles.label}>Mã OTP</label>
                             <div className={styles.inputWrapper}>
@@ -180,7 +180,7 @@ function ResetPasswordPage() {
                             </div>
                         </div>
 
-                        {/* New Password Input */}
+                        {}
                         <div className={styles.inputGroup}>
                             <label htmlFor="newPassword" className={styles.label}>Mật khẩu mới</label>
                             <div className={styles.inputWrapper}>
@@ -210,7 +210,7 @@ function ResetPasswordPage() {
                             </div>
                         </div>
 
-                         {/* Confirm Password Input */}
+                         {}
                         <div className={styles.inputGroup}>
                             <label htmlFor="confirmPassword" className={styles.label}>Xác nhận lại mật khẩu</label>
                             <div className={styles.inputWrapper}>
@@ -241,7 +241,7 @@ function ResetPasswordPage() {
                         </div>
 
 
-                        {/* Messages */}
+                        {}
                         {success && (
                             <p id="reset-password-success" className={styles.success} role="status" aria-live="polite">
                                 <FiCheckCircle /> {success}
@@ -253,7 +253,7 @@ function ResetPasswordPage() {
                             </p>
                         )}
 
-                        {/* Submit Button */}
+                        {}
                         <Button
                             type="submit"
                             className={styles.submitButton}
@@ -267,7 +267,7 @@ function ResetPasswordPage() {
                             )}
                         </Button>
 
-                        {/* Link back to Login */}
+                        {}
                         <div className={styles.loginLinkContainer}>
                             <span>Quay lại?</span>
                             <Link to="/login" className={`${styles.link} ${styles.loginLink}`}>

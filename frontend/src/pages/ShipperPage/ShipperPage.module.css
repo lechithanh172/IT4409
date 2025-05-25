@@ -20,7 +20,7 @@
     font-weight: 600;
 }
 
-/* --- Tab Navigation --- */
+
 .tabContainer {
     display: flex;
     gap: 20px;
@@ -55,7 +55,7 @@
     border-bottom: 3px solid #3498db;
 }
 
-/* --- Filter Button --- */
+
 .filterButton {
     margin-left: auto;
     padding: 10px 20px;
@@ -83,7 +83,7 @@
     color: #1976d2;
 }
 
-/* --- Order Table --- */
+
 .tableContainer {
     width: 100%;
     overflow-x: auto;
@@ -116,7 +116,7 @@
     letter-spacing: 0.6px;
 }
 
-/* --- Status Badges --- */
+
 .statusBadge {
     padding: 6px 12px;
     border-radius: 15px;
@@ -134,7 +134,7 @@
 .statusCancelled { background-color: #dc3545; color: #fff; }
 .statusFailed_Delivery { background-color: #dc3545; color: #fff; }
 
-/* --- Action Buttons --- */
+
 .actionButtons {
     display: flex;
     gap: 8px;
@@ -195,7 +195,7 @@
     background-color: #9254de;
 }
 
-/* --- Order Details --- */
+
 .orderDetails {
     background-color: #f8f9fa;
     padding: 20px;
@@ -213,7 +213,7 @@
     margin-right: 8px;
 }
 
-/* --- Loading & Error States --- */
+
 .loadingContainer,
 .errorContainer {
     display: flex;
@@ -235,7 +235,7 @@
     color: #dc3545;
 }
 
-/* --- Responsive Design --- */
+
 @media (max-width: 768px) {
     .container {
         padding: 15px;
@@ -274,7 +274,7 @@
     }
 }
 
-/* --- Empty State --- */
+
 .emptyState {
     text-align: center;
     padding: 40px 20px;

@@ -1,38 +1,38 @@
-/* src/components/Header/Header.module.css */
 
-/* --- Variables (using your provided colors and spacing) --- */
+
+
 :root {
-  --primary-color: #007bff; /* Blue - Example Primary */
-  --secondary-color: #f8fafc; /* Light Grayish Blue */
-  --text-color-dark: #1a3b5d; /* Dark Blue */
-  --text-color-light: #4a5568; /* Grayish Blue */
-  --border-color: #e2e8f0; /* Light Gray Border */
-  --shadow-base: 0 1px 4px rgba(0, 0, 0, 0.07); /* Gentle Shadow */
+  --primary-color: #007bff; 
+  --secondary-color: #f8fafc; 
+  --text-color-dark: #1a3b5d; 
+  --text-color-light: #4a5568; 
+  --border-color: #e2e8f0; 
+  --shadow-base: 0 1px 4px rgba(0, 0, 0, 0.07); 
   --spacing-xs: 8px;
   --spacing-sm: 12px;
   --spacing-md: 20px;
 }
 
-/* Dark mode variables (Based on common dark mode patterns, adjust if you have a specific dark theme) */
-/* Using existing variables as fallback */
+
+
 @media (prefers-color-scheme: dark) {
     :root {
-        --primary-color: #66aaff; /* Lighter blue */
-        --secondary-color: #2d3748; /* Darker background */
-        --text-color-dark: #f7fafc; /* White */
-        --text-color-light: #a0aec0; /* Light gray */
-        --border-color: #4a5568; /* Dark gray border */
+        --primary-color: #66aaff; 
+        --secondary-color: #2d3748; 
+        --text-color-dark: #f7fafc; 
+        --text-color-light: #a0aec0; 
+        --border-color: #4a5568; 
         --shadow-base: 0 2px 8px rgba(0, 0, 0, 0.4);
-        /* Add card/background variables from homepage if used here */
-        /* --card-background: #2d3748; */
-        /* --background-color-light: #1a202c; */
+        
+        
+        
     }
 }
 
 
-/* --- Base Header Styles --- */
+
 .header {
-  background-color: #ffffff; /* Keeping original white background */
+  background-color: #ffffff; 
   padding: var(--spacing-sm) 0;
   box-shadow: var(--shadow-base);
   position: sticky;
@@ -40,7 +40,7 @@
   z-index: 1000;
   transition: box-shadow 0.2s ease;
 }
-/* Optional: Dark mode for header background if you have a global dark mode switch */
+
 /* @media (prefers-color-scheme: dark) {
     .header {
         background-color: var(--card-background, #2d3748);
@@ -59,7 +59,7 @@
   gap: var(--spacing-sm);
 }
 
-/* --- Logo Style --- */
+
 .logo {
    text-decoration: none;
    flex-shrink: 0;
@@ -75,7 +75,7 @@
 }
 
 
-/* --- Desktop Navigation --- */
+
 .desktopNav {
   display: flex;
   align-items: center;
@@ -120,7 +120,7 @@
   color: var(--text-color-dark);
 }
 
-/* Style cho link đang active */
+
 .navLink.active {
   background-color: #ebf4ff;
   color: var(--primary-color);
@@ -128,20 +128,20 @@
 }
 @media (prefers-color-scheme: dark) {
     .navLink.active {
-        background-color: rgba(102, 126, 234, 0.2); /* Semi-transparent blue */
+        background-color: rgba(102, 126, 234, 0.2); 
         color: var(--primary-color);
     }
 }
 
 
-/* --- Dropdown Styles (Category, User, Search) --- */
-.dropdownContainer, .searchDropdownContainer { /* Added .searchDropdownContainer */
+
+.dropdownContainer, .searchDropdownContainer { 
   position: relative;
   display: inline-block;
   z-index: 900;
   vertical-align: middle;
-  width: auto; /* Ensure width is auto for searchDropdownContainer */
-  overflow: visible; /* Ensure search dropdown is not clipped */
+  width: auto; 
+  overflow: visible; 
 }
 .dropdownContainer:hover{
     color: white;
@@ -150,7 +150,7 @@
   transition: transform 0.2s ease;
   font-size: 0.8em;
   margin-left: 2px;
-  color: var(--text-color-light); /* Màu chevron nhạt mặc định */
+  color: var(--text-color-light); 
 }
 .dropdownToggle:hover .chevronIcon { color: var(--text-color-dark); }
 .userChevron { font-size: 1em; margin-left: 4px; }
@@ -162,7 +162,7 @@
   position: absolute;
   top: calc(100% + 10px);
   left: 0;
-  background-color: var(--card-background, #ffffff); /* Using default white or variable */
+  background-color: var(--card-background, #ffffff); 
   border-radius: var(--border-radius-sm);
   box-shadow: var(--shadow-base);
   padding: 8px 0;
@@ -198,9 +198,9 @@
   align-items: center;
   gap: 10px;
   padding: 10px var(--spacing-sm);
-  /* === SỬA MÀU CHỮ ITEM TRONG DROPDOWN MENU === */
-  color: var(--text-color-dark); /* Màu chữ item đậm hơn */
-  /* ========================================= */
+  
+  color: var(--text-color-dark); 
+  
   text-decoration: none;
   font-size: 0.95rem;
   white-space: nowrap;
@@ -214,39 +214,39 @@
 }
 .dropdownItem:hover {
   background-color: var(--secondary-color);
-  /* === MÀU CHỮ ITEM TRONG DROPDOWN KHI HOVER === */
-  color: var(--text-color-dark); /* Giữ màu đậm khi hover */
-  /* === HOẶC ĐỔI SANG MÀU NHẤN PRIMARY === */
-  /* color: var(--primary-color); */
-  /* ======================================= */
+  
+  color: var(--text-color-dark); 
+  
+  
+  
   padding-left: calc(var(--spacing-sm) + 4px);
 }
 
 .categoryIcon, .categoryEmoji, .dropdownIcon {
     font-size: 1.1em;
-    /* === SỬA MÀU ICON TRONG DROPDOWN MENU === */
-    color: var(--text-color-dark); /* Icon màu đậm hơn */
-    /* ======================================= */
+    
+    color: var(--text-color-dark); 
+    
     margin-right: 8px;
     vertical-align: middle;
     flex-shrink: 0;
-    transition: color 0.2s ease; /* Thêm transition màu cho icon */
+    transition: color 0.2s ease; 
 }
 .categoryEmoji { width: 1.2em; text-align: center; }
 
 .dropdownItem:hover .categoryIcon,
 .dropdownItem:hover .categoryEmoji,
 .dropdownItem:hover .dropdownIcon {
-     /* === MÀU ICON TRONG DROPDOWN KHI HOVER ITEM === */
-     color: var(--primary-color); /* Màu nhấn khi hover */
-     /* ============================================ */
+     
+     color: var(--primary-color); 
+     
 }
 
 .dropdownDivider { border: none; border-top: 1px solid var(--border-color); margin: 6px 0; }
 .dropdownError, .dropdownLoading { padding: 10px var(--spacing-sm); color: var(--text-color-light); font-style: italic; font-size: 0.9rem; display: flex; align-items: center; gap: 8px; }
 .dropdownLoading .spinner > div { width: 14px !important; height: 14px !important; border-width: 2px !important;}
 
-/* User Dropdown */
+
 .userDropdown { left: auto; right: 0; min-width: 200px; }
 .dropdownHeader { padding: 10px var(--spacing-sm); font-weight: 600; color: var(--text-color-dark); font-size: 0.9rem; border-bottom: 1px solid var(--border-color); margin-bottom: 5px; }
 
@@ -255,10 +255,10 @@
 .logoutButton:hover .dropdownIcon { color: #c53030; }
 
 
-/* --- Actions Area --- */
+
 .actions { display: flex; align-items: center; gap: var(--spacing-sm); flex-shrink: 0; }
 
-/* --- Search Bar --- */
+
 .searchBar {
     display: flex;
     align-items: center;
@@ -312,48 +312,48 @@
     color: var(--text-color-dark);
 }
 
-/* --- Action Buttons (Cart, User) --- */
-/* Style chung cho các nút icon hành động (Giỏ hàng, Tài khoản khi chưa login) */
+
+
 .actionButton {
     position: relative;
     display: flex;
     align-items: center;
     justify-content: center;
     padding: 9px;
-    background: none; /* Nền trong suốt mặc định */
+    background: none; 
     border: none;
-    border-radius: 50%; /* Hình tròn */
-    /* === SỬA MÀU CHO ICON (Giỏ hàng, User khi chưa login) === */
-    color: #353535; /* Sử dụng màu đậm hơn */
-    /* ===================================================== */
+    border-radius: 50%; 
+    
+    color: #353535; 
+    
     cursor: pointer;
     transition: background-color 0.2s ease, color 0.2s ease;
-    font-size: 1.25rem; /* Kích thước icon */
+    font-size: 1.25rem; 
     font-weight: bold;
-    text-decoration: none; /* Nếu là Link */
+    text-decoration: none; 
 }
-.actionButton:hover { background-color: var(--secondary-color); color: #FFFFFF; } /* Hover effect */
+.actionButton:hover { background-color: var(--secondary-color); color: #FFFFFF; } 
 
-/* Style riêng cho nút User khi ĐÃ login (có tên bên cạnh) */
+
 .userButton {
     gap: 5px;
     padding-left: 6px;
     padding-right: 6px;
-    /* === MÀU CHO NÚT USER KHI ĐÃ LOGIN (icon FiUserCheck và tên) === */
-    color: #353535; /* Sử dụng màu đậm hơn */
-    /* ========================================================= */
-    /* Override background/border-radius nếu cần style khác actionButton */
-    background-color: transparent; /* Vẫn giữ nền trong suốt */
-    border-radius: var(--border-radius-sm); /* Hoặc 20px để bo tròn theo chiều ngang */
-    /* Bỏ background/border-radius: 50% để chỉ bo góc nhẹ */
+    
+    color: #353535; 
+    
+    
+    background-color: transparent; 
+    border-radius: var(--border-radius-sm); 
+    
 }
-/* Hover effect riêng cho nút user đã login nếu cần */
+
 .userButton:hover {
      background-color: var(--secondary-color);
-     color: #FFFFFF; /* Giữ màu đậm */
-     /* === HOẶC ĐỔI MÀU CHỮ/ICON SANG MÀU NHẤN PRIMARY KHI HOVER === */
-     /* color: var(--primary-color); */
-     /* ======================================================== */
+     color: #FFFFFF; 
+     
+     
+     
 }
 
 
@@ -361,16 +361,16 @@
     font-size: 0.9rem;
     font-weight: 500;
     margin: 0 4px 0 2px;
-    /* === MÀU CHO TÊN USER TRONG NÚT === */
-    color: #353535; /* Sử dụng màu đậm hơn */
-    /* =============================== */
+    
+    color: #353535; 
+    
     display: inline;
     white-space: nowrap;
     max-width: 100px;
     overflow: hidden;
     text-overflow: ellipsis;
     vertical-align: middle;
-    /* Transition màu chữ nếu cần */
+    
     transition: color 0.2s ease;
 }
 .userNameDesktop:hover {
@@ -378,11 +378,11 @@
      font-size: 0.9rem;
     font-weight: 500;
 }
-/* === Màu tên user khi hover nút user === */
-/* .userButton:hover .userNameDesktop { color: var(--text-color-dark); } */ /* Giữ màu đậm khi hover */
-/* === HOẶC ĐỔI SANG MÀU NHẤN PRIMARY KHI HOVER === */
-/* .userButton:hover .userNameDesktop { color: var(--primary-color); } */
-/* =============================================== */
+
+ 
+
+
+
 
 
 .cartCount { position: absolute; top: 0px; right: 0px; background-color: #e53e3e; color: white; border-radius: 50%; padding: 1px 5px; font-size: 0.7rem; font-weight: 600; min-width: 16px; text-align: center; line-height: 1; border: 1px solid var(--card-background, white); transform: translate(30%, -30%); }
@@ -391,17 +391,17 @@
 }
 
 
-/* --- Auth Buttons (Desktop) --- */
+
 .desktopAuth { display: flex; align-items: center; gap: var(--spacing-xs); }
 .authButton { padding: 6px var(--spacing-sm) !important; font-size: 0.9rem !important; border-radius: var(--border-radius-sm) !important; font-weight: bold;  }
 .authButton svg { margin-right: 5px; font-size: 1em; vertical-align: middle; margin-top: -2px;}
 
 
-/* --- Mobile Menu Toggle --- */
+
 .mobileMenuToggle { display: none; background: none; border: none; font-size: 1.6rem; color: var(--text-color-dark); cursor: pointer; padding: 5px; }
 
 
-/* --- Mobile Menu Drawer --- */
+
 .mobileMenu { position: fixed; top: 0; right: -100%; width: 280px; max-width: 80%; height: 100vh; background-color: var(--card-background, #ffffff); box-shadow: -4px 0 20px rgba(0, 0, 0, 0.1); z-index: 1100; transition: right 0.35s ease-in-out; overflow-y: auto; display: flex; flex-direction: column; }
 .mobileMenuOpen { right: 0; }
 .mobileMenuHeader { display: flex; justify-content: space-between; align-items: center; padding: var(--spacing-sm) var(--spacing-md); border-bottom: 1px solid var(--border-color); flex-shrink: 0; }
@@ -425,14 +425,14 @@
 .mobileLoading, .mobileError { padding: var(--spacing-xs) var(--spacing-md); color: var(--text-color-light); font-style: italic; font-size: 0.9rem; display: flex; align-items: center; gap: 8px; }
 .mobileError { color: #e53e3e; }
 
-/* Overlay */
+
 .overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.5); z-index: 1050; opacity: 0; visibility: hidden; transition: opacity 0.35s ease, visibility 0.35s ease; }
 .mobileMenuOpen + .overlay { opacity: 1; visibility: visible; }
 
 
-/* --- STYLE CHO SEARCH DROPDOWN --- */
 
-/* Container chứa search input và dropdown, cần position: relative */
+
+
 .searchDropdownContainer {
     position: relative;
     display: inline-block;
@@ -443,11 +443,11 @@
 }
 
 
-/* Menu dropdown kết quả tìm kiếm */
+
 .searchResultsDropdown {
     position: absolute;
     top: calc(100% + 8px);
-    left: 0; /* Căn trái với container */
+    left: 0; 
     width: 100%;
     background-color: var(--card-background, #ffffff);
     border-radius: var(--border-radius-sm);
@@ -463,7 +463,7 @@
     overflow-y: auto;
     border: 1px solid var(--border-color);
 }
-/* Class .show được thêm bởi JS */
+
 .searchResultsDropdown.show {
     opacity: 1;
     visibility: visible;
@@ -478,7 +478,7 @@
 }
 
 
-/* Style cho trạng thái loading */
+
 .searchLoading,
 .searchEmpty {
     padding: var(--spacing-sm);
@@ -493,18 +493,18 @@
     gap: 8px;
 }
 
-/* Danh sách kết quả */
+
 .searchResultsList {
-    /* No specific styles needed */
+    
 }
 
-/* Từng item kết quả */
+
 .searchResultItem {
     display: flex;
     align-items: center;
     padding: var(--spacing-xs) var(--spacing-sm);
     text-decoration: none;
-    color: var(--text-color-dark); /* Màu chữ item kết quả đậm */
+    color: var(--text-color-dark); 
     transition: background-color 0.2s ease;
     border-bottom: 1px solid var(--border-color);
 }
@@ -558,7 +558,7 @@
 }
 
 
-/* Link "Xem tất cả" */
+
 .searchViewAllLink {
     display: block;
     padding: var(--spacing-xs) var(--spacing-sm);
@@ -572,7 +572,7 @@
      background-color:white;
 }
 
-/* --- Responsive Adjustments --- */
+
 @media (max-width: 1024px) {
     .desktopNav, .desktopAuth { display: none; }
     .mobileMenuToggle { display: block; }
@@ -580,7 +580,7 @@
 @media (max-width: 768px) {
     .container { padding: 0 var(--spacing-sm); gap: var(--spacing-xs); }
     .logo img { height: 32px; }
-    /* Hide search bar and search dropdown container on tablet and mobile */
+    
     .searchBar { display: none; }
     .searchDropdownContainer { display: none; }
     .actions { gap: var(--spacing-xs); }
@@ -599,7 +599,7 @@
     .header { padding: 10px 0; }
     .logo img { height: 30px; }
     .actions { gap: var(--spacing-xs); }
-    /* Search bar and dropdown remain hidden */
+    
     .actionButton { font-size: 1.1rem; padding: 7px; }
      .mobileMenu { max-width: 90%; width: 250px; }
      .mobileMenuHeader { padding: var(--spacing-xs) var(--spacing-sm); }

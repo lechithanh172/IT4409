@@ -3,7 +3,7 @@ import { useEffect } from 'react';
 function useClickOutside(ref, handler) {
   useEffect(() => {
     const listener = (event) => {
-      // Do nothing if clicking ref's element or descendent elements
+
       if (!ref.current || ref.current.contains(event.target)) {
         return;
       }
@@ -11,13 +11,13 @@ function useClickOutside(ref, handler) {
     };
 
     document.addEventListener('mousedown', listener);
-    document.addEventListener('touchstart', listener); // For touch devices
+    document.addEventListener('touchstart', listener);
 
     return () => {
       document.removeEventListener('mousedown', listener);
       document.removeEventListener('touchstart', listener);
     };
-  }, [ref, handler]); // Reload only if ref or handler changes
+  }, [ref, handler]);
 }
 
 export default useClickOutside;

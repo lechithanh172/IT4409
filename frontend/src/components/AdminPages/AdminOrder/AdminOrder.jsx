@@ -34,14 +34,14 @@ import apiService from "../../../services/api";
 
 const { Text } = Typography;
 
-// 1. Add FAILED_DELIVERY to STATUS_DETAILS
+
 const STATUS_DETAILS = {
   PENDING: { label: "Chờ xử lý", color: "gold" },
   APPROVED: { label: "Đã duyệt", color: "blue" },
   REJECTED: { label: "Bị từ chối", color: "error" },
   SHIPPING: { label: "Đang giao", color: "processing" },
   DELIVERED: { label: "Đã giao", color: "success" },
-  FAILED_DELIVERY: { label: "Giao thất bại", color: "volcano" }, // Using 'volcano' for a distinct error-like color
+  FAILED_DELIVERY: { label: "Giao thất bại", color: "volcano" }, 
 };
 
 const OrderStatusTag = ({ status }) => {
@@ -53,14 +53,14 @@ const OrderStatusTag = ({ status }) => {
   return <Tag color={details.color}>{details.label}</Tag>;
 };
 
-// 2. Update VALID_STATUS_TRANSITIONS
+
 const VALID_STATUS_TRANSITIONS = {
   PENDING: ["APPROVED", "REJECTED"],
   APPROVED: ["SHIPPING"],
-  REJECTED: [], // Rejected is often a final state
-  SHIPPING: ["DELIVERED", "FAILED_DELIVERY"], // Shipping can now go to Delivered or Failed Delivery
-  DELIVERED: [], // Delivered is a final state
-  FAILED_DELIVERY: ["SHIPPING", "REJECTED"], // Failed Delivery can go back to Shipping (re-attempt) or perhaps Rejected
+  REJECTED: [], 
+  SHIPPING: ["DELIVERED", "FAILED_DELIVERY"], 
+  DELIVERED: [], 
+  FAILED_DELIVERY: ["SHIPPING", "REJECTED"], 
 };
 
 function formatDate(isoString) {
@@ -77,7 +77,7 @@ function formatDate(isoString) {
       year: "numeric",
       hour12: false,
     });
-  } catch (error) {
+  } catch {
     return "Invalid Date";
   }
 }
@@ -117,7 +117,7 @@ const AdminOrder = () => {
   const [shipperModalState, setShipperModalState] = useState({
     visible: false,
     orderId: null,
-    targetStatus: null, // Should be 'SHIPPING' when this modal is used
+    targetStatus: null, 
     shipperId: null,
     shipperList: [],
     loading: false
@@ -146,8 +146,8 @@ const AdminOrder = () => {
         );
 
         const finalProcessedData = fetchedOrders.map((order) => {
-          // Assuming totalAmount already includes item total + shipping fee from backend
-          // If not, adjust this calculation based on your backend's response structure
+          
+          
           const calculatedGrandTotal = order.totalAmount ?? 0;
 
           return {
@@ -157,14 +157,14 @@ const AdminOrder = () => {
             userName: userMap.get(order.userId)?.username || "N/A",
             formattedCreatedAt: formatDate(order.createdAt),
             paymentMethod: order.paymentMethod || "N/A",
-            status: order.status?.toUpperCase() || "PENDING", // Ensure status is uppercase
+            status: order.status?.toUpperCase() || "PENDING", 
             totalAmount: calculatedGrandTotal,
           };
         });
 
         setProcessedOrders(finalProcessedData);
 
-        // Apply status filter after processing
+        
         const ordersToDisplay =
           statusFilter === "all"
             ? finalProcessedData
@@ -188,16 +188,16 @@ const AdminOrder = () => {
         setLoading(false);
       }
     },
-    [statusFilter, loadingAction] // Include loadingAction to prevent stale state reference, though fetchData is mostly reactive to statusFilter
+    [statusFilter, loadingAction] 
   );
 
   useEffect(() => {
     fetchData();
-  }, [fetchData]); // Effect depends on fetchData
+  }, [fetchData]); 
 
   useEffect(() => {
-      // Update displayed orders when processedOrders or statusFilter changes
-      if (!loading) { // Only filter if data is not actively loading in fetchData
+      
+      if (!loading) { 
           const ordersToDisplay =
             statusFilter === "all"
               ? processedOrders
@@ -207,17 +207,17 @@ const AdminOrder = () => {
                 );
           setDisplayedOrders(ordersToDisplay);
         }
-  }, [statusFilter, processedOrders, loading]); // Dependencies for this filtering effect
+  }, [statusFilter, processedOrders, loading]); 
 
   const onRefresh = useCallback(() => {
-    // Reset filter to 'all' maybe? Or keep current? Let's keep current.
-    fetchData(true); // Pass true to show success message
-  }, [fetchData]); // Depends on fetchData
+    
+    fetchData(true); 
+  }, [fetchData]); 
 
   const handleApplyStatus = useCallback(
     async (orderId, currentStatus, newStatus) => {
       if (loadingAction === orderId) {
-        return; // Prevent multiple actions on the same row
+        return; 
       }
 
       if (!orderId || !currentStatus || !newStatus) {
@@ -235,24 +235,24 @@ const AdminOrder = () => {
           STATUS_DETAILS[currentStatusUpper]?.label || currentStatus
         }' sang '${STATUS_DETAILS[newStatusUpper]?.label || newStatus}'.`;
         message.warning(warningMsg);
-        setConfirmModalState(prev => ({ ...prev, isLoading: false })); // Ensure modal closes or state updates
+        setConfirmModalState(prev => ({ ...prev, isLoading: false })); 
         return;
       }
 
-      setLoadingAction(orderId); // Start loading state for this row
-      // setConfirmModalState((prev) => ({ ...prev, isLoading: true })); // Only if this was triggered by the confirm modal
+      setLoadingAction(orderId); 
+      
 
-      // Optimistically update the UI
+      
       const originalProcessedOrders = [...processedOrders];
       const updatedProcessedOrders = processedOrders.map((order) =>
         order.orderId === orderId ? { ...order, status: newStatusUpper } : order
       );
-      setProcessedOrders(updatedProcessedOrders); // This will trigger the filtering effect below
+      setProcessedOrders(updatedProcessedOrders); 
 
       try {
         await apiService.applyOrderStatus({
           orderId: orderId,
-          status: newStatusUpper // Send the uppercase status to the API
+          status: newStatusUpper 
         });
 
         message.success(
@@ -260,11 +260,11 @@ const AdminOrder = () => {
             STATUS_DETAILS[newStatusUpper]?.label || newStatus
           }.`
         );
-        // No need to call onRefresh here because the optimistic update and
-        // the state setters (`setProcessedOrders`) already update the UI.
-        // Call onRefresh *if* you anticipate the API response might
-        // provide slightly different data (e.g., update timestamps, etc.)
-        // Let's keep onRefresh for now to ensure full data sync.
+        
+        
+        
+        
+        
          onRefresh();
 
       } catch (error) {
@@ -281,16 +281,16 @@ const AdminOrder = () => {
           message.error(`Lỗi cập nhật trạng thái: ${error.message}`);
         }
 
-        // Revert UI state if API call failed
+        
         setProcessedOrders(originalProcessedOrders);
-         // The filtering effect will handle updating displayedOrders
+         
 
       } finally {
-        setLoadingAction(null); // Stop loading state for this row
-        setConfirmModalState(prev => ({ ...prev, visible: false, record: null, targetStatus: null, isLoading: false })); // Close modal regardless of success/fail
+        setLoadingAction(null); 
+        setConfirmModalState(prev => ({ ...prev, visible: false, record: null, targetStatus: null, isLoading: false })); 
       }
     },
-    [processedOrders, loadingAction, statusFilter, onRefresh] // Add onRefresh to dependencies
+    [processedOrders, loadingAction, onRefresh] 
   );
 
   const fetchShippers = async () => {
@@ -301,14 +301,14 @@ const AdminOrder = () => {
           ...prev,
           shipperList: response.data.map(shipper => ({
             value: shipper.userId,
-            label: `${shipper.username}${shipper.phoneNumber ? ` - ${shipper.phoneNumber}` : ''}` // Added phone number
+            label: `${shipper.username}${shipper.phoneNumber ? ` - ${shipper.phoneNumber}` : ''}` 
           }))
         }));
       }
     } catch (error) {
       console.error("Error fetching shippers:", error);
       message.error('Không thể tải danh sách shipper');
-      setShipperModalState(prev => ({ ...prev, shipperList: [] })); // Clear list on error
+      setShipperModalState(prev => ({ ...prev, shipperList: [] })); 
     }
   };
 
@@ -321,27 +321,27 @@ const AdminOrder = () => {
     const fullRecord = processedOrders.find(o => o.orderId === record.orderId) || record;
     const targetStatusUpper = targetStatus.toUpperCase();
 
-    // If the target status is SHIPPING, show the shipper assignment modal
+    
     if (targetStatusUpper === 'SHIPPING') {
       setShipperModalState({
         visible: true,
         orderId: fullRecord.orderId,
-        targetStatus: targetStatusUpper, // Make sure to pass uppercase
-        shipperId: null, // Reset selected shipper
-        shipperList: [], // Reset list while loading
-        loading: true // Indicate loading shippers
+        targetStatus: targetStatusUpper, 
+        shipperId: null, 
+        shipperList: [], 
+        loading: true 
       });
-      fetchShippers().finally(() => setShipperModalState(prev => ({...prev, loading: false}))); // Fetch shippers and stop loading
+      fetchShippers().finally(() => setShipperModalState(prev => ({...prev, loading: false}))); 
     } else {
-      // For all other status transitions, show the generic confirmation modal
+      
       setConfirmModalState({
         visible: true,
         record: fullRecord,
-        targetStatus: targetStatusUpper, // Make sure to pass uppercase
+        targetStatus: targetStatusUpper, 
         isLoading: false,
       });
     }
-  }, [processedOrders]); // Dependency on processedOrders to get the full record
+  }, [processedOrders]); 
 
   const handleShipperModalOk = async () => {
     const { orderId, targetStatus, shipperId } = shipperModalState;
@@ -355,19 +355,19 @@ const AdminOrder = () => {
     }
 
     setShipperModalState(prev => ({ ...prev, loading: true }));
-    setLoadingAction(orderId); // Start loading for the main table row as well
+    setLoadingAction(orderId); 
 
     try {
-      // 1. Assign shipper to the order
+      
       await apiService.assignOrder(orderId, shipperId);
-      // 2. Then update the status to SHIPPING
+      
       await apiService.applyOrderStatus({
         orderId: orderId,
-        status: targetStatus // This should be 'SHIPPING'
+        status: targetStatus 
       });
 
       message.success('Đã gán shipper và cập nhật trạng thái đơn hàng thành công');
-      // Close modal and reset state
+      
       setShipperModalState({
         visible: false,
         orderId: null,
@@ -376,16 +376,16 @@ const AdminOrder = () => {
         shipperList: [],
         loading: false
       });
-      // Refresh main data to show updated status and potentially shipper info if API provides it later
+      
       onRefresh();
     } catch (error) {
        console.error("Error assigning shipper or updating status:", error);
        const msg = error.response?.data?.message || error.message || 'Không thể cập nhật đơn hàng';
        message.error(msg);
-       // Optionally revert optimistic UI update here if needed, but onRefresh handles it
+       
     } finally {
-       setShipperModalState(prev => ({ ...prev, loading: false })); // Stop modal loading
-       setLoadingAction(null); // Stop row loading
+       setShipperModalState(prev => ({ ...prev, loading: false })); 
+       setLoadingAction(null); 
     }
   };
 
@@ -404,9 +404,9 @@ const AdminOrder = () => {
   const handleConfirmModalOk = useCallback(() => {
     const { record, targetStatus } = confirmModalState;
     if (record && targetStatus) {
-      // Call handleApplyStatus for the actual API update and UI change
+      
       handleApplyStatus(record.orderId, record.status, targetStatus);
-      // handleApplyStatus will set loadingAction and close the modal on success/fail
+      
     } else {
       message.error("Lỗi: Không tìm thấy thông tin đơn hàng để xác nhận.");
       setConfirmModalState({
@@ -416,7 +416,7 @@ const AdminOrder = () => {
         isLoading: false,
       });
     }
-  }, [confirmModalState, handleApplyStatus]); // Dependency on handleApplyStatus
+  }, [confirmModalState, handleApplyStatus]); 
 
 
   const handleConfirmModalCancel = useCallback(() => {
@@ -426,7 +426,7 @@ const AdminOrder = () => {
       targetStatus: null,
       isLoading: false,
     });
-  }, []); // No dependencies needed here
+  }, []); 
 
   const handleSearch = (selectedKeys, confirm, dataIndex) => {
     confirm();
@@ -440,6 +440,7 @@ const AdminOrder = () => {
     confirm();
     setSearchedColumn("");
   };
+
 
   const getColumnSearchProps = (dataIndex) => ({
     filterDropdown: ({
@@ -491,7 +492,7 @@ const AdminOrder = () => {
         if (recordValue === null || typeof recordValue === 'undefined') {
             return false;
         }
-         // Handle case sensitivity and potential non-string values
+         
         return recordValue.toString().toLowerCase().includes(value.toLowerCase());
     },
     onFilterDropdownOpenChange: (visible) => {
@@ -512,14 +513,14 @@ const AdminOrder = () => {
       ),
   });
 
-  // 3. Add FAILED_DELIVERY to statusOptions
+  
   const statusOptions = useMemo(() => [
     { value: "all", label: "Tất cả trạng thái" },
     ...Object.entries(STATUS_DETAILS).map(([key, { label }]) => ({
       value: key.toLowerCase(),
       label,
     })),
-  ], []); // Only regenerate if STATUS_DETAILS changes
+  ], []); 
 
   const columns = useMemo(() => [
     {
@@ -575,10 +576,10 @@ const AdminOrder = () => {
       render: (status) => <OrderStatusTag status={status} />,
       filters: Object.entries(STATUS_DETAILS).map(([key, { label }]) => ({
            text: label,
-           value: key.toUpperCase(), // Filter by uppercase status key
+           value: key.toUpperCase(), 
       })),
       onFilter: (value, record) => record.status === value,
-       filterMultiple: true, // Allow selecting multiple statuses
+       filterMultiple: true, 
     },
     {
       title: "Hành động",
@@ -587,18 +588,18 @@ const AdminOrder = () => {
       align: "center",
       fixed: "right",
       render: (_, record) => {
-        // Use find to get the latest status from processedOrders state
+        
         const currentRecord = processedOrders.find(o => o.key === record.key) || record;
         const currentStatusUpper = currentRecord.status;
         const isLoadingThisRow = loadingAction === currentRecord.orderId;
 
-         // Check valid transitions based on current state
+         
         const possibleNextStatuses =
           VALID_STATUS_TRANSITIONS[currentStatusUpper] || [];
 
-         // 4. Updated Logic for Action Button/Dropdown
-         // If there are no valid next transitions, only show view button.
-         // Otherwise, show dropdown with available transitions.
+         
+         
+         
         if (possibleNextStatuses.length === 0) {
           return (
             <Tooltip title="Xem chi tiết đơn hàng">
@@ -612,23 +613,23 @@ const AdminOrder = () => {
                     orderId: currentRecord.orderId,
                   });
                 }}
-                // Disable button if any other action is loading
+                
                 disabled={!!loadingAction && loadingAction !== currentRecord.orderId}
               />
             </Tooltip>
           );
         }
 
-         // Map valid next statuses to dropdown menu items
+         
         const menuItems = possibleNextStatuses.map((targetStatusKey) => ({
           key: targetStatusKey,
           label: `Chuyển sang "${
             STATUS_DETAILS[targetStatusKey]?.label || targetStatusKey
           }"`,
-          danger: ["REJECTED", "FAILED_DELIVERY"].includes(targetStatusKey), // Highlight rejection/failure
+          danger: ["REJECTED", "FAILED_DELIVERY"].includes(targetStatusKey), 
           onClick: (e) => {
-            e.domEvent.stopPropagation(); // Stop event propagation
-            showStatusChangeConfirm(currentRecord, targetStatusKey); // Use the new handler
+            e.domEvent.stopPropagation(); 
+            showStatusChangeConfirm(currentRecord, targetStatusKey); 
           },
         }));
 
@@ -645,7 +646,7 @@ const AdminOrder = () => {
                            orderId: currentRecord.orderId,
                         });
                      }}
-                    disabled={!!loadingAction} // Disable if any action is loading
+                    disabled={!!loadingAction} 
                  />
               </Tooltip>
                <Dropdown menu={{ items: menuItems }} trigger={["click"]} disabled={isLoadingThisRow || (!!loadingAction && loadingAction !== currentRecord.orderId)}>
@@ -655,9 +656,9 @@ const AdminOrder = () => {
                    <Button
                      icon={<EditOutlined />}
                      size="small"
-                     onClick={(e) => e.stopPropagation()} // Stop event propagation
-                     loading={isLoadingThisRow} // Show loading spinner on this button
-                     disabled={!!loadingAction && loadingAction !== currentRecord.orderId} // Disable if another row is loading
+                     onClick={(e) => e.stopPropagation()} 
+                     loading={isLoadingThisRow} 
+                     disabled={!!loadingAction && loadingAction !== currentRecord.orderId} 
                    />
                  </Tooltip>
                </Dropdown>
@@ -665,33 +666,33 @@ const AdminOrder = () => {
         );
       },
     },
-  ], [processedOrders, loadingAction, getColumnSearchProps, showStatusChangeConfirm]); // Add dependencies
+  ], [processedOrders, loadingAction, getColumnSearchProps, showStatusChangeConfirm]); 
 
-  // Calculate revenue is fine as is, assuming totalAmount includes fees
+  
    const calculateRevenue = useCallback((orders) => {
     const now = new Date();
-    const currentMonth = now.getMonth(); // 0-indexed
+    const currentMonth = now.getMonth(); 
     const currentYear = now.getFullYear();
 
     let monthlyTotal = 0;
     let yearlyTotal = 0;
 
     orders.forEach(order => {
-        // Robust parsing of formattedCreatedAt
+        
         const parts = order.formattedCreatedAt.split(' ');
         if (parts.length >= 2) {
-            const [timeStr, dateStr] = parts;
+            const [, dateStr] = parts;
             const dateParts = dateStr.split('/');
             if (dateParts.length === 3) {
                 const [day, month, year] = dateParts.map(Number);
-                 // Note: month is 1-indexed from split, need to convert to 0-indexed for Date constructor
+                 
                 const orderDate = new Date(year, month - 1, day);
 
-                // Check if date parsing was successful and if it's a valid date
+                
                 if (!isNaN(orderDate.getTime())) {
-                    const orderMonth = orderDate.getMonth(); // 0-indexed
+                    const orderMonth = orderDate.getMonth(); 
                     const orderYear = orderDate.getFullYear();
-                    const amount = order.totalAmount || 0; // Use totalAmount including fees
+                    const amount = order.totalAmount || 0; 
 
                     if (orderMonth === currentMonth && orderYear === currentYear) {
                         monthlyTotal += amount;
@@ -720,16 +721,16 @@ const AdminOrder = () => {
     if (processedOrders.length > 0) {
       calculateRevenue(processedOrders);
     } else {
-        // Reset revenue if there are no orders
+        
         setMonthlyRevenue(0);
         setYearlyRevenue(0);
     }
-  }, [processedOrders, calculateRevenue]); // Dependencies for this effect
+  }, [processedOrders, calculateRevenue]); 
 
   return (
     <div>
       <Row gutter={[16, 16]} style={{ marginBottom: 24 }}>
-        <Col xs={24} sm={12}> {/* Use responsive columns */}
+        <Col xs={24} sm={12}> 
           <Card bordered={false} style={{ background: '#f0f5ff' }}>
             <Statistic
               title={
@@ -745,7 +746,7 @@ const AdminOrder = () => {
             />
           </Card>
         </Col>
-        <Col xs={24} sm={12}> {/* Use responsive columns */}
+        <Col xs={24} sm={12}>
           <Card bordered={false} style={{ background: '#f6ffed' }}>
             <Statistic
               title={
@@ -769,46 +770,35 @@ const AdminOrder = () => {
           style={{ width: 200 }}
           onChange={(value) => setStatusFilter(value)}
           options={statusOptions}
-          disabled={loading} // Disable if loading data
+          disabled={loading} 
         />
-         {/* Added Search Input here based on Ant Design example, alongside filters */}
-         {/* This needs to be implemented properly if you want global search */}
-         {/* <Input.Search
-             placeholder="Tìm kiếm đơn hàng..."
-             style={{ width: 300 }}
-             onSearch={value => handleGlobalSearch(value)} // Implement handleGlobalSearch
-             onChange={e => setGlobalSearchText(e.target.value)} // Implement state for global search text
-             loading={loading}
-         /> */}
         <Button
           onClick={onRefresh}
-          loading={loading && !loadingAction} // Show loading only for general refresh, not specific action
-          disabled={!!loadingAction} // Disable if any action is currently processing
+          loading={loading && !loadingAction} 
+          disabled={!!loadingAction} 
         >
           {loading && !loadingAction ? "Đang tải..." : "Tải Lại DS"}
         </Button>
       </Space>
 
-      {/* Order Details Modal */}
       <Modal
         title={`Chi Tiết Đơn Hàng #${detailsModalContent.orderId || ""}`}
         open={detailsModalContent.visible}
         onCancel={() => setDetailsModalContent({ visible: false, orderId: null })}
         maskClosable={true}
         footer={null}
-        destroyOnClose={true} // Destroy content when modal closes
+        destroyOnClose={true} 
         width="80vw"
         style={{ top: 20 }}
         bodyStyle={{ maxHeight: "85vh", overflowY: "auto" }}
       >
-        {/* Render OrderDetails component only when modal is visible and has orderId */}
         {detailsModalContent.visible && detailsModalContent.orderId && (
           <OrderDetails
             orderId={detailsModalContent.orderId}
-            handleRefreshParent={onRefresh} // Pass refresh function if details modal can trigger changes
+            handleRefreshParent={onRefresh} 
           />
         )}
-         {/* Fallback loader/message if modal is somehow visible without orderId */}
+        
         {!detailsModalContent.orderId && detailsModalContent.visible && (
              <div style={{ textAlign: "center", padding: "50px" }}>
                <Spin size="large" />
@@ -817,7 +807,6 @@ const AdminOrder = () => {
          )}
       </Modal>
 
-      {/* Status Confirmation Modal */}
       <Modal
         title="Xác nhận thay đổi trạng thái?"
         open={confirmModalState.visible}
@@ -826,8 +815,8 @@ const AdminOrder = () => {
         okText="Xác nhận"
         cancelText="Hủy"
         confirmLoading={confirmModalState.isLoading}
-        maskClosable={false} // Prevent closing by clicking outside when confirming
-         destroyOnClose={true} // Reset state on close
+        maskClosable={false} 
+         destroyOnClose={true} 
       >
         {confirmModalState.record && confirmModalState.targetStatus ? (
           <div>
@@ -845,11 +834,10 @@ const AdminOrder = () => {
             </p>
           </div>
         ) : (
-          <p>Đang tải thông tin xác nhận...</p> // Should not happen if logic is correct
+          <p>Đang tải thông tin xác nhận...</p> 
         )}
       </Modal>
 
-      {/* Shipper Assignment Modal (for SHIPPING status) */}
       <Modal
         title="Chọn shipper giao hàng"
         open={shipperModalState.visible}
@@ -859,9 +847,9 @@ const AdminOrder = () => {
         okText="Xác nhận"
         cancelText="Hủy"
         maskClosable={!shipperModalState.loading}
-        destroyOnClose={true} // Reset state on close
+        destroyOnClose={true} 
       >
-         <Spin spinning={shipperModalState.loading && shipperModalState.shipperList.length === 0}> {/* Only show spinner if initially loading list */}
+         <Spin spinning={shipperModalState.loading && shipperModalState.shipperList.length === 0}>
             <div style={{ marginBottom: 16 }}>
               <p>Vui lòng chọn shipper để giao đơn hàng <Text strong>#{shipperModalState.orderId}</Text>:</p>
               <Select
@@ -870,9 +858,9 @@ const AdminOrder = () => {
                 options={shipperModalState.shipperList}
                 value={shipperModalState.shipperId}
                 onChange={(value) => setShipperModalState(prev => ({ ...prev, shipperId: value }))}
-                disabled={shipperModalState.loading} // Disable selection while loading or confirming
-                showSearch // Allow searching shippers by typing
-                optionFilterProp="children" // Filter based on the label
+                disabled={shipperModalState.loading} 
+                showSearch 
+                optionFilterProp="children"
                  filterOption={(input, option) =>
                     (option?.label ?? '').toLowerCase().includes(input.toLowerCase())
                  }
@@ -886,13 +874,11 @@ const AdminOrder = () => {
             </div>
          </Spin>
       </Modal>
-
-      {/* Main Order Table */}
       <Table
         columns={columns}
         dataSource={displayedOrders}
-        rowKey="key" // Use 'key' from your processed data
-        loading={loading || !!loadingAction} // Show loading spinner on table
+        rowKey="key" 
+        loading={loading || !!loadingAction} 
         pagination={{
           pageSize: 10,
           showSizeChanger: true,
@@ -901,18 +887,13 @@ const AdminOrder = () => {
           showTotal: (total, range) =>
             `${range[0]}-${range[1]} trên ${total} mục`,
         }}
-        scroll={{ x: 1200 }} // Increased scrollable area slightly
+        scroll={{ x: 1200 }} 
         bordered
         size="middle"
         onRow={(record) => ({
           onClick: (event) => {
-            // Get the latest record data from state in case it changed optimistically
              const currentRecord = processedOrders.find(o => o.key === record.key) || record;
-
-            // Check if the click was on an interactive element (button, link, input, select)
             const isInteractiveElement = event.target.closest('button, a, input, select, .ant-dropdown-trigger, .ant-dropdown-menu-item');
-
-            // If the click was not on an interactive element AND no action is loading on this row
             if (!isInteractiveElement && loadingAction !== currentRecord.orderId) {
               setDetailsModalContent({
                 visible: true,
@@ -921,15 +902,12 @@ const AdminOrder = () => {
             }
           },
           style: {
-            // Add a different cursor only if an action is loading on *this* row
-            // and the click wasn't on an interactive element
             cursor:
               loadingAction === record.orderId
-                ? "progress" // or "wait"
-                : (loadingAction ? "not-allowed" : "pointer"), // Not-allowed if another row is loading, pointer otherwise
+                ? "progress"
+                : (loadingAction ? "not-allowed" : "pointer"), 
           },
         })}
-         // Apply a class when an action is loading on a row for potential styling (e.g., reduced opacity)
         rowClassName={(record) => (loadingAction === record.orderId ? "table-row-action-loading" : "")}
       />
     </div>

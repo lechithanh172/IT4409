@@ -1,28 +1,28 @@
-/* src/components/RatingStars/RatingStars.module.css */
+
 
 .rating {
     display: flex;
     align-items: center;
-    color: #ffc107; /* Màu vàng cho sao */
-    font-size: 1em; /* Kích thước mặc định cho sao */
+    color: #ffc107; 
+    font-size: 1em; 
 }
 
 .smallRating {
-    font-size: 0.9em; /* Kích thước nhỏ hơn cho card hoặc nơi khác cần */
+    font-size: 0.9em; 
 }
 
 .stars {
     display: flex;
     align-items: center;
-    margin-right: 5px; /* Khoảng cách giữa sao và số lượt */
+    margin-right: 5px; 
 }
 
 .starIcon {
-    margin-right: 1px; /* Khoảng cách giữa các icon sao */
+    margin-right: 1px; 
 }
 
 .reviewCount {
-    font-size: 0.9em; /* Kích thước chữ số lượt đánh giá */
-    color: #555; /* Màu chữ số lượt đánh giá */
-    margin-left: 0; /* reviewCountLink mới có margin left */
+    font-size: 0.9em; 
+    color: #555; 
+    margin-left: 0; 
 }

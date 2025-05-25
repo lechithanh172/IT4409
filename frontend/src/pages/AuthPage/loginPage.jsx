@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate, Link, useLocation } from 'react-router-dom'; // Thêm useLocation
-import styles from './loginPage.module.css'; // Sử dụng CSS Module
-import { useAuth } from '../../contexts/AuthContext'; // Import Auth Hook
-import { FiUser, FiLock, FiAlertCircle, FiLogIn, FiEye, FiEyeOff } from 'react-icons/fi'; // Thêm icon mắt
-import Button from '../../components/Button/Button'; // Import Button nếu muốn dùng component Button chung
-import Spinner from '../../components/Spinner/Spinner'; // Import Spinner cho trạng thái loading
+import { useNavigate, Link, useLocation } from 'react-router-dom';
+import styles from './loginPage.module.css';
+import { useAuth } from '../../contexts/AuthContext';
+import { FiUser, FiLock, FiAlertCircle, FiLogIn, FiEye, FiEyeOff } from 'react-icons/fi';
+import Button from '../../components/Button/Button';
+import Spinner from '../../components/Spinner/Spinner';
 
 function LoginPage() {
     useEffect(() => {
@@ -12,7 +12,7 @@ function LoginPage() {
         }, []);
     const [userName, setUsername] = useState('');
     const [password, setPassword] = useState('');
-    const [showPassword, setShowPassword] = useState(false); // State ẩn/hiện mật khẩu
+    const [showPassword, setShowPassword] = useState(false);
     const [error, setError] = useState('');
     const [isLoading, setIsLoading] = useState(false);
     const navigate = useNavigate();
@@ -36,9 +36,9 @@ function LoginPage() {
         setIsLoading(true);
         try {
             const user = await login(userName, password);
-            // Điều hướng về trang chủ sau khi login thành công (theo yêu cầu mới nhất)
+
             navigate('/', { replace: true });
-            // Hoặc giữ logic điều hướng theo role nếu cần
+
             /*
             switch (user.role.toLowerCase()) {
                 case 'admin': navigate('/admin', { replace: true }); break;
@@ -83,7 +83,7 @@ function LoginPage() {
                                     className={styles.input}
                                     disabled={isLoading}
                                     required
-                                    aria-invalid={!!error} // True nếu có lỗi
+                                    aria-invalid={!!error}
                                     aria-describedby="login-error"
                                 />
                             </div>
@@ -95,7 +95,7 @@ function LoginPage() {
                             <div className={styles.inputWrapper}>
                                 <FiLock className={styles.inputIcon} />
                                 <input
-                                    type={showPassword ? 'text' : 'password'} // Đổi type dựa vào state
+                                    type={showPassword ? 'text' : 'password'}
                                     id="password"
                                     placeholder="Nhập mật khẩu"
                                     value={password}
@@ -108,11 +108,11 @@ function LoginPage() {
                                 />
                                 {/* Nút ẩn/hiện mật khẩu */}
                                 <button
-                                    type="button" // Quan trọng: type="button" để không submit form
+                                    type="button"
                                     onClick={() => setShowPassword(!showPassword)}
                                     className={styles.passwordToggle}
                                     aria-label={showPassword ? "Ẩn mật khẩu" : "Hiện mật khẩu"}
-                                    tabIndex={-1} // Bỏ khỏi tab navigation
+                                    tabIndex={-1}
                                 >
                                     {showPassword ? <FiEyeOff /> : <FiEye />}
                                 </button>
@@ -135,12 +135,12 @@ function LoginPage() {
                         {/* Nút Đăng nhập (Sử dụng Component Button) */}
                         <Button
                             type="submit"
-                            className={styles.loginButton} // Class riêng cho nút login
-                            variant="gradient" // Thêm variant mới nếu cần, hoặc custom bằng class
+                            className={styles.loginButton}
+                            variant="gradient"
                             disabled={isLoading}
                         >
                             {isLoading ? (
-                                <Spinner size="small" color="#fff" /> // Spinner màu trắng
+                                <Spinner size="small" color="#fff" />
                             ) : (
                                 <> <FiLogIn /> Đăng nhập </>
                             )}

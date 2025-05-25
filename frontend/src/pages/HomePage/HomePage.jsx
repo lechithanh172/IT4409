@@ -1,18 +1,18 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-// Import react-slick và CSS của nó
+
 import Slider from 'react-slick';
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 
-import ProductSlider from '../../components/ProductSlider/ProductSlider'; // Component Slider ngang
-import Button from '../../components/Button/Button';                     // Component Nút bấm
-import Spinner from '../../components/Spinner/Spinner';                 // Component Loading
-import styles from './HomePage.module.css';                             // CSS Module cho trang Home
-import apiService from '../../services/api';                     // Service gọi API
-import { FiChevronRight } from 'react-icons/fi';                      // Icon cho link "Xem thêm"
+import ProductSlider from '../../components/ProductSlider/ProductSlider';
+import Button from '../../components/Button/Button';
+import Spinner from '../../components/Spinner/Spinner';
+import styles from './HomePage.module.css';
+import apiService from '../../services/api';
+import { FiChevronRight } from 'react-icons/fi';
 
-// --- Data cho Hero Slider (Sử dụng ảnh của bạn) ---
+
 const heroSlides = [
   {
     id: 1,
@@ -20,8 +20,8 @@ const heroSlides = [
     subtitle: 'Sản phẩm chính hãng, giá tốt hàng đầu.',
     ctaText: 'Mua Sắm Ngay',
     ctaLink: '/products',
-    // Sử dụng đường dẫn ảnh từ thư mục public
-    bgUrl: '/images/bg1.jpg', // <-- Thay đổi đường dẫn ảnh nền slide 1
+
+    bgUrl: '/images/bg1.jpg',
   },
   {
     id: 2,
@@ -29,8 +29,8 @@ const heroSlides = [
     subtitle: 'Đừng bỏ lỡ cơ hội sở hữu sản phẩm yêu thích với giá tốt.',
     ctaText: 'Xem Ưu Đãi',
     ctaLink: '/promotions',
-    // Sử dụng đường dẫn ảnh từ thư mục public
-    bgUrl: '/images/bg2.jpg', // <-- Thay đổi đường dẫn ảnh nền slide 2
+
+    bgUrl: '/images/bg2.jpg',
   },
   {
     id: 3,
@@ -38,32 +38,32 @@ const heroSlides = [
     subtitle: 'Cập nhật xu hướng công nghệ mới nhất.',
     ctaText: 'Khám Phá Ngay',
     ctaLink: '/latest',
-    // Bạn có thể sử dụng lại ảnh 1 hoặc 2, hoặc thêm ảnh thứ 3 nếu có
-    bgUrl: '/images/bg3.jpg', // <-- Ví dụ sử dụng lại ảnh 1 cho slide 3
-    // Nếu bạn có ảnh thứ 3 (ví dụ: bg3.jpg) thì dùng: bgUrl: '/images/bg3.jpg',
+
+    bgUrl: '/images/bg3.jpg',
+
   },
 ];
 
 
 const HomePage = () => {
-  // State cho dữ liệu từ API
+
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);
   const [brands, setBrands] = useState([]);
 
-  // State quản lý loading
+
   const [isProductsLoading, setIsProductsLoading] = useState(true);
   const [isCategoryLoading, setIsCategoryLoading] = useState(true);
   const [isBrandLoading, setIsBrandLoading] = useState(true);
 
-  // State quản lý lỗi chung
+
   const [error, setError] = useState(null);
 
   useEffect(() => {
     document.title = "Trang chủ | HustShop";
   }, []);
 
-  // Cấu hình cho Hero Slider (giữ nguyên)
+
   const heroSliderSettings = {
     dots: true,
     infinite: true,
@@ -78,7 +78,7 @@ const HomePage = () => {
   };
 
 
-  // useEffect để fetch tất cả dữ liệu cần thiết (giữ nguyên)
+
   useEffect(() => {
     const loadHomePageData = async () => {
       setIsProductsLoading(true);
@@ -96,20 +96,20 @@ const HomePage = () => {
 
         let fetchedProducts = [];
         if (productsRes.status === 'fulfilled' && Array.isArray(productsRes.value?.data)) {
-          fetchedProducts = productsRes.value.data; // Lưu tạm dữ liệu sản phẩm
+          fetchedProducts = productsRes.value.data;
           console.log("All products data fetched:", fetchedProducts);
-          // setProducts(fetchedProducts); // Chưa set ngay, đợi xử lý category
+
         } else {
           console.error("Lỗi fetch All Products:", productsRes.reason || productsRes.value);
-          // setProducts([]);
+
         }
         setIsProductsLoading(false);
 
         let fetchedCategories = [];
         if (categoryRes.status === 'fulfilled' && Array.isArray(categoryRes.value?.data)) {
-          fetchedCategories = categoryRes.value.data; // Lưu tạm dữ liệu category
+          fetchedCategories = categoryRes.value.data;
           console.log("Categories data fetched:", fetchedCategories);
-          setCategories(fetchedCategories); // Set category state
+          setCategories(fetchedCategories);
         } else {
           console.error("Lỗi fetch Categories:", categoryRes.reason || categoryRes.value);
           setCategories([]);
@@ -126,33 +126,33 @@ const HomePage = () => {
          setIsBrandLoading(false);
 
 
-        // --- Xử lý gắn categoryName vào sản phẩm sau khi có cả 2 dữ liệu ---
-        // Tạo map categoryId -> categoryName để lookup nhanh
+
+
         const categoryMap = fetchedCategories.reduce((map, category) => {
-          // Giả định category object có categoryId và name
+
           if (category.categoryId) {
               map[category.categoryId] = category.name;
-          } else if (category.id) { // Fallback nếu sử dụng 'id' thay vì categoryId
+          } else if (category.id) {
               map[category.id] = category.name;
           }
           return map;
         }, {});
 
-        // Gắn categoryName vào từng sản phẩm
+
         const productsWithCategoryNames = fetchedProducts.map(product => {
-          // Giả định product object có categoryId
+
           const categoryName = product.categoryId
             ? categoryMap[product.categoryId]
-            : 'Chưa phân loại'; // Giá trị mặc định nếu không tìm thấy danh mục
+            : 'Chưa phân loại';
 
           return {
-            ...product, // Sao chép tất cả thuộc tính hiện có của sản phẩm
-            categoryName: categoryName // Thêm thuộc tính categoryName mới
+            ...product,
+            categoryName: categoryName
           };
         });
 
-        setProducts(productsWithCategoryNames); // Set state products với dữ liệu đã được gắn categoryName
-        // --- Kết thúc xử lý ---
+        setProducts(productsWithCategoryNames);
+
 
 
         const errors = [];
@@ -172,7 +172,7 @@ const HomePage = () => {
         setIsProductsLoading(false);
         setIsCategoryLoading(false);
         setIsBrandLoading(false);
-         // Vẫn set products/categories/brands về rỗng trong trường hợp catch toàn bộ lỗi
+
         setProducts([]);
         setCategories([]);
         setBrands([]);
@@ -180,10 +180,10 @@ const HomePage = () => {
     };
 
     loadHomePageData();
-  }, []); // Chỉ chạy 1 lần khi component mount
+  }, []);
 
-  // Lọc và lấy 15 sản phẩm đầu tiên để hiển thị trong slider
-  // Data products lúc này đã bao gồm categoryName
+
+
   const productsForSlider = products.slice(0, 15);
 
 
@@ -197,7 +197,7 @@ const HomePage = () => {
             <div key={slide.id} className={styles.heroSlide}>
               <div
                 className={styles.heroSlideBackground}
-                style={{ backgroundImage: `url(${slide.bgUrl})` }} // Sử dụng bgUrl từ slide data
+                style={{ backgroundImage: `url(${slide.bgUrl})` }}
               ></div>
               <div className={styles.heroSlideOverlay}></div>
               <div className={styles.heroSlideContent}>
@@ -221,8 +221,8 @@ const HomePage = () => {
          </div>
         {isProductsLoading ? (
              <div className={styles.loadingContainer}><Spinner /></div>
-        ) : productsForSlider.length > 0 ? ( // Sử dụng productsForSlider đã qua xử lý
-            // Truyền danh sách sản phẩm đã được gắn categoryName vào ProductSlider
+        ) : productsForSlider.length > 0 ? (
+
              <ProductSlider products={productsForSlider} />
         ) : (
             !error && <p className={styles.noProducts}>Hiện chưa có sản phẩm nào.</p>
@@ -262,7 +262,7 @@ const HomePage = () => {
          ) : categories.length > 0 ? (
             <div className={styles.categoryList}>
             {categories.map((category) => (
-                // Link đến trang sản phẩm theo danh mục
+
                 <Link to={`/products?category=${encodeURIComponent(category.categoryName)}`} key={category.categoryId} className={styles.categoryCard}>
                 <div className={styles.categoryImageWrapper}>
                     {/* Sử dụng imageUrl từ category nếu có, fallback về placeholder */}

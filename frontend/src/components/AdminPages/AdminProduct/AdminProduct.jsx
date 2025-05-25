@@ -78,7 +78,7 @@ const AdminProduct = () => {
               try {
                 parsedSpecs = JSON.parse(product.specifications);
                 if (!Array.isArray(parsedSpecs)) parsedSpecs = [];
-              } catch (e) {
+              } catch {
                 parsedSpecs = [];
               }
             } else if (Array.isArray(product.specifications)) {
@@ -102,7 +102,7 @@ const AdminProduct = () => {
           setProducts([]);
           message.error("Dữ liệu sản phẩm không hợp lệ.");
         }
-      } catch (error) {
+      } catch {
         message.error("Không thể tải dữ liệu. Vui lòng thử lại.");
         setProducts([]);
         setCategoriesList([]);

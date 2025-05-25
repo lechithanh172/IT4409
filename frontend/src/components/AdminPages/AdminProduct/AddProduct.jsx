@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useMemo } from "react";
 import {
   Button, Form, Input, InputNumber, Space, Row, Col,
   message, Image, Select, Divider, Checkbox, Typography, Card
@@ -41,7 +41,7 @@ const AddProduct = ({ closeModal, onProductAdded, categoriesList = [], brandsLis
   ), [brandsList]);
 
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [loadingData, setLoadingData] = useState(false); 
+  const [loadingData] = useState(false); 
 
   const handleBrandChange = (value) => {
     const selected = brandOptions.find((b) => b.value === value);
@@ -82,20 +82,6 @@ const AddProduct = ({ closeModal, onProductAdded, categoriesList = [], brandsLis
     );
   };
 
-  const handleImageUploadForVariant = (key, { file }) => {
-    if (file && file.status !== 'removed') {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        handleVariantChange(key, "imageUrl", reader.result);
-        handleVariantChange(key, "imageFile", file.originFileObj);
-      };
-      reader.readAsDataURL(file.originFileObj);
-    } else if (file && file.status === 'removed') {
-         handleVariantChange(key, "imageUrl", "");
-         handleVariantChange(key, "imageFile", null);
-    }
-    return false;
-  };
 
   const onFinish = async (values) => {
     setIsSubmitting(true);
@@ -150,8 +136,6 @@ const AddProduct = ({ closeModal, onProductAdded, categoriesList = [], brandsLis
     }
 
     try {
-      const brandDataForAPI = brandOptions.find(b => b.value === values.brandName);
-
       const productData = {
         productName: values.productName.trim(),
         description: values.description.trim(),

@@ -1,19 +1,19 @@
-/* src/pages/OrderSuccessPage/OrderSuccessPage.module.css */
+
 
 .orderSuccessPageContainer {
-    max-width: 700px; /* Match max width with VNPayReturn */
-    margin: 40px auto; /* Center the container */
+    max-width: 700px; 
+    margin: 40px auto; 
     padding: 30px;
-    background-color: #ffffff; /* Clean white background */
-    border-radius: 12px; /* More rounded corners */
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1); /* Softer, more prominent shadow */
-    text-align: center; /* Center content */
-    min-height: 450px; /* Ensure minimum height */
-    display: flex; /* Use flexbox to center content vertically */
+    background-color: #ffffff; 
+    border-radius: 12px; 
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1); 
+    text-align: center; 
+    min-height: 450px; 
+    display: flex; 
     align-items: center;
     justify-content: center;
-    font-family: 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; /* Modern font stack */
-    color: #333; /* Default text color */
+    font-family: 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; 
+    color: #333; 
 }
 
 .loadingContainer,
@@ -23,7 +23,7 @@
     align-items: center;
     justify-content: center;
     padding: 20px;
-    width: 100%; /* Take full width of parent (max 700px) */
+    width: 100%; 
 }
 
 .loadingContainer p {
@@ -34,29 +34,29 @@
 }
 
 .resultContainer .icon {
-    font-size: 70px; /* Larger icons */
-    margin-bottom: 25px; /* More space below icon */
+    font-size: 70px; 
+    margin-bottom: 25px; 
 }
 
 .resultContainer h2 {
-    margin-top: 0; /* Remove default top margin */
+    margin-top: 0; 
     margin-bottom: 15px;
-    font-size: 2em; /* Larger heading */
+    font-size: 2em; 
     font-weight: 700;
 }
 
 .resultContainer p {
     margin-bottom: 12px;
     font-size: 1.05em;
-    line-height: 1.6; /* Improve readability */
+    line-height: 1.6; 
     color: #555;
 }
 
-/* State-specific colors */
-.success .icon { color: #28a745; /* Green */ }
+
+.success .icon { color: #28a745;  }
 .success h2 { color: #28a745; }
 
-.failed .icon { color: #dc3545; /* Red */ }
+.failed .icon { color: #dc3545;  }
 .failed h2 { color: #dc3545; }
 .failed .errorMessage {
     color: #dc3545;
@@ -64,21 +64,21 @@
     margin-top: 15px;
     margin-bottom: 20px;
     padding: 15px;
-    background-color: #f8d7da; /* Light red background */
+    background-color: #f8d7da; 
     border: 1px solid #f5c6cb;
     border-radius: 8px;
-    width: 90%; /* Slightly less than full width */
+    width: 90%; 
     margin-left: auto;
     margin-right: auto;
 }
 
-.warning .icon { color: #ffc107; /* Yellow/Orange */ }
+.warning .icon { color: #ffc107;  }
 .warning h2 { color: #ffc107; }
-.warning p { color: #6c757d; } /* Slightly different text color for warning */
+.warning p { color: #6c757d; } 
 
 
-/* Order Details Section (Optional, if you add more details here later) */
-/* Similar to transactionDetails in VNPayReturn if needed */
+
+
 /*
 .orderDetails {
      margin-top: 30px;
@@ -110,21 +110,21 @@
 */
 
 
-/* Actions Button Container */
+
 .actions {
-    margin-top: 40px; /* More space above buttons */
+    margin-top: 40px; 
     display: flex;
-    gap: 20px; /* Space between buttons */
-    flex-wrap: wrap; /* Allow wrapping on smaller screens */
+    gap: 20px; 
+    flex-wrap: wrap; 
     justify-content: center;
 }
 
-/* Ensure Button styles are consistent */
+
 .actions a {
-    text-decoration: none; /* Remove default link underline */
+    text-decoration: none; 
 }
 
-/* Responsive Adjustments (Match VNPayReturn) */
+
 @media (max-width: 768px) {
     .orderSuccessPageContainer {
         margin: 20px 15px;
@@ -141,10 +141,10 @@
         font-size: 1em;
     }
     .actions {
-        flex-direction: column; /* Stack buttons vertically */
+        flex-direction: column; 
         gap: 15px;
     }
-    /* Adjust button width when stacked */
+    
     .actions button,
     .actions a button {
         width: 100%;
@@ -170,18 +170,8 @@
      .resultContainer p {
          font-size: 0.95em;
      }
-     /* Adjust details padding if orderDetails section is added */
-     /*
-     .orderDetails {
-         padding: 15px;
-     }
-      .orderDetails h4 {
-          font-size: 1.1em;
-      }
-      .orderDetails p {
-          font-size: 0.9em;
-      }
-      */
+     
+    
      .actions {
          gap: 10px;
          margin-top: 30px;

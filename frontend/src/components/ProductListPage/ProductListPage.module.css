@@ -1,30 +1,30 @@
-/* src/pages/ProductListPage/ProductListPage.module.css */
+
 
 .pageContainer {
-    max-width: 1300px; /* Rộng hơn để chứa sidebar */
+    max-width: 1300px; 
     margin: 30px auto;
-    padding: 0 20px; /* Padding ngang */
+    padding: 0 20px; 
   }
   
   .pageTitle {
-    font-size: 2.2rem; /* Tăng kích thước */
+    font-size: 2.2rem; 
     font-weight: 700;
-    color: #1a2b3c; /* Màu tối hơn, chuyên nghiệp hơn */
-    margin-bottom: 10px; /* Giảm khoảng cách dưới */
+    color: #1a2b3c; 
+    margin-bottom: 10px; 
     text-align: center;
   }
   
-/* --- Breadcrumbs --- */
+
 .breadcrumbs {
     margin-bottom: 20px;
     padding: 12px 0;
     font-size: 0.9rem;
-    color: #6b7280; /* Màu xám */
+    color: #6b7280; 
     display: flex;
     align-items: center;
-    flex-wrap: wrap; /* Xuống dòng nếu cần */
-    gap: 5px 8px; /* Khoảng cách dọc và ngang */
-    border-bottom: 1px solid #e5e7eb; /* Phân cách nhẹ */
+    flex-wrap: wrap; 
+    gap: 5px 8px; 
+    border-bottom: 1px solid #e5e7eb; 
 }
 .breadcrumbs a,
 .breadcrumbs span {
@@ -37,39 +37,39 @@
 .breadcrumbs a {
     transition: color 0.2s ease;
     font-weight: 500;
-    color: #4f46e5; /* Màu link (tím) */
+    color: #4f46e5; 
 }
 .breadcrumbs a:hover {
-    color: #3730a3; /* Đậm hơn khi hover */
+    color: #3730a3; 
     text-decoration: underline;
 }
-/* Dấu phân cách (nếu không dùng icon) */
-.breadcrumbs span:not(:last-child):not(:has(a)) { /* Chọn span không phải cuối và không chứa link */
+
+.breadcrumbs span:not(:last-child):not(:has(a)) { 
    color: #cbd5e0;
-   margin: 0 3px; /* Khoảng cách nhỏ */
+   margin: 0 3px; 
 }
-/* Trang hiện tại */
+
 .breadcrumbCurrent {
-    color: #1f2937; /* Đen đậm */
-    font-weight: 600; /* Đậm hơn */
+    color: #1f2937; 
+    font-weight: 600; 
     cursor: default;
 }
 
   
-  /* Nút mở filter trên mobile */
+  
   .mobileFilterButton {
-      display: none; /* Sẽ hiện ở media query */
-      width: auto; /* Không chiếm cả dòng */
+      display: none; 
+      width: auto; 
       padding: 9px 18px;
       margin-bottom: 20px;
       background-color: #fff;
-      border: 1px solid #d1d5db; /* Viền rõ hơn */
-      border-radius: 8px; /* Bo góc nhiều hơn */
+      border: 1px solid #d1d5db; 
+      border-radius: 8px; 
       font-size: 0.95rem;
       font-weight: 500;
       color: #374151;
       cursor: pointer;
-      /* display: inline-flex; */ /* Bỏ comment ở media query */
+       
       align-items: center;
       justify-content: center;
       gap: 8px;
@@ -86,35 +86,35 @@
   }
   
   
-  /* --- Layout chính: Filter Panel + Main Area --- */
+  
   .contentWrapper {
       display: flex;
-      gap: 30px; /* Khoảng cách giữa filter và list */
-      align-items: flex-start; /* Căn các cột lên trên */
+      gap: 30px; 
+      align-items: flex-start; 
   }
   
-  /* Container cho Filter Panel (Sidebar) */
+  
   .filterPanelContainer {
-      width: 260px; /* Độ rộng cố định */
-      flex-shrink: 0; /* Không co lại */
-      /* FilterSortPanel sẽ có position: sticky bên trong nó */
-      /* Thêm position relative để nút đóng mobile tuyệt đối với nó */
+      width: 260px; 
+      flex-shrink: 0; 
+      
+      
       position: relative;
   }
   
-  /* Main Area (Product List + Pagination) */
+  
   .mainProductArea {
-      flex-grow: 1; /* Chiếm hết không gian còn lại */
-      min-width: 0; /* Quan trọng cho flex item để không bị tràn */
+      flex-grow: 1; 
+      min-width: 0; 
   }
   .closeMobileFilter {
     display: none;
 }
 
-  /* Header của danh sách sản phẩm */
+  
   .listHeader {
       margin-bottom: 20px;
-      padding-bottom: 10px; /* Giảm padding */
+      padding-bottom: 10px; 
       border-bottom: 1px solid #e5e7eb;
       color: #6b7280;
       font-size: 0.9rem;
@@ -124,33 +124,33 @@
   }
   
   
-  /* Loading & Error & No Results */
+  
   .loadingContainer { display: flex; justify-content: center; align-items: center; min-height: 40vh; }
   .error, .noResults { text-align: center; margin: 50px auto; padding: 30px; max-width: 500px; font-size: 1.1rem; color: #4b5563; font-weight: 500; background-color: #fff; border-radius: 8px; border: 1px solid #e5e7eb; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
   .fetchError { color: #ef4444; background-color: #fee2e2; border-color: #fca5a5; }
   
-  /* Product List Grid */
+  
   .productListGrid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); /* Tăng minmax */
-    gap: 25px; /* Giữ nguyên hoặc tăng nhẹ */
-    margin-bottom: 40px; /* Khoảng cách lớn hơn với pagination */
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); 
+    gap: 25px; 
+    margin-bottom: 40px; 
   }
   
   
-  /* --- Responsive --- */
-  @media (max-width: 992px) { /* Tablet trở xuống */
+  
+  @media (max-width: 992px) { 
       .contentWrapper {
-          /* Bỏ flex để filter panel dạng offcanvas hoạt động */
-          display: block; /* Chuyển về block */
-          /* flex-direction: column; */
-          /* gap: 0; */
+          
+          display: block; 
+          
+          
       }
   
       .filterPanelContainer {
           width: 280px;
-          position: fixed; /* Chuyển thành dạng Offcanvas */
-          left: -100%; /* Ẩn ban đầu */
+          position: fixed; 
+          left: -100%; 
           top: 0;
           bottom: 0;
           background-color: #fff;
@@ -159,14 +159,14 @@
           overflow-y: auto;
           box-shadow: 4px 0 15px rgba(0,0,0,0.1);
           padding: 20px;
-          padding-top: 65px; /* Chừa chỗ nút đóng */
+          padding-top: 65px; 
       }
-      .filterPanelContainer.mobileFilterOpen { left: 0; } /* Hiện ra khi mở */
+      .filterPanelContainer.mobileFilterOpen { left: 0; } 
   
-      /* Nút đóng filter mobile */
+      
        .closeMobileFilter {
-          display: flex; /* Hiện nút đóng */
-          position: absolute; /* Định vị tuyệt đối */
+          display: flex; 
+          position: absolute; 
           top: 15px;
           right: 15px;
           background: #f3f4f6;
@@ -180,39 +180,39 @@
           color: #4b5563;
           cursor: pointer;
           transition: background-color 0.2s, color 0.2s;
-          z-index: 1201; /* Trên panel */
+          z-index: 1201; 
       }
        .closeMobileFilter:hover { background-color: #e5e7eb; color: #1f2937; }
       .closeMobileFilter svg { font-size: 1.2rem; }
   
-      /* Lớp phủ khi filter mobile mở */
+      
       .mobileFilterOverlay {
-          display: none; /* Sẽ hiện khi mobileFilterOpen */
+          display: none; 
           position: fixed;
           top: 0;
           left: 0;
           width: 100%;
           height: 100%;
-          background-color: rgba(0, 0, 0, 0.6); /* Đậm hơn */
+          background-color: rgba(0, 0, 0, 0.6); 
           z-index: 1150;
           cursor: pointer;
            opacity: 0;
            visibility: hidden;
            transition: opacity 0.3s ease;
       }
-       .filterPanelContainer.mobileFilterOpen + .mobileFilterOverlay { /* Hiện overlay khi panel mở */
+       .filterPanelContainer.mobileFilterOpen + .mobileFilterOverlay { 
            display: block;
            opacity: 1;
            visibility: visible;
        }
   
       .mainProductArea { width: 100%; margin-top: 0; }
-      .mobileFilterButton { display: inline-flex; } /* Hiện nút mở */
+      .mobileFilterButton { display: inline-flex; } 
        .listHeader { display: block; text-align: center; margin-bottom: 15px;}
        .productListGrid { grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 20px; }
   }
   
-  @media (max-width: 600px) { /* Mobile nhỏ hơn */
+  @media (max-width: 600px) { 
       .pageContainer { padding: 0 10px; }
       .pageTitle { font-size: 1.8rem; }
       .breadcrumbs { font-size: 0.85rem; margin-bottom: 20px; }
@@ -225,5 +225,5 @@
       .pageContainer { margin: 20px auto; }
       .pageTitle { font-size: 1.5rem; }
       .productListGrid { gap: 12px; }
-      .filterPanelContainer { width: 90%; max-width: 320px; } /* Rộng hơn chút trên đt nhỏ */
+      .filterPanelContainer { width: 90%; max-width: 320px; } 
   }

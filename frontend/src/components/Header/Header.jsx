@@ -14,7 +14,7 @@ import {
 } from 'react-icons/fi';
 
 const Header = () => {
-  // Removed: const { cartItemCount } = useCart();
+
   const { user, isAuthenticated, logout } = useAuth();
 
   const navigate = useNavigate();
@@ -23,11 +23,11 @@ const Header = () => {
   const [isCategoryDropdownOpen, setIsCategoryDropdownOpen] = useState(false);
   const [isUserDropdownOpen, setIsUserDropdownOpen] = useState(false);
 
-  // --- State cho Tìm kiếm Dropdown ---
+
   const [searchResults, setSearchResults] = useState([]);
   const [isSearching, setIsSearching] = useState(false);
   const [isSearchDropdownOpen, setIsSearchDropdownOpen] = useState(false);
-  // --- End State mới ---
+
 
   const [categories, setCategories] = useState([]);
   const [isCategoryLoading, setIsCategoryLoading] = useState(true);
@@ -35,10 +35,10 @@ const Header = () => {
   const categoryDropdownRef = useRef(null);
   const userDropdownRef = useRef(null);
   const mobileMenuRef = useRef(null);
-  // --- Ref mới cho Tìm kiếm Dropdown ---
+
   const searchDropdownRef = useRef(null);
   const searchTimeoutRef = useRef(null);
-  // --- End Ref mới ---
+
 
   useClickOutside(categoryDropdownRef, () => setIsCategoryDropdownOpen(false));
   useClickOutside(userDropdownRef, () => setIsUserDropdownOpen(false));
@@ -47,7 +47,7 @@ const Header = () => {
    });
 
 
-  // --- Fetch Categories (Giữ nguyên) ---
+
   useEffect(() => {
     const fetchCategories = async () => {
       setIsCategoryLoading(true);
@@ -74,18 +74,18 @@ const Header = () => {
   }, []);
 
 
-  // --- Effect cho Tìm kiếm (Debounce) ---
+
   useEffect(() => {
     if (searchTimeoutRef.current) {
       clearTimeout(searchTimeoutRef.current);
     }
 
-    const minLength = 2; // Số ký tự tối thiểu để bắt đầu tìm kiếm API
+    const minLength = 2;
     const trimmedSearchTerm = searchTerm.trim();
 
     if (trimmedSearchTerm.length >= minLength) {
       setIsSearching(true);
-      setIsSearchDropdownOpen(true); // Mở dropdown ngay khi bắt đầu search
+      setIsSearchDropdownOpen(true);
 
       searchTimeoutRef.current = setTimeout(async () => {
         try {
@@ -93,7 +93,7 @@ const Header = () => {
           const response = await apiService.searchProducts(trimmedSearchTerm);
 
           if (response && Array.isArray(response.data)) {
-            setSearchResults(response.data.slice(0, 5)); // Giới hạn 5 kết quả
+            setSearchResults(response.data.slice(0, 5));
           } else {
              console.warn("[Header] Invalid search results data:", response?.data);
              setSearchResults([]);
@@ -104,14 +104,14 @@ const Header = () => {
         } finally {
           setIsSearching(false);
         }
-      }, 300); // Debounce delay
+      }, 300);
 
     } else {
-      // Nếu searchTerm rỗng hoặc quá ngắn
-      setSearchResults([]); // Xóa kết quả
-      setIsSearching(false); // Không còn loading search
+
+      setSearchResults([]);
+      setIsSearching(false);
       if (trimmedSearchTerm.length === 0) {
-         setIsSearchDropdownOpen(false); // Đóng hẳn khi input rỗng
+         setIsSearchDropdownOpen(false);
       }
        console.log("[Header] Search term too short or empty, clearing results.");
     }
@@ -124,13 +124,13 @@ const Header = () => {
   }, [searchTerm]);
 
 
-  // --- Event Handlers (Đã sửa và hoàn thiện) ---
+
 
   const closeAllDropdowns = useCallback(() => {
     setIsMobileMenuOpen(false);
     setIsCategoryDropdownOpen(false);
     setIsUserDropdownOpen(false);
-    setIsSearchDropdownOpen(false); // Đóng search dropdown
+    setIsSearchDropdownOpen(false);
   }, []);
 
   const handleDropdownLinkClick = useCallback(() => {
@@ -191,11 +191,11 @@ const Header = () => {
   }, [logout, closeAllDropdowns]);
 
 
-  // --- Derived Data ---
+
   const displayName = user?.firstName || user?.username || 'Tài khoản';
   const userRole = user?.role?.toLowerCase() || null;
 
-  // --- RENDER ---
+
   return (
     <header className={styles.header}>
       <div className={styles.container}>
@@ -255,8 +255,8 @@ const Header = () => {
                       value={searchTerm}
                       onChange={handleSearchChange}
                       aria-label="Tìm kiếm sản phẩm"
-                      onFocus={handleSearchInputFocus} // Mở dropdown khi focus
-                      // onBlur={handleSearchInputBlur} // Tùy chọn: delay đóng khi blur
+                      onFocus={handleSearchInputFocus}
+
                   />
                   <button type="submit" className={styles.searchButton} aria-label="Tìm kiếm"><FiSearch /></button>
                 </form>
@@ -274,7 +274,7 @@ const Header = () => {
                            <>
                              <div className={styles.searchResultsList}>
                                 {searchResults.map(product => (
-                                    // --- HIỂN THỊ KẾT QUẢ TÌM KIẾM: Lấy ảnh từ variant đầu tiên ---
+
                                     <Link to={`/products/${product.productId || product.id}`} key={product.productId || product.id} className={styles.searchResultItem} onClick={handleSearchResultItemClick} role="option" aria-selected="false">
                                         {/* Lấy imageUrl từ variants[0].imageUrl nếu có, nếu không dùng placeholder */}
                                         <img
@@ -283,16 +283,16 @@ const Header = () => {
                                               ? product.variants[0].imageUrl
                                               : '/images/placeholder-product.png'
                                            }
-                                           alt={product.productName} // Sử dụng productName cho alt text
+                                           alt={product.productName}
                                            className={styles.searchResultImage}
-                                           onError={(e)=>{e.target.src='/images/placeholder-product.png'}} // Xử lý lỗi tải ảnh
+                                           onError={(e)=>{e.target.src='/images/placeholder-product.png'}}
                                         />
                                         <div className={styles.searchResultInfo}>
                                            <div className={styles.searchResultName}>{product.productName}</div> {/* Sử dụng productName */}
                                             {product.price != null && <div className={styles.searchResultPrice}>{new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(product.price)}</div>} {/* Sử dụng price */}
                                         </div>
                                     </Link>
-                                    // --- KẾT THÚC HIỂN THỊ KẾT QUẢ ---
+
                                 ))}
                              </div>
                              <hr className={styles.dropdownDivider}/>
@@ -302,12 +302,12 @@ const Header = () => {
                                  </Link>
                               )}
                            </>
-                        ) : searchTerm.trim().length >= 2 && !isSearching ? ( // Đã gõ đủ ký tự để search nhưng không có kết quả
+                        ) : searchTerm.trim().length >= 2 && !isSearching ? (
                              <div className={styles.searchEmpty}>Không tìm thấy sản phẩm nào cho "{searchTerm}".</div>
-                        ) : searchTerm.trim().length > 0 && searchTerm.trim().length < 2 && !isSearching ? ( // Đã gõ nhưng chưa đủ ký tự để search
+                        ) : searchTerm.trim().length > 0 && searchTerm.trim().length < 2 && !isSearching ? (
                             <div className={styles.searchEmpty}>Tiếp tục gõ ({2 - searchTerm.trim().length} ký tự nữa)...</div>
                         ) : (
-                            // Input rỗng hoặc chỉ có khoảng trắng
+
                             <div className={styles.searchEmpty}>Nhập từ khóa để tìm kiếm...</div>
                         )}
                     </div>

@@ -9,40 +9,40 @@ import styles from './SearchProductListPage.module.css';
 import { FiFilter, FiChevronRight, FiX, FiSearch } from 'react-icons/fi';
 import Button from '../../components/Button/Button';
 
-const PRODUCTS_PER_PAGE = 12; // Số sản phẩm trên mỗi trang
+const PRODUCTS_PER_PAGE = 12;
 
 const SearchProductListPage = () => {
-  // Hooks
+
   useEffect(() => {
           document.title = "Tìm kiếm | HustShop";
       }, []);
   const [searchParams, setSearchParams] = useSearchParams();
 
-  // State
-  const [allProducts, setAllProducts] = useState([]); // Lưu trữ kết quả tìm kiếm gốc
-  const [brands, setBrands] = useState([]);           // Lưu trữ danh sách brand để lọc
-  const [isLoading, setIsLoading] = useState(true);   // Trạng thái loading
-  const [error, setError] = useState(null);           // Trạng thái lỗi fetch
-  const [isMobileFilterOpen, setIsMobileFilterOpen] = useState(false); // Trạng thái mở filter mobile
-  // State lưu trữ min/max price tổng thể (khởi tạo với giá trị mặc định)
+
+  const [allProducts, setAllProducts] = useState([]);
+  const [brands, setBrands] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [isMobileFilterOpen, setIsMobileFilterOpen] = useState(false);
+
   const [overallMinPrice, setOverallMinPrice] = useState(0);
   const [overallMaxPrice, setOverallMaxPrice] = useState(100000000);
 
-  // Đọc các tham số từ URL, cung cấp giá trị mặc định
-  const searchTerm = searchParams.get('q') || ''; // Lấy từ khóa tìm kiếm 'q'
+
+  const searchTerm = searchParams.get('q') || '';
   const currentPage = parseInt(searchParams.get('page') || '1', 10);
   const currentSort = searchParams.get('sort') || '';
   const currentBrand = searchParams.get('brand') || '';
   const currentMinPrice = searchParams.get('price_gte') || overallMinPrice.toString();
   const currentMaxPrice = searchParams.get('price_lte') || overallMaxPrice.toString();
 
-  // useEffect: Fetch dữ liệu tìm kiếm và brands khi searchTerm thay đổi
+
   useEffect(() => {
-    // Chỉ fetch khi có searchTerm
+
     if (!searchTerm) {
       setAllProducts([]);
       setIsLoading(false);
-      // Có thể hiển thị thông báo yêu cầu nhập từ khóa ở phần render
+
       return;
     }
 
@@ -50,7 +50,7 @@ const SearchProductListPage = () => {
       setIsLoading(true);
       setError(null);
       setAllProducts([]);
-      if (brands.length === 0) setBrands([]); // Chỉ reset brands nếu chưa fetch
+      if (brands.length === 0) setBrands([]);
 
       try {
         console.log(`[SearchPage] Fetching search results for: ${searchTerm}`);
@@ -59,7 +59,7 @@ const SearchProductListPage = () => {
 
         const [productRes, brandRes] = await Promise.allSettled([productPromise, brandPromise]);
 
-        // Xử lý products và tính min/max price
+
         let minP = Infinity;
         let maxP = 0;
         let processedProducts = [];
@@ -87,14 +87,14 @@ const SearchProductListPage = () => {
                  return { ...p, finalPrice: productFinalPrice, basePrice: productBasePrice };
            });
           setAllProducts(processedProducts);
-          // Cập nhật min/max tổng thể
+
           if (processedProducts.length > 0) {
               setOverallMinPrice(minP === Infinity ? 0 : minP);
               setOverallMaxPrice(maxP === 0 ? 100000000 : maxP);
           } else {
               setOverallMinPrice(0);
               setOverallMaxPrice(100000000);
-              // Nếu không có kết quả, cũng có thể coi là một dạng 'lỗi' hoặc thông báo
+
               setError(`Không tìm thấy sản phẩm nào với từ khóa "${searchTerm}".`);
           }
         } else {
@@ -106,7 +106,7 @@ const SearchProductListPage = () => {
           }
         }
 
-         // Xử lý brands
+
          if (brandRes.status === 'fulfilled' && brandRes.value?.data && Array.isArray(brandRes.value.data) && brands.length === 0) {
             setBrands([...brandRes.value.data].sort((a, b) => (a.brandName || '').localeCompare(b.brandName || '')));
          } else if (brandRes.status === 'rejected' && brands.length === 0) {
@@ -124,21 +124,21 @@ const SearchProductListPage = () => {
     };
 
     fetchData();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [searchTerm]); // Fetch lại khi searchTerm thay đổi
 
-  // --- Lọc và Sắp xếp phía Client ---
+  }, [searchTerm]);
+
+
   const filteredAndSortedProducts = useMemo(() => {
     let tempProducts = [...allProducts];
     const numMinPrice = parseInt(currentMinPrice, 10);
     const numMaxPrice = parseInt(currentMaxPrice, 10);
 
-    // 1. Lọc theo Brand
+
     if (currentBrand) {
       tempProducts = tempProducts.filter(p => (p.brandName || '').toLowerCase() === currentBrand.toLowerCase());
     }
 
-    // 2. Lọc theo Giá
+
     const isPriceFilterActive = !isNaN(numMinPrice) && !isNaN(numMaxPrice) && (numMinPrice > overallMinPrice || numMaxPrice < overallMaxPrice);
     if (isPriceFilterActive) {
         tempProducts = tempProducts.filter(p => {
@@ -147,7 +147,7 @@ const SearchProductListPage = () => {
         });
     }
 
-    // 3. Sắp xếp
+
     switch (currentSort) {
         case 'name_asc': tempProducts.sort((a, b) => (a.productName || '').localeCompare(b.productName || '')); break;
         case 'name_desc': tempProducts.sort((a, b) => (b.productName || '').localeCompare(a.productName || '')); break;
@@ -158,14 +158,14 @@ const SearchProductListPage = () => {
     return tempProducts;
   }, [allProducts, currentSort, currentBrand, currentMinPrice, currentMaxPrice, overallMinPrice, overallMaxPrice]);
 
-  // --- Phân trang ---
+
   const totalPages = Math.ceil(filteredAndSortedProducts.length / PRODUCTS_PER_PAGE);
   const validatedCurrentPage = Math.max(1, Math.min(currentPage, totalPages || 1));
   const startIndex = (validatedCurrentPage - 1) * PRODUCTS_PER_PAGE;
   const endIndex = startIndex + PRODUCTS_PER_PAGE;
   const currentProducts = filteredAndSortedProducts.slice(startIndex, endIndex);
 
-  // --- Handler cập nhật URL cho Filter/Sort/Price ---
+
   const handleFilterChange = useCallback((newFilters) => {
     setSearchParams(prevParams => {
       const updatedParams = new URLSearchParams(prevParams.toString());
@@ -191,7 +191,7 @@ const SearchProductListPage = () => {
     setIsMobileFilterOpen(false);
   }, [setSearchParams, searchTerm, overallMinPrice, overallMaxPrice]);
 
-  // --- Handler phân trang ---
+
    const handlePageChange = useCallback((newPage) => {
         if (newPage >= 1 && newPage <= totalPages) {
              setSearchParams(prevParams => {
@@ -202,7 +202,7 @@ const SearchProductListPage = () => {
         }
    }, [totalPages, setSearchParams]);
 
-   // --- useEffect kiểm tra trang không hợp lệ ---
+
    useEffect(() => {
         if (currentPage > totalPages && totalPages > 0) {
             handlePageChange(totalPages);
@@ -212,10 +212,10 @@ const SearchProductListPage = () => {
    }, [currentPage, totalPages, handlePageChange, filteredAndSortedProducts.length]);
 
 
-  // --- Render ---
+
   const pageTitle = `Kết quả tìm kiếm cho "${searchTerm}"`;
 
-  // Nội dung render khi chưa nhập từ khóa
+
   const renderPrompt = () => (
       <div className={styles.promptContainer}>
           <FiSearch size={50} style={{color: '#ccc', marginBottom: '15px'}}/>
@@ -285,7 +285,7 @@ const SearchProductListPage = () => {
           </div>
         </>
       ) : (
-        // Hiển thị thông báo yêu cầu nhập từ khóa nếu searchTerm rỗng
+
         renderPrompt()
       )}
     </div>

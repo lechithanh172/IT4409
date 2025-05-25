@@ -30,7 +30,7 @@ const AdminBrands = () => {
                     message.error('Dữ liệu thương hiệu không hợp lệ.');
                     setBrands([]);
                 }
-            } catch (error) {
+            } catch {
                 message.error('Không thể lấy dữ liệu thương hiệu.');
                 setBrands([]);
             } finally {
@@ -50,7 +50,7 @@ const AdminBrands = () => {
         setSearchedColumn(dataIndex);
     };
 
-    const handleReset = (clearFilters, confirm, dataIndex) => {
+    const handleReset = (clearFilters, confirm) => {
         clearFilters && clearFilters();
         confirm();
         setSearchText('');

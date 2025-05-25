@@ -1,5 +1,5 @@
 import React, { useState, useEffect} from 'react';
-import { Link } from 'react-router-dom'; // Changed from Navigate as we use window.location
+import { Link } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import styles from './forgetPassword.module.css';
 import { FiMail, FiAlertCircle, FiSend } from 'react-icons/fi';
@@ -11,35 +11,35 @@ const ForgetPasswordPage = () => {
         document.title = "Quên mật khẩu | HustShop";
     }, []);
 
-    const { forgetPassword } = useAuth(); // Assuming this sends OTP/email
+    const { forgetPassword } = useAuth();
     const [email, setEmail] = useState('');
-    const [message, setMessage] = useState(''); // For success message
-    const [error, setError] = useState(''); // For error message
+    const [message, setMessage] = useState('');
+    const [error, setError] = useState('');
     const [isLoading, setIsLoading] = useState(false);
-    // State to control when to redirect - ensures message is shown first
+
     const [redirectToReset, setRedirectToReset] = useState('');
 
-    // Use useEffect to handle the redirect AFTER the message is set
+
     useEffect(() => {
         if (redirectToReset) {
-             // ** IMPORTANT: Replace with your actual Reset Password Page URL **
-            const resetPasswordBaseUrl = 'https://lehaanhduc.io.vn/reset-password'; // Example URL
+
+            const resetPasswordBaseUrl = 'https://lehaanhduc.io.vn/reset-password';
             const targetUrlWithEmail = `${resetPasswordBaseUrl}?email=${encodeURIComponent(redirectToReset)}`;
 
             console.log("Redirecting to:", targetUrlWithEmail);
-            // Perform the full page redirect
+
             window.location.href = targetUrlWithEmail;
 
-             // Note: Code below window.location.href might not execute
-             // as the browser immediately navigates.
+
+
         }
-    }, [redirectToReset]); // Dependency array includes redirectToReset
+    }, [redirectToReset]);
 
    const handleSubmit = async (e) => {
         e.preventDefault();
         setMessage('');
         setError('');
-        setRedirectToReset(''); // Clear previous redirect intent
+        setRedirectToReset('');
 
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         const trimmedEmail = email.trim();
@@ -55,25 +55,25 @@ const ForgetPasswordPage = () => {
 
         setIsLoading(true);
         try {
-            // Call the backend API to request OTP/reset link
-            // Assuming forgetPassword sends an email and returns a success indicator/message
+
+
             await forgetPassword(trimmedEmail);
 
-            // On success, set a message and trigger the redirect via state update
+
             setMessage('Yêu cầu đặt lại mật khẩu đã được xử lý. Đang chuyển hướng...');
-            // Set the email to trigger the redirect useEffect
+
             setRedirectToReset(trimmedEmail);
 
 
         } catch (err) {
-            // Handle API errors
+
             console.error("Forget Password Error:", err);
             setError(err.message || 'Có lỗi xảy ra khi gửi yêu cầu. Vui lòng kiểm tra email và thử lại.');
-             // If API fails, stop loading here
+
             setIsLoading(false);
         }
-        // Note: finally block is less predictable with window.location.href
-        // The useEffect handles the success case loading state implicitly by navigating.
+
+
     };
 
     return (
@@ -107,7 +107,7 @@ const ForgetPasswordPage = () => {
                                     placeholder="Email của bạn"
                                     required
                                     className={styles.input}
-                                    disabled={isLoading || !!message} // Disable input while loading or message (redirecting) is shown
+                                    disabled={isLoading || !!message}
                                     aria-invalid={!!error}
                                     aria-describedby={error ? "forget-password-error" : undefined}
                                 />
@@ -131,7 +131,7 @@ const ForgetPasswordPage = () => {
                             type="submit"
                             className={styles.submitButton}
                             variant="gradient"
-                            disabled={isLoading || !!message} // Disable button while loading or redirecting
+                            disabled={isLoading || !!message}
                         >
                             {isLoading ? (
                                 <Spinner size="small" color="#fff" />

@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import styles from './SpecificationTable.module.css'; // Đảm bảo có file CSS này
+import styles from './SpecificationTable.module.css';
 
 const SpecificationTable = ({ specs }) => {
   let parsedSpecs = null;

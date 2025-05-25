@@ -1,31 +1,31 @@
-import React, { useState, useEffect } from 'react'; // Import useState here
+import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { useAuth } from '../../contexts/AuthContext'; // Hook để lấy thông tin user
-import Button from '../../components/Button/Button';     // Component Button
-import Spinner from '../../components/Spinner/Spinner';   // Component Spinner
-import styles from './UserProfilePage.module.css';        // CSS Module cho trang này
-import { FiUser, FiMail, FiPhone, FiMapPin, FiEdit3, FiKey, FiLogOut, FiSave, FiXCircle } from 'react-icons/fi'; // Icons cần thêm Save và Cancel
-import apiService from '../../services/api'; // Import your apiService
+import { useAuth } from '../../contexts/AuthContext';
+import Button from '../../components/Button/Button';
+import Spinner from '../../components/Spinner/Spinner';
+import styles from './UserProfilePage.module.css';
+import { FiUser, FiMail, FiPhone, FiMapPin, FiEdit3, FiKey, FiLogOut, FiSave, FiXCircle } from 'react-icons/fi';
+import apiService from '../../services/api';
 
 const UserProfilePage = () => {
-  const { user, isLoading, updateUser } = useAuth(); // Lấy thêm updateUser nếu AuthContext cung cấp
+  const { user, isLoading, updateUser } = useAuth();
   const navigate = useNavigate();
 
-  // --- State cho chức năng chỉnh sửa ---
-  const [isEditing, setIsEditing] = useState(false); // Trạng thái: đang chỉnh sửa hay không
-  const [formData, setFormData] = useState({ // State lưu dữ liệu đang chỉnh sửa
+
+  const [isEditing, setIsEditing] = useState(false);
+  const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
     phoneNumber: '',
     address: '',
   });
-  const [isUpdating, setIsUpdating] = useState(false); // Trạng thái: đang gửi yêu cầu cập nhật
-  const [updateError, setUpdateError] = useState(null); // State lưu lỗi khi cập nhật
-  const [updateSuccess, setUpdateSuccess] = useState(false); // State lưu trạng thái cập nhật thành công
+  const [isUpdating, setIsUpdating] = useState(false);
+  const [updateError, setUpdateError] = useState(null);
+  const [updateSuccess, setUpdateSuccess] = useState(false);
 
 
-  // --- Effects ---
-  // Effect để đặt lại formData khi user data từ context thay đổi (sau khi load ban đầu hoặc sau khi update thành công)
+
+
   useEffect(() => {
     if (user) {
       setFormData({
@@ -35,84 +35,84 @@ const UserProfilePage = () => {
         address: user.address || '',
       });
     }
-    // Đặt lại trạng thái chỉnh sửa và update khi user data thay đổi (ví dụ sau khi update thành công)
+
      setIsEditing(false);
      setIsUpdating(false);
      setUpdateError(null);
-     setUpdateSuccess(false); // Reset success state
-  }, [user]); // Chạy khi user object thay đổi
+     setUpdateSuccess(false);
+  }, [user]);
 
-  // Effect để set tiêu đề trang
+
   useEffect(() => {
       document.title = "Thông tin cá nhân | HustShop";
   }, []);
 
-  // --- Handlers ---
-  // Bắt đầu chỉnh sửa
+
+
   const handleEditClick = () => {
     setIsEditing(true);
-    setUpdateError(null); // Xóa lỗi cũ nếu có
-    setUpdateSuccess(false); // Reset success state
+    setUpdateError(null);
+    setUpdateSuccess(false);
   };
 
-  // Xử lý thay đổi ở các input field
+
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData({
       ...formData,
       [name]: value,
     });
-     setUpdateError(null); // Xóa lỗi khi người dùng bắt đầu chỉnh sửa lại
-      setUpdateSuccess(false); // Reset success state
+     setUpdateError(null);
+      setUpdateSuccess(false);
   };
 
-  // Lưu thông tin đã chỉnh sửa
+
   const handleSaveClick = async () => {
     setIsUpdating(true);
-    setUpdateError(null); // Xóa lỗi cũ
-    setUpdateSuccess(false); // Reset success
+    setUpdateError(null);
+    setUpdateSuccess(false);
     try {
-      // Gửi dữ liệu cập nhật
-      // Assuming apiService.updateUserInfo expects an object like { firstName, lastName, phoneNumber, address }
+
+
       const updatedUserData = await apiService.updateUserInfo(formData);
 
-      // Cập nhật user data trong AuthContext (nếu AuthContext có hàm updateUser)
-      // Điều này quan trọng để các component khác dùng useAuth thấy data mới ngay lập tức
-      if (updateUser) { // Kiểm tra xem hàm updateUser có tồn tại không
-         updateUser(updatedUserData.data); // Cập nhật user state trong context
+
+
+      if (updateUser) {
+         updateUser(updatedUserData.data);
       } else {
-          // Nếu không có hàm updateUser trong context, bạn có thể cần cách khác
-          // để refresh user data hoặc chấp nhận dữ liệu trong context sẽ cũ
-          // cho đến khi page reload hoặc user login lại.
-          // Đối với ví dụ này, chúng ta sẽ dựa vào effect [user] để tự set lại formData
-          // khi user data trong context thay đổi (nếu có).
+
+
+
+
+
           console.warn("AuthContext does not provide an 'updateUser' function. Profile data in context might not update immediately.");
       }
 
 
-      setUpdateSuccess(true); // Đánh dấu thành công
-      // Tự động thoát khỏi chế độ chỉnh sửa sau 2 giây (hoặc giữ nguyên tùy UX)
+      setUpdateSuccess(true);
+
       setTimeout(() => {
          setIsEditing(false);
-         setUpdateSuccess(false); // Ẩn thông báo thành công
-      }, 2000); // Thoát sau 2 giây
+         setUpdateSuccess(false);
+      }, 2000);
 
     } catch (error) {
       console.error('Error updating profile:', error);
-       // Xử lý lỗi chi tiết hơn nếu API trả về cấu trúc lỗi cụ thể
+
       const errorMessage = error.response?.data?.message || 'Không thể cập nhật thông tin. Vui lòng thử lại.';
       setUpdateError(errorMessage);
-      setUpdateSuccess(false); // Đảm bảo success là false khi có lỗi
-      // Giữ nguyên chế độ chỉnh sửa để người dùng sửa lại
-      setIsEditing(true); // Giữ chế độ edit khi lỗi
+      setUpdateSuccess(false);
+
+      setIsEditing(true);
     } finally {
-      setIsUpdating(false); // Kết thúc quá trình cập nhật
+      setIsUpdating(false);
     }
   };
 
-  // Hủy bỏ chỉnh sửa
+
   const handleCancelClick = () => {
-    // Đặt lại formData về dữ liệu user hiện tại từ context
+
     if (user) {
        setFormData({
         firstName: user.firstName || '',
@@ -121,21 +121,21 @@ const UserProfilePage = () => {
         address: user.address || '',
        });
     }
-    setIsEditing(false); // Thoát chế độ chỉnh sửa
-    setUpdateError(null); // Xóa lỗi
-    setUpdateSuccess(false); // Xóa thông báo thành công
+    setIsEditing(false);
+    setUpdateError(null);
+    setUpdateSuccess(false);
   };
 
 
-   // Hàm xử lý khi nhấn nút đổi mật khẩu (chuyển đến trang đổi mật khẩu)
+
    const handleChangePassword = () => {
-      navigate('/change-password'); // Ví dụ đường dẫn trang đổi mật khẩu
+      navigate('/change-password');
       console.log("Điều hướng đến trang đổi mật khẩu...");
    };
 
 
-  // --- Render trạng thái Loading ban đầu ---
-  // Hiển thị Spinner nếu context đang trong quá trình kiểm tra token ban đầu và chưa có user
+
+
   if (isLoading && !user) {
     return (
       <div className={styles.loadingContainer}>
@@ -144,8 +144,8 @@ const UserProfilePage = () => {
     );
   }
 
-  // --- Render trạng thái nếu không có thông tin user sau khi loading ---
-  // Xảy ra nếu ProtectedRoute không hoạt động đúng hoặc context lỗi sau khi loading
+
+
   if (!user) {
     return (
       <div className={styles.profileContainer}>
@@ -157,7 +157,7 @@ const UserProfilePage = () => {
     );
   }
 
-  // --- Render giao diện Profile khi có dữ liệu user ---
+
   const fullName = `${user.firstName || ''} ${user.lastName || ''}`.trim();
 
   return (
@@ -265,7 +265,7 @@ const UserProfilePage = () => {
                 <span className={styles.infoLabel}>Số điện thoại</span>
                 {isEditing ? (
                    <input
-                     type="text" // Hoặc 'tel'
+                     type="text"
                      name="phoneNumber"
                      value={formData.phoneNumber}
                      onChange={handleInputChange}
@@ -306,22 +306,22 @@ const UserProfilePage = () => {
                             variant="primary"
                             onClick={handleSaveClick}
                             className={styles.actionButton}
-                            disabled={isUpdating} // Disable khi đang cập nhật
+                            disabled={isUpdating}
                         >
                            {isUpdating ? <Spinner size="small" /> : <FiSave />}
                            {isUpdating ? 'Đang lưu...' : 'Lưu thông tin'}
                        </Button>
                        <Button
-                            variant="outline" // Hoặc secondary
+                            variant="outline"
                             onClick={handleCancelClick}
                             className={styles.actionButton}
-                            disabled={isUpdating} // Disable khi đang cập nhật
+                            disabled={isUpdating}
                         >
                             <FiXCircle /> Hủy bỏ
                         </Button>
                     </>
                 ) : (
-                    // Hiển thị nút Chỉnh sửa khi không chỉnh sửa
+
                     <Button
                         variant="secondary"
                         onClick={handleEditClick}
@@ -333,10 +333,10 @@ const UserProfilePage = () => {
 
                 {/* Nút Đổi mật khẩu (luôn hiển thị) */}
                  <Button
-                    variant="outline" // Hoặc secondary
+                    variant="outline"
                     onClick={handleChangePassword}
                     className={styles.actionButton}
-                    disabled={isEditing || isUpdating} // Disable khi đang chỉnh sửa hoặc lưu
+                    disabled={isEditing || isUpdating}
                 >
                     <FiKey /> Đổi mật khẩu
                 </Button>

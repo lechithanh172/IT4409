@@ -5,36 +5,36 @@ import { useAuth } from '../../contexts/AuthContext';
 import { FiUser, FiMail, FiPhone, FiMapPin, FiLock, FiEye, FiEyeOff, FiAlertCircle, FiUserPlus, FiKey } from 'react-icons/fi';
 import Button from '../../components/Button/Button';
 import Spinner from '../../components/Spinner/Spinner';
-import { useLocation } from 'react-router-dom'; // useLocation is correctly imported
-// --- Add this import for react-toastify ---
+import { useLocation } from 'react-router-dom';
+
 import { toast } from 'react-toastify';
-// ----------------------------------------
+
 
 function SignupPage() {
-    // --- FIX START ---
+
     useEffect(() => {
             document.title = "Đăng ký | HustShop";
         }, []);
-    // Uncomment these lines to define location and prefillData
+
     const location = useLocation();
     const prefillData = location.state || {};
-    // --- FIX END ---
+
 
     const [formData, setFormData] = useState({
-        // Use prefillData for initial state, with fallback to '' if not present
+
         username: prefillData.username || '',
-        firstname: prefillData.firstname || '', // Corrected: Use prefillData.firstname
-        lastname: prefillData.lastname || '',   // Added prefill
-        email: prefillData.email || '',         // Added prefill
-        otp: prefillData.otp || '',             // Added prefill
-        phone: prefillData.phone || '',         // Added prefill
-        address: prefillData.address || '',     // Added prefill
-        password: '', // Passwords are typically not prefilled
-        confirmPassword: '', // Passwords are typically not prefilled
+        firstname: prefillData.firstname || '',
+        lastname: prefillData.lastname || '',
+        email: prefillData.email || '',
+        otp: prefillData.otp || '',
+        phone: prefillData.phone || '',
+        address: prefillData.address || '',
+        password: '',
+        confirmPassword: '',
     });
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-    // Keep inline error state for form validation feedback
+
     const [error, setError] = useState('');
     const [isLoading, setIsLoading] = useState(false);
     const { signup } = useAuth();
@@ -43,7 +43,7 @@ function SignupPage() {
     const handleChange = (e) => {
         const { name, value } = e.target;
         setFormData(prev => ({ ...prev, [name]: value }));
-        // Clear error when user starts typing again
+
         if (error) {
             setError('');
         }
@@ -51,46 +51,46 @@ function SignupPage() {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        setError(''); // Clear previous inline error
-        // You might also want to clear toasts here if needed, but usually not necessary
+        setError('');
 
-        // Kiểm tra dữ liệu (Validation)
+
+
         const { username, firstname, lastname, email, otp, phone, address, password, confirmPassword } = formData;
         if (!username || !firstname || !lastname || !email || !otp || !phone || !address || !password || !confirmPassword) {
             const msg = 'Vui lòng nhập đầy đủ thông tin.';
-            setError(msg); // Set inline error
-            toast.error(msg); // Show toast error
+            setError(msg);
+            toast.error(msg);
             return;
         }
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         if (!emailRegex.test(email)) {
             const msg = 'Email không hợp lệ.';
-            setError(msg); // Set inline error
-            toast.error(msg); // Show toast error
+            setError(msg);
+            toast.error(msg);
             return;
         }
         if (!/^\d{6}$/.test(otp)) {
             const msg = 'Mã OTP phải là 6 chữ số.';
-            setError(msg); // Set inline error
-            toast.error(msg); // Show toast error
+            setError(msg);
+            toast.error(msg);
             return;
         }
         if (!/^\d{10,11}$/.test(phone)) {
              const msg = 'Số điện thoại phải có 10-11 chữ số.';
-            setError(msg); // Set inline error
-            toast.error(msg); // Show toast error
+            setError(msg);
+            toast.error(msg);
             return;
         }
         if (password.length < 6) {
             const msg = 'Mật khẩu phải có ít nhất 6 ký tự.';
-            setError(msg); // Set inline error
-            toast.error(msg); // Show toast error
+            setError(msg);
+            toast.error(msg);
             return;
         }
         if (password !== confirmPassword) {
             const msg = 'Mật khẩu và xác nhận mật khẩu không khớp.';
-            setError(msg); // Set inline error
-            toast.error(msg); // Show toast error
+            setError(msg);
+            toast.error(msg);
             return;
         }
 
@@ -100,19 +100,19 @@ function SignupPage() {
             const dataToSend = { ...signupData, role: 'CUSTOMER' };
             await signup(dataToSend);
 
-            // --- Use toast.success for success ---
-            toast.success('Đăng ký tài khoản thành công! Vui lòng đăng nhập.');
-            // ------------------------------------
 
-            // Delay navigation slightly if needed, to let the toast be seen
-            // setTimeout(() => navigate('/login'), 1000); // Optional delay
-            navigate('/login'); // Navigate immediately
+            toast.success('Đăng ký tài khoản thành công! Vui lòng đăng nhập.');
+
+
+
+
+            navigate('/login');
         } catch (err) {
             const msg = err.response?.data?.message || err.message || 'Đăng ký không thành công. Vui lòng thử lại.';
-            setError(msg); // Set inline error
-            // --- Use toast.error for API errors ---
+            setError(msg);
+
             toast.error(msg);
-            // -------------------------------------
+
         } finally {
             setIsLoading(false);
         }

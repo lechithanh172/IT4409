@@ -143,7 +143,9 @@
   width: auto; /* Ensure width is auto for searchDropdownContainer */
   overflow: visible; /* Ensure search dropdown is not clipped */
 }
-
+.dropdownContainer:hover{
+    color: white;
+}
 .chevronIcon {
   transition: transform 0.2s ease;
   font-size: 0.8em;
@@ -260,7 +262,8 @@
 .searchBar {
     display: flex;
     align-items: center;
-    background-color: var(--secondary-color);
+    background-color: var(--card-background, #ffffff);
+    border-color: #cbd5e0;
     border-radius: 20px;
     padding: 2px 5px 2px var(--spacing-sm);
     transition: all 0.2s ease;
@@ -370,8 +373,10 @@
     /* Transition màu chữ nếu cần */
     transition: color 0.2s ease;
 }
-.userNameDesktop.hover {
+.userNameDesktop:hover {
     color:white;
+     font-size: 0.9rem;
+    font-weight: 500;
 }
 /* === Màu tên user khi hover nút user === */
 /* .userButton:hover .userNameDesktop { color: var(--text-color-dark); } */ /* Giữ màu đậm khi hover */

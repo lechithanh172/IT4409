@@ -71,7 +71,7 @@ const VALID_STATUS_TRANSITIONS = {
 function formatDate(isoString) {
   if (!isoString) return "N/A";
   try {
-    const date = new Date(isoString);
+    var date = new Date(isoString);
     if (isNaN(date.getTime())) {
        const parts = isoString.split(' ');
        if(parts.length === 2) {
@@ -194,7 +194,7 @@ const AdminOrder = () => {
              shipperId: order.shipperId,
 
 
-             shipperName: order.shipperId ? 'Đã gán shipper' : 'Chưa gán',
+             shipperName: order.shipperId ? 'Shipper đã nhận đơn' : 'Chưa có',
             formattedCreatedAt: formatDate(order.createdAt),
             paymentMethod: order.paymentMethod || "N/A",
             status: order.status?.toUpperCase() || "PENDING",

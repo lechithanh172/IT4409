@@ -54,8 +54,8 @@ HustShop được xây dựng trên nền tảng công nghệ hiện đại, đ�
 
 - **Spring Boot**: Framework microservice/monolith dựa trên Java.
 - **Java 23**: Ngôn ngữ chính.
-- **[Maven / Gradle]**: Dependency Management & Build Automation.
-- **[Tên Database]**: Cơ sở dữ liệu quan hệ/NoSQL.
+- **Maven**: Dependency Management & Build Automation.
+- **PostgreSQL**: Cơ sở dữ liệu quan hệ.
 - **Spring Data JPA / Hibernate**: ORM layer.
 - **Spring Security**: Authentication & Authorization.
 - **RESTful APIs**: Giao tiếp Frontend-Backend.upload, v.v.]\*\*

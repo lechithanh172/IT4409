@@ -150,11 +150,7 @@ const OrderDetails = ({ orderId, handleRefreshParent }) => {
         setLoadingShipperInfo(true);
         setShipperInfo(null);
         try {
-            const shipperResponse = await apiService.getUserById(shipperId);
-
-            if (shipperResponse?.data) {
-                setShipperInfo(shipperResponse.data);
-            } else {
+            
                 const response = await apiService.getUsersByRole("SHIPPER");
                 if (response && response.data) {
                     const shipperList = response?.data;
@@ -164,7 +160,6 @@ const OrderDetails = ({ orderId, handleRefreshParent }) => {
                      console.warn(`API getUsersByRole did not return valid data for shipper ID ${shipperId}`);
                      setShipperInfo({ username: `Shipper ID ${shipperId} không tìm thấy` });
                 }
-            }
         } catch (error) {
             console.error(`Lỗi tải thông tin shipper ID ${shipperId}:`, error);
             setShipperInfo({ username: "Lỗi tải shipper" });

@@ -462,7 +462,14 @@ body {
     white-space: nowrap;
 
     background: none;
-    border: 1px solid transparent;
+    border: 1px solid #2d3748;
+
+    /* Text Glow/Shadow */
+    /* Creates a blurred shadow around the text */
+    text-shadow:
+        0 0 2px #2d3748, /* Smaller, sharper shadow */
+        0 0 4px #2d3748, /* Medium shadow */
+        0 0 6px #2d3748; /* Larger, softer shadow */
 }
 .mobileMenuToggle {
     display: none;
@@ -543,7 +550,7 @@ body {
     display: block;
     padding: var(--spacing-xs) var(--spacing-sm);
     text-align: center;
-    color: white;
+    color: rgb(0, 102, 255);
     text-decoration: none;
     font-weight: 500;
     transition: background-color 0.2s ease, color 0.2s ease;

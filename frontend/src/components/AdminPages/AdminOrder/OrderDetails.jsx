@@ -123,10 +123,7 @@ const OrderDetails = ({ orderId, handleRefreshParent }) => {
       setLoadingUserInfo(true);
       setCustomerInfo(null);
       try {
-        const userResponse = await apiService.getUserById(userId);
-        if (userResponse?.data) {
-            setCustomerInfo(userResponse.data);
-        } else {
+       
              const customerResponse = await apiService.getUsersByRole("CUSTOMER");
              const customerList = customerResponse?.data;
              if (!Array.isArray(customerList)) {
@@ -134,9 +131,10 @@ const OrderDetails = ({ orderId, handleRefreshParent }) => {
                setCustomerInfo({ username: "Lỗi dữ liệu user" });
                return;
              }
+             console.log(customerResponse?.data);
              const foundUser = customerList.find((user) => user.userId === userId);
              setCustomerInfo(foundUser || { username: `User ID ${userId} không tìm thấy` });
-        }
+        
 
       } catch (error) {
         console.error(`Lỗi tải thông tin customer ID ${userId}:`, error);
@@ -199,6 +197,7 @@ const OrderDetails = ({ orderId, handleRefreshParent }) => {
         if (!orderResponse || !orderResponse.data) {
            throw new Error("Không nhận được dữ liệu đơn hàng hợp lệ.");
         }
+        console.log(orderResponse.data);
         const fetchedOrder = orderResponse.data;
         setOrderData(fetchedOrder);
         setCurrentOrderStatus(fetchedOrder.status?.toUpperCase() || "PENDING");

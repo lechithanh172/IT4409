@@ -43,7 +43,7 @@ const items = [
 
 const Admin = () => {
   useEffect(() => {
-        document.title = "Admin | HustShop";
+        document.title = "Quản lý | HustShop";
     }, []);
   const navigate = useNavigate();
   const [keySelected, setKeySelected] = useState("products");
